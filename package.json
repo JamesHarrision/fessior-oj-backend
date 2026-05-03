@@ -1,37 +1,19 @@
 {
-  "name": "fessior-project-backend",
-  "version": "1.0.0",
-  "main": "index.js",
+  "name": "ocj-monorepo",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "nodemon src/server.ts",
-    "build": "tsc",
-    "start": "node dist/server.js",
-    "lint": "eslint . --ext .ts"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "dependencies": {
-    "cors": "^2.8.6",
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "helmet": "^8.1.0",
-    "mongodb": "^7.2.0",
-    "mongoose": "^9.5.0"
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.6",
-    "@types/node": "^25.6.0",
-    "@typescript-eslint/eslint-plugin": "^8.58.2",
-    "@typescript-eslint/parser": "^8.58.2",
-    "eslint": "^10.2.1",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.5",
-    "nodemon": "^3.1.14",
-    "prettier": "^3.8.3",
-    "ts-node": "^10.9.2",
-    "typescript": "^6.0.3"
+    "turbo": "latest",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0"
   }
 }
