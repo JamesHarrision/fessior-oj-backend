@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "tsx watch src/server.ts",
+    "start": "node dist/server.js",
     "build": "tsc",
+    "lint": "eslint . --ext .ts",
     "db:push": "prisma db push",
     "db:studio": "prisma studio"
   },
@@ -15,12 +17,26 @@
   "devDependencies": {
     "@ocj/tsconfig": "^1.0.0",
     "@ocj/types": "^1.0.0",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/node": "^25.6.0",
+    "@typescript-eslint/eslint-plugin": "^8.59.1",
+    "@typescript-eslint/parser": "^8.59.1",
+    "eslint": "^10.3.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
+    "nodemon": "^3.1.14",
+    "prettier": "^3.8.3",
     "prisma": "5.22",
+    "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
     "typescript": "^6.0.3"
   },
   "dependencies": {
-    "@prisma/client": "^5.22.0"
+    "@prisma/client": "5.22",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "helmet": "^8.1.0"
   }
 }
