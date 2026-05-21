@@ -35,6 +35,10 @@ model RefreshToken {
   user_id    String   @db.VarChar(36)
   user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   expires_at DateTime
+  user_agent   String?  @db.VarChar(500)    
+  ip_address   String?  @db.VarChar(45)      
+  last_used_at DateTime?                    
+  is_revoked   Boolean  @default(false)
   created_at DateTime @default(now())
 
   @@map("refresh_tokens")

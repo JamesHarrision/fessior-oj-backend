@@ -12,5 +12,6 @@ router.post('/logout', requireAuth, validateRequest(refreshTokenSchema), authCon
 router.post('/refresh', validateRequest(refreshTokenSchema), authController.refresh);
 router.get('/me', requireAuth, authController.getMe);
 router.post('/change-password', requireAuth, validateRequest(changePasswordSchema), authController.changePassword);
+router.delete('/sessions/:sessionId', requireAuth, authController.revokeSession);
 
 export default router;

@@ -46,3 +46,16 @@ export const updateUserPassword = async (userId: string, newPasswordHash: string
     data: { password_hash: newPasswordHash },
   });
 };
+
+export const findRefreshTokenById = async (tokenId: string) => {
+  return prisma.refreshToken.findUnique({
+    where: { id: tokenId },
+  });
+};
+
+export const revokeRefreshTokenById = async (tokenId: string) => {
+  return prisma.refreshToken.update({
+    where: { id: tokenId },
+    data: { is_revoked: true },
+  });
+};
