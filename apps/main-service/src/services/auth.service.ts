@@ -144,3 +144,8 @@ export const revokeSession = async (userId: string, sessionId: string) => {
   
   return { message: 'Session revoked successfully' };
 };
+
+export const revokeAllSessions = async (userId: string) => {
+  await authRepo.revokeAllUserSessions(userId);
+  return { message: 'All sessions revoked successfully' };
+};

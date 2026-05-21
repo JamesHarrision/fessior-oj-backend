@@ -105,12 +105,31 @@ export const revokeSession = async (req: Request, res: Response, next: NextFunct
       res.status(400).json({ status: 'Error', message: 'Invalid session ID' });
       return;
     }
-    
+
     await authService.revokeSession(userId, sessionId);
     
     res.status(200).json({
       status: 'Success',
       message: 'Session revoked successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const revokeAllSessions = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      res.status(401).json({ status: 'Error', message: 'Unauthorized' });
+      return;
+    }
+    
+    await authService.revokeAllSessions(userId);
+    
+    res.status(200).json({
+      status: 'Success',
+      message: 'All sessions revoked successfully',
     });
   } catch (error) {
     next(error);
