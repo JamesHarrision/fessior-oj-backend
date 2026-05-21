@@ -135,3 +135,23 @@ export const revokeAllSessions = async (req: Request, res: Response, next: NextF
     next(error);
   }
 };
+
+export const getUserSessions = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      res.status(401).json({ status: 'Error', message: 'Unauthorized' });
+      return;
+    }
+    
+    const data = await authService.getUserSessions(userId);
+    
+    res.status(200).json({
+      status: 'Success',
+      message: 'Sessions retrieved successfully',
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

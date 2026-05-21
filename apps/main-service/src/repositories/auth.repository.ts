@@ -69,3 +69,22 @@ export const revokeAllUserSessions = async (userId: string) => {
     data: { is_revoked: true },
   });
 };
+
+export const getUserSessions = async (userId: string) => {
+  return prisma.refreshToken.findMany({
+    where: {
+      user_id: userId,
+      is_revoked: false,
+      expires_at: { gt: new Date() }, 
+    },
+    orderBy: { created_at: 'desc' },
+    select: {
+      id: true,
+      user_agent: true,
+      ip_address: true,
+      created_at: true,
+      expires_at: true,
+      last_used_at: true,
+    },
+  });
+};
