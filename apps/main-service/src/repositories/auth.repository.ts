@@ -39,3 +39,10 @@ export const deleteRefreshToken = async (token: string) => {
     where: { token },
   });
 };
+
+export const updateUserPassword = async (userId: string, newPasswordHash: string) => {
+  return prisma.user.update({
+    where: { id: userId },
+    data: { password_hash: newPasswordHash },
+  });
+};

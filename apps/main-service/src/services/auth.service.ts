@@ -105,3 +105,32 @@ export const getMe = async (userId: string) => {
   const { password_hash, ...userWithoutPassword } = user;
   return userWithoutPassword;
 };
+
+export const changePassword = async (userId: string, oldPassword: string, newPassword: string) => {
+  // 1. Lấy user từ database
+  const user = await authRepo.findUserById(userId);
+  if (!user) {
+    throw new AppError('User not found', 404);
+  }
+
+  if (!user || !user.password_hash) {
+    throw new AppError('Invalid email or password', 401);
+  }
+
+  // 2. Kiểm tra mật khẩu cũ có đúng không
+  const isPasswordValid = await comparePassword(oldPassword, user.password_hash);
+  if (!isPasswordValid) {
+    throw new AppError('Current password is incorrect', 401);
+  }
+
+  // 3. Hash mật khẩu mới
+  const newPasswordHash = await hashPassword(newPassword);
+
+  // 4. Cập nhật mật khẩu mới vào database
+  await authRepo.updateUserPassword(userId, newPasswordHash);
+
+  // 5. (Khuyến nghị) Revoke tất cả refresh token cũ trừ token hiện tại
+  // TODO: Sẽ thêm sau khi code Revoke All Sessions
+
+  return { message: 'Password changed successfully' };
+};
