@@ -20,6 +20,7 @@ model User {
   updated_at    DateTime @updatedAt
   
   refresh_tokens RefreshToken[]
+  password_reset_tokens PasswordResetToken[]
 
   @@map("users")
 }
@@ -42,4 +43,16 @@ model RefreshToken {
   created_at DateTime @default(now())
 
   @@map("refresh_tokens")
+}
+
+model PasswordResetToken {
+  id         String   @id @default(uuid()) @db.VarChar(36)
+  token      String   @unique @db.VarChar(500)
+  user_id    String   @db.VarChar(36)
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  expires_at DateTime
+  used       Boolean  @default(false)
+  created_at DateTime @default(now())
+
+  @@map("password_reset_tokens")
 }

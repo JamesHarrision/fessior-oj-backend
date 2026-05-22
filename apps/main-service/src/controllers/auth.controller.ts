@@ -155,3 +155,17 @@ export const getUserSessions = async (req: Request, res: Response, next: NextFun
     next(error);
   }
 };
+
+export const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email } = req.body;
+    const result = await authService.forgotPassword(email);
+    
+    res.status(200).json({
+      status: 'Success',
+      message: result.message,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

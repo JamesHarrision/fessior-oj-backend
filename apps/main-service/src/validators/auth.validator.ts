@@ -23,3 +23,7 @@ export const changePasswordSchema = z.object({
 export const revokeSessionParamsSchema = z.object({
   sessionId: z.string().min(1, 'Session ID is required'),
 });
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().email('Invalid email format'),
+});

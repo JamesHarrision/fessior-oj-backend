@@ -88,3 +88,13 @@ export const getUserSessions = async (userId: string) => {
     },
   });
 };
+
+export const createPasswordResetToken = async (userId: string, token: string, expiresAt: Date) => {
+  return prisma.passwordResetToken.create({
+    data: {
+      token,
+      user_id: userId,
+      expires_at: expiresAt,
+    },
+  });
+};

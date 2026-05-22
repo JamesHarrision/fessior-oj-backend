@@ -4,6 +4,8 @@ import { hashPassword, comparePassword } from '../utils/password.util';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/jwt.util';
 import { z } from 'zod';
 import { registerSchema, loginSchema } from '../validators/auth.validator';
+import { v4 as uuidv4 } from 'uuid';
+import { sendResetPasswordEmail } from './email.service';
 
 type RegisterInput = z.infer<typeof registerSchema>;
 type LoginInput = z.infer<typeof loginSchema>;
@@ -153,4 +155,26 @@ export const revokeAllSessions = async (userId: string) => {
 export const getUserSessions = async (userId: string) => {
   const sessions = await authRepo.getUserSessions(userId);
   return { sessions };
+};
+
+export const forgotPassword = async (email: string) => {
+  const user = await authRepo.findUserByEmail(email);
+  if (!user) {
+    return { message: 'If email exists, reset link has been sent' };
+  }
+
+  const resetToken = uuidv4();
+  const expiresAt = new Date();
+  expiresAt.setMinutes(expiresAt.getMinutes() + 15); // Expires in 15 minutes
+
+  await authRepo.createPasswordResetToken(user.id, resetToken, expiresAt);
+
+  try {
+    await sendResetPasswordEmail(email, resetToken);
+  } catch (error) {
+    console.error('Email sending failed:', error);
+    // Do not throw error to avoid revealing email existence
+  }
+
+  return { message: 'If email exists, reset link has been sent' };
 };
