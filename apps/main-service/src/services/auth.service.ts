@@ -126,7 +126,7 @@ export const changePassword = async (userId: string, oldPassword: string, newPas
   const newPasswordHash = await hashPassword(newPassword);
   await authRepo.updateUserPassword(userId, newPasswordHash);
 
-  // TODO: Sẽ thêm sau khi code Revoke All Sessions
+  revokeAllSessions(userId); 
 
   return { message: 'Password changed successfully' };
 };
@@ -173,8 +173,22 @@ export const forgotPassword = async (email: string) => {
     await sendResetPasswordEmail(email, resetToken);
   } catch (error) {
     console.error('Email sending failed:', error);
-    // Do not throw error to avoid revealing email existence
   }
 
   return { message: 'If email exists, reset link has been sent' };
+};
+
+export const resetPassword = async (token: string, newPassword: string) => {
+  const resetToken = await authRepo.findValidResetToken(token);
+  if (!resetToken) {
+    throw new AppError('Invalid or expired reset token', 400);
+  }
+
+  const newPasswordHash = await hashPassword(newPassword);
+
+  await authRepo.updateUserPassword(resetToken.user_id, newPasswordHash);
+  await authRepo.markResetTokenAsUsed(resetToken.id);
+  await authRepo.revokeAllUserSessions(resetToken.user_id);
+
+  return { message: 'Password has been reset successfully' };
 };

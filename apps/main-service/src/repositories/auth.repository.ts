@@ -98,3 +98,20 @@ export const createPasswordResetToken = async (userId: string, token: string, ex
     },
   });
 };
+
+export const findValidResetToken = async (token: string) => {
+  return prisma.passwordResetToken.findFirst({
+    where: {
+      token: token,
+      used: false,
+      expires_at: { gt: new Date() },
+    },
+  });
+};
+
+export const markResetTokenAsUsed = async (tokenId: string) => {
+  return prisma.passwordResetToken.update({
+    where: { id: tokenId },
+    data: { used: true },
+  });
+};

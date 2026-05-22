@@ -169,3 +169,17 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
     next(error);
   }
 };
+
+export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { token, newPassword } = req.body;
+    const result = await authService.resetPassword(token, newPassword);
+    
+    res.status(200).json({
+      status: 'Success',
+      message: result.message,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

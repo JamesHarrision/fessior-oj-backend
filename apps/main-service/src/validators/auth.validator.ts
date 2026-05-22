@@ -27,3 +27,8 @@ export const revokeSessionParamsSchema = z.object({
 export const forgotPasswordSchema = z.object({
   email: z.string().email('Invalid email format'),
 });
+
+export const resetPasswordSchema = z.object({
+  token: z.string().min(1, 'Token is required'),
+  newPassword: z.string().min(6, 'Password must be at least 6 characters').max(100),
+});
