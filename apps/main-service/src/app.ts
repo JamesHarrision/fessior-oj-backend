@@ -4,6 +4,7 @@ import helmet from 'helmet'
 import { prisma } from './config/prisma';
 import authRoutes from './routes/auth.route';
 import problemRoutes from './routes/problem.route';
+import submissionRoutes from './routes/submission.route';
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.use(express.json());
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/problems', problemRoutes);
+app.use('/api/v1/submissions', submissionRoutes);
 
 app.get('/', async (req, res) => {
   const userCount = await prisma.user.findMany();
@@ -22,6 +24,7 @@ app.get('/', async (req, res) => {
     userCount
   })
 });
+
 
 
 export default app;
