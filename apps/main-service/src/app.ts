@@ -5,6 +5,8 @@ import { prisma } from './config/prisma';
 import authRoutes from './routes/auth.route';
 import problemRoutes from './routes/problem.route';
 import submissionRoutes from './routes/submission.route';
+import aiRoutes from './routes/ai.route';
+import leaderboardRoutes from './routes/leaderboard.route';
 
 const app = express();
 
@@ -15,6 +17,9 @@ app.use(express.json());
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/problems', problemRoutes);
 app.use('/api/v1/submissions', submissionRoutes);
+app.use('/api/v1/ai', aiRoutes);
+app.use('/api/v1/leaderboard', leaderboardRoutes);
+
 
 app.get('/', async (req, res) => {
   const userCount = await prisma.user.findMany();

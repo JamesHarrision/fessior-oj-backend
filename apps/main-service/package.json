@@ -37,6 +37,7 @@
     "typescript": "^6.0.3"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@prisma/client": "5.22",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.77.3",
