@@ -16,11 +16,17 @@ model User {
   role          Role     @default(USER)
   elo_rating    Int      @default(1200)
   streak_count  Int      @default(0)
+  max_streak    Int      @default(0)
+  last_active_date DateTime? @db.Date
+  code_coins    Int      @default(0)
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
   
   refresh_tokens RefreshToken[]
   password_reset_tokens PasswordResetToken[]
+  matches_as_p1  Match[]    @relation("Player1")
+  matches_as_p2  Match[]    @relation("Player2")
+  tag_stats      UserTagStat[]
 
   @@map("users")
 }
@@ -56,3 +62,86 @@ model PasswordResetToken {
 
   @@map("password_reset_tokens")
 }
+
+model Match {
+  id             String            @id @default(uuid()) @db.VarChar(36)
+  player1_id     String            @db.VarChar(36)
+  player2_id     String            @db.VarChar(36)
+  problem_id     String            @db.VarChar(24)
+  winner_id      String?           @db.VarChar(36)
+  status         MatchStatus       @default(PENDING)
+  player1_status PlayerMatchStatus @default(CODING)
+  player2_status PlayerMatchStatus @default(CODING)
+  created_at     DateTime          @default(now())
+  updated_at     DateTime          @updatedAt
+
+  player1      User @relation("Player1", fields: [player1_id], references: [id], onDelete: Cascade)
+  player2      User @relation("Player2", fields: [player2_id], references: [id], onDelete: Cascade)
+
+  @@map("matches")
+}
+
+enum MatchStatus {
+  PENDING
+  RUNNING
+  FINISHED
+  DRAW
+}
+
+enum PlayerMatchStatus {
+  CODING
+  SUBMITTED_WA
+  ACCEPTED
+}
+
+model Tag {
+  id         String            @id @default(uuid()) @db.VarChar(36)
+  name       String            @unique @db.VarChar(100)
+  slug       String            @unique @db.VarChar(100)
+  color      String?           @db.VarChar(7)
+  user_stats UserTagStat[]
+  problems   ProblemIndexTag[]
+
+  @@map("tags")
+}
+
+model UserTagStat {
+  user_id         String @db.VarChar(36)
+  tag_id          String @db.VarChar(36)
+  problems_solved Int    @default(0)
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tag_id], references: [id], onDelete: Cascade)
+
+  @@id([user_id, tag_id])
+  @@map("user_tag_stats")
+}
+
+model ProblemIndex {
+  mongo_problem_id String          @id @db.VarChar(24)
+  title            String          @db.VarChar(255)
+  slug             String          @unique @db.VarChar(255)
+  difficulty       Difficulty
+  created_at       DateTime        @default(now())
+  tags             ProblemIndexTag[]
+
+  @@map("problem_index")
+}
+
+model ProblemIndexTag {
+  mongo_problem_id String @db.VarChar(24)
+  tag_id           String @db.VarChar(36)
+
+  problem ProblemIndex @relation(fields: [mongo_problem_id], references: [mongo_problem_id], onDelete: Cascade)
+  tag     Tag          @relation(fields: [tag_id], references: [id], onDelete: Cascade)
+
+  @@id([mongo_problem_id, tag_id])
+  @@map("problem_index_tags")
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
