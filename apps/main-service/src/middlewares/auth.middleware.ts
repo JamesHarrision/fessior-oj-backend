@@ -27,3 +27,12 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction) => 
     return;
   }
 };
+
+export const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
+  if (!req.user || req.user.role !== 'ADMIN') {
+     res.status(403).json({ status: 'Error', message: 'Forbidden: Admin access required' });
+     return;
+  }
+  next();
+};
+
