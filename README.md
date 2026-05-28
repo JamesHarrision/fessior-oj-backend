@@ -1,89 +1,96 @@
 # Hệ thống Chấm điểm Mã nguồn Trực tuyến (Online Code Judge - OCJ)
 
-Đây là một monorepo theo kiến trúc microservices cho nền tảng Online Code Judge, được xây dựng bằng Node.js, Express, Prisma và TurboRepo.
+Đây là monorepo chứa mã nguồn backend của nền tảng **Online Code Judge (OCJ)**, được phát triển trên kiến trúc Microservices sử dụng **Turborepo** và **npm workspaces**. 
 
-## Yêu cầu hệ thống
+Hệ thống hỗ trợ chấm điểm mã nguồn nhiều ngôn ngữ, ghép cặp thi đấu 1v1 realtime theo ELO, hỗ trợ AI phản hồi phỏng vấn và đề xuất lộ trình học thuật.
 
-- [Node.js](https://nodejs.org/) (Khuyến nghị v18+)
-- [Docker](https://www.docker.com/) & Docker Compose
-- npm (Khuyến nghị v10+)
+---
 
-## Cấu trúc Dự án
+## 📂 Tài liệu Hướng dẫn & Tích hợp (Thư mục `AI_SLOP_2`)
 
-- `apps/main-service`: API backend chính sử dụng Express.js và Prisma.
-- `packages/`: Các package dùng chung trong toàn bộ monorepo (ví dụ: types, tsconfig).
-- Hạ tầng (quản lý qua Docker):
-  - **MySQL** (`mysql:8.0` trên cổng `3307`)
-  - **MongoDB** (`mongo:6.0` trên cổng `27017`)
-  - **Redis** (`redis:7-alpine` trên cổng `6379`)
+Trước khi bắt đầu, hãy tham khảo các tài liệu chi tiết sau được lưu trong thư mục `AI_SLOP_2/`:
 
-## Hướng dẫn Cài đặt
+1.  **[completed_features.md](file:///d:/.Learn/Fessior/online-code-judge/AI_SLOP_2/completed_features.md)**: Tổng quan kiến trúc công nghệ và mô tả tất cả tính năng hiện có (Auth & Session, CRUD Problems & Testcases, BullMQ & Worker, Realtime Matchmaking 1v1, Gemini AI).
+2.  **[test_guide.md](file:///d:/.Learn/Fessior/online-code-judge/AI_SLOP_2/test_guide.md)**: Hướng dẫn chạy thử nghiệm hệ thống, cấp quyền ADMIN và chạy script mô phỏng Realtime Solo 1v1.
+3.  **[api_endpoints.md](file:///d:/.Learn/Fessior/online-code-judge/AI_SLOP_2/api_endpoints.md)**: Danh sách đầy đủ các API Endpoints hiện tại (Request, Response, Phân quyền).
+4.  **[suggested_endpoints.md](file:///d:/.Learn/Fessior/online-code-judge/AI_SLOP_2/suggested_endpoints.md)**: Backlog danh sách các API đề xuất phát triển thêm (Custom Rooms, Contests, Comments, Friends, Shop & Coins) để phát triển tiếp.
 
-Làm theo các bước sau để thiết lập và chạy dự án ở môi trường local.
+---
 
-### 1. Cài đặt Thư viện
+## 🛠️ Hướng dẫn Chạy Hệ Thống
 
-Từ thư mục gốc của dự án, cài đặt tất cả các dependencies cho monorepo:
+Bạn có thể chạy hệ thống bằng 2 cách: dùng Docker Compose (Khuyên dùng - Nhanh nhất) hoặc chạy thủ công từng phần để phát triển (Development).
 
-```bash
-npm install
-```
+### CÁCH 1: Chạy toàn bộ hệ thống bằng Docker Compose (Khuyên dùng)
 
-### 2. Khởi chạy Hạ tầng (Databases & Redis)
+Cách này sẽ khởi chạy tất cả 5 dịch vụ (MySQL, MongoDB, Redis, API chính và Worker chấm bài) trong container chỉ với 1 lệnh duy nhất.
 
-Khởi động các cơ sở dữ liệu và dịch vụ caching chạy ngầm bằng Docker Compose. Cấu hình được lấy từ file `.env.docker`.
+1.  **Tạo file cấu hình môi trường**:
+    Sao chép file template cấu hình môi trường từ thư mục gốc:
+    ```bash
+    cp .env.docker.example .env.docker
+    ```
+    *(Mở file `.env.docker` và điền key `GEMINI_API_KEY` nếu muốn thử nghiệm tính năng AI).*
 
-```bash
-docker-compose up -d
-```
+2.  **Khởi động các dịch vụ**:
+    ```bash
+    docker compose up -d --build
+    ```
+    *Dịch vụ chính (API) sẽ lắng nghe tại cổng `http://localhost:6868`. Cơ sở dữ liệu và các tác vụ Prisma migration/sync tự động chạy khi container khởi động.*
 
-### 3. Thiết lập Biến môi trường
+3.  **Kiểm tra logs hoạt động**:
+    *   API chính: `docker compose logs -f main-service`
+    *   Worker chấm bài: `docker compose logs -f worker-service`
 
-Đảm bảo `main-service` đã được cấu hình đúng các biến môi trường. Kiểm tra file `apps/main-service/.env`. 
-Theo mặc định, cấu hình này sẽ khớp với cấu hình Docker ở local:
+4.  **Dừng hệ thống**:
+    ```bash
+    docker compose down
+    ```
 
-```env
-PORT=6868
-DATABASE_URL="mysql://root:ocj_root_secret@localhost:3307/ocj_main_db"
-```
+---
 
-*(Nếu file `.env` không tồn tại, hãy copy từ file `.env.example` sang `.env` và điền các giá trị).*
+### CÁCH 2: Chạy thủ công trên máy (Dành cho việc chỉnh sửa Code)
 
-### 4. Cập nhật Database Schema (Prisma)
+Nếu muốn phát triển và chỉnh sửa mã nguồn trực tiếp (hot-reload), hãy chạy các cơ sở dữ liệu trên Docker và chạy code trên máy thật.
 
-Di chuyển vào thư mục `main-service` để đồng bộ (push) Prisma schema lên cơ sở dữ liệu MySQL đang chạy.
+1.  **Cài đặt thư viện**:
+    Tại thư mục gốc dự án:
+    ```bash
+    npm install
+    ```
 
-```bash
-cd apps/main-service
-npm run db:push
-```
+2.  **Khởi động Databases & Caching**:
+    Chỉ khởi động các dịch vụ hạ tầng trong file `docker-compose.yml`:
+    ```bash
+    docker compose up -d mysql mongodb redis
+    ```
 
-### 5. Chạy Ứng dụng
+3.  **Cấu hình môi trường cho Main Service**:
+    Vào thư mục `apps/main-service/`, tạo file `.env` tương tự `.env.example` và thiết lập kết nối đến localhost:
+    ```env
+    DATABASE_URL="mysql://root:ocj_root_secret@localhost:3307/ocj_main_db"
+    ```
 
-Bạn có thể khởi động development server bằng TurboRepo từ **thư mục gốc**. Lệnh này sẽ chạy kịch bản `dev` song song trên tất cả các ứng dụng.
+4.  **Đồng bộ database schema (Prisma)**:
+    ```bash
+    cd apps/main-service
+    npm run db:push
+    ```
 
-```bash
-# Từ thư mục gốc (online-code-judge)
-npm run dev
-```
+5.  **Chạy dự án ở chế độ Dev**:
+    *   Chạy song song cả API chính và Worker chấm bài từ thư mục gốc:
+        ```bash
+        # Tại thư mục gốc online-code-judge
+        npm run dev
+        ```
+    *   Hoặc chạy riêng lẻ từng dịch vụ:
+        *   API chính: `cd apps/main-service && npm run dev`
+        *   Worker: `cd apps/worker-service && npm run dev`
 
-Hoặc, nếu bạn chỉ muốn chạy riêng main service:
+---
 
-```bash
-cd apps/main-service
-npm run dev
-```
-
-## Các Lệnh Hữu ích Khác
-
-Các lệnh này chạy từ thư mục gốc:
-- `npm run build`: Build toàn bộ workspaces bằng Turbo.
-- `npm run lint`: Chạy lint để kiểm tra lỗi code.
-- `npm run format`: Format lại code bằng Prettier.
-- `docker-compose down`: Dừng và xóa các container Docker.
-
-Để xem cơ sở dữ liệu trực quan bằng Prisma Studio:
-```bash
-cd apps/main-service
-npm run db:studio
-```
+## 📈 Các Lệnh Hữu Ích Khi Dev
+*   `npm run build`: Build toàn bộ monorepo workspaces bằng Turbo.
+*   `npm run lint`: Kiểm tra lỗi cú pháp/style code.
+*   `npm run format`: Tự động format code với Prettier.
+*   `npm run db:studio` (trong thư mục `apps/main-service`): Mở giao diện Prisma Studio trực quan để quản lý dữ liệu MySQL.
