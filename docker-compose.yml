@@ -43,6 +43,38 @@ services:
     volumes:
       - redis_data:/data
 
+  main-service:
+    build:
+      context: .
+      dockerfile: apps/main-service/Dockerfile
+    container_name: ocj_main_service
+    restart: always
+    ports:
+      - "6868:6868"
+    env_file:
+      - .env.docker
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      redis:
+        condition: service_started
+
+  worker-service:
+    build:
+      context: .
+      dockerfile: apps/worker-service/Dockerfile
+    container_name: ocj_worker_service
+    restart: always
+    env_file:
+      - .env.docker
+    depends_on:
+      mongodb:
+        condition: service_started
+      redis:
+        condition: service_started
+
 volumes:
   mysql_data:
   mongo_data:
