@@ -12,9 +12,9 @@ const LANGUAGE_IDS = {
   python: 71, // Python (3.8.1)
 };
 
-const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY || '';
-const RAPIDAPI_HOST = process.env.RAPIDAPI_HOST || 'judge0-ce.p.rapidapi.com';
-const JUDGE0_URL = process.env.JUDGE0_URL || `https://${RAPIDAPI_HOST}`;
+const getRapidApiKey = () => process.env.RAPIDAPI_KEY || '';
+const getRapidApiHost = () => process.env.RAPIDAPI_HOST || 'judge0-ce.p.rapidapi.com';
+const getJudge0Url = () => process.env.JUDGE0_URL || `https://${getRapidApiHost()}`;
 
 const getLanguageId = (lang: 'cpp' | 'java' | 'python'): number => {
   return LANGUAGE_IDS[lang] || 71;
@@ -33,9 +33,12 @@ const executeTestCase = async (
   memory: number;
   error: string | null;
 }> => {
-  const isRapidAPI = JUDGE0_URL.includes('rapidapi.com');
+  const rapidApiKey = getRapidApiKey();
+  const rapidApiHost = getRapidApiHost();
+  const judge0Url = getJudge0Url();
+  const isRapidAPI = judge0Url.includes('rapidapi.com');
 
-  if (isRapidAPI && !RAPIDAPI_KEY) {
+  if (isRapidAPI && !rapidApiKey) {
     // Return mock successful result for testing/offline mode
     console.warn('RAPIDAPI_KEY is not defined. Using offline simulated compilation and test runner.');
     return {
@@ -51,12 +54,12 @@ const executeTestCase = async (
       'Content-Type': 'application/json',
     };
     if (isRapidAPI) {
-      headers['x-rapidapi-key'] = RAPIDAPI_KEY;
-      headers['x-rapidapi-host'] = RAPIDAPI_HOST;
+      headers['x-rapidapi-key'] = rapidApiKey;
+      headers['x-rapidapi-host'] = rapidApiHost;
     }
 
     const response = await axios.post(
-      `${JUDGE0_URL}/submissions?base64_encoded=true&wait=true`,
+      `${judge0Url}/submissions?base64_encoded=true&wait=true`,
       {
         source_code: Buffer.from(code).toString('base64'),
         language_id: languageId,

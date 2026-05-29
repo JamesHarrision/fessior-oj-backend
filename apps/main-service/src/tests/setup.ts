@@ -25,6 +25,11 @@ if (fs.existsSync(dockerEnvPath)) {
   }
 }
 
+// Nếu URL trỏ đến host.docker.internal (trong môi trường docker), chuyển thành localhost để chạy ở host
+if (process.env.JUDGE0_URL === 'http://host.docker.internal:2358') {
+  process.env.JUDGE0_URL = 'http://localhost:2358';
+}
+
 beforeAll(async () => {
   // Kết nối MongoDB nếu chưa kết nối
   const mongoUri = process.env.MONGO_URI || 'mongodb://mongoadmin:mongosecret@localhost:27017/ocj_database_test?authSource=admin';
