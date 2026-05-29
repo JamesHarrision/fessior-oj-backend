@@ -18,6 +18,7 @@ describe('Custom Rooms & Matches Integration Tests', () => {
     // 1. Clean up database
     await prisma.customRoom.deleteMany({});
     await prisma.match.deleteMany({});
+    await prisma.problemIndex.deleteMany({});
     await prisma.user.deleteMany({});
     await Problem.deleteMany({});
 
@@ -75,6 +76,7 @@ describe('Custom Rooms & Matches Integration Tests', () => {
   afterAll(async () => {
     await prisma.customRoom.deleteMany({});
     await prisma.match.deleteMany({});
+    await prisma.problemIndex.deleteMany({});
     await prisma.user.deleteMany({});
     await Problem.deleteMany({});
   });
