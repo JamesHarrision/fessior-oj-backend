@@ -12,6 +12,7 @@ import matchRoutes from './routes/match_history.route';
 import contestRoutes from './routes/contest.route';
 import commentRoutes from './routes/comment.route';
 import friendshipRoutes from './routes/friendship.route';
+import shopRoutes from './routes/shop.route';
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use('/api/v1/matches', matchRoutes);
 app.use('/api/v1/contests', contestRoutes);
 app.use('/api/v1/comments', commentRoutes);
 app.use('/api/v1/friends', friendshipRoutes);
+app.use('/api/v1/shop', shopRoutes);
 
 
 app.get('/', async (req, res) => {
