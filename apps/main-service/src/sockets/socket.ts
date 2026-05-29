@@ -41,7 +41,9 @@ export const initSocket = (socketIoServer: Server) => {
   });
 
   io.on('connection', (socket: Socket) => {
-    console.log(`Socket connected: ${socket.id} (User: ${socket.data.user.userId})`);
+    const connUserId = socket.data.user.userId;
+    console.log(`Socket connected: ${socket.id} (User: ${connUserId})`);
+    redis.sadd('online_users', connUserId).catch(err => console.error(err));
 
     // Matchmaking Join Queue
     socket.on('join-queue', async () => {
@@ -103,6 +105,7 @@ export const initSocket = (socketIoServer: Server) => {
     socket.on('disconnect', () => {
       console.log(`Socket disconnected: ${socket.id}`);
       removeUserFromQueue(socket.data.user.userId);
+      redis.srem('online_users', socket.data.user.userId).catch(err => console.error(err));
     });
   });
 
