@@ -9,6 +9,7 @@ import aiRoutes from './routes/ai.route';
 import leaderboardRoutes from './routes/leaderboard.route';
 import roomRoutes from './routes/room.route';
 import matchRoutes from './routes/match_history.route';
+import contestRoutes from './routes/contest.route';
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use('/api/v1/ai', aiRoutes);
 app.use('/api/v1/leaderboard', leaderboardRoutes);
 app.use('/api/v1/rooms', roomRoutes);
 app.use('/api/v1/matches', matchRoutes);
+app.use('/api/v1/contests', contestRoutes);
 
 
 app.get('/', async (req, res) => {
