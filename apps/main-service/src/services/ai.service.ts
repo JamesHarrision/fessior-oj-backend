@@ -70,7 +70,7 @@ export class AIService {
 
     try {
       const model = this.genAI.getGenerativeModel({
-        model: 'gemini-1.5-flash',
+        model: 'gemini-2.5-flash',
         generationConfig: { responseMimeType: 'application/json' },
       });
 
@@ -129,7 +129,7 @@ export class AIService {
       feedback = this.getSimulatedInterviewerFeedback(submission, problem);
     } else {
       try {
-        const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const model = this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
         const prompt = `
           You are a professional software engineer conducting a mock coding interview.
           The candidate is solving the problem "${problem.title}".

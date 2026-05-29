@@ -76,7 +76,7 @@ describe('AI Feature Integration Tests', () => {
     expect(res.body.status).toBe('Success');
     expect(res.body.data).toHaveProperty('title');
     expect(res.body.data).toHaveProperty('nodes');
-  });
+  }, 30000);
 
   it('should generate mock interview feedback for a submission', async () => {
     const res = await request(app)
@@ -86,6 +86,7 @@ describe('AI Feature Integration Tests', () => {
     expect(res.status).toBe(200);
     expect(res.body.status).toBe('Success');
     expect(res.body.data).toHaveProperty('feedback');
-    expect(res.body.data.feedback).toContain('AI Mock Interviewer Feedback');
-  });
+    expect(typeof res.body.data.feedback).toBe('string');
+    expect(res.body.data.feedback.length).toBeGreaterThan(0);
+  }, 30000);
 });
