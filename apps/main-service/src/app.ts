@@ -10,6 +10,7 @@ import leaderboardRoutes from './routes/leaderboard.route';
 import roomRoutes from './routes/room.route';
 import matchRoutes from './routes/match_history.route';
 import contestRoutes from './routes/contest.route';
+import commentRoutes from './routes/comment.route';
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use('/api/v1/leaderboard', leaderboardRoutes);
 app.use('/api/v1/rooms', roomRoutes);
 app.use('/api/v1/matches', matchRoutes);
 app.use('/api/v1/contests', contestRoutes);
+app.use('/api/v1/comments', commentRoutes);
 
 
 app.get('/', async (req, res) => {

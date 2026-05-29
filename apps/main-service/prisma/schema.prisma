@@ -216,17 +216,18 @@ model ContestRegistration {
 
 // 3. Comments & Discussions
 model Comment {
-  id               String   @id @default(uuid()) @db.VarChar(36)
-  mongo_problem_id String   @db.VarChar(24)
-  user_id          String   @db.VarChar(36)
-  content          String   @db.Text
-  parent_id        String?  @db.VarChar(36)
-  created_at       DateTime @default(now())
-  updated_at       DateTime @updatedAt
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  target_id   String   @db.VarChar(36)
+  target_type String   @db.VarChar(20) @default("PROBLEM")
+  user_id     String   @db.VarChar(36)
+  content     String   @db.Text
+  parent_id   String?  @db.VarChar(36)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
-  parent           Comment? @relation("Replies", fields: [parent_id], references: [id], onDelete: Cascade)
-  replies          Comment[] @relation("Replies")
-  likes            CommentLike[]
+  parent      Comment? @relation("Replies", fields: [parent_id], references: [id], onDelete: Cascade)
+  replies     Comment[] @relation("Replies")
+  likes       CommentLike[]
 
   @@map("comments")
 }
