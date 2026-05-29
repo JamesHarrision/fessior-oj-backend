@@ -33,7 +33,9 @@ const executeTestCase = async (
   memory: number;
   error: string | null;
 }> => {
-  if (!RAPIDAPI_KEY) {
+  const isRapidAPI = JUDGE0_URL.includes('rapidapi.com');
+
+  if (isRapidAPI && !RAPIDAPI_KEY) {
     // Return mock successful result for testing/offline mode
     console.warn('RAPIDAPI_KEY is not defined. Using offline simulated compilation and test runner.');
     return {
@@ -45,6 +47,14 @@ const executeTestCase = async (
   }
 
   try {
+    const headers: any = {
+      'Content-Type': 'application/json',
+    };
+    if (isRapidAPI) {
+      headers['x-rapidapi-key'] = RAPIDAPI_KEY;
+      headers['x-rapidapi-host'] = RAPIDAPI_HOST;
+    }
+
     const response = await axios.post(
       `${JUDGE0_URL}/submissions?base64_encoded=true&wait=true`,
       {
@@ -54,13 +64,7 @@ const executeTestCase = async (
         expected_output: Buffer.from(expectedOutput).toString('base64'),
         cpu_time_limit: timeLimitMs / 1000,
       },
-      {
-        headers: {
-          'x-rapidapi-key': RAPIDAPI_KEY,
-          'x-rapidapi-host': RAPIDAPI_HOST,
-          'Content-Type': 'application/json',
-        },
-      }
+      { headers }
     );
 
     const result = response.data;
