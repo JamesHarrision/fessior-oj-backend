@@ -14,6 +14,7 @@ import commentRoutes from './routes/comment.route';
 import friendshipRoutes from './routes/friendship.route';
 import shopRoutes from './routes/shop.route';
 import notificationRoutes from './routes/notification.route';
+import reportRoutes from './routes/report.route';
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.use('/api/v1/comments', commentRoutes);
 app.use('/api/v1/friends', friendshipRoutes);
 app.use('/api/v1/shop', shopRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
+app.use('/api/v1/reports', reportRoutes);
 
 
 app.get('/', async (req, res) => {
