@@ -16,14 +16,19 @@ Mở terminal tại thư mục `apps/main-service` và chạy:
 ```bash
 npm run test
 ```
-*Lệnh này sẽ tự động khởi chạy và chạy tuần tự 7 suite kiểm thử:*
-1.  **Custom Rooms**: `src/tests/room.test.ts`
-2.  **Contests**: `src/tests/contest.test.ts`
-3.  **Comments**: `src/tests/comment.test.ts`
-4.  **Friends**: `src/tests/friendship.test.ts`
-5.  **Shop & Equip**: `src/tests/shop.test.ts`
-6.  **Notifications**: `src/tests/notification.test.ts`
-7.  **Reports**: `src/tests/report.test.ts`
+*Lệnh này sẽ tự động khởi chạy và chạy tuần tự 12 suite kiểm thử bao phủ toàn bộ hệ thống:*
+1.  **Auth & Session**: `src/tests/auth.test.ts`
+2.  **Problems & Tags**: `src/tests/problem.test.ts`
+3.  **Submissions & BullMQ**: `src/tests/submission.test.ts`
+4.  **Leaderboard & ELO**: `src/tests/leaderboard.test.ts`
+5.  **AI (Roadmap & Interview Feedback)**: `src/tests/ai.test.ts`
+6.  **Custom Rooms**: `src/tests/room.test.ts`
+7.  **Contests**: `src/tests/contest.test.ts`
+8.  **Comments & Discussions**: `src/tests/comment.test.ts`
+9.  **Friends & Social**: `src/tests/friendship.test.ts`
+10. **Shop & Equip**: `src/tests/shop.test.ts`
+11. **Notifications**: `src/tests/notification.test.ts`
+12. **Reports & Flagging**: `src/tests/report.test.ts`
 
 ### 3. Chạy một Test Suite đơn lẻ:
 Để chạy kiểm thử duy nhất một tính năng cụ thể (ví dụ: Shop):

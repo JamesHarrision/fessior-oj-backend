@@ -14,7 +14,7 @@ export const generateAccessToken = (payload: JwtPayload): string => {
 };
 
 export const generateRefreshToken = (payload: JwtPayload): string => {
-  return jwt.sign(payload, REFRESH_SECRET, { expiresIn: '7d' });
+  return jwt.sign({ ...payload, jti: Math.random().toString(36).substring(7) }, REFRESH_SECRET, { expiresIn: '7d' });
 };
 
 export const verifyAccessToken = (token: string): JwtPayload => {
