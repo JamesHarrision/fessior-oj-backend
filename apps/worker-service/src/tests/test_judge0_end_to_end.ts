@@ -20,10 +20,10 @@ if (fs.existsSync(dockerEnvPath)) {
 }
 
 // Override connection settings for running on the host machine
-process.env.MONGO_URI = 'mongodb://mongoadmin:mongosecret@localhost:27017/ocj_database?authSource=admin';
-process.env.REDIS_HOST = 'localhost';
+process.env.MONGO_URI = 'mongodb://mongoadmin:mongosecret@127.0.0.1:27017/ocj_database?authSource=admin';
+process.env.REDIS_HOST = '127.0.0.1';
 process.env.REDIS_PORT = '6379';
-process.env.JUDGE0_URL = 'https://ce.judge0.com';
+process.env.JUDGE0_URL = 'http://127.0.0.1:2358';
 process.env.RAPIDAPI_KEY = ''; // Force direct Judge0 connection bypassing RapidAPI
 
 console.log('--- E2E TEST CONFIGURATION ---');
