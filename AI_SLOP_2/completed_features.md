@@ -25,67 +25,63 @@ Dự án được xây dựng dưới dạng **Monorepo** sử dụng công cụ
 ### A. Hệ Thống Xác Thực & Quản Lý Phiên (Authentication & Sessions)
 *   **Đăng ký & Đăng nhập (Register & Login)**:
     *   Mã hóa mật khẩu bằng `bcrypt`.
-    *   Cấp cặp mã thông báo JWT: **Access Token** (hết hạn ngắn) và **Refresh Token** (lưu database MySQL để duy trì trạng thái đăng nhập).
+    *   Cập nhật cặp mã thông báo JWT: **Access Token** và **Refresh Token**.
 *   **Quản lý Phiên Hoạt Động (Session Management)**:
-    *   Ghi nhận địa chỉ IP, User-Agent và thời điểm tương tác cuối cùng của mỗi phiên hoạt động.
-    *   Cho phép người dùng xem danh sách các phiên đăng nhập đang hoạt động.
-    *   Cho phép đăng xuất đơn lẻ, thu hồi một phiên cụ thể (Revoke Session), hoặc thu hồi toàn bộ các phiên hoạt động khác để bảo mật (Revoke All Sessions).
+    *   Ghi nhận địa chỉ IP, User-Agent và thời điểm tương tác của phiên.
+    *   Xem danh sách các phiên đăng nhập, thu hồi một phiên (Revoke Session) hoặc toàn bộ các phiên khác.
 *   **Khôi phục Mật khẩu (Password Recovery)**:
-    *   Yêu cầu đổi mật khẩu khi đang đăng nhập (Change Password).
-    *   Yêu cầu đặt lại mật khẩu qua email khi quên mật khẩu (Forgot/Reset Password): Tạo token khôi phục dùng 1 lần (hạn 15 phút) và gửi link qua email (Sử dụng `nodemailer`).
+    *   Yêu cầu đổi mật khẩu khi đang đăng nhập (Change Password) hoặc đặt lại mật khẩu qua email khi quên mật khẩu (Forgot/Reset Password) qua `nodemailer`.
 
 ### B. Quản Lý Bài Tập & Kiểm Thử (Problem & Testcase Management)
-*   **Quản lý Thẻ phân loại (Tags)**:
-    *   Admin có thể tạo mới thẻ (ví dụ: `Dynamic Programming`, `Greedy`, `Array`).
-    *   Người dùng có thể liệt kê toàn bộ thẻ.
-*   **Quản lý Bài tập (Problems)**:
-    *   CRUD bài tập (chỉ dành cho Admin). Thông tin lưu trong MongoDB bao gồm: Tiêu đề, Slug, Mô tả (Markdown), Độ khó (`EASY`, `MEDIUM`, `HARD`), Giới hạn thời gian (ms), Giới hạn bộ nhớ (MB), Starter Codes mẫu (C++, Java, Python), Lời giải chi tiết (Editorial Markdown/Video URL).
-    *   Tự động đồng bộ hóa thông tin cơ bản sang bảng `problem_index` trong MySQL để tối ưu hóa việc query và lọc danh sách bài tập.
-*   **Quản lý Testcase**:
-    *   Thêm/Xóa testcase cho một bài tập cụ thể.
-    *   Cấu hình testcase làm ví dụ minh họa (`isExample: true` hiện mô tả đề bài) hoặc ẩn đi để làm bài test chấm điểm (`isExample: false`).
+*   **Quản lý Thẻ phân loại (Tags)**: Admin tạo mới thẻ tag, người dùng liệt kê danh sách tag.
+*   **Quản lý Bài tập (Problems)**: CRUD bài tập lưu trữ trong MongoDB và tự động đồng bộ hóa thông tin cơ bản sang bảng `problem_index` trong MySQL phục vụ tìm kiếm/lọc.
+*   **Quản lý Testcase**: Cấu hình các testcase ví dụ (`isExample: true`) hoặc ẩn làm test chấm điểm (`isExample: false`).
 
 ### C. Nộp Bài & Chấm Điểm Tự Động (Submissions & Judge Worker)
-*   **Tiến trình Nộp bài**:
-    *   Người dùng gửi code lên kèm ID bài tập và ngôn ngữ lựa chọn (C++, Java, Python).
-    *   Hệ thống tạo bản ghi nộp bài ở trạng thái `PENDING` trong MongoDB và đưa tác vụ vào hàng đợi `submission_queue` qua BullMQ.
+*   **Tiến trình Nộp bài**: Tạo bản ghi nộp bài ở trạng thái `PENDING` và đẩy job vào hàng đợi BullMQ.
 *   **Dịch vụ Worker chấm bài (worker-service)**:
-    *   Chạy độc lập để lắng nghe hàng đợi BullMQ.
-    *   Khi nhận được bài nộp, cập nhật trạng thái thành `PROCESSING`.
-    *   Lấy toàn bộ danh sách testcase ẩn của bài tập từ MongoDB.
-    *   Gửi từng testcase tuần tự qua API của Judge0 để biên dịch và chạy thử code.
-    *   Kiểm tra kết quả trả về từ Judge0 để xác định kết quả: `ACCEPTED` (Đạt), `WA` (Sai kết quả), `TLE` (Quá thời hạn chạy), `MLE` (Tràn bộ nhớ), `RE` (Lỗi runtime), hoặc `CE` (Lỗi biên dịch).
-    *   Cập nhật trạng thái bài nộp, số lượng testcase vượt qua, thời gian chạy tối đa, bộ nhớ tiêu thụ tối đa và chi tiết lỗi biên dịch nếu có.
-    *   **Simulation Mode (Dev)**: Nếu chưa cấu hình `RAPIDAPI_KEY`, Worker tự động chạy ở chế độ giả lập (luôn trả về ACCEPTED) giúp lập trình viên kiểm thử luồng code offline dễ dàng.
-    *   Sau khi chấm xong, Worker phát thông điệp (Publish) trạng thái kết quả bài nộp lên Redis channel `submission-updates` phục vụ realtime.
+    *   Chạy bất đồng bộ, cập nhật trạng thái `PROCESSING`.
+    *   Biên dịch và chạy thử code qua Judge0 API, so sánh đầu ra để trả về: `ACCEPTED`, `WA`, `TLE`, `MLE`, `RE`, `CE`.
+    *   Phát kết quả chấm bài qua Redis Pub/Sub lên channel `submission-updates`.
 
 ### D. Thi Đấu Solo 1vs1 Thời Gian Thực (Realtime Matchmaking 1v1)
-Đây là tính năng điểm nhấn của hệ thống, cho phép hai người dùng thi đấu giải bài tập trực tuyến với nhau.
-*   **Hàng đợi ghép cặp (Matchmaking Queue)**:
-    *   Người dùng kết nối và xác thực Socket.io bằng JWT.
-    *   Gửi sự kiện `join-queue` để vào hàng đợi. Hệ thống tự lấy thông tin ELO hiện tại của người chơi trong MySQL.
-*   **Thuật toán Ghép cặp theo ELO**:
-    *   Khi hàng đợi có từ 2 người trở lên, hệ thống sắp xếp danh sách theo ELO và ghép cặp 2 người có khoảng cách điểm ELO gần nhất với nhau để đảm bảo công bằng.
-*   **Tiến trình trận đấu (Match Lifecycle)**:
-    *   Khi tìm thấy đối thủ, hệ thống chọn ngẫu nhiên một bài tập từ MongoDB, tạo bản ghi `Match` với trạng thái `PENDING` trong MySQL.
-    *   Tự động đưa socket của 2 đối thủ vào phòng chat chung `match:${match.id}`.
-    *   Gửi sự kiện `match-found` kèm đầy đủ đề bài, code mẫu và thông tin đối thủ.
-    *   **Đồng bộ realtime**: Khi một người chơi nộp bài và worker chấm xong, hệ thống nhận tín hiệu qua Redis Pub/Sub và phát sự kiện `rival-submission` đến người chơi còn lại để cập nhật tiến trình làm bài của đối thủ (ví dụ: Đối thủ đã pass `5/10` testcases).
-    *   **Xử lý thắng cuộc**: Người đầu tiên nhận kết quả `ACCEPTED` cho bài nộp sẽ thắng trận đấu. Hệ thống sẽ:
-        *   Cập nhật trạng thái Match thành `FINISHED`.
-        *   Tự động cộng `+25` ELO cho người thắng và cập nhật chuỗi thắng (Streak).
-        *   Tự động trừ `-15` ELO của người thua (ELO tối thiểu là 800) và reset chuỗi thắng về 0.
-        *   Thông báo kết quả `match-ended` kèm cập nhật ELO cho cả phòng đấu.
-    *   **Xin hàng (Forfeit)**: Người chơi có thể chọn xin thua giữa trận đấu bằng cách gửi sự kiện `forfeit-match`, đối thủ sẽ tự động được xử thắng và nhận ELO.
+*   **Hàng đợi ghép cặp**: Người chơi gửi sự kiện `join-queue` qua Socket.io.
+*   **Thuật toán Ghép cặp**: Ghép cặp 2 người có khoảng cách điểm ELO gần nhất.
+*   **Trận đấu (Match Lifecycle)**: Chọn bài tập ngẫu nhiên, tự động join room socket `match:${match.id}`, đồng bộ tiến trình làm bài của đối thủ và cộng/trừ ELO (thắng +25, thua -15), cập nhật streak thắng.
 
 ### E. Tích Hợp AI Trí Tuệ Nhân Tạo (AI Features)
-*   **Vẽ Lộ trình học tập (Roadmap Generator)**:
-    *   Nhận thông tin chủ đề lập trình hoặc mục tiêu học tập từ người dùng.
-    *   Sử dụng Gemini AI thiết lập một lộ trình học tập chi tiết, chia thành các chặng kèm các bài tập thực hành.
-*   **Đánh giá bài làm & Phản hồi Phỏng vấn (Mock Interview Feedback)**:
-    *   Nhận thông tin mã nguồn của một bài nộp cụ thể (`submissionId`).
-    *   Gemini AI phân tích thuật toán, tính tối ưu của mã nguồn về mặt độ phức tạp thời gian/không gian ($O(N)$), nhận xét lỗi sai, hướng dẫn cải tiến và đưa ra các câu hỏi phỏng vấn gợi mở liên quan trực tiếp đến bài tập đó để rèn luyện tư duy.
+*   **Vẽ Lộ trình học tập (Roadmap Generator)**: Gemini AI sinh lộ trình học DSA tự động dựa trên trình độ người chơi.
+*   **Đánh giá bài làm & Phản hồi Phỏng vấn (Mock Interview Feedback)**: Gemini AI nhận xét độ phức tạp của code bài nộp, hướng dẫn cải tiến và đưa câu hỏi phỏng vấn giả định.
 
 ### F. Bảng Xếp Hạng (Leaderboard)
-*   Liệt kê danh sách người dùng sắp xếp giảm dần theo điểm **ELO Rating**.
-*   Hỗ trợ phân trang phục vụ xây dựng giao diện hiển thị vinh danh.
+*   Liệt kê danh sách người dùng sắp xếp giảm dần theo điểm **ELO Rating** (phân trang).
+
+### G. Phòng Đấu Tùy Chỉnh (Custom Rooms)
+*   Cho phép người chơi tự tạo phòng đấu 1v1 riêng tư (`POST /api/v1/rooms/create`), gửi mã phòng cho bạn bè tham gia.
+*   Chủ phòng có quyền cập nhật cấu hình phòng (độ khó, thời gian đấu) hoặc hủy phòng.
+*   Đồng bộ socket cho phép bắt đầu trận đấu tùy chỉnh sau khi có đối thủ tham gia.
+
+### H. Giải Đấu & Cuộc Thi (Contests)
+*   Quản lý cuộc thi (đăng ký tham gia, xem danh sách bài tập, xem lịch sử nộp bài trong khuôn khổ contest).
+*   **Bảng xếp hạng Contest**: Tự động tổng hợp điểm số và thời gian penalty của tất cả thí sinh tham dự thời gian thực.
+
+### I. Thảo Luận & Bình Luận (Discussions & Comments)
+*   Bình luận đa diện (polymorphic) trên nhiều đối tượng (Problems, Contests, Discussions).
+*   Hỗ trợ bình luận phân cấp dạng cây (Threaded Replies), lượt thích bình luận (Likes).
+
+### J. Bạn Bè & Mạng Xã Hội (Social & Friends)
+*   Gửi, chấp nhận, từ chối yêu cầu kết bạn, hủy kết bạn.
+*   **Theo dõi Trạng thái Online/Offline**: Tích hợp Redis `online_users` và sự kiện socket kết nối/ngắt kết nối giúp lấy danh sách bạn bè kèm trạng thái hoạt động thực tế.
+
+### K. Cửa Hàng & Kho Đồ Cá Nhân (Shop & Inventory)
+*   Admin đăng bán vật phẩm (Avatar Frames, Themes).
+*   Người dùng mua vật phẩm bằng `code_coins` qua giao dịch an toàn (Prisma Transaction).
+*   Xem kho đồ cá nhân, trang bị/hủy trang bị vật phẩm ảo (ví dụ: Avatar Frame) và hiển thị lên profile.
+
+### L. Thông Báo Hệ Thống (Notifications)
+*   Gửi thông báo hệ thống và thông báo cá nhân (kết bạn, kết quả thi đấu).
+*   **Realtime Push**: Tích hợp Socket.io, đẩy thông báo thời gian thực tới room riêng tư `user:${userId}` của người nhận.
+
+### M. Báo Cáo & Góp Ý (Reports & Feedback)
+*   Người dùng gửi báo cáo lỗi hệ thống, đề bài sai hoặc hành vi gian lận (Target type: USER, PROBLEM, COMMENT).
+*   Admin kiểm tra danh sách báo cáo toàn hệ thống, cập nhật trạng thái xử lý (`PENDING`, `RESOLVED`, `REJECTED`).

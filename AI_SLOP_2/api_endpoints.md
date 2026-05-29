@@ -19,25 +19,9 @@ Hệ thống cung cấp các API RESTful phục vụ cho giao diện Frontend. T
 *   **Request Body**:
     ```json
     {
-      "username": "user123", // String, min 3, max 50 (Bắt buộc)
-      "email": "user@example.com", // String, email format (Bắt buộc)
-      "password": "SecretPassword123" // String, min 6, max 100 (Bắt buộc)
-    }
-    ```
-*   **Response mẫu (201 Created)**:
-    ```json
-    {
-      "id": "12345678-abcd-ef01-2345-6789abcdef01",
       "username": "user123",
       "email": "user@example.com",
-      "avatar_url": null,
-      "role": "USER",
-      "elo_rating": 1200,
-      "streak_count": 0,
-      "max_streak": 0,
-      "code_coins": 0,
-      "created_at": "2026-05-28T06:00:00.000Z",
-      "updated_at": "2026-05-28T06:00:00.000Z"
+      "password": "SecretPassword123"
     }
     ```
 
@@ -47,136 +31,14 @@ Hệ thống cung cấp các API RESTful phục vụ cho giao diện Frontend. T
 *   **Request Body**:
     ```json
     {
-      "email": "user@example.com", // String, email format (Bắt buộc)
-      "password": "SecretPassword123" // String (Bắt buộc)
-    }
-    ```
-*   **Response mẫu (200 OK)**:
-    ```json
-    {
-      "user": {
-        "id": "12345678-abcd-ef01-2345-6789abcdef01",
-        "username": "user123",
-        "email": "user@example.com",
-        "avatar_url": null,
-        "role": "USER",
-        "elo_rating": 1200
-      },
-      "accessToken": "eyJhbGciOi...",
-      "refreshToken": "eyJhbGciOi..."
+      "email": "user@example.com",
+      "password": "SecretPassword123"
     }
     ```
 
 ### Đăng xuất (Logout)
 *   **Endpoint**: `POST /api/v1/auth/logout`
 *   **Phân quyền**: User
-*   **Request Body**:
-    ```json
-    {
-      "refreshToken": "eyJhbGciOi..." // Refresh token cần thu hồi (Bắt buộc)
-    }
-    ```
-*   **Response mẫu (200 OK)**:
-    ```json
-    {
-      "status": "Success",
-      "message": "Logged out successfully"
-    }
-    ```
-
-### Làm mới token (Refresh Token)
-*   **Endpoint**: `POST /api/v1/auth/refresh`
-*   **Phân quyền**: Public
-*   **Request Body**:
-    ```json
-    {
-      "refreshToken": "eyJhbGciOi..." // Refresh token hiện tại (Bắt buộc)
-    }
-    ```
-*   **Response mẫu (200 OK)**:
-    ```json
-    {
-      "accessToken": "eyJhbGciOi_new..."
-    }
-    ```
-
-### Lấy thông tin cá nhân (Get Current User)
-*   **Endpoint**: `GET /api/v1/auth/me`
-*   **Phân quyền**: User
-*   **Response mẫu (200 OK)**:
-    ```json
-    {
-      "id": "12345678-abcd-ef01-2345-6789abcdef01",
-      "username": "user123",
-      "email": "user@example.com",
-      "role": "USER",
-      "elo_rating": 1200,
-      "streak_count": 0,
-      "max_streak": 0
-    }
-    ```
-
-### Đổi mật khẩu (Change Password)
-*   **Endpoint**: `POST /api/v1/auth/change-password`
-*   **Phân quyền**: User
-*   **Request Body**:
-    ```json
-    {
-      "oldPassword": "SecretPassword123", // String (Bắt buộc)
-      "newPassword": "NewSecretPassword456" // String, min 6, max 100 (Bắt buộc)
-    }
-    ```
-
-### Lấy danh sách phiên đăng nhập (Get User Sessions)
-*   **Endpoint**: `GET /api/v1/auth/sessions`
-*   **Phân quyền**: User
-*   **Response mẫu (200 OK)**:
-    ```json
-    {
-      "sessions": [
-        {
-          "id": "session-uuid",
-          "token": "eyJ...",
-          "user_id": "user-uuid",
-          "expires_at": "2026-06-04T00:00:00Z",
-          "user_agent": "Mozilla/5.0...",
-          "ip_address": "127.0.0.1",
-          "last_used_at": "2026-05-28T06:00:00Z",
-          "is_revoked": false,
-          "created_at": "2026-05-28T06:00:00Z"
-        }
-      ]
-    }
-    ```
-
-### Thu hồi phiên cụ thể (Revoke Specific Session)
-*   **Endpoint**: `DELETE /api/v1/auth/sessions/:sessionId`
-*   **Phân quyền**: User
-
-### Thu hồi toàn bộ các phiên khác (Revoke All Sessions)
-*   **Endpoint**: `DELETE /api/v1/auth/sessions`
-*   **Phân quyền**: User
-
-### Yêu cầu quên mật khẩu (Forgot Password)
-*   **Endpoint**: `POST /api/v1/auth/forgot-password`
-*   **Phân quyền**: Public
-*   **Request Body**:
-    ```json
-    {
-      "email": "user@example.com" // String, email format (Bắt buộc)
-    }
-    ```
-
-### Đặt lại mật khẩu (Reset Password)
-*   **Endpoint**: `POST /api/v1/auth/reset-password`
-*   **Phân quyền**: Public
-*   **Request Body**:
-    ```json
-    {
-      "token": "reset-token-uuid-sent-via-email", // String (Bắt buộc)
-      "newPassword": "BrandNewPassword123" // String, min 6, max 100 (Bắt buộc)
-    }
-    ```
 
 ---
 
@@ -184,137 +46,20 @@ Hệ thống cung cấp các API RESTful phục vụ cho giao diện Frontend. T
 
 ### Liệt kê thẻ phân loại (Get Tags)
 *   **Endpoint**: `GET /api/v1/problems/tags`
-*   **Phân quyền**: Public
-*   **Response mẫu (200 OK)**:
-    ```json
-    {
-      "status": "Success",
-      "data": [
-        { "id": "tag-uuid", "name": "Greedy", "slug": "greedy", "color": "#00FF00" }
-      ]
-    }
-    ```
 
 ### Tạo mới thẻ phân loại (Create Tag)
 *   **Endpoint**: `POST /api/v1/problems/tags`
 *   **Phân quyền**: Admin
-*   **Request Body**:
-    ```json
-    {
-      "name": "Greedy", // String, unique (Bắt buộc)
-      "color": "#00FF00" // String hex code, optional
-    }
-    ```
 
 ### Liệt kê bài tập (List Problems)
 *   **Endpoint**: `GET /api/v1/problems`
-*   **Phân quyền**: Public
-*   **Query Parameters**:
-    *   `difficulty`: Cấp độ (`EASY`, `MEDIUM`, `HARD`) - Tùy chọn.
-    *   `tag`: Slug của tag (Ví dụ: `greedy`) - Tùy chọn.
-    *   `page`: Trang hiện tại (Mặc định: 1) - Tùy chọn.
-    *   `limit`: Số lượng/trang (Mặc định: 10) - Tùy chọn.
-*   **Response mẫu (200 OK)**:
-    ```json
-    {
-      "status": "Success",
-      "data": {
-        "total": 1,
-        "page": 1,
-        "limit": 10,
-        "items": [
-          {
-            "mongo_problem_id": "64a78cd9...",
-            "title": "Sum of Two Numbers",
-            "slug": "sum-of-two-numbers",
-            "difficulty": "EASY",
-            "created_at": "2026-05-28T06:00:00Z",
-            "tags": [
-              { "tag": { "name": "Greedy", "slug": "greedy", "color": "#00FF00" } }
-            ]
-          }
-        ]
-      }
-    }
-    ```
+*   **Query Parameters**: `difficulty`, `tag`, `page`, `limit`
 
 ### Lấy chi tiết bài tập (Get Problem Details)
 *   **Endpoint**: `GET /api/v1/problems/:slug`
-*   **Phân quyền**: Public
-*   **Response mẫu (200 OK)**:
-    ```json
-    {
-      "status": "Success",
-      "data": {
-        "_id": "64a78cd9...",
-        "title": "Sum of Two Numbers",
-        "slug": "sum-of-two-numbers",
-        "description": "Write a program that returns the sum of two integers...",
-        "difficulty": "EASY",
-        "timeLimit": 2000,
-        "memoryLimit": 256,
-        "starterCodes": {
-          "cpp": "#include...",
-          "java": "public class...",
-          "python": "import sys..."
-        },
-        "editorialMarkdown": "Explain logic here...",
-        "editorialVideoUrl": "https://..."
-      }
-    }
-    ```
 
 ### Tạo bài tập mới (Create Problem)
 *   **Endpoint**: `POST /api/v1/problems`
-*   **Phân quyền**: Admin
-*   **Request Body**:
-    ```json
-    {
-      "title": "Sum of Two Numbers", // String, min 3, max 255 (Bắt buộc)
-      "description": "Problem desc...", // String, min 10 (Bắt buộc)
-      "difficulty": "EASY", // 'EASY' | 'MEDIUM' | 'HARD' (Bắt buộc)
-      "timeLimit": 2000, // Number, ms (Bắt buộc)
-      "memoryLimit": 256, // Number, MB (Bắt buộc)
-      "starterCodes": { // Optional
-        "cpp": "code_here",
-        "java": "code_here",
-        "python": "code_here"
-      },
-      "editorialMarkdown": "Markdown solved solution...", // Optional
-      "editorialVideoUrl": "https://...", // Optional
-      "tags": ["uuid-tag-1", "uuid-tag-2"] // Array of tag UUIDs (Bắt buộc)
-    }
-    ```
-
-### Cập nhật bài tập (Update Problem)
-*   **Endpoint**: `PUT /api/v1/problems/:id`
-*   **Phân quyền**: Admin
-*   **Request Body**: Gửi các trường tương tự như tạo mới để cập nhật (Không bắt buộc gửi đầy đủ).
-
-### Xóa bài tập (Delete Problem)
-*   **Endpoint**: `DELETE /api/v1/problems/:id`
-*   **Phân quyền**: Admin
-
-### Thêm testcase cho bài tập (Add Testcase)
-*   **Endpoint**: `POST /api/v1/problems/:problemId/testcases`
-*   **Phân quyền**: Admin
-*   **Request Body**:
-    ```json
-    {
-      "input": "2 3", // Dữ liệu đầu vào (Bắt buộc)
-      "output": "5", // Dữ liệu mong muốn đầu ra (Bắt buộc)
-      "isExample": true // True nếu làm ví dụ mô tả, False để làm test ẩn (Mặc định: false)
-    }
-    ```
-
-### Xem danh sách testcase của bài tập (Get Testcases)
-*   **Endpoint**: `GET /api/v1/problems/:problemId/testcases`
-*   **Phân quyền**: User
-*   **Query Parameters**:
-    *   `example`: `true` nếu chỉ muốn lấy testcase ví dụ, `false` lấy toàn bộ (Mặc định: false).
-
-### Xóa testcase (Delete Testcase)
-*   **Endpoint**: `DELETE /api/v1/problems/testcases/:testcaseId`
 *   **Phân quyền**: Admin
 
 ---
@@ -327,40 +72,14 @@ Hệ thống cung cấp các API RESTful phục vụ cho giao diện Frontend. T
 *   **Request Body**:
     ```json
     {
-      "problemId": "64a78cd9...", // MongoDB Problem ObjectId hoặc Slug (Bắt buộc)
-      "language": "python", // 'cpp' | 'java' | 'python' (Bắt buộc)
-      "code": "import sys\nprint(sum(map(int, sys.stdin.read().split())))" // Min 10 chars (Bắt buộc)
-    }
-    ```
-*   **Response mẫu (201 Created)**:
-    ```json
-    {
-      "status": "Success",
-      "data": {
-        "_id": "65b9cd20...",
-        "userId": "user-uuid",
-        "problemId": "64a78cd9...",
-        "code": "...",
-        "language": "python",
-        "status": "PENDING",
-        "testCasesPassed": 0,
-        "testCasesTotal": 0,
-        "createdAt": "2026-05-28T06:10:00Z"
-      }
+      "problemId": "64a78cd9...",
+      "language": "python",
+      "code": "import sys\nprint(sum(map(int, sys.stdin.read().split())))"
     }
     ```
 
 ### Lấy danh sách bài nộp của User (Get User Submissions)
 *   **Endpoint**: `GET /api/v1/submissions`
-*   **Phân quyền**: User
-*   **Query Parameters**:
-    *   `problemId`: ID bài tập để lọc - Tùy chọn.
-    *   `page`: Trang hiện tại (Mặc định: 1) - Tùy chọn.
-    *   `limit`: Số lượng/trang (Mặc định: 10) - Tùy chọn.
-
-### Lấy chi tiết một bài nộp (Get Submission Details)
-*   **Endpoint**: `GET /api/v1/submissions/:id`
-*   **Phân quyền**: User (Chỉ tác giả của bài nộp hoặc Admin mới có quyền truy cập)
 
 ---
 
@@ -368,37 +87,218 @@ Hệ thống cung cấp các API RESTful phục vụ cho giao diện Frontend. T
 
 ### Tạo lộ trình học thuật thuật toán (Generate DSA Roadmap)
 *   **Endpoint**: `POST /api/v1/ai/roadmap`
-*   **Phân quyền**: User
-*   **Request Body**: Nhận bất kỳ JSON đối tượng câu hỏi nào, ví dụ:
-    ```json
-    {
-      "skillLevel": "BEGINNER",
-      "focusArea": "Dynamic Programming",
-      "studyHoursPerWeek": 10
-    }
-    ```
-*   **Response mẫu (200 OK)**: Trả về Roadmap JSON dạng cấu trúc cây (Topic, mô tả, số tuần ước lượng và bài tập gợi ý).
 
 ### Đánh giá và nhận xét code bài nộp (AI Mock Interview Feedback)
 *   **Endpoint**: `POST /api/v1/ai/feedback/:submissionId`
+
+---
+
+## 6. API PHÒNG ĐẤU TÙY CHỈNH & TRẬN ĐẤU (CUSTOM ROOMS & MATCHES)
+
+### Tạo phòng đấu tùy chỉnh (Create Custom Room)
+*   **Endpoint**: `POST /api/v1/rooms/create`
 *   **Phân quyền**: User
-*   **Response mẫu (200 OK)**:
+*   **Request Body**:
     ```json
     {
-      "status": "Success",
-      "data": {
-        "feedback": "### AI Interviewer Feedback...\n1. Code Correctness...\n2. Time Complexity: O(N)..."
-      }
+      "problemId": "64a78cd9...", // MongoDB Problem ObjectId (Tùy chọn)
+      "difficulty": "EASY" // EASY | MEDIUM | HARD (Bắt buộc nếu không chọn problemId)
+    }
+    ```
+
+### Lấy phòng đấu đang hoạt động (Get Active Rooms)
+*   **Endpoint**: `GET /api/v1/rooms/active`
+*   **Phân quyền**: User
+
+### Tham gia phòng đấu (Join Room)
+*   **Endpoint**: `POST /api/v1/rooms/join`
+*   **Phân quyền**: User
+*   **Request Body**:
+    ```json
+    {
+      "roomCode": "ABCD12"
+    }
+    ```
+
+### Cập nhật cấu hình phòng (Update Room Config)
+*   **Endpoint**: `PUT /api/v1/rooms/:roomId`
+*   **Phân quyền**: User (Chủ phòng)
+*   **Request Body**:
+    ```json
+    {
+      "difficulty": "MEDIUM",
+      "problemId": "64a78cd9..."
+    }
+    ```
+
+### Rời khỏi phòng (Leave Room)
+*   **Endpoint**: `POST /api/v1/rooms/leave`
+*   **Phân quyền**: User
+
+---
+
+## 7. API GIẢI ĐẤU & CUỘC THI (CONTESTS)
+
+### Tạo cuộc thi mới (Create Contest)
+*   **Endpoint**: `POST /api/v1/contests`
+*   **Phân quyền**: Admin
+*   **Request Body**:
+    ```json
+    {
+      "title": "Summer Code Clash",
+      "description": "Contest description",
+      "startTime": "2026-06-01T12:00:00.000Z",
+      "endTime": "2026-06-01T15:00:00.000Z",
+      "problems": [
+        { "problemId": "64a78...", "points": 100, "order": 1 }
+      ]
+    }
+    ```
+
+### Đăng ký tham gia (Register Contest)
+*   **Endpoint**: `POST /api/v1/contests/:contestId/register`
+*   **Phân quyền**: User
+
+### Bảng xếp hạng cuộc thi (Get Contest Standings/Leaderboard)
+*   **Endpoint**: `GET /api/v1/contests/:contestId/leaderboard`
+*   **Phân quyền**: Public
+
+---
+
+## 8. API THẢO LUẬN & BÌNH LUẬN (DISCUSSIONS & COMMENTS)
+
+### Gửi bình luận mới (Create Comment)
+*   **Endpoint**: `POST /api/v1/comments`
+*   **Phân quyền**: User
+*   **Request Body**:
+    ```json
+    {
+      "targetId": "64a78...", // Target ID (Problem, Contest hoặc Comment)
+      "targetType": "PROBLEM", // PROBLEM | CONTEST | DISCUSSION | COMMENT
+      "content": "This is a great task!"
+    }
+    ```
+
+### Lấy danh sách bình luận (Get Comments)
+*   **Endpoint**: `GET /api/v1/comments`
+*   **Query Parameters**: `targetId`, `targetType`
+
+---
+
+## 9. API BẠN BÈ & TRẠNG THÁI ONLINE (SOCIAL & FRIENDS)
+
+### Lấy danh sách bạn bè & Trạng thái Online (Get Friends & Presence)
+*   **Endpoint**: `GET /api/v1/friends`
+*   **Phân quyền**: User
+*   **Response mẫu**:
+    ```json
+    {
+      "success": true,
+      "data": [
+        {
+          "id": "friend-user-uuid",
+          "username": "coder_friend",
+          "avatar_url": "https://...",
+          "elo_rating": 1300,
+          "is_online": true // Trạng thái online thực tế lấy từ Redis
+        }
+      ]
+    }
+    ```
+
+### Gửi yêu cầu kết bạn (Send Friend Request)
+*   **Endpoint**: `POST /api/v1/friends/request`
+*   **Phân quyền**: User
+*   **Request Body**:
+    ```json
+    {
+      "receiverId": "receiver-user-uuid"
+    }
+    ```
+
+### Phản hồi yêu cầu kết bạn (Respond to Friend Request)
+*   **Endpoint**: `POST /api/v1/friends/respond`
+*   **Phân quyền**: User
+*   **Request Body**:
+    ```json
+    {
+      "senderId": "sender-user-uuid",
+      "action": "ACCEPT" // ACCEPT | DECLINE
     }
     ```
 
 ---
 
-## 6. API BẢNG XẾP HẠNG (LEADERBOARD)
+## 10. API CỬA HÀNG & KHO ĐỒ (SHOP & INVENTORY)
 
-### Lấy bảng xếp hạng theo ELO (Get ELO Leaderboard)
-*   **Endpoint**: `GET /api/v1/leaderboard`
-*   **Phân quyền**: Public
-*   **Query Parameters**:
-    *   `page`: Trang hiện tại (Mặc định: 1) - Tùy chọn.
-    *   `limit`: Số lượng/trang (Mặc định: 10) - Tùy chọn.
+### Lấy danh sách vật phẩm shop (Get Shop Items)
+*   **Endpoint**: `GET /api/v1/shop/items`
+
+### Mua vật phẩm (Buy Item)
+*   **Endpoint**: `POST /api/v1/shop/buy`
+*   **Phân quyền**: User
+*   **Request Body**:
+    ```json
+    {
+      "itemId": "shop-item-uuid"
+    }
+    ```
+
+### Xem kho đồ cá nhân (Get Inventory)
+*   **Endpoint**: `GET /api/v1/shop/inventory`
+*   **Phân quyền**: User
+
+### Trang bị vật phẩm (Equip Item)
+*   **Endpoint**: `POST /api/v1/shop/inventory/equip`
+*   **Phân quyền**: User
+*   **Request Body**:
+    ```json
+    {
+      "inventoryItemId": "inventory-item-uuid"
+    }
+    ```
+
+---
+
+## 11. API THÔNG BÁO (NOTIFICATIONS)
+
+### Lấy danh sách thông báo (Get Notifications)
+*   **Endpoint**: `GET /api/v1/notifications`
+*   **Phân quyền**: User
+*   **Query Parameters**: `page`, `limit`
+
+### Đánh dấu thông báo đã đọc (Mark Read)
+*   **Endpoint**: `PUT /api/v1/notifications/read`
+*   **Phân quyền**: User
+*   **Request Body**:
+    ```json
+    {
+      "notificationIds": ["uuid-1", "uuid-2"]
+    }
+    ```
+
+---
+
+## 12. API BÁO CÁO (REPORTS)
+
+### Gửi báo cáo lỗi/gian lận (Submit Report)
+*   **Endpoint**: `POST /api/v1/reports`
+*   **Phân quyền**: User
+*   **Request Body**:
+    ```json
+    {
+      "type": "BUG", // BUG | TYPO | CHEATING | OTHERS
+      "content": "Description of the report...",
+      "problemId": "64a78..." // Tùy chọn (Nếu báo cáo lỗi bài tập)
+    }
+    ```
+
+### Cập nhật trạng thái báo cáo (Update Report Status)
+*   **Endpoint**: `PUT /api/v1/reports/:reportId`
+*   **Phân quyền**: Admin
+*   **Request Body**:
+    ```json
+    {
+      "status": "RESOLVED" // PENDING | RESOLVED | REJECTED
+    }
+    ```
