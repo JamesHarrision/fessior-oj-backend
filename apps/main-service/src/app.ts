@@ -13,6 +13,7 @@ import contestRoutes from './routes/contest.route';
 import commentRoutes from './routes/comment.route';
 import friendshipRoutes from './routes/friendship.route';
 import shopRoutes from './routes/shop.route';
+import notificationRoutes from './routes/notification.route';
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use('/api/v1/contests', contestRoutes);
 app.use('/api/v1/comments', commentRoutes);
 app.use('/api/v1/friends', friendshipRoutes);
 app.use('/api/v1/shop', shopRoutes);
+app.use('/api/v1/notifications', notificationRoutes);
 
 
 app.get('/', async (req, res) => {

@@ -44,6 +44,7 @@ export const initSocket = (socketIoServer: Server) => {
     const connUserId = socket.data.user.userId;
     console.log(`Socket connected: ${socket.id} (User: ${connUserId})`);
     redis.sadd('online_users', connUserId).catch(err => console.error(err));
+    socket.join(`user:${connUserId}`);
 
     // Matchmaking Join Queue
     socket.on('join-queue', async () => {
