@@ -7,6 +7,8 @@ import problemRoutes from './routes/problem.route';
 import submissionRoutes from './routes/submission.route';
 import aiRoutes from './routes/ai.route';
 import leaderboardRoutes from './routes/leaderboard.route';
+import roomRoutes from './routes/room.route';
+import matchRoutes from './routes/match_history.route';
 
 const app = express();
 
@@ -19,6 +21,8 @@ app.use('/api/v1/problems', problemRoutes);
 app.use('/api/v1/submissions', submissionRoutes);
 app.use('/api/v1/ai', aiRoutes);
 app.use('/api/v1/leaderboard', leaderboardRoutes);
+app.use('/api/v1/rooms', roomRoutes);
+app.use('/api/v1/matches', matchRoutes);
 
 
 app.get('/', async (req, res) => {

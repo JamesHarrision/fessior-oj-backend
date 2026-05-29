@@ -14,7 +14,7 @@ interface QueuePlayer {
 }
 
 const matchmakingQueue: QueuePlayer[] = [];
-let io: Server | null = null;
+export let io: Server | null = null;
 
 // Initialize a separate Redis client for Pub/Sub subscription
 const pubSubClient = new Redis({
