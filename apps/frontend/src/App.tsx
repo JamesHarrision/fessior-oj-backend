@@ -3,14 +3,30 @@ import { Navbar } from './components/layout/Navbar';
 import { Sidebar } from './components/layout/Sidebar';
 import { MatchFindingView } from './views/MatchFindingView';
 import { SoloEditorView } from './views/SoloEditorView';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthModal } from './components/auth/AuthModal';
 import './App.css';
 
-function App() {
+function AppContent() {
+  const { user, token, loading } = useAuth();
   const [currentView, setCurrentView] = useState<string>('match');
 
   const handleStartMatch = () => {
     setCurrentView('editor');
   };
+
+  if (loading) {
+    return (
+      <div className="loading-screen">
+        <div className="loading-spinner"></div>
+        <p>Đang tải thông tin phiên đăng nhập...</p>
+      </div>
+    );
+  }
+
+  if (!token || !user) {
+    return <AuthModal />;
+  }
 
   return (
     <div className="app-container">
@@ -29,6 +45,14 @@ function App() {
         </main>
       </div>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 
