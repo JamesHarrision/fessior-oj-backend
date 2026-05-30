@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Navbar } from './components/layout/Navbar';
 import { Sidebar } from './components/layout/Sidebar';
 import { MatchFindingView } from './views/MatchFindingView';
@@ -14,8 +14,28 @@ import './App.css';
 
 function AppContent() {
   const { user, token, loading } = useAuth();
-  const [currentView, setCurrentView] = useState<string>('match');
+  const [currentView, setCurrentView] = useState<string>(() => {
+    const hash = window.location.hash.replace('#', '');
+    const allowedViews = ['match', 'contest', 'ranking', 'shop', 'editor', 'ai', 'settings'];
+    return allowedViews.includes(hash) ? hash : 'match';
+  });
   const [activeMatch, setActiveMatch] = useState<any>(null);
+
+  useEffect(() => {
+    window.location.hash = currentView;
+  }, [currentView]);
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '');
+      const allowedViews = ['match', 'contest', 'ranking', 'shop', 'editor', 'ai', 'settings'];
+      if (allowedViews.includes(hash)) {
+        setCurrentView(hash);
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
 
   const handleStartMatch = (matchData: any) => {
     setActiveMatch(matchData);
