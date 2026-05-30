@@ -1,16 +1,34 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { Wrench, Send } from 'lucide-react';
 import './SettingsView.css';
 
 export const SettingsView: React.FC = () => {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const [reportType, setReportType] = useState('BUG');
   const [content, setContent] = useState('');
   const [problemId, setProblemId] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [history, setHistory] = useState<any[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(true);
+
+  useEffect(() => {
+    const loadHistory = async () => {
+      try {
+        const res = await api.getMatchHistory();
+        if (res.success && res.data) {
+          setHistory(res.data);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setHistoryLoading(false);
+      }
+    };
+    loadHistory();
+  }, []);
 
   const handleSubmitReport = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +42,7 @@ export const SettingsView: React.FC = () => {
         problemId: problemId.trim() || undefined,
       });
       if (res.success) {
-        setMessage('Báo cáo đã được gửi tới Ban quản trị. Cảm ơn sự đóng góp của bạn!');
+        setMessage('Báo cáo đã được gửi thành công!');
         setContent('');
         setProblemId('');
       }
@@ -39,11 +57,47 @@ export const SettingsView: React.FC = () => {
     <div className="settings-view glass-card">
       <div className="settings-header">
         <Wrench size={28} className="glow-icon-purple" />
-        <h2>Công cụ & Báo cáo</h2>
-        <p>Gửi phản hồi cho Ban quản trị hoặc đăng xuất khỏi hệ thống</p>
+        <h2>Thiết Lập & Lịch Sử</h2>
+        <p>Xem lịch sử đấu, báo cáo lỗi và quản lý tài khoản</p>
       </div>
 
       <div className="settings-content">
+        <div className="history-section">
+          <h3>🏆 Lịch Sử Đấu (Match History)</h3>
+          {historyLoading ? (
+            <p className="loading-txt">Đang tải lịch sử đấu...</p>
+          ) : history.length === 0 ? (
+            <p className="no-history-txt">Bạn chưa tham gia trận đấu nào.</p>
+          ) : (
+            <div className="history-list">
+              {history.map((m) => {
+                const isWinner = m.winnerId === user?.id;
+                const isDraw = m.status === 'DRAW';
+                const eloChange = m.eloUpdates?.[user?.id || '']?.change || 0;
+                const date = new Date(m.createdAt || m.endedAt).toLocaleDateString();
+                const opponentName = m.player1?.userId === user?.id ? m.player2?.username : m.player1?.username;
+
+                return (
+                  <div key={m.id || m._id} className="history-card">
+                    <div className="history-meta">
+                      <span className={`outcome-badge ${isWinner ? 'win' : isDraw ? 'draw' : 'lose'}`}>
+                        {isWinner ? 'THẮNG' : isDraw ? 'HÒA' : 'THUA'}
+                      </span>
+                      <span className="history-opp">đối đầu với <strong>{opponentName || 'Đấu thủ'}</strong></span>
+                    </div>
+                    <div className="history-stats">
+                      <span>{date}</span>
+                      <span className={`elo-diff ${eloChange >= 0 ? 'plus' : 'minus'}`}>
+                        {eloChange >= 0 ? `+${eloChange}` : eloChange} ELO
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
         <div className="report-section">
           <h3>Gửi Báo Cáo / Phản Hồi</h3>
           <form onSubmit={handleSubmitReport} className="report-form">

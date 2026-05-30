@@ -78,4 +78,30 @@ export const api = {
   getContests: () => request<any>('/contests'),
   registerContest: (contestId: string) => request<any>(`/contests/${contestId}/register`, { method: 'POST' }),
   getContestLeaderboard: (contestId: string) => request<any>(`/contests/${contestId}/leaderboard`),
+
+  // AI
+  getAIRoadmap: (body: { skillLevel: string; focusArea: string }) =>
+    request<any>('/ai/roadmap', { method: 'POST', body: JSON.stringify(body) }),
+  getAIFeedback: (submissionId: string) =>
+    request<any>(`/ai/feedback/${submissionId}`, { method: 'POST' }),
+
+  // Comments
+  getComments: (problemId: string) => request<any>(`/comments?problemId=${problemId}`),
+  createComment: (body: { problemId: string; content: string }) =>
+    request<any>('/comments', { method: 'POST', body: JSON.stringify(body) }),
+  updateComment: (id: string, body: { content: string }) =>
+    request<any>(`/comments/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+  deleteComment: (id: string) => request<any>(`/comments/${id}`, { method: 'DELETE' }),
+  toggleLikeComment: (id: string) => request<any>(`/comments/${id}/like`, { method: 'POST' }),
+
+  // Match History
+  getMatchHistory: () => request<any>('/matches/history'),
+  getMatchDetails: (id: string) => request<any>(`/matches/${id}`),
+
+  // Notifications
+  getNotifications: () => request<any>('/notifications'),
+  markNotificationsAsRead: (notificationIds: string[]) =>
+    request<any>('/notifications/read', { method: 'PUT', body: JSON.stringify({ notificationIds }) }),
+  deleteNotification: (id: string) => request<any>(`/notifications/${id}`, { method: 'DELETE' }),
 };
+

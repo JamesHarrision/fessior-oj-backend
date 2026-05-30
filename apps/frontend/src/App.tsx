@@ -7,6 +7,7 @@ import { RankingView } from './views/RankingView';
 import { ShopView } from './views/ShopView';
 import { ContestView } from './views/ContestView';
 import { SettingsView } from './views/SettingsView';
+import { AIView } from './views/AIView';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AuthModal } from './components/auth/AuthModal';
 import './App.css';
@@ -56,6 +57,9 @@ function AppContent() {
           )}
           {currentView === 'editor' && (
             <SoloEditorView activeMatch={activeMatch} />
+          )}
+          {currentView === 'ai' && (
+            <AIView />
           )}
           {currentView === 'settings' && (
             <SettingsView />
