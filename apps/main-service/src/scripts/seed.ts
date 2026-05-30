@@ -4,6 +4,7 @@ import { PrismaClient } from '@prisma/client';
 import mongoose from 'mongoose';
 import { Problem } from '../models/problem.model';
 import { Testcase } from '../models/testcase.model';
+import { hashPassword } from '../utils/password.util';
 
 const prisma = new PrismaClient();
 
@@ -16,6 +17,33 @@ async function main() {
   console.log('MongoDB connected successfully!');
 
   console.log('Seeding initial system data...');
+
+  // 0. Seed Users (MySQL)
+  console.log('Seeding default users...');
+  const testerHash = await hashPassword('password123');
+  const adminHash = await hashPassword('admin123');
+
+  await prisma.user.upsert({
+    where: { email: 'tester@example.com' },
+    update: {},
+    create: {
+      email: 'tester@example.com',
+      username: 'tester',
+      password_hash: testerHash,
+      role: 'USER',
+    },
+  });
+
+  await prisma.user.upsert({
+    where: { email: 'admin@example.com' },
+    update: {},
+    create: {
+      email: 'admin@example.com',
+      username: 'admin',
+      password_hash: adminHash,
+      role: 'ADMIN',
+    },
+  });
 
   // 1. Seed Contests (MySQL)
   const now = new Date();
