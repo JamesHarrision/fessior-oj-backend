@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Navbar } from './components/layout/Navbar';
 import { Sidebar } from './components/layout/Sidebar';
 import { MatchFindingView } from './views/MatchFindingView';
+import { SoloEditorView } from './views/SoloEditorView';
 import './App.css';
 
 function App() {
@@ -23,12 +24,7 @@ function App() {
             <MatchFindingView onStartMatch={handleStartMatch} />
           )}
           {currentView === 'editor' && (
-            <div className="glass-card" style={{ textAlign: 'center', marginTop: '40px' }}>
-              <h2>Solo Editor Screen</h2>
-              <p style={{ color: 'var(--text-secondary)', marginTop: '10px' }}>
-                (Chúng ta sẽ tích hợp các thành phần của trình soạn thảo mã tại đây ở bước tiếp theo)
-              </p>
-            </div>
+            <SoloEditorView />
           )}
         </main>
       </div>

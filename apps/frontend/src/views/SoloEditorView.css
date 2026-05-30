@@ -1,0 +1,37 @@
+.solo-editor-view {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+  min-height: calc(100vh - 110px);
+}
+
+.status-row {
+  width: 100%;
+}
+
+.editor-main-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 20px;
+  flex: 1;
+}
+
+@media (max-width: 1200px) {
+  .editor-main-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.left-column {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
