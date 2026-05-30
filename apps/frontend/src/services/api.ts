@@ -22,7 +22,10 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   if (!response.ok) {
     throw new Error(data.message || 'Something went wrong');
   }
-  return data;
+  return {
+    ...data,
+    success: data.status === 'Success',
+  };
 }
 
 export const api = {
