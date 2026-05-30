@@ -18,12 +18,19 @@ export const CodeEditorPane: React.FC<CodeEditorPaneProps> = ({
   const [shareActive, setShareActive] = useState(false);
   const lineCount = code.split('\n').length;
 
+  const getExtension = () => {
+    if (language === 'python') return 'py';
+    if (language === 'cpp') return 'cpp';
+    if (language === 'java') return 'java';
+    return 'js';
+  };
+
   return (
     <div className="code-editor-pane glass-card">
       <div className="editor-header">
         <div className="active-tab">
           <span className="tab-indicator"></span>
-          <span className="tab-label">solution.js</span>
+          <span className="tab-label">solution.{getExtension()}</span>
         </div>
 
         <div className="editor-actions">
@@ -32,7 +39,7 @@ export const CodeEditorPane: React.FC<CodeEditorPaneProps> = ({
             onClick={() => setShareActive(!shareActive)}
           >
             <ScreenShare size={16} />
-            <span>{shareActive ? 'Sharing' : 'Share screen'}</span>
+            <span>{shareActive ? 'Sharing' : 'Share'}</span>
           </button>
 
           <div className="select-wrapper">
@@ -41,9 +48,9 @@ export const CodeEditorPane: React.FC<CodeEditorPaneProps> = ({
               onChange={(e) => onLanguageChange(e.target.value)}
               className="lang-select"
             >
-              <option value="javascript">JavaScript</option>
               <option value="python">Python</option>
               <option value="cpp">C++</option>
+              <option value="java">Java</option>
             </select>
             <ChevronDown size={14} className="select-arrow" />
           </div>
@@ -63,7 +70,7 @@ export const CodeEditorPane: React.FC<CodeEditorPaneProps> = ({
           onChange={(e) => onChange(e.target.value)}
           className="code-textarea"
           spellCheck="false"
-          placeholder="// Write your code here"
+          placeholder="// Gõ mã nguồn của bạn tại đây"
         />
       </div>
     </div>

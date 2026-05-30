@@ -7,6 +7,8 @@ interface OpponentStatusProps {
   opponentAvatar: string;
   isSubmitted: boolean;
   timeLeftSeconds: number;
+  userProgress: number;
+  opponentProgress: number;
 }
 
 export const OpponentStatus: React.FC<OpponentStatusProps> = ({
@@ -14,6 +16,8 @@ export const OpponentStatus: React.FC<OpponentStatusProps> = ({
   opponentAvatar,
   isSubmitted,
   timeLeftSeconds,
+  userProgress,
+  opponentProgress,
 }) => {
   const [secs, setSecs] = useState(timeLeftSeconds);
 
@@ -50,19 +54,19 @@ export const OpponentStatus: React.FC<OpponentStatusProps> = ({
           <div className="profile-details">
             <span className="opponent-label">Trạng thái:</span>
             <span className={`opponent-verdict ${isSubmitted ? 'submitted' : 'pending'}`}>
-              {isSubmitted ? 'Đã nộp bài' : 'Chưa nộp'}
+              {isSubmitted ? 'Đã nộp bài' : 'Đang làm bài'}
             </span>
           </div>
         </div>
 
         <div className="progress-comparison">
           <div className="progress-labels">
-            <span className="user-score">Bạn: 0%</span>
-            <span className="opponent-score">{opponentName}: 100%</span>
+            <span className="user-score">Bạn: {userProgress}%</span>
+            <span className="opponent-score">{opponentName}: {opponentProgress}%</span>
           </div>
           <div className="bar-wrapper">
-            <div className="user-bar" style={{ width: '0%' }}></div>
-            <div className="opponent-bar" style={{ width: '100%' }}></div>
+            <div className="user-bar" style={{ width: `${userProgress}%` }}></div>
+            <div className="opponent-bar" style={{ width: `${opponentProgress}%` }}></div>
           </div>
         </div>
       </div>
