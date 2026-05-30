@@ -71,11 +71,11 @@ export const api = {
   getLeaderboard: () => request<any>('/leaderboard'),
 
   // Shop & Inventory
-  getShopItems: () => request<any>('/shop/items'),
+  getShopItems: () => request<any>('/shop'),
   buyItem: (itemId: string) => request<any>('/shop/buy', { method: 'POST', body: JSON.stringify({ itemId }) }),
   getInventory: () => request<any>('/shop/inventory'),
   equipItem: (inventoryItemId: string) =>
-    request<any>('/shop/inventory/equip', { method: 'POST', body: JSON.stringify({ inventoryItemId }) }),
+    request<any>('/shop/equip', { method: 'POST', body: JSON.stringify({ inventoryItemId }) }),
 
   // Reports
   submitReport: (body: { type: string; content: string; problemId?: string }) =>

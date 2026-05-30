@@ -41,13 +41,27 @@ export const SoloEditorView: React.FC<SoloEditorViewProps> = ({ activeMatch }) =
     }
   }, [verdictDetails]);
 
+  const fetchProblemDetail = async (slug: string) => {
+    try {
+      const res = await api.getProblemDetail(slug);
+      if (res.success && res.data) {
+        setProblem(res.data);
+      }
+    } catch (err) {
+      console.error('Error fetching problem details:', err);
+    }
+  };
+
   // Fetch problems if not in active match
   useEffect(() => {
     if (!activeMatch) {
       api.getProblems().then((res) => {
-        if (res.success && res.data && res.data.length > 0) {
-          setProblemsList(res.data);
-          setProblem(res.data[0]);
+        if (res.success && res.data) {
+          const list = Array.isArray(res.data) ? res.data : (res.data.items || []);
+          if (list.length > 0) {
+            setProblemsList(list);
+            fetchProblemDetail(list[0].slug);
+          }
         }
       });
     }
@@ -158,12 +172,12 @@ export const SoloEditorView: React.FC<SoloEditorViewProps> = ({ activeMatch }) =
         </div>
       )}
 
-      {!activeMatch && problemsList.length > 1 && (
+      {!activeMatch && problemsList.length > 0 && (
         <div className="problem-selector-row">
           <label>Chọn đề bài luyện tập: </label>
           <select 
             value={problem?.slug} 
-            onChange={(e) => setProblem(problemsList.find(p => p.slug === e.target.value))}
+            onChange={(e) => fetchProblemDetail(e.target.value)}
             className="problems-dropdown"
           >
             {problemsList.map(p => (

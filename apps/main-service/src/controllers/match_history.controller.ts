@@ -19,7 +19,7 @@ export class MatchHistoryController {
 
   async getMatchDetails(req: Request, res: Response) {
     try {
-      const { matchId } = req.params;
+      const matchId = req.params.matchId as string;
       const match = await matchHistoryService.getMatchDetails(matchId);
       res.status(200).json({
         success: true,
@@ -32,7 +32,7 @@ export class MatchHistoryController {
 
   async deleteMatch(req: Request, res: Response) {
     try {
-      const { matchId } = req.params;
+      const matchId = req.params.matchId as string;
       await matchHistoryService.deleteMatch(matchId);
       res.status(200).json({
         success: true,

@@ -89,11 +89,11 @@ export class RoomService {
         }
         const randomIndex = Math.floor(Math.random() * fallbackCount);
         const randomProblem = await Problem.findOne().skip(randomIndex);
-        problemId = randomProblem?._id.toString();
+        problemId = randomProblem?._id.toString() as string;
       } else {
         const randomIndex = Math.floor(Math.random() * count);
         const problem = await Problem.findOne(query).skip(randomIndex);
-        problemId = problem?._id.toString();
+        problemId = problem?._id.toString() as string;
       }
     }
 

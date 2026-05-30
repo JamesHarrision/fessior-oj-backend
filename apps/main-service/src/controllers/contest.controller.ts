@@ -29,7 +29,7 @@ export class ContestController {
 
   async getContestDetails(req: Request, res: Response) {
     try {
-      const { contestId } = req.params;
+      const contestId = req.params.contestId as string;
       const contest = await contestService.getContestDetails(contestId);
       res.status(200).json({
         success: true,
@@ -42,7 +42,7 @@ export class ContestController {
 
   async updateContest(req: Request, res: Response) {
     try {
-      const { contestId } = req.params;
+      const contestId = req.params.contestId as string;
       const updated = await contestService.updateContest(contestId, req.body);
       res.status(200).json({
         success: true,
@@ -55,7 +55,7 @@ export class ContestController {
 
   async deleteContest(req: Request, res: Response) {
     try {
-      const { contestId } = req.params;
+      const contestId = req.params.contestId as string;
       await contestService.deleteContest(contestId);
       res.status(200).json({
         success: true,
@@ -69,7 +69,7 @@ export class ContestController {
   async register(req: Request, res: Response) {
     try {
       const userId = req.user.userId;
-      const { contestId } = req.params;
+      const contestId = req.params.contestId as string;
       const reg = await contestService.register(contestId, userId);
       res.status(200).json({
         success: true,
@@ -83,7 +83,7 @@ export class ContestController {
   async unregister(req: Request, res: Response) {
     try {
       const userId = req.user.userId;
-      const { contestId } = req.params;
+      const contestId = req.params.contestId as string;
       await contestService.unregister(contestId, userId);
       res.status(200).json({
         success: true,
@@ -97,7 +97,7 @@ export class ContestController {
   async getContestProblems(req: Request, res: Response) {
     try {
       const userId = req.user.userId;
-      const { contestId } = req.params;
+      const contestId = req.params.contestId as string;
       const problems = await contestService.getContestProblems(contestId, userId);
       res.status(200).json({
         success: true,
@@ -112,7 +112,7 @@ export class ContestController {
     try {
       const userId = req.user.userId;
       const userRole = req.user.role;
-      const { contestId } = req.params;
+      const contestId = req.params.contestId as string;
       const submissions = await contestService.getContestSubmissions(contestId, userId, userRole);
       res.status(200).json({
         success: true,
@@ -125,7 +125,7 @@ export class ContestController {
 
   async getLeaderboard(req: Request, res: Response) {
     try {
-      const { contestId } = req.params;
+      const contestId = req.params.contestId as string;
       const leaderboard = await contestService.getLeaderboard(contestId);
       res.status(200).json({
         success: true,

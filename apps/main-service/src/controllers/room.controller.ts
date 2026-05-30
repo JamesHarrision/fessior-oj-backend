@@ -4,7 +4,7 @@ import { roomService } from '../services/room.service';
 export class RoomController {
   async createRoom(req: Request, res: Response) {
     try {
-      const creatorId = req.user.userId;
+      const creatorId = (req as any).user.userId;
       const room = await roomService.createRoom(creatorId, req.body);
       res.status(201).json({
         success: true,
@@ -29,7 +29,7 @@ export class RoomController {
 
   async getRoomDetails(req: Request, res: Response) {
     try {
-      const { roomId } = req.params;
+      const roomId = req.params.roomId as string;
       const room = await roomService.getRoomDetails(roomId);
       res.status(200).json({
         success: true,
@@ -42,7 +42,7 @@ export class RoomController {
 
   async joinRoom(req: Request, res: Response) {
     try {
-      const opponentId = req.user.userId;
+      const opponentId = (req as any).user.userId;
       const { roomCode } = req.body;
       const result = await roomService.joinRoom(roomCode, opponentId);
       res.status(200).json({
@@ -56,7 +56,7 @@ export class RoomController {
 
   async leaveRoom(req: Request, res: Response) {
     try {
-      const userId = req.user.userId;
+      const userId = (req as any).user.userId;
       const { roomId } = req.body;
       const result = await roomService.leaveRoom(roomId, userId);
       res.status(200).json({
@@ -70,8 +70,8 @@ export class RoomController {
 
   async updateRoomConfig(req: Request, res: Response) {
     try {
-      const creatorId = req.user.userId;
-      const { roomId } = req.params;
+      const creatorId = (req as any).user.userId;
+      const roomId = req.params.roomId as string;
       const updated = await roomService.updateRoomConfig(roomId, creatorId, req.body);
       res.status(200).json({
         success: true,
@@ -84,9 +84,9 @@ export class RoomController {
 
   async deleteRoom(req: Request, res: Response) {
     try {
-      const creatorId = req.user.userId;
-      const { roomId } = req.params;
-      const result = await roomService.deleteRoom(roomId, creatorId);
+      const creatorId = (req as any).user.userId;
+      const roomId = req.params.roomId as string;
+      await roomService.deleteRoom(roomId, creatorId);
       res.status(200).json({
         success: true,
         message: 'Room deleted successfully',

@@ -13,7 +13,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange }) =
     { id: 'contest', icon: GitFork, label: 'Contests' },
     { id: 'ranking', icon: Map, label: 'Map' },
     { id: 'shop', icon: Trophy, label: 'Shop' },
-    { id: 'editor', icon: BookOpen, label: 'Editor' },
+    { id: 'editor', icon: BookOpen, label: 'Problems' },
     { id: 'ai', icon: Sparkles, label: 'AI Assistant' },
     { id: 'settings', icon: Wrench, label: 'Tools' },
   ];
