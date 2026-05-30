@@ -3,6 +3,10 @@ import { Navbar } from './components/layout/Navbar';
 import { Sidebar } from './components/layout/Sidebar';
 import { MatchFindingView } from './views/MatchFindingView';
 import { SoloEditorView } from './views/SoloEditorView';
+import { RankingView } from './views/RankingView';
+import { ShopView } from './views/ShopView';
+import { ContestView } from './views/ContestView';
+import { SettingsView } from './views/SettingsView';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AuthModal } from './components/auth/AuthModal';
 import './App.css';
@@ -41,8 +45,20 @@ function AppContent() {
           {currentView === 'match' && (
             <MatchFindingView onStartMatch={handleStartMatch} />
           )}
+          {currentView === 'contest' && (
+            <ContestView />
+          )}
+          {currentView === 'ranking' && (
+            <RankingView />
+          )}
+          {currentView === 'shop' && (
+            <ShopView />
+          )}
           {currentView === 'editor' && (
             <SoloEditorView activeMatch={activeMatch} />
+          )}
+          {currentView === 'settings' && (
+            <SettingsView />
           )}
         </main>
       </div>

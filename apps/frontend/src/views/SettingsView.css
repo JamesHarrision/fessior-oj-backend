@@ -1,0 +1,129 @@
+.settings-view {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 30px !important;
+}
+
+.settings-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.settings-header h2 {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: 800;
+  color: #fff;
+  margin-top: 10px;
+  margin-bottom: 6px;
+}
+
+.settings-header p {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.settings-content {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.report-section, .account-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border-top: 1px solid var(--border-primary);
+  padding-top: 20px;
+}
+
+.report-section h3, .account-section h3 {
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.report-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.report-select, .report-input-field, .report-textarea-field {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #fff;
+  font-size: 13px;
+  outline: none;
+}
+
+.report-select:focus, .report-input-field:focus, .report-textarea-field:focus {
+  border-color: var(--border-active);
+}
+
+.report-textarea-field {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.submit-report-btn {
+  background: linear-gradient(135deg, var(--color-purple) 0%, #7c3aed 100%);
+  border: none;
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
+  transition: all 0.2s ease;
+}
+
+.submit-report-btn:hover {
+  transform: translateY(-1px);
+}
+
+.report-msg-feedback {
+  font-size: 12px;
+  color: var(--color-green);
+  font-weight: 600;
+}
+
+.logout-btn {
+  background: transparent;
+  border: 1px solid var(--color-red);
+  color: var(--color-red);
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  width: fit-content;
+  transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  transform: translateY(-1px);
+}
