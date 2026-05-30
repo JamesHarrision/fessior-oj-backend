@@ -24,7 +24,6 @@ export const SoloEditorView: React.FC<SoloEditorViewProps> = ({ activeMatch }) =
   const [language, setLanguage] = useState<'python' | 'cpp' | 'java'>('python');
   
   // Evaluation/Console states
-  const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [verdict, setVerdict] = useState('');
   const [verdictDetails, setVerdictDetails] = useState<any>(null);
@@ -88,7 +87,6 @@ export const SoloEditorView: React.FC<SoloEditorViewProps> = ({ activeMatch }) =
         if (res.success && res.data && res.data.status !== 'PENDING') {
           clearInterval(interval);
           setIsSubmitting(false);
-          setIsRunning(false);
           
           const details = res.data;
           setVerdict(details.status);
@@ -109,7 +107,6 @@ export const SoloEditorView: React.FC<SoloEditorViewProps> = ({ activeMatch }) =
         console.error(err);
         clearInterval(interval);
         setIsSubmitting(false);
-        setIsRunning(false);
       }
     }, 1500);
   };
@@ -117,7 +114,6 @@ export const SoloEditorView: React.FC<SoloEditorViewProps> = ({ activeMatch }) =
   const handleSubmit = async () => {
     if (!problem) return;
     setIsSubmitting(true);
-    setIsRunning(true);
     setVerdict('');
     setVerdictDetails(null);
 
@@ -191,11 +187,13 @@ export const SoloEditorView: React.FC<SoloEditorViewProps> = ({ activeMatch }) =
           />
           
           <ConsolePane
-            onRun={handleSubmit}
+            problem={problem}
+            code={code}
+            language={language}
             onSubmit={handleSubmit}
-            isRunning={isRunning}
             isSubmitting={isSubmitting}
             verdict={verdict}
+            verdictDetails={verdictDetails}
           />
         </div>
       </div>

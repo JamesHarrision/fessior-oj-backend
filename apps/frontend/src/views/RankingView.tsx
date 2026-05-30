@@ -11,7 +11,7 @@ export const RankingView: React.FC = () => {
     try {
       const res = await api.getLeaderboard();
       if (res.success && res.data) {
-        setLeaderboard(res.data);
+        setLeaderboard(res.data.items || []);
       }
     } catch (err) {
       console.error(err);

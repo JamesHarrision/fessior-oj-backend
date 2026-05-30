@@ -9,6 +9,7 @@ const router = Router();
 router.use(requireAuth);
 
 router.post('/', validateRequest(submitCodeSchema), submissionController.submit);
+router.post('/run', submissionController.runCode);
 router.get('/', submissionController.getUserSubmissions);
 router.get('/:id', submissionController.getSubmissionDetails);
 

@@ -41,10 +41,14 @@ export const api = {
     return request<any>(`/problems?${query}`);
   },
   getProblemDetail: (slug: string) => request<any>(`/problems/${slug}`),
+  getTestcases: (problemId: string, exampleOnly = false) =>
+    request<any>(`/problems/${problemId}/testcases${exampleOnly ? '?example=true' : ''}`),
 
   // Submissions
   submitCode: (body: { problemId: string; language: string; code: string }) =>
     request<any>('/submissions', { method: 'POST', body: JSON.stringify(body) }),
+  runCode: (body: { problemId: string; language: string; code: string; customInput?: string }) =>
+    request<any>('/submissions/run', { method: 'POST', body: JSON.stringify(body) }),
   getSubmissions: () => request<any>('/submissions'),
   getSubmissionDetail: (id: string) => request<any>(`/submissions/${id}`),
 
