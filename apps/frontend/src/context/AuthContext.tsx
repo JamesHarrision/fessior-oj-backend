@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { api } from '../services/api';
+import { socketService } from '../services/socket';
 
 interface User {
   id: string;
@@ -42,6 +43,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.removeItem('refreshToken');
       setToken(null);
       setUser(null);
+      socketService.disconnect();
     } finally {
       setLoading(false);
     }
@@ -49,8 +51,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     if (token) {
+      socketService.connect(token);
       fetchProfile();
     } else {
+      socketService.disconnect();
       setLoading(false);
     }
   }, [token]);
@@ -68,7 +72,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const register = async (username: string, email: string, password: string) => {
     const res = await api.register({ username, email, password });
     if (res.success && res.data) {
-      // Auto login after successful register if token is returned, or prompt login
       if (res.data.accessToken) {
         localStorage.setItem('token', res.data.accessToken);
         localStorage.setItem('refreshToken', res.data.refreshToken);
@@ -89,6 +92,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.removeItem('refreshToken');
       setToken(null);
       setUser(null);
+      socketService.disconnect();
     }
   };
 

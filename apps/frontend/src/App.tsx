@@ -10,8 +10,10 @@ import './App.css';
 function AppContent() {
   const { user, token, loading } = useAuth();
   const [currentView, setCurrentView] = useState<string>('match');
+  const [activeMatch, setActiveMatch] = useState<any>(null);
 
-  const handleStartMatch = () => {
+  const handleStartMatch = (matchData: any) => {
+    setActiveMatch(matchData);
     setCurrentView('editor');
   };
 
@@ -40,7 +42,7 @@ function AppContent() {
             <MatchFindingView onStartMatch={handleStartMatch} />
           )}
           {currentView === 'editor' && (
-            <SoloEditorView />
+            <SoloEditorView activeMatch={activeMatch} />
           )}
         </main>
       </div>

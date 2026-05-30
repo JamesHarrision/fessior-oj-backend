@@ -5,7 +5,12 @@ import { CodeEditorPane } from '../components/editor/CodeEditorPane';
 import { ConsolePane } from '../components/editor/ConsolePane';
 import './SoloEditorView.css';
 
-export const SoloEditorView: React.FC = () => {
+interface SoloEditorViewProps {
+  activeMatch?: any;
+}
+
+export const SoloEditorView: React.FC<SoloEditorViewProps> = ({ activeMatch }) => {
+  console.log('Active match data:', activeMatch);
   const [code, setCode] = useState(`/**
  * @param {number[]} nums
  * @param {number} target

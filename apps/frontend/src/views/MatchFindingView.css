@@ -57,7 +57,18 @@
   transform: translateY(0) scale(1);
 }
 
-.lobby-footer {
+.lobby-secondary-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 20px;
   width: 100%;
-  padding-top: 30px;
+  max-width: 1200px;
+  margin-top: 40px;
 }
+
+@media (max-width: 992px) {
+  .lobby-secondary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
