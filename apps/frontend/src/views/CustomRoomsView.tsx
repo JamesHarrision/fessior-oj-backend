@@ -101,7 +101,7 @@ export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomM
     if (!activeRoom) return;
     try {
       if (activeRoom.creator_id === user?.id) {
-        await api.request(`/rooms/${activeRoom.id}`, { method: 'DELETE' });
+        await api.deleteRoom(activeRoom.id);
       } else {
         await api.leaveRoom({ roomId: activeRoom.id });
       }

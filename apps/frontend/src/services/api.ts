@@ -41,6 +41,7 @@ export const api = {
     return request<any>(`/problems?${query}`);
   },
   getProblemDetail: (slug: string) => request<any>(`/problems/${slug}`),
+  getProblemTags: () => request<any>('/problems/tags'),
   getTestcases: (problemId: string, exampleOnly = false) =>
     request<any>(`/problems/${problemId}/testcases${exampleOnly ? '?example=true' : ''}`),
 
@@ -58,7 +59,9 @@ export const api = {
     request<any>('/rooms/create', { method: 'POST', body: JSON.stringify(body) }),
   joinRoom: (body: { roomCode: string }) =>
     request<any>('/rooms/join', { method: 'POST', body: JSON.stringify(body) }),
-  leaveRoom: () => request<any>('/rooms/leave', { method: 'POST' }),
+  leaveRoom: (body: { roomId: string }) =>
+    request<any>('/rooms/leave', { method: 'POST', body: JSON.stringify(body) }),
+  deleteRoom: (roomId: string) => request<any>(`/rooms/${roomId}`, { method: 'DELETE' }),
 
   // Friends & Presence
   getFriends: () => request<any>('/friends'),

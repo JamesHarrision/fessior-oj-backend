@@ -28,7 +28,7 @@ export const ProblemsView: React.FC<ProblemsViewProps> = ({ onSelectProblem }) =
       }).catch(() => setLoading(false));
     });
 
-    api.request<any>('/problems/tags').then(res => {
+    api.getProblemTags().then(res => {
       if (res.success && res.data) {
         setTags(res.data);
       }
