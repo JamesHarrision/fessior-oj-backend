@@ -58,8 +58,9 @@
 }
 
 .status-accepted, .status-success { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-.status-wrong_answer, .status-error { background: rgba(239, 68, 68, 0.2); color: #f87171; }
-.status-pending { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+.status-wrong_answer, .status-error, .status-wa { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+.status-tle, .status-mle, .status-re, .status-ce { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+.status-pending, .status-processing { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
 
 .submission-detail-overlay {
   position: fixed;
@@ -164,4 +165,22 @@
   color: #cbd5e1;
   white-space: pre-line;
   line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .submissions-view-container {
+    padding: 16px;
+  }
+  .meta-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .submissions-table th, .submissions-table td {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+  .submissions-table th:nth-child(5),
+  .submissions-table td:nth-child(5) {
+    display: none; /* Hide Execution time on small screens */
+  }
 }
