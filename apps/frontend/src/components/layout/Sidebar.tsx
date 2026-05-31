@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, GitFork, Map, Trophy, BookOpen, Wrench, Sparkles, Terminal } from 'lucide-react';
+import { Home, GitFork, Map, Trophy, BookOpen, Wrench, Sparkles, Terminal, Clock } from 'lucide-react';
 import './Sidebar.css';
 
 interface SidebarProps {
@@ -10,10 +10,11 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange }) => {
   const items = [
     { id: 'match', icon: Home, label: 'Lobby' },
+    { id: 'problems', icon: BookOpen, label: 'Problems' },
     { id: 'contest', icon: GitFork, label: 'Contests' },
     { id: 'ranking', icon: Map, label: 'Map' },
     { id: 'shop', icon: Trophy, label: 'Shop' },
-    { id: 'editor', icon: BookOpen, label: 'Problems' },
+    { id: 'submissions', icon: Clock, label: 'Submissions' },
     { id: 'ai', icon: Sparkles, label: 'AI Assistant' },
     { id: 'settings', icon: Wrench, label: 'Tools' },
     { id: 'tester', icon: Terminal, label: 'API Tester' },

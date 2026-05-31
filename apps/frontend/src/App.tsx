@@ -9,6 +9,8 @@ import { ContestView } from './views/ContestView';
 import { SettingsView } from './views/SettingsView';
 import { AIView } from './views/AIView';
 import { ApiTesterView } from './views/tester/ApiTesterView';
+import { ProblemsView } from './views/ProblemsView';
+import { SubmissionsView } from './views/SubmissionsView';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AuthModal } from './components/auth/AuthModal';
 import './App.css';
@@ -17,10 +19,11 @@ function AppContent() {
   const { user, token, loading } = useAuth();
   const [currentView, setCurrentView] = useState<string>(() => {
     const hash = window.location.hash.replace('#', '');
-    const allowedViews = ['match', 'contest', 'ranking', 'shop', 'editor', 'ai', 'settings', 'tester'];
-    return allowedViews.includes(hash) ? hash : 'match';
+    const allowed = ['match', 'contest', 'ranking', 'shop', 'editor', 'ai', 'settings', 'tester', 'problems', 'submissions'];
+    return allowed.includes(hash) ? hash : 'match';
   });
   const [activeMatch, setActiveMatch] = useState<any>(null);
+  const [selectedProblemSlug, setSelectedProblemSlug] = useState<string | null>(null);
 
   useEffect(() => {
     window.location.hash = currentView;
@@ -29,8 +32,8 @@ function AppContent() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
-      const allowedViews = ['match', 'contest', 'ranking', 'shop', 'editor', 'ai', 'settings', 'tester'];
-      if (allowedViews.includes(hash)) {
+      const allowed = ['match', 'contest', 'ranking', 'shop', 'editor', 'ai', 'settings', 'tester', 'problems', 'submissions'];
+      if (allowed.includes(hash)) {
         setCurrentView(hash);
       }
     };
@@ -40,6 +43,7 @@ function AppContent() {
 
   const handleStartMatch = (matchData: any) => {
     setActiveMatch(matchData);
+    setSelectedProblemSlug(null);
     setCurrentView('editor');
   };
 
@@ -77,7 +81,7 @@ function AppContent() {
             <ShopView />
           )}
           {currentView === 'editor' && (
-            <SoloEditorView activeMatch={activeMatch} />
+            <SoloEditorView activeMatch={activeMatch} problemSlug={selectedProblemSlug} />
           )}
           {currentView === 'ai' && (
             <AIView />
@@ -87,6 +91,15 @@ function AppContent() {
           )}
           {currentView === 'tester' && (
             <ApiTesterView />
+          )}
+          {currentView === 'problems' && (
+            <ProblemsView onSelectProblem={(slug) => {
+              setSelectedProblemSlug(slug);
+              setCurrentView('editor');
+            }} />
+          )}
+          {currentView === 'submissions' && (
+            <SubmissionsView />
           )}
         </main>
       </div>

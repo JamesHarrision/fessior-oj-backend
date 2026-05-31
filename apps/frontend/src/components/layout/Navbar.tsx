@@ -72,10 +72,11 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, onViewChange }) => 
       <nav className="navbar-center">
         {[
           { id: 'match', label: 'Lobby' },
+          { id: 'problems', label: 'Problems' },
           { id: 'contest', label: 'Contests' },
           { id: 'ranking', label: 'Rankings' },
           { id: 'shop', label: 'Shop' },
-          { id: 'editor', label: 'Editor' },
+          { id: 'submissions', label: 'Submissions' },
           { id: 'settings', label: 'Tools' },
           { id: 'tester', label: 'API Tester' },
         ].map((item) => (

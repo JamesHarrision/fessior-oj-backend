@@ -10,9 +10,10 @@ import './SoloEditorView.css';
 
 interface SoloEditorViewProps {
   activeMatch?: any;
+  problemSlug?: string | null;
 }
 
-export const SoloEditorView: React.FC<SoloEditorViewProps> = ({ activeMatch }) => {
+export const SoloEditorView: React.FC<SoloEditorViewProps> = ({ activeMatch, problemSlug }) => {
   const { user } = useAuth();
   
   // Problem state
@@ -54,7 +55,11 @@ export const SoloEditorView: React.FC<SoloEditorViewProps> = ({ activeMatch }) =
 
   // Fetch problems if not in active match
   useEffect(() => {
-    if (!activeMatch) {
+    if (activeMatch) return;
+    
+    if (problemSlug) {
+      fetchProblemDetail(problemSlug);
+    } else {
       api.getProblems().then((res) => {
         if (res.success && res.data) {
           const list = Array.isArray(res.data) ? res.data : (res.data.items || []);
@@ -65,7 +70,7 @@ export const SoloEditorView: React.FC<SoloEditorViewProps> = ({ activeMatch }) =
         }
       });
     }
-  }, [activeMatch]);
+  }, [activeMatch, problemSlug]);
 
   // Set default starter code whenever problem or language changes
   useEffect(() => {
