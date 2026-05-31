@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ApiEndpoint } from './apiListData';
+import type { ApiEndpoint } from './apiListData';
 import { Play } from 'lucide-react';
 
 interface ApiRequestFormProps {

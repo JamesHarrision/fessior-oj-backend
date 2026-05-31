@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { API_LIST, ApiEndpoint } from './apiListData';
+import { API_LIST, type ApiEndpoint } from './apiListData';
 import { ApiRequestForm } from './ApiRequestForm';
 import { ApiResponseView } from './ApiResponseView';
 import { useAuth } from '../../context/AuthContext';
