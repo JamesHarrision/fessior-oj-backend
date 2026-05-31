@@ -77,6 +77,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, onViewChange }) => 
           { id: 'shop', label: 'Shop' },
           { id: 'editor', label: 'Editor' },
           { id: 'settings', label: 'Tools' },
+          { id: 'tester', label: 'API Tester' },
         ].map((item) => (
           <button
             key={item.id}

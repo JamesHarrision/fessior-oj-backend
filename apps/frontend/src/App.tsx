@@ -8,6 +8,7 @@ import { ShopView } from './views/ShopView';
 import { ContestView } from './views/ContestView';
 import { SettingsView } from './views/SettingsView';
 import { AIView } from './views/AIView';
+import { ApiTesterView } from './views/tester/ApiTesterView';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AuthModal } from './components/auth/AuthModal';
 import './App.css';
@@ -16,7 +17,7 @@ function AppContent() {
   const { user, token, loading } = useAuth();
   const [currentView, setCurrentView] = useState<string>(() => {
     const hash = window.location.hash.replace('#', '');
-    const allowedViews = ['match', 'contest', 'ranking', 'shop', 'editor', 'ai', 'settings'];
+    const allowedViews = ['match', 'contest', 'ranking', 'shop', 'editor', 'ai', 'settings', 'tester'];
     return allowedViews.includes(hash) ? hash : 'match';
   });
   const [activeMatch, setActiveMatch] = useState<any>(null);
@@ -28,7 +29,7 @@ function AppContent() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
-      const allowedViews = ['match', 'contest', 'ranking', 'shop', 'editor', 'ai', 'settings'];
+      const allowedViews = ['match', 'contest', 'ranking', 'shop', 'editor', 'ai', 'settings', 'tester'];
       if (allowedViews.includes(hash)) {
         setCurrentView(hash);
       }
@@ -83,6 +84,9 @@ function AppContent() {
           )}
           {currentView === 'settings' && (
             <SettingsView />
+          )}
+          {currentView === 'tester' && (
+            <ApiTesterView />
           )}
         </main>
       </div>
