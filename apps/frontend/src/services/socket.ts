@@ -6,7 +6,8 @@ export const socketService = {
   connect: (token: string) => {
     if (socket) return socket;
     
-    socket = io('http://localhost:6868', {
+    const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:6868';
+    socket = io(socketUrl, {
       auth: { token },
       transports: ['websocket'],
     });
