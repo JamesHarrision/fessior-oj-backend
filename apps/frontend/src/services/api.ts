@@ -110,5 +110,6 @@ export const api = {
   markNotificationsAsRead: (notificationIds: string[]) =>
     request<any>('/notifications/read', { method: 'PUT', body: JSON.stringify({ notificationIds }) }),
   deleteNotification: (id: string) => request<any>(`/notifications/${id}`, { method: 'DELETE' }),
+  request: <T = any>(endpoint: string, options?: RequestInit) => request<T>(endpoint, options),
 };
 
