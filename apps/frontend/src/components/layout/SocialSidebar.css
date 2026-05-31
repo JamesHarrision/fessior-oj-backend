@@ -10,22 +10,38 @@
   min-height: 400px;
 }
 
-.social-header {
+.social-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 8px;
+}
+
+.social-tab-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 6px 4px;
+  cursor: pointer;
+  border-radius: 4px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 4px;
+  transition: all 0.2s;
 }
 
-.social-header h3 {
-  font-family: var(--font-heading);
-  font-size: 15px;
-  font-weight: 700;
-  color: #fff;
+.social-tab-btn:hover {
+  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.02);
 }
 
-.purple-glow-icon {
-  color: var(--color-purple);
-  filter: drop-shadow(0 0 4px rgba(168, 85, 247, 0.4));
+.social-tab-btn.active {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
 }
 
 .add-friend-form {
@@ -69,7 +85,7 @@
 
 .friend-msg {
   font-size: 11px;
-  color: var(--color-purple);
+  color: #60a5fa;
   margin: 0;
 }
 
@@ -81,9 +97,9 @@
   max-height: 300px;
 }
 
-.no-friends {
+.no-friends, .no-requests {
   font-size: 12px;
-  color: var(--text-muted);
+  color: #64748b;
   text-align: center;
   margin: 20px 0;
 }
@@ -144,17 +160,70 @@
 }
 
 .status-dot.offline {
-  background-color: var(--text-muted);
+  background-color: #475569;
 }
 
-.accept-friend-btn {
+.btn-remove-friend {
   background: none;
   border: none;
-  color: var(--color-green);
+  color: #64748b;
   cursor: pointer;
   padding: 4px;
+  transition: color 0.2s;
 }
 
-.accept-friend-btn:hover {
-  transform: scale(1.1);
+.btn-remove-friend:hover {
+  color: #f87171;
+}
+
+/* Requests list */
+.requests-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.request-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.request-name {
+  font-size: 0.85rem;
+  color: #e2e8f0;
+}
+
+.request-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.btn-accept, .btn-decline {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.btn-accept {
+  color: #34d399;
+}
+
+.btn-accept:hover {
+  background: rgba(52, 211, 153, 0.1);
+}
+
+.btn-decline {
+  color: #f87171;
+}
+
+.btn-decline:hover {
+  background: rgba(248, 113, 113, 0.1);
 }

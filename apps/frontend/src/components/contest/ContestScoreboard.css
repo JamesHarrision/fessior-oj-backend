@@ -1,0 +1,161 @@
+.contest-scoreboard {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 24px;
+}
+
+.scoreboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.title-section h3 {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+}
+
+.trophy-gold {
+  color: #fbbf24;
+  filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.4));
+}
+
+.scoreboard-table-wrapper {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.scoreboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.scoreboard-table th {
+  background: rgba(255, 255, 255, 0.02);
+  padding: 14px 18px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #94a3b8;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.scoreboard-table td {
+  padding: 12px 18px;
+  font-size: 0.9rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.scoreboard-row:hover {
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.cell-center {
+  text-align: center;
+}
+
+.empty-scoreboard {
+  text-align: center;
+  color: #64748b;
+  padding: 40px 0;
+}
+
+/* Rank medals */
+.rank-cell {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.medal-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.medal-badge.gold {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  box-shadow: 0 0 8px rgba(251, 191, 36, 0.5);
+}
+
+.medal-badge.silver {
+  background: linear-gradient(135deg, #cbd5e1, #94a3b8);
+  box-shadow: 0 0 8px rgba(203, 213, 225, 0.5);
+}
+
+.medal-badge.bronze {
+  background: linear-gradient(135deg, #b45309, #78350f);
+  box-shadow: 0 0 8px rgba(180, 83, 9, 0.5);
+  color: #fff;
+}
+
+/* User cell */
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.scoreboard-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.scoreboard-username {
+  font-weight: 600;
+  color: #f1f5f9;
+}
+
+.elo-cell {
+  color: #a855f7;
+  font-weight: 600;
+}
+
+.solved-badge {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.score-cell {
+  color: #f8fafc;
+}
+
+.penalty-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #e2e8f0;
+}
+
+/* Podium special rows styling */
+.scoreboard-row.podium-gold {
+  background: rgba(251, 191, 36, 0.02);
+}
+.scoreboard-row.podium-silver {
+  background: rgba(203, 213, 225, 0.01);
+}
+.scoreboard-row.podium-bronze {
+  background: rgba(180, 83, 9, 0.01);
+}

@@ -16,17 +16,14 @@ export const ProblemsView: React.FC<ProblemsViewProps> = ({ onSelectProblem }) =
   const [selectedTag, setSelectedTag] = useState('');
 
   useEffect(() => {
-    // Fetch tags
-    api.getProblems({}).then(res => {
-      // Fetch tags from distinct tags in problems or fallback
-      api.getProblems().then(problemsRes => {
-        if (problemsRes.success && problemsRes.data) {
-          const list = Array.isArray(problemsRes.data) ? problemsRes.data : (problemsRes.data.items || []);
-          setProblems(list);
-        }
-        setLoading(false);
-      }).catch(() => setLoading(false));
-    });
+    // Fetch problems
+    api.getProblems().then(problemsRes => {
+      if (problemsRes.success && problemsRes.data) {
+        const list = Array.isArray(problemsRes.data) ? problemsRes.data : (problemsRes.data.items || []);
+        setProblems(list);
+      }
+      setLoading(false);
+    }).catch(() => setLoading(false));
 
     api.getProblemTags().then(res => {
       if (res.success && res.data) {

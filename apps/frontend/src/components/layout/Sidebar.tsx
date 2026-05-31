@@ -1,5 +1,6 @@
 import React from 'react';
-import { Home, GitFork, Map, Trophy, BookOpen, Wrench, Sparkles, Terminal, Clock, Shield } from 'lucide-react';
+import { Home, GitFork, Map, Trophy, BookOpen, Wrench, Sparkles, Terminal, Clock, Shield, Settings } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 import './Sidebar.css';
 
 interface SidebarProps {
@@ -8,6 +9,7 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange }) => {
+  const { user } = useAuth();
   const items = [
     { id: 'match', icon: Home, label: 'Lobby' },
     { id: 'custom-rooms', icon: Shield, label: 'Custom Arena' },
@@ -20,6 +22,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange }) =
     { id: 'settings', icon: Wrench, label: 'Tools' },
     { id: 'tester', icon: Terminal, label: 'API Tester' },
   ];
+
+  if (user?.role === 'ADMIN') {
+    items.push({ id: 'admin', icon: Settings, label: 'Admin Panel' });
+  }
 
   return (
     <aside className="sidebar">

@@ -2,7 +2,6 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { Navbar } from './Navbar';
 import { useAuth } from '../../context/AuthContext';
-import { api } from '../../services/api';
 
 // Mock AuthContext hook
 vi.mock('../../context/AuthContext', () => ({

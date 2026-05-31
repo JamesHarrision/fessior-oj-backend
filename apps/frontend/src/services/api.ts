@@ -42,6 +42,8 @@ export const api = {
   },
   getProblemDetail: (slug: string) => request<any>(`/problems/${slug}`),
   getProblemTags: () => request<any>('/problems/tags'),
+  createProblem: (body: any) => request<any>('/problems', { method: 'POST', body: JSON.stringify(body) }),
+  deleteProblem: (id: string) => request<any>(`/problems/${id}`, { method: 'DELETE' }),
   getTestcases: (problemId: string, exampleOnly = false) =>
     request<any>(`/problems/${problemId}/testcases${exampleOnly ? '?example=true' : ''}`),
 
@@ -65,10 +67,15 @@ export const api = {
 
   // Friends & Presence
   getFriends: () => request<any>('/friends'),
+  getPendingRequests: () => request<any>('/friends/requests'),
   sendFriendRequest: (receiverId: string) =>
     request<any>('/friends/request', { method: 'POST', body: JSON.stringify({ receiverId }) }),
-  respondFriendRequest: (senderId: string, action: 'ACCEPT' | 'DECLINE') =>
-    request<any>('/friends/respond', { method: 'POST', body: JSON.stringify({ senderId, action }) }),
+  acceptFriendRequest: (senderId: string) =>
+    request<any>('/friends/accept', { method: 'POST', body: JSON.stringify({ senderId }) }),
+  declineFriendRequest: (senderId: string) =>
+    request<any>('/friends/decline', { method: 'POST', body: JSON.stringify({ senderId }) }),
+  removeFriend: (friendId: string) =>
+    request<any>(`/friends/${friendId}`, { method: 'DELETE' }),
 
   // Leaderboard
   getLeaderboard: () => request<any>('/leaderboard'),
@@ -83,9 +90,14 @@ export const api = {
   // Reports
   submitReport: (body: { type: string; content: string; problemId?: string }) =>
     request<any>('/reports', { method: 'POST', body: JSON.stringify(body) }),
+  getReports: () => request<any>('/reports'),
+  updateReportStatus: (reportId: string, body: { status: string }) =>
+    request<any>(`/reports/${reportId}`, { method: 'PUT', body: JSON.stringify(body) }),
 
   // Contests
   getContests: () => request<any>('/contests'),
+  createContest: (body: any) => request<any>('/contests', { method: 'POST', body: JSON.stringify(body) }),
+  deleteContest: (contestId: string) => request<any>(`/contests/${contestId}`, { method: 'DELETE' }),
   registerContest: (contestId: string) => request<any>(`/contests/${contestId}/register`, { method: 'POST' }),
   getContestLeaderboard: (contestId: string) => request<any>(`/contests/${contestId}/leaderboard`),
 

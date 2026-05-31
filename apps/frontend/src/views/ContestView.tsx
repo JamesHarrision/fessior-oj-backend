@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { api } from '../services/api';
 import { GitFork, Calendar, Award } from 'lucide-react';
 import './ContestView.css';
+import { ContestScoreboard } from '../components/contest/ContestScoreboard';
 
 export const ContestView: React.FC = () => {
   const [contests, setContests] = useState<any[]>([]);
@@ -63,32 +64,10 @@ export const ContestView: React.FC = () => {
       {loading ? (
         <div className="contest-loading">Đang tải các giải đấu...</div>
       ) : activeLeaderboard ? (
-        <div className="contest-leaderboard-section">
-          <div className="lb-header">
-            <h3>Bảng xếp hạng giải đấu</h3>
-            <button onClick={() => setActiveLeaderboard(null)} className="back-btn">
-              Quay lại danh sách
-            </button>
-          </div>
-          <div className="lb-table">
-            <div className="lb-row lb-head">
-              <span>Hạng</span>
-              <span>Đấu thủ</span>
-              <span>Điểm số</span>
-            </div>
-            {activeLeaderboard.length === 0 ? (
-              <p className="no-lb">Chưa có xếp hạng cho giải đấu này.</p>
-            ) : (
-              activeLeaderboard.map((row: any, idx: number) => (
-                <div key={idx} className="lb-row">
-                  <span>{idx + 1}</span>
-                  <span>{row.username}</span>
-                  <span>{row.score}</span>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
+        <ContestScoreboard
+          leaderboardData={activeLeaderboard}
+          onBack={() => setActiveLeaderboard(null)}
+        />
       ) : (
         <div className="contest-list">
           {contests.length === 0 ? (

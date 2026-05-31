@@ -4,6 +4,8 @@ import { socketService } from '../services/socket';
 import { api } from '../services/api';
 import { OpponentStatus } from '../components/editor/OpponentStatus';
 import { ProblemDescription } from '../components/editor/ProblemDescription';
+import { ProblemComments } from '../components/editor/ProblemComments';
+import { ReportForm } from '../components/editor/ReportForm';
 import { CodeEditorPane } from '../components/editor/CodeEditorPane';
 import { ConsolePane } from '../components/editor/ConsolePane';
 import './SoloEditorView.css';
@@ -16,7 +18,8 @@ interface SoloEditorViewProps {
 export const SoloEditorView: React.FC<SoloEditorViewProps> = ({ activeMatch, problemSlug }) => {
   const { user } = useAuth();
   
-  // Problem state
+  // Tabs and problem state
+  const [leftTab, setLeftTab] = useState<'desc' | 'comments' | 'report'>('desc');
   const [problem, setProblem] = useState<any>(activeMatch?.problem || null);
   const [problemsList, setProblemsList] = useState<any[]>([]);
   
@@ -194,7 +197,35 @@ export const SoloEditorView: React.FC<SoloEditorViewProps> = ({ activeMatch, pro
 
       <div className="editor-main-layout">
         <div className="left-column">
-          <ProblemDescription problem={problem} />
+          <div className="left-tabs-header">
+            <button 
+              className={`left-tab-btn ${leftTab === 'desc' ? 'active' : ''}`}
+              onClick={() => setLeftTab('desc')}
+            >
+              Mô tả
+            </button>
+            <button 
+              className={`left-tab-btn ${leftTab === 'comments' ? 'active' : ''}`}
+              onClick={() => setLeftTab('comments')}
+            >
+              Thảo luận
+            </button>
+            <button 
+              className={`left-tab-btn ${leftTab === 'report' ? 'active' : ''}`}
+              onClick={() => setLeftTab('report')}
+            >
+              Báo cáo
+            </button>
+          </div>
+          <div className="left-tab-content">
+            {leftTab === 'desc' ? (
+              <ProblemDescription problem={problem} />
+            ) : leftTab === 'comments' ? (
+              <ProblemComments problemId={problem?.id || problem?._id} />
+            ) : (
+              <ReportForm problemId={problem?.id || problem?._id} />
+            )}
+          </div>
         </div>
         
         <div className="right-column">

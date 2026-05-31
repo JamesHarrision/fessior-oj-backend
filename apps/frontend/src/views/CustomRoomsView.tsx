@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import { socketService } from '../services/socket';
 import { useAuth } from '../context/AuthContext';
-import { Shield, Plus, Users, ArrowRight, X, LogOut, Play } from 'lucide-react';
+import { Shield, Plus, Users, ArrowRight, LogOut, Play } from 'lucide-react';
 import './CustomRoomsView.css';
 
 interface CustomRoomsViewProps {
@@ -39,7 +39,7 @@ export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomM
       setActiveRoom(updatedRoom);
     });
 
-    socketService.onPlayerLeft(({ userId }) => {
+    socketService.onPlayerLeft(() => {
       setActiveRoom((prev: any) => {
         if (!prev) return null;
         return { ...prev, opponent_id: null, opponent: null };

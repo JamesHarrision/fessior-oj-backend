@@ -1,18 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../../services/api';
-import { UserCheck, UserPlus, Users } from 'lucide-react';
+import { UserCheck, UserPlus, Users, Trash2, X } from 'lucide-react';
 import './SocialSidebar.css';
 
 export const SocialSidebar: React.FC = () => {
   const [friends, setFriends] = useState<any[]>([]);
+  const [requests, setRequests] = useState<any[]>([]);
   const [newFriendUsername, setNewFriendUsername] = useState('');
   const [message, setMessage] = useState('');
+  const [activeTab, setActiveTab] = useState<'list' | 'requests'>('list');
 
-  const loadFriends = async () => {
+  const loadSocialData = async () => {
     try {
-      const res = await api.getFriends();
-      if (res.success && res.data) {
-        setFriends(res.data);
+      const friendsRes = await api.getFriends();
+      if (friendsRes.success && friendsRes.data) {
+        setFriends(friendsRes.data);
+      }
+      const requestsRes = await api.getPendingRequests();
+      if (requestsRes.success && requestsRes.data) {
+        setRequests(requestsRes.data);
       }
     } catch (err) {
       console.error(err);
@@ -20,8 +26,8 @@ export const SocialSidebar: React.FC = () => {
   };
 
   useEffect(() => {
-    loadFriends();
-    const interval = setInterval(loadFriends, 10000); // Poll friends every 10s
+    loadSocialData();
+    const interval = setInterval(loadSocialData, 10000);
     return () => clearInterval(interval);
   }, []);
 
@@ -30,22 +36,45 @@ export const SocialSidebar: React.FC = () => {
     if (!newFriendUsername.trim()) return;
     setMessage('');
     try {
-      // Find receiver ID by username
       const res = await api.sendFriendRequest(newFriendUsername);
       if (res.success) {
         setMessage('Đã gửi yêu cầu kết bạn!');
         setNewFriendUsername('');
+        loadSocialData();
       }
     } catch (err: any) {
-      setMessage(err.message || 'Không tìm thấy người chơi này.');
+      setMessage(err.message || 'Không gửi được yêu cầu.');
     }
   };
 
-  const handleAcceptRequest = async (senderId: string) => {
+  const handleAccept = async (senderId: string) => {
     try {
-      const res = await api.respondFriendRequest(senderId, 'ACCEPT');
+      const res = await api.acceptFriendRequest(senderId);
       if (res.success) {
-        loadFriends();
+        loadSocialData();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDecline = async (senderId: string) => {
+    try {
+      const res = await api.declineFriendRequest(senderId);
+      if (res.success) {
+        loadSocialData();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleRemove = async (friendId: string) => {
+    if (!window.confirm('Xóa bạn bè này khỏi danh sách?')) return;
+    try {
+      const res = await api.removeFriend(friendId);
+      if (res.success) {
+        loadSocialData();
       }
     } catch (err) {
       console.error(err);
@@ -54,55 +83,95 @@ export const SocialSidebar: React.FC = () => {
 
   return (
     <div className="social-sidebar glass-card">
-      <div className="social-header">
-        <Users size={18} className="purple-glow-icon" />
-        <h3>Bạn bè trực tuyến</h3>
-      </div>
-
-      <form onSubmit={handleSendRequest} className="add-friend-form">
-        <input
-          type="text"
-          value={newFriendUsername}
-          onChange={(e) => setNewFriendUsername(e.target.value)}
-          placeholder="Tên bạn bè..."
-          className="friend-input"
-        />
-        <button type="submit" className="add-friend-btn">
-          <UserPlus size={16} />
+      <div className="social-tabs">
+        <button 
+          onClick={() => setActiveTab('list')} 
+          className={`social-tab-btn ${activeTab === 'list' ? 'active' : ''}`}
+        >
+          <Users size={16} /> Bạn bè ({friends.length})
         </button>
-      </form>
-      {message && <p className="friend-msg">{message}</p>}
-
-      <div className="friend-list">
-        {friends.length === 0 ? (
-          <p className="no-friends">Chưa có bạn bè nào.</p>
-        ) : (
-          friends.map((friend) => (
-            <div key={friend.id} className="friend-item">
-              <img
-                src={friend.avatar_url || `https://api.dicebear.com/7.x/adventurer/svg?seed=${friend.username}`}
-                alt="avatar"
-                className="friend-avatar"
-              />
-              <div className="friend-info">
-                <span className="friend-name">{friend.username}</span>
-                <span className="friend-elo">{friend.elo_rating} ELO</span>
-              </div>
-              <div className={`status-dot ${friend.is_online ? 'online' : 'offline'}`} />
-
-              {friend.isPending && (
-                <button
-                  onClick={() => handleAcceptRequest(friend.id)}
-                  className="accept-friend-btn"
-                  title="Chấp nhận kết bạn"
-                >
-                  <UserCheck size={14} />
-                </button>
-              )}
-            </div>
-          ))
-        )}
+        <button 
+          onClick={() => setActiveTab('requests')} 
+          className={`social-tab-btn ${activeTab === 'requests' ? 'active' : ''}`}
+        >
+          Yêu cầu ({requests.length})
+        </button>
       </div>
+
+      {activeTab === 'list' ? (
+        <>
+          <form onSubmit={handleSendRequest} className="add-friend-form">
+            <input
+              type="text"
+              value={newFriendUsername}
+              onChange={(e) => setNewFriendUsername(e.target.value)}
+              placeholder="Nhập username kết bạn..."
+              className="friend-input"
+            />
+            <button type="submit" className="add-friend-btn">
+              <UserPlus size={16} />
+            </button>
+          </form>
+          {message && <p className="friend-msg">{message}</p>}
+
+          <div className="friend-list">
+            {friends.length === 0 ? (
+              <p className="no-friends">Chưa có bạn bè nào.</p>
+            ) : (
+              friends.map((friend) => (
+                <div key={friend.id} className="friend-item">
+                  <img
+                    src={friend.avatar_url || `https://api.dicebear.com/7.x/adventurer/svg?seed=${friend.username}`}
+                    alt="avatar"
+                    className="friend-avatar"
+                  />
+                  <div className="friend-info">
+                    <span className="friend-name">{friend.username}</span>
+                    <span className="friend-elo">{friend.elo_rating} ELO</span>
+                  </div>
+                  <div className={`status-dot ${friend.is_online ? 'online' : 'offline'}`} />
+                  <button
+                    onClick={() => handleRemove(friend.id)}
+                    className="btn-remove-friend"
+                    title="Hủy kết bạn"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+        </>
+      ) : (
+        <div className="requests-list">
+          {requests.length === 0 ? (
+            <p className="no-requests">Không có lời mời kết bạn nào.</p>
+          ) : (
+            requests.map((req) => (
+              <div key={req.id || req.sender_id} className="request-item">
+                <span className="request-name">{req.sender?.username || 'User'}</span>
+                <div className="request-actions">
+                  <button
+                    onClick={() => handleAccept(req.sender_id || req.sender?.id)}
+                    className="btn-accept"
+                    title="Chấp nhận"
+                  >
+                    <UserCheck size={14} />
+                  </button>
+                  <button
+                    onClick={() => handleDecline(req.sender_id || req.sender?.id)}
+                    className="btn-decline"
+                    title="Từ chối"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
     </div>
   );
 };
+export default SocialSidebar;

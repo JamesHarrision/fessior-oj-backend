@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
-import { Clock, Eye, Sparkles, AlertCircle } from 'lucide-react';
+import { Clock, Eye, Sparkles } from 'lucide-react';
 import './SubmissionsView.css';
 
 export const SubmissionsView: React.FC = () => {

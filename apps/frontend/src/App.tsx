@@ -12,6 +12,7 @@ import { ApiTesterView } from './views/tester/ApiTesterView';
 import { ProblemsView } from './views/ProblemsView';
 import { SubmissionsView } from './views/SubmissionsView';
 import { CustomRoomsView } from './views/CustomRoomsView';
+import { AdminDashboard } from './views/AdminDashboard';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AuthModal } from './components/auth/AuthModal';
 import './App.css';
@@ -20,7 +21,7 @@ function AppContent() {
   const { user, token, loading } = useAuth();
   const [currentView, setCurrentView] = useState<string>(() => {
     const hash = window.location.hash.replace('#', '');
-    const allowed = ['match', 'contest', 'ranking', 'shop', 'editor', 'ai', 'settings', 'tester', 'problems', 'submissions', 'custom-rooms'];
+    const allowed = ['match', 'contest', 'ranking', 'shop', 'editor', 'ai', 'settings', 'tester', 'problems', 'submissions', 'custom-rooms', 'admin'];
     return allowed.includes(hash) ? hash : 'match';
   });
   const [activeMatch, setActiveMatch] = useState<any>(null);
@@ -33,7 +34,7 @@ function AppContent() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
-      const allowed = ['match', 'contest', 'ranking', 'shop', 'editor', 'ai', 'settings', 'tester', 'problems', 'submissions', 'custom-rooms'];
+      const allowed = ['match', 'contest', 'ranking', 'shop', 'editor', 'ai', 'settings', 'tester', 'problems', 'submissions', 'custom-rooms', 'admin'];
       if (allowed.includes(hash)) {
         setCurrentView(hash);
       }
@@ -107,6 +108,9 @@ function AppContent() {
               setActiveMatch({ id: matchId, problem_id: problemId });
               setCurrentView('editor');
             }} />
+          )}
+          {currentView === 'admin' && (
+            <AdminDashboard />
           )}
         </main>
       </div>
