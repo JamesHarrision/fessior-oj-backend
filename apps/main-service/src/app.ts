@@ -15,6 +15,7 @@ import friendshipRoutes from './routes/friendship.route';
 import shopRoutes from './routes/shop.route';
 import notificationRoutes from './routes/notification.route';
 import reportRoutes from './routes/report.route';
+import { errorMiddleware } from './middlewares/error.middleware';
 
 const app = express();
 
@@ -36,9 +37,8 @@ app.use('/api/v1/shop', shopRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/reports', reportRoutes);
 
-
 app.get('/', async (req, res) => {
-  const userCount = await prisma.user.findMany();
+  const userCount = await prisma.user.count();
   return res.status(200).json({
     status: "Success",
     message: "Welcome x 3.14",
@@ -46,6 +46,7 @@ app.get('/', async (req, res) => {
   })
 });
 
-
+// Global error handler middleware should be at the end of route declarations
+app.use(errorMiddleware);
 
 export default app;
