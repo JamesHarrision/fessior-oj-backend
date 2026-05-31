@@ -45,6 +45,15 @@ export const socketService = {
     socket?.emit('forfeit-match', { matchId });
   },
 
+  // Custom Room Emitters
+  joinCustomRoom: (roomCode: string) => {
+    socket?.emit('join-custom-room', { roomCode });
+  },
+
+  leaveCustomRoom: (roomCode: string) => {
+    socket?.emit('leave-custom-room', { roomCode });
+  },
+
   // Listeners
   onQueueStatus: (callback: (data: { status: 'QUEUED' | 'IDLE' | 'MATCHED'; elo?: number; message?: string }) => void) => {
     socket?.off('queue-status');
@@ -89,5 +98,26 @@ export const socketService = {
   }) => void) => {
     socket?.off('match-ended');
     socket?.on('match-ended', callback);
+  },
+
+  // Custom Room Listeners
+  onMatchStarted: (callback: (data: { matchId: string; roomId: string; problemId: string }) => void) => {
+    socket?.off('match-started');
+    socket?.on('match-started', callback);
+  },
+
+  onPlayerLeft: (callback: (data: { userId: string }) => void) => {
+    socket?.off('player-left');
+    socket?.on('player-left', callback);
+  },
+
+  onConfigUpdated: (callback: (data: any) => void) => {
+    socket?.off('config-updated');
+    socket?.on('config-updated', callback);
+  },
+
+  onRoomDeleted: (callback: () => void) => {
+    socket?.off('room-deleted');
+    socket?.on('room-deleted', callback);
   },
 };

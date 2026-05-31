@@ -11,6 +11,7 @@ import { AIView } from './views/AIView';
 import { ApiTesterView } from './views/tester/ApiTesterView';
 import { ProblemsView } from './views/ProblemsView';
 import { SubmissionsView } from './views/SubmissionsView';
+import { CustomRoomsView } from './views/CustomRoomsView';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AuthModal } from './components/auth/AuthModal';
 import './App.css';
@@ -19,7 +20,7 @@ function AppContent() {
   const { user, token, loading } = useAuth();
   const [currentView, setCurrentView] = useState<string>(() => {
     const hash = window.location.hash.replace('#', '');
-    const allowed = ['match', 'contest', 'ranking', 'shop', 'editor', 'ai', 'settings', 'tester', 'problems', 'submissions'];
+    const allowed = ['match', 'contest', 'ranking', 'shop', 'editor', 'ai', 'settings', 'tester', 'problems', 'submissions', 'custom-rooms'];
     return allowed.includes(hash) ? hash : 'match';
   });
   const [activeMatch, setActiveMatch] = useState<any>(null);
@@ -32,7 +33,7 @@ function AppContent() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
-      const allowed = ['match', 'contest', 'ranking', 'shop', 'editor', 'ai', 'settings', 'tester', 'problems', 'submissions'];
+      const allowed = ['match', 'contest', 'ranking', 'shop', 'editor', 'ai', 'settings', 'tester', 'problems', 'submissions', 'custom-rooms'];
       if (allowed.includes(hash)) {
         setCurrentView(hash);
       }
@@ -100,6 +101,12 @@ function AppContent() {
           )}
           {currentView === 'submissions' && (
             <SubmissionsView />
+          )}
+          {currentView === 'custom-rooms' && (
+            <CustomRoomsView onStartCustomMatch={(matchId, problemId) => {
+              setActiveMatch({ id: matchId, problem_id: problemId });
+              setCurrentView('editor');
+            }} />
           )}
         </main>
       </div>

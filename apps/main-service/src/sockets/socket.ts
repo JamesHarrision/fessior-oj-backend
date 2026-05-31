@@ -103,6 +103,17 @@ export const initSocket = (socketIoServer: Server) => {
       }
     });
 
+    // Custom Room Subscriptions
+    socket.on('join-custom-room', (data: { roomCode: string }) => {
+      socket.join(`custom-room:${data.roomCode}`);
+      console.log(`Socket ${socket.id} joined custom-room: ${data.roomCode}`);
+    });
+
+    socket.on('leave-custom-room', (data: { roomCode: string }) => {
+      socket.leave(`custom-room:${data.roomCode}`);
+      console.log(`Socket ${socket.id} left custom-room: ${data.roomCode}`);
+    });
+
     socket.on('disconnect', () => {
       console.log(`Socket disconnected: ${socket.id}`);
       removeUserFromQueue(socket.data.user.userId);
