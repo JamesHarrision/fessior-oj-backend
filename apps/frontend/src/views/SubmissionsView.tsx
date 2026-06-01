@@ -88,7 +88,7 @@ export const SubmissionsView: React.FC = () => {
                 submissions.map(sub => (
                   <tr key={sub.id || sub._id}>
                     <td className="code-font">{String(sub.id || sub._id).slice(-6)}</td>
-                    <td className="bold">{sub.problem?.title || sub.problemId}</td>
+                    <td className="bold">{sub.problemId?.title || sub.problem?.title || sub.problemId}</td>
                     <td className="code-font">{sub.language}</td>
                     <td>
                       <span className={`verdict-badge status-${sub.status.toLowerCase()}`}>
@@ -120,10 +120,10 @@ export const SubmissionsView: React.FC = () => {
             
             <div className="modal-content">
               <div className="meta-grid">
-                <div><strong>Đề bài:</strong> {selectedSub.problem?.title || selectedSub.problemId}</div>
+                <div><strong>Đề bài:</strong> {selectedSub.problemId?.title || selectedSub.problem?.title || selectedSub.problemId}</div>
                 <div><strong>Kết quả:</strong> <span className={`verdict-badge status-${selectedSub.status.toLowerCase()}`}>{selectedSub.status}</span></div>
                 <div><strong>Ngôn ngữ:</strong> {selectedSub.language}</div>
-                <div><strong>Độ khó:</strong> {selectedSub.problem?.difficulty || 'N/A'}</div>
+                <div><strong>Độ khó:</strong> {selectedSub.problemId?.difficulty || selectedSub.problem?.difficulty || 'N/A'}</div>
               </div>
 
               <h4>Mã nguồn đã nộp:</h4>
