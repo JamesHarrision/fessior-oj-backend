@@ -82,8 +82,8 @@ export const AdminDashboard: React.FC = () => {
     try {
       const res = await api.createContest({
         title: contestTitle,
-        startTime: contestStart,
-        endTime: contestEnd,
+        startTime: new Date(contestStart).toISOString(),
+        endTime: new Date(contestEnd).toISOString(),
         problems: [],
       });
       if (res.success) {
