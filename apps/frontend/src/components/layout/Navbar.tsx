@@ -19,7 +19,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, onViewChange }) => 
     try {
       const res = await api.getNotifications();
       if (res.success && res.data) {
-        setNotifications(res.data);
+        setNotifications(res.data.items || []);
       }
     } catch (err) {
       console.error('Failed to fetch notifications:', err);
@@ -39,7 +39,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, onViewChange }) => 
       const res = await api.markNotificationsAsRead([id]);
       if (res.success) {
         setNotifications((prev) =>
-          prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+          prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
         );
       }
     } catch (err) {
@@ -58,7 +58,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, onViewChange }) => 
     }
   };
 
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
+  const unreadCount = notifications.filter((n) => !n.is_read).length;
 
   return (
     <header className="navbar">
@@ -112,13 +112,13 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, onViewChange }) => 
                   <p className="no-notif">Không có thông báo nào.</p>
                 ) : (
                   notifications.map((n) => (
-                    <div key={n.id} className={`notif-item ${n.isRead ? 'read' : 'unread'}`}>
+                    <div key={n.id} className={`notif-item ${n.is_read ? 'read' : 'unread'}`}>
                       <div className="notif-content">
                         <p className="notif-text">{n.content || n.message}</p>
-                        <span className="notif-time">{new Date(n.createdAt).toLocaleTimeString()}</span>
+                        <span className="notif-time">{new Date(n.created_at).toLocaleTimeString()}</span>
                       </div>
                       <div className="notif-actions">
-                        {!n.isRead && (
+                        {!n.is_read && (
                           <button
                             onClick={() => handleMarkAsRead(n.id)}
                             className="notif-action-btn read-btn"
