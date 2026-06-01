@@ -14,11 +14,11 @@ export const SocialSidebar: React.FC = () => {
     try {
       const friendsRes = await api.getFriends();
       if (friendsRes.success && friendsRes.data) {
-        setFriends(friendsRes.data);
+        setFriends(friendsRes.data.items || []);
       }
       const requestsRes = await api.getPendingRequests();
       if (requestsRes.success && requestsRes.data) {
-        setRequests(requestsRes.data);
+        setRequests(requestsRes.data.incoming || []);
       }
     } catch (err) {
       console.error(err);
@@ -129,7 +129,7 @@ export const SocialSidebar: React.FC = () => {
                     <span className="friend-name">{friend.username}</span>
                     <span className="friend-elo">{friend.elo_rating} ELO</span>
                   </div>
-                  <div className={`status-dot ${friend.is_online ? 'online' : 'offline'}`} />
+                  <div className={`status-dot ${friend.online ? 'online' : 'offline'}`} />
                   <button
                     onClick={() => handleRemove(friend.id)}
                     className="btn-remove-friend"
