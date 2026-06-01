@@ -62,7 +62,7 @@ const executeLocally = async (
           status: 'CE',
           time: 0,
           memory: 0,
-          error: `Compilation Error:\n${err.stderr?.toString() || err.message}`,
+          error: `Lỗi biên dịch cục bộ (Local Compilation Error):\nKhông tìm thấy hoặc không thể chạy trình biên dịch 'g++' trên hệ thống Windows của bạn.\n\nGợi ý:\n1. Môi trường Docker/WSL2 của bạn gặp lỗi cgroup sandbox (Error 13), do đó hệ thống tự động chuyển sang chế độ biên dịch cục bộ.\n2. Máy của bạn chưa cài đặt hoặc chưa cấu hình biến môi trường PATH cho 'g++' (MinGW).\n3. Hãy cài đặt g++ hoặc chuyển sang ngôn ngữ Python để chạy thử ổn định.`,
         });
         try { fs.unlinkSync(filePath); } catch {}
         return;
