@@ -107,15 +107,15 @@ export const ShopView: React.FC = () => {
               <p className="no-items">Kho đồ trống. Hãy ghé cửa hàng để mua vật phẩm nhé!</p>
             ) : (
               inventory.map((invItem) => (
-                <div key={invItem.id} className={`shop-item-card ${invItem.isEquipped ? 'equipped' : ''}`}>
+                <div key={invItem.id} className={`shop-item-card ${invItem.is_equipped ? 'equipped' : ''}`}>
                   <div className="item-icon-wrapper">
-                    {invItem.isEquipped ? <Check size={24} className="check-icon" /> : <Sparkles size={24} className="sparkle-icon" />}
+                    {invItem.is_equipped ? <Check size={24} className="check-icon" /> : <Sparkles size={24} className="sparkle-icon" />}
                   </div>
                   <h3 className="item-name">{invItem.item.name}</h3>
                   <p className="item-desc">{invItem.item.description}</p>
                   <div className="item-footer">
-                    <span className="equipped-label">{invItem.isEquipped ? 'Đang trang bị' : 'Chưa dùng'}</span>
-                    {!invItem.isEquipped && (
+                    <span className="equipped-label">{invItem.is_equipped ? 'Đang trang bị' : 'Chưa dùng'}</span>
+                    {!invItem.is_equipped && (
                       <button onClick={() => handleEquip(invItem.id)} className="equip-btn">
                         Trang bị
                       </button>
