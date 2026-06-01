@@ -112,8 +112,10 @@ export const ProblemDescription: React.FC<ProblemProps> = ({ problem }) => {
               <span className={`badge difficulty ${difficulty.toLowerCase()}`}>
                 {difficulty}
               </span>
-              {tags.map((tag, idx) => (
-                <span key={idx} className="badge tag">{tag}</span>
+              {tags.map((tag: any, idx) => (
+                <span key={idx} className="badge tag" style={tag.color ? { borderColor: tag.color, color: tag.color } : undefined}>
+                  {typeof tag === 'object' ? tag.name : tag}
+                </span>
               ))}
             </div>
             <div
