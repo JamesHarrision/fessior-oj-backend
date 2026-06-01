@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const friendRequestSchema = z.object({
-  receiverId: z.string().uuid('Invalid receiver ID format'),
+  receiverId: z.string().min(1, 'Receiver ID or username is required'),
 });
 
 export const friendAcceptSchema = z.object({

@@ -117,6 +117,11 @@ export class ContestRepository {
         _count: {
           select: { registrations: true, problems: true },
         },
+        registrations: {
+          select: {
+            user_id: true,
+          },
+        },
       },
     });
   }
