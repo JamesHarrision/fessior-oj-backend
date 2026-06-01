@@ -62,8 +62,8 @@ export const RankingView: React.FC = () => {
                       />
                       <span className="player-username-cell">{player.username}</span>
                     </div>
-                    <span className="player-elo-cell">{player.elo_rating}</span>
-                    <span className="player-streak-cell">🔥 {player.streak_count}</span>
+                    <span className="player-elo-cell">{player.elo}</span>
+                    <span className="player-streak-cell">🔥 {player.streak}</span>
                   </div>
                 );
               })
