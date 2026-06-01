@@ -3,8 +3,10 @@ import { api } from '../services/api';
 import { GitFork, Calendar, Award } from 'lucide-react';
 import './ContestView.css';
 import { ContestScoreboard } from '../components/contest/ContestScoreboard';
+import { useAuth } from '../context/AuthContext';
 
 export const ContestView: React.FC = () => {
+  const { user } = useAuth();
   const [contests, setContests] = useState<any[]>([]);
   const [activeLeaderboard, setActiveLeaderboard] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -73,35 +75,51 @@ export const ContestView: React.FC = () => {
           {contests.length === 0 ? (
             <p className="no-contests">Hiện tại không có giải đấu nào đang mở.</p>
           ) : (
-            contests.map((contest) => (
-              <div key={contest.id} className="contest-card">
-                <div className="contest-meta">
-                  <h3 className="contest-title">{contest.title}</h3>
-                  <span className={`status-badge ${contest.status.toLowerCase()}`}>
-                    {contest.status}
-                  </span>
-                </div>
-                <div className="contest-details">
-                  <span>
-                    <Calendar size={14} /> Bắt đầu: {new Date(contest.startTime).toLocaleString()}
-                  </span>
-                  <span>
-                    <Award size={14} /> Thời lượng: {contest.durationMinutes} phút
-                  </span>
-                </div>
-                <div className="contest-actions">
-                  {!contest.isRegistered && contest.status === 'UPCOMING' && (
-                    <button onClick={() => handleRegister(contest.id)} className="register-btn">
-                      Đăng ký tham gia
+            contests.map((contest) => {
+              const now = new Date();
+              const startTime = new Date(contest.start_time);
+              const endTime = new Date(contest.end_time);
+              
+              let status = 'UPCOMING';
+              if (now >= startTime && now <= endTime) {
+                status = 'ONGOING';
+              } else if (now > endTime) {
+                status = 'PAST';
+              }
+
+              const durationMinutes = Math.round((endTime.getTime() - startTime.getTime()) / 60000);
+              const isRegistered = contest.registrations?.some((r: any) => r.user_id === user?.id);
+
+              return (
+                <div key={contest.id} className="contest-card">
+                  <div className="contest-meta">
+                    <h3 className="contest-title">{contest.title}</h3>
+                    <span className={`status-badge ${status.toLowerCase()}`}>
+                      {status}
+                    </span>
+                  </div>
+                  <div className="contest-details">
+                    <span>
+                      <Calendar size={14} /> Bắt đầu: {startTime.toLocaleString()}
+                    </span>
+                    <span>
+                      <Award size={14} /> Thời lượng: {durationMinutes} phút
+                    </span>
+                  </div>
+                  <div className="contest-actions">
+                    {!isRegistered && status === 'UPCOMING' && (
+                      <button onClick={() => handleRegister(contest.id)} className="register-btn">
+                        Đăng ký tham gia
+                      </button>
+                    )}
+                    {isRegistered && <span className="registered-tag">Đã đăng ký</span>}
+                    <button onClick={() => handleViewLeaderboard(contest.id)} className="view-lb-btn">
+                      Xem xếp hạng
                     </button>
-                  )}
-                  {contest.isRegistered && <span className="registered-tag">Đã đăng ký</span>}
-                  <button onClick={() => handleViewLeaderboard(contest.id)} className="view-lb-btn">
-                    Xem xếp hạng
-                  </button>
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       )}
