@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import { socketService } from '../services/socket';
 import { useAuth } from '../context/AuthContext';
-import { Shield, Plus, Users, ArrowRight, LogOut, Play } from 'lucide-react';
+import { Shield, Plus, ArrowRight } from 'lucide-react';
+import { ActiveRoomsTable } from '../components/rooms/ActiveRoomsTable';
+import { RoomLobbyPanel } from '../components/rooms/RoomLobbyPanel';
 import './CustomRoomsView.css';
 
 interface CustomRoomsViewProps {
@@ -84,7 +86,6 @@ export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomM
     try {
       const res = await api.joinRoom({ roomCode: targetCode });
       if (res.success && res.data) {
-        // joinRoom returns { room, matchId }
         setActiveRoom(res.data.room);
         if (res.data.matchId) {
           onStartCustomMatch(res.data.matchId, res.data.room.problem_id || '');
@@ -113,55 +114,13 @@ export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomM
   };
 
   if (activeRoom) {
-    const isCreator = activeRoom.creator_id === user?.id;
     return (
-      <div className="room-lobby-container glass-card">
-        <div className="lobby-header">
-          <h3>Phòng Đấu Tùy Chỉnh: <span className="room-code-badge">{activeRoom.room_code}</span></h3>
-          <button onClick={handleLeaveRoom} className="btn-leave glass-button">
-            <LogOut size={16} /> {isCreator ? 'Giải tán phòng' : 'Rời phòng'}
-          </button>
-        </div>
-
-        <div className="lobby-players">
-          <div className="player-box glass-card creator-box">
-            <span className="player-badge">CHỦ PHÒNG</span>
-            <h4>{activeRoom.creator?.username || user?.username}</h4>
-            <span className="player-elo">ELO: {activeRoom.creator?.elo_rating || user?.elo_rating}</span>
-          </div>
-
-          <div className="versus-badge">VS</div>
-
-          <div className="player-box glass-card opponent-box">
-            {activeRoom.opponent_id ? (
-              <>
-                <span className="player-badge opponent">ĐỐI THỦ</span>
-                <h4>{activeRoom.opponent?.username || 'Đang tải...'}</h4>
-                <span className="player-elo">ELO: {activeRoom.opponent?.elo_rating}</span>
-              </>
-            ) : (
-              <div className="waiting-placeholder">
-                <div className="pulse-loader"></div>
-                <p>Đang chờ đối thủ tham gia...</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="lobby-config glass-card">
-          <h4>Cấu hình trận đấu</h4>
-          <p><strong>Độ khó đề bài:</strong> {activeRoom.difficulty || 'Mọi độ khó'}</p>
-          <p><strong>Thời gian giới hạn:</strong> {activeRoom.time_limit || 2000} ms</p>
-          {isCreator && activeRoom.opponent_id && (
-            <button 
-              onClick={() => handleJoinRoom(activeRoom.room_code)} 
-              className="btn-start-match glass-button"
-            >
-              <Play size={18} /> Bắt đầu Duel!
-            </button>
-          )}
-        </div>
-      </div>
+      <RoomLobbyPanel
+        activeRoom={activeRoom}
+        user={user}
+        onLeaveRoom={handleLeaveRoom}
+        onStartMatch={handleJoinRoom}
+      />
     );
   }
 
@@ -209,47 +168,9 @@ export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomM
         </div>
       </div>
 
-      <div className="active-rooms-list glass-card">
-        <div className="list-title">
-          <Users size={18} />
-          <h3>Phòng chơi đang mở</h3>
-        </div>
-        <div className="rooms-table-wrap">
-          <table className="rooms-table">
-            <thead>
-              <tr>
-                <th>Mã phòng</th>
-                <th>Chủ phòng</th>
-                <th>Độ khó</th>
-                <th>Người chơi</th>
-                <th>Hành động</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rooms.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="empty-cell">Không có phòng chơi tùy chỉnh nào đang đợi. Hãy tự tạo một phòng!</td>
-                </tr>
-              ) : (
-                rooms.map(r => (
-                  <tr key={r.id}>
-                    <td className="code-font bold">{r.room_code}</td>
-                    <td>{r.creator?.username}</td>
-                    <td><span className={`diff-pill diff-${r.difficulty?.toLowerCase() || 'easy'}`}>{r.difficulty || 'ANY'}</span></td>
-                    <td>1 / 2</td>
-                    <td>
-                      <button onClick={() => handleJoinRoom(r.room_code)} className="btn-join-row glass-button">
-                        Tham gia
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <ActiveRoomsTable rooms={rooms} onJoinRoom={handleJoinRoom} />
     </div>
   );
 };
+
 export default CustomRoomsView;
