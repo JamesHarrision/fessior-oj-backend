@@ -7,10 +7,11 @@ import { LeftTabPanel } from '../components/editor/LeftTabPanel';
 import { MatchResultModal } from '../components/editor/MatchResultModal';
 import { CodeEditorPane } from '../components/editor/CodeEditorPane';
 import { ConsolePane } from '../components/editor/ConsolePane';
+import type { IMatch, IProblem, IUser } from '@ocj/types';
 import './SoloEditorView.css';
 
 interface SoloEditorViewProps {
-  activeMatch?: any;
+  activeMatch?: IMatch;
   problemSlug?: string | null;
 }
 
@@ -18,8 +19,8 @@ export const SoloEditorView: React.FC<SoloEditorViewProps> = ({ activeMatch, pro
   const { user } = useAuth();
   
   // Problem states
-  const [problem, setProblem] = useState<any>(activeMatch?.problem || null);
-  const [problemsList, setProblemsList] = useState<any[]>([]);
+  const [problem, setProblem] = useState<IProblem | null>(activeMatch?.problem || null);
+  const [problemsList, setProblemsList] = useState<IProblem[]>([]);
   
   // Code editor states
   const [code, setCode] = useState('');
@@ -158,8 +159,8 @@ export const SoloEditorView: React.FC<SoloEditorViewProps> = ({ activeMatch, pro
   };
 
   // Identify opponent profile details
-  const opponent = activeMatch 
-    ? (activeMatch.player1.userId === user?.id ? activeMatch.player2 : activeMatch.player1)
+  const opponent: IUser | null = activeMatch 
+    ? ((activeMatch.player1?.userId === user?.id ? activeMatch.player2 : activeMatch.player1) || null)
     : null;
 
   return (

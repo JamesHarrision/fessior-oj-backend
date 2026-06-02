@@ -1,9 +1,10 @@
 import React from 'react';
 import { LogOut, Play } from 'lucide-react';
+import type { ICustomRoom, IUser } from '@ocj/types';
 
 interface RoomLobbyPanelProps {
-  activeRoom: any;
-  user: any;
+  activeRoom: ICustomRoom;
+  user: IUser | null;
   onLeaveRoom: () => void;
   onStartMatch: (code: string) => void;
 }

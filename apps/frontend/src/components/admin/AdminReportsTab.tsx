@@ -1,8 +1,9 @@
 import React from 'react';
 import { Check, X } from 'lucide-react';
+import type { IReport } from '@ocj/types';
 
 interface AdminReportsTabProps {
-  reports: any[];
+  reports: IReport[];
   onUpdateStatus: (id: string, status: 'RESOLVED' | 'REJECTED') => void;
 }
 

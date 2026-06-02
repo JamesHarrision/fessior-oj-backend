@@ -5,6 +5,7 @@ import { Settings, FileText, Calendar, ShieldAlert } from 'lucide-react';
 import { AdminProblemsTab } from '../components/admin/AdminProblemsTab';
 import { AdminContestsTab } from '../components/admin/AdminContestsTab';
 import { AdminReportsTab } from '../components/admin/AdminReportsTab';
+import type { IProblem, IContest, IReport } from '@ocj/types';
 import './AdminDashboard.css';
 
 export const AdminDashboard: React.FC = () => {
@@ -12,9 +13,9 @@ export const AdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'problems' | 'contests' | 'reports'>('problems');
 
   // Lists
-  const [problems, setProblems] = useState<any[]>([]);
-  const [contests, setContests] = useState<any[]>([]);
-  const [reports, setReports] = useState<any[]>([]);
+  const [problems, setProblems] = useState<IProblem[]>([]);
+  const [contests, setContests] = useState<IContest[]>([]);
+  const [reports, setReports] = useState<IReport[]>([]);
 
   // Create form states
   const [probTitle, setProbTitle] = useState('');

@@ -3,10 +3,11 @@ import { Terminal, Play, CheckCircle } from 'lucide-react';
 import { api } from '../../services/api';
 import { TestCaseSelector } from './TestCaseSelector';
 import { ExecutionResultPanel } from './ExecutionResultPanel';
+import type { IProblem } from '@ocj/types';
 import './ConsolePane.css';
 
 interface ConsolePaneProps {
-  problem: any;
+  problem: IProblem | null;
   code: string;
   language: string;
   onSubmit: () => void;

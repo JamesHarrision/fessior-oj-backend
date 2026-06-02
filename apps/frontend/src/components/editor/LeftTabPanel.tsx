@@ -2,14 +2,15 @@ import React, { useState } from 'react';
 import { ProblemDescription } from './ProblemDescription';
 import { ProblemComments } from './ProblemComments';
 import { ReportForm } from './ReportForm';
+import type { IProblem } from '@ocj/types';
 
 interface LeftTabPanelProps {
-  problem: any;
+  problem: IProblem | null;
 }
 
 export const LeftTabPanel: React.FC<LeftTabPanelProps> = ({ problem }) => {
   const [leftTab, setLeftTab] = useState<'desc' | 'comments' | 'report'>('desc');
-  const problemId = problem?.id || problem?._id;
+  const problemId = problem?.id || problem?._id || '';
 
   return (
     <div className="left-column">

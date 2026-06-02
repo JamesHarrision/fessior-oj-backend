@@ -1,8 +1,9 @@
 import React from 'react';
 import { Users } from 'lucide-react';
+import type { ICustomRoom } from '@ocj/types';
 
 interface ActiveRoomsTableProps {
-  rooms: any[];
+  rooms: ICustomRoom[];
   onJoinRoom: (code: string) => void;
 }
 

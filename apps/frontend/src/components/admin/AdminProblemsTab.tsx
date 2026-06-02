@@ -1,5 +1,6 @@
 import React from 'react';
 import { Plus, X } from 'lucide-react';
+import type { IProblem } from '@ocj/types';
 
 interface AdminProblemsTabProps {
   probTitle: string;
@@ -9,7 +10,7 @@ interface AdminProblemsTabProps {
   probDiff: 'EASY' | 'MEDIUM' | 'HARD';
   setProbDiff: (val: 'EASY' | 'MEDIUM' | 'HARD') => void;
   onSubmit: (e: React.FormEvent) => void;
-  problems: any[];
+  problems: IProblem[];
   onDelete: (id: string) => void;
 }
 
@@ -69,7 +70,7 @@ export const AdminProblemsTab: React.FC<AdminProblemsTabProps> = ({
                 </span>
               </span>
               <button
-                onClick={() => onDelete(p.id || p.mongo_problem_id)}
+                onClick={() => onDelete(p.id || p.mongo_problem_id || '')}
                 className="btn-admin-delete"
               >
                 <X size={14} />

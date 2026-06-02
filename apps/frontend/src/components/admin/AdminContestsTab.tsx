@@ -1,5 +1,6 @@
 import React from 'react';
 import { Plus, X } from 'lucide-react';
+import type { IContest } from '@ocj/types';
 
 interface AdminContestsTabProps {
   contestTitle: string;
@@ -9,7 +10,7 @@ interface AdminContestsTabProps {
   contestEnd: string;
   setContestEnd: (val: string) => void;
   onSubmit: (e: React.FormEvent) => void;
-  contests: any[];
+  contests: IContest[];
   onDelete: (id: string) => void;
 }
 

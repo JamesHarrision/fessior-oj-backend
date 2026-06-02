@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { Shield, Plus, ArrowRight } from 'lucide-react';
 import { ActiveRoomsTable } from '../components/rooms/ActiveRoomsTable';
 import { RoomLobbyPanel } from '../components/rooms/RoomLobbyPanel';
+import type { ICustomRoom } from '@ocj/types';
 import './CustomRoomsView.css';
 
 interface CustomRoomsViewProps {
@@ -13,8 +14,8 @@ interface CustomRoomsViewProps {
 
 export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomMatch }) => {
   const { user } = useAuth();
-  const [rooms, setRooms] = useState<any[]>([]);
-  const [activeRoom, setActiveRoom] = useState<any>(null);
+  const [rooms, setRooms] = useState<ICustomRoom[]>([]);
+  const [activeRoom, setActiveRoom] = useState<ICustomRoom | null>(null);
   const [roomCodeInput, setRoomCodeInput] = useState('');
   const [difficulty, setDifficulty] = useState<'EASY' | 'MEDIUM' | 'HARD'>('EASY');
   const [loading, setLoading] = useState(false);

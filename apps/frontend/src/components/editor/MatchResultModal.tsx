@@ -1,9 +1,10 @@
 import React from 'react';
+import type { IUser } from '@ocj/types';
 
 interface MatchResultModalProps {
   matchResult: any;
-  user: any;
-  opponent: any;
+  user: IUser | null;
+  opponent: IUser | null;
   onClose: () => void;
 }
 

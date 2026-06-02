@@ -2,18 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { BookOpen, MessageSquare, ThumbsUp, Trash2, Send } from 'lucide-react';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import type { IProblem } from '@ocj/types';
 import './ProblemDescription.css';
 
 interface ProblemProps {
-  problem?: {
-    id?: string;
-    _id?: string;
-    slug: string;
-    title: string;
-    description: string;
-    difficulty: string;
-    tags?: string[];
-  };
+  problem?: IProblem | null;
 }
 
 export const ProblemDescription: React.FC<ProblemProps> = ({ problem }) => {
