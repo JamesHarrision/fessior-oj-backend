@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { validateUsername, validateEmail, checkPasswordStrength } from '@ocj/validators';
 import './AuthModal.css';
 
 export const AuthModal: React.FC = () => {
@@ -20,6 +21,22 @@ export const AuthModal: React.FC = () => {
       if (isLogin) {
         await login(email, password);
       } else {
+        if (!validateUsername(username)) {
+          setError('Tên hiển thị không hợp lệ! Tên phải từ 3-30 ký tự, chỉ gồm chữ, số hoặc dấu gạch dưới.');
+          setLoading(false);
+          return;
+        }
+        if (!validateEmail(email)) {
+          setError('Email không hợp lệ!');
+          setLoading(false);
+          return;
+        }
+        const pwdStrength = checkPasswordStrength(password);
+        if (!pwdStrength.isStrong) {
+          setError('Mật khẩu quá yếu! ' + pwdStrength.feedback.join(' '));
+          setLoading(false);
+          return;
+        }
         await register(username, email, password);
         // Switch to login tab on success
         setIsLogin(true);

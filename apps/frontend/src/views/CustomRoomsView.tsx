@@ -6,6 +6,7 @@ import { Shield, Plus, ArrowRight } from 'lucide-react';
 import { ActiveRoomsTable } from '../components/rooms/ActiveRoomsTable';
 import { RoomLobbyPanel } from '../components/rooms/RoomLobbyPanel';
 import type { ICustomRoom } from '@ocj/types';
+import { validateRoomCode } from '@ocj/validators';
 import './CustomRoomsView.css';
 
 interface CustomRoomsViewProps {
@@ -83,6 +84,10 @@ export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomM
   const handleJoinRoom = async (codeToJoin?: string) => {
     const targetCode = codeToJoin || roomCodeInput;
     if (!targetCode) return;
+    if (!validateRoomCode(targetCode)) {
+      alert('Mã phòng đấu không hợp lệ! Mã phòng phải đúng 6 ký tự, chỉ chứa chữ và số.');
+      return;
+    }
     setLoading(true);
     try {
       const res = await api.joinRoom({ roomCode: targetCode });
