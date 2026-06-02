@@ -3,9 +3,8 @@ import { useAuth } from '../context/AuthContext';
 import { socketService } from '../services/socket';
 import { api } from '../services/api';
 import { OpponentStatus } from '../components/editor/OpponentStatus';
-import { ProblemDescription } from '../components/editor/ProblemDescription';
-import { ProblemComments } from '../components/editor/ProblemComments';
-import { ReportForm } from '../components/editor/ReportForm';
+import { LeftTabPanel } from '../components/editor/LeftTabPanel';
+import { MatchResultModal } from '../components/editor/MatchResultModal';
 import { CodeEditorPane } from '../components/editor/CodeEditorPane';
 import { ConsolePane } from '../components/editor/ConsolePane';
 import './SoloEditorView.css';
@@ -18,8 +17,7 @@ interface SoloEditorViewProps {
 export const SoloEditorView: React.FC<SoloEditorViewProps> = ({ activeMatch, problemSlug }) => {
   const { user } = useAuth();
   
-  // Tabs and problem state
-  const [leftTab, setLeftTab] = useState<'desc' | 'comments' | 'report'>('desc');
+  // Problem states
   const [problem, setProblem] = useState<any>(activeMatch?.problem || null);
   const [problemsList, setProblemsList] = useState<any[]>([]);
   
@@ -147,7 +145,6 @@ export const SoloEditorView: React.FC<SoloEditorViewProps> = ({ activeMatch, pro
       });
 
       if (res.success && res.data) {
-        // Poll for submission evaluation completion
         runSubmissionPoll(res.data.id || res.data._id);
       } else {
         setIsSubmitting(false);
@@ -196,37 +193,7 @@ export const SoloEditorView: React.FC<SoloEditorViewProps> = ({ activeMatch, pro
       )}
 
       <div className="editor-main-layout">
-        <div className="left-column">
-          <div className="left-tabs-header">
-            <button 
-              className={`left-tab-btn ${leftTab === 'desc' ? 'active' : ''}`}
-              onClick={() => setLeftTab('desc')}
-            >
-              Mô tả
-            </button>
-            <button 
-              className={`left-tab-btn ${leftTab === 'comments' ? 'active' : ''}`}
-              onClick={() => setLeftTab('comments')}
-            >
-              Thảo luận
-            </button>
-            <button 
-              className={`left-tab-btn ${leftTab === 'report' ? 'active' : ''}`}
-              onClick={() => setLeftTab('report')}
-            >
-              Báo cáo
-            </button>
-          </div>
-          <div className="left-tab-content">
-            {leftTab === 'desc' ? (
-              <ProblemDescription problem={problem} />
-            ) : leftTab === 'comments' ? (
-              <ProblemComments problemId={problem?.id || problem?._id} />
-            ) : (
-              <ReportForm problemId={problem?.id || problem?._id} />
-            )}
-          </div>
-        </div>
+        <LeftTabPanel problem={problem} />
         
         <div className="right-column">
           <CodeEditorPane
@@ -249,39 +216,12 @@ export const SoloEditorView: React.FC<SoloEditorViewProps> = ({ activeMatch, pro
       </div>
 
       {matchResult && (
-        <div className="match-result-overlay">
-          <div className="result-modal glass-card">
-            <h2>{matchResult.winnerId === user?.id ? '🏆 CHIẾN THẮNG!' : '💀 THẤT BẠI'}</h2>
-            <p className="result-subtitle">Kết quả trận đấu PvP Arena</p>
-            
-            <div className="elo-changes">
-              <div className="elo-box">
-                <span className="player-label">{user?.username}</span>
-                <span className="elo-value">
-                  {matchResult.eloUpdates[user?.id || '']?.elo || 1000} 
-                  <span className="elo-diff plus">
-                    (+{matchResult.eloUpdates[user?.id || '']?.change || 0})
-                  </span>
-                </span>
-              </div>
-              {opponent && (
-                <div className="elo-box">
-                  <span className="player-label">{opponent.username}</span>
-                  <span className="elo-value">
-                    {matchResult.eloUpdates[opponent.userId]?.elo || 1000}
-                    <span className="elo-diff minus">
-                      ({matchResult.eloUpdates[opponent.userId]?.change || 0})
-                    </span>
-                  </span>
-                </div>
-              )}
-            </div>
-
-            <button className="close-result-btn" onClick={() => window.location.reload()}>
-              Quay lại sảnh
-            </button>
-          </div>
-        </div>
+        <MatchResultModal
+          matchResult={matchResult}
+          user={user}
+          opponent={opponent}
+          onClose={() => window.location.reload()}
+        />
       )}
     </div>
   );
