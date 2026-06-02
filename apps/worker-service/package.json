@@ -18,6 +18,7 @@
     "typescript": "^6.0.3"
   },
   "dependencies": {
+    "@ocj/executor": "*",
     "axios": "^1.7.9",
     "bullmq": "^5.77.3",
     "dotenv": "^17.4.2",

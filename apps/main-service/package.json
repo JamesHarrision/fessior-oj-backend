@@ -43,6 +43,7 @@
     "typescript": "^6.0.3"
   },
   "dependencies": {
+    "@ocj/executor": "*",
     "@google/generative-ai": "^0.24.1",
     "@prisma/client": "5.22",
     "bcrypt": "^6.0.0",
