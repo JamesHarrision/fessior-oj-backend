@@ -1,5 +1,6 @@
 import React from 'react';
 import { AlertCircle, Clock, Cpu } from 'lucide-react';
+import { formatExecutionTime, formatMemoryKb } from '@ocj/utils';
 
 interface ExecutionResultPanelProps {
   isRunning: boolean;
@@ -67,7 +68,7 @@ export const ExecutionResultPanel: React.FC<ExecutionResultPanelProps> = ({
               <div className="case-tabs">
                 {runResults.map((result, idx) => (
                   <button
-                    key={idx}
+                     key={idx}
                     className={`case-tab-btn ${runActiveCaseIdx === idx ? 'active' : ''} ${result.status}`}
                     onClick={() => setRunActiveCaseIdx(idx)}
                   >
@@ -85,11 +86,11 @@ export const ExecutionResultPanel: React.FC<ExecutionResultPanelProps> = ({
                     <div className="metrics-group">
                       <span className="metric-item">
                         <Clock size={12} />
-                        {runResults[runActiveCaseIdx].time} ms
+                        {formatExecutionTime(runResults[runActiveCaseIdx].time)}
                       </span>
                       <span className="metric-item">
                         <Cpu size={12} />
-                        {runResults[runActiveCaseIdx].memory} KB
+                        {formatMemoryKb(runResults[runActiveCaseIdx].memory)}
                       </span>
                     </div>
                   </div>

@@ -3,6 +3,7 @@ import { BookOpen, MessageSquare, ThumbsUp, Trash2, Send } from 'lucide-react';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import type { IProblem } from '@ocj/types';
+import { renderMarkdownToHtml } from '@ocj/utils';
 import './ProblemDescription.css';
 
 interface ProblemProps {
@@ -113,7 +114,7 @@ export const ProblemDescription: React.FC<ProblemProps> = ({ problem }) => {
             </div>
             <div
               className="problem-text"
-              dangerouslySetInnerHTML={{ __html: description }}
+              dangerouslySetInnerHTML={{ __html: renderMarkdownToHtml(description) }}
             />
           </>
         ) : (

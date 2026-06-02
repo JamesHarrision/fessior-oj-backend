@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { validateUsername, validateEmail, checkPasswordStrength } from '@ocj/validators';
+import { parseErrorMessage } from '@ocj/utils';
 import './AuthModal.css';
 
 export const AuthModal: React.FC = () => {
@@ -43,7 +44,7 @@ export const AuthModal: React.FC = () => {
         setError('Đăng ký thành công! Hãy đăng nhập.');
       }
     } catch (err: any) {
-      setError(err.message || 'Thao tác thất bại, vui lòng thử lại.');
+      setError(parseErrorMessage(err));
     } finally {
       setLoading(false);
     }

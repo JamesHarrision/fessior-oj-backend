@@ -3,6 +3,7 @@ import { Problem } from '../models/problem.model';
 import { MatchStatus, PlayerMatchStatus } from '@prisma/client';
 import { io } from './socket';
 import { SOCKET_EVENTS } from '@ocj/constants';
+import { calculateEloPvP } from '@ocj/utils';
 
 export interface QueuePlayer {
   userId: string;
@@ -158,9 +159,11 @@ export const endMatch = async (matchId: string, winnerId: string) => {
 
     if (!winner || !loser) return;
 
-    // ELO updates (+25 for winner, -15 for loser)
-    const newWinnerElo = winner.elo_rating + 25;
-    const newLoserElo = Math.max(800, loser.elo_rating - 15); // Floor ELO at 800
+    // ELO updates
+    const { newWinnerElo, newLoserElo, winnerChange, loserChange } = calculateEloPvP(
+      winner.elo_rating,
+      loser.elo_rating
+    );
 
     // Streak updates
     const newWinnerStreak = winner.streak_count + 1;
@@ -201,8 +204,8 @@ export const endMatch = async (matchId: string, winnerId: string) => {
       winnerId,
       loserId,
       eloUpdates: {
-        [winnerId]: { elo: newWinnerElo, change: +25, streak: newWinnerStreak },
-        [loserId]: { elo: newLoserElo, change: -15, streak: 0 },
+        [winnerId]: { elo: newWinnerElo, change: winnerChange, streak: newWinnerStreak },
+        [loserId]: { elo: newLoserElo, change: loserChange, streak: 0 },
       },
     });
 
