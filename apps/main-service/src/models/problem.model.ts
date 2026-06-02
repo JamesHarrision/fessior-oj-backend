@@ -1,4 +1,5 @@
 import { Schema, model, Document } from 'mongoose';
+import { DEFAULT_LIMITS } from '@ocj/constants';
 
 export interface IProblem extends Document {
   title: string;
@@ -24,8 +25,8 @@ const ProblemSchema = new Schema<IProblem>(
     slug: { type: String, required: true, unique: true, index: true },
     description: { type: String, required: true },
     difficulty: { type: String, enum: ['EASY', 'MEDIUM', 'HARD'], required: true },
-    timeLimit: { type: Number, default: 2000 },
-    memoryLimit: { type: Number, default: 256 },
+    timeLimit: { type: Number, default: DEFAULT_LIMITS.TIME_LIMIT_MS },
+    memoryLimit: { type: Number, default: DEFAULT_LIMITS.MEMORY_LIMIT_MB },
     starterCodes: {
       cpp: { type: String, default: '' },
       java: { type: String, default: '' },

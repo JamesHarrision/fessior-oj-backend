@@ -1,5 +1,6 @@
 import { notificationRepository } from '../repositories/notification.repository';
 import { io } from '../sockets/socket';
+import { SOCKET_EVENTS } from '@ocj/constants';
 
 export class NotificationService {
   async createNotification(data: {
@@ -13,7 +14,7 @@ export class NotificationService {
 
     // Emit real-time notification via Socket.IO
     if (io) {
-      io.to(`user:${data.userId}`).emit('notification', notification);
+      io.to(`user:${data.userId}`).emit(SOCKET_EVENTS.NOTIFICATION, notification);
     }
 
     return notification;

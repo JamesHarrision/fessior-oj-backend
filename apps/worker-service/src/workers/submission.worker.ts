@@ -4,6 +4,7 @@ import { Submission } from '../models/submission.model';
 import { Problem } from '../models/problem.model';
 import { Testcase } from '../models/testcase.model';
 import { executeTestCase, getLanguageId, LanguageKey } from '@ocj/executor';
+import { DEFAULT_LIMITS, REDIS_CHANNELS } from '@ocj/constants';
 
 const getRapidApiKey = () => process.env.RAPIDAPI_KEY || '';
 const getRapidApiHost = () => process.env.RAPIDAPI_HOST || 'judge0-ce.p.rapidapi.com';
@@ -61,7 +62,7 @@ export const startSubmissionWorker = () => {
             languageId,
             tc.input,
             tc.output,
-            problem.timeLimit || 2000,
+            problem.timeLimit || DEFAULT_LIMITS.TIME_LIMIT_MS,
             {
               judge0Url: getJudge0Url(),
               rapidApiKey: getRapidApiKey(),
@@ -94,7 +95,7 @@ export const startSubmissionWorker = () => {
 
         // 5. Publish update to Redis channel for Realtime Solo 1vs1 match updates
         await redis.publish(
-          'submission-updates',
+          REDIS_CHANNELS.SUBMISSION_UPDATES,
           JSON.stringify({
             submissionId,
             userId: submission.userId,

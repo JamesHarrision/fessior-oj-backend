@@ -11,6 +11,7 @@ import {
   handleSubmissionUpdate,
   QueuePlayer
 } from './matchmaking';
+import { SOCKET_EVENTS, REDIS_CHANNELS } from '@ocj/constants';
 
 export let io: Server | null = null;
 
@@ -38,14 +39,14 @@ export const initSocket = (socketIoServer: Server) => {
     }
   });
 
-  io.on('connection', (socket: Socket) => {
+  io.on(SOCKET_EVENTS.CONNECT, (socket: Socket) => {
     const connUserId = socket.data.user.userId;
     console.log(`Socket connected: ${socket.id} (User: ${connUserId})`);
     redis.sadd('online_users', connUserId).catch(err => console.error(err));
     socket.join(`user:${connUserId}`);
 
     // Matchmaking Join Queue
-    socket.on('join-queue', async () => {
+    socket.on(SOCKET_EVENTS.JOIN_QUEUE, async () => {
       try {
         const userId = socket.data.user.userId;
         
@@ -55,14 +56,14 @@ export const initSocket = (socketIoServer: Server) => {
         });
 
         if (!user) {
-          socket.emit('error', { message: 'User not found' });
+          socket.emit(SOCKET_EVENTS.ERROR, { message: 'User not found' });
           return;
         }
 
         // Check if already in queue
         const alreadyInQueue = matchmakingQueue.find((p) => p.userId === userId);
         if (alreadyInQueue) {
-          socket.emit('queue-status', { message: 'Already in queue' });
+          socket.emit(SOCKET_EVENTS.QUEUE_STATUS, { message: 'Already in queue' });
           return;
         }
 
@@ -75,24 +76,24 @@ export const initSocket = (socketIoServer: Server) => {
 
         matchmakingQueue.push(player);
         console.log(`Player joined queue: ${player.username} (ELO: ${player.elo})`);
-        socket.emit('queue-status', { status: 'QUEUED', elo: player.elo });
+        socket.emit(SOCKET_EVENTS.QUEUE_STATUS, { status: 'QUEUED', elo: player.elo });
 
         // Try matchmaking
         await tryMatchmaking();
       } catch (err) {
         console.error('Error joining matchmaking queue:', err);
-        socket.emit('error', { message: 'Failed to join matchmaking queue' });
+        socket.emit(SOCKET_EVENTS.ERROR, { message: 'Failed to join matchmaking queue' });
       }
     });
 
     // Leave Queue
-    socket.on('leave-queue', () => {
+    socket.on(SOCKET_EVENTS.LEAVE_QUEUE, () => {
       removeUserFromQueue(socket.data.user.userId);
-      socket.emit('queue-status', { status: 'IDLE' });
+      socket.emit(SOCKET_EVENTS.QUEUE_STATUS, { status: 'IDLE' });
     });
 
     // Handle Forfeit/Leave Match
-    socket.on('forfeit-match', async (data: { matchId: string }) => {
+    socket.on(SOCKET_EVENTS.FORFEIT_MATCH, async (data: { matchId: string }) => {
       try {
         const userId = socket.data.user.userId;
         await handleForfeit(data.matchId, userId);
@@ -102,17 +103,17 @@ export const initSocket = (socketIoServer: Server) => {
     });
 
     // Custom Room Subscriptions
-    socket.on('join-custom-room', (data: { roomCode: string }) => {
+    socket.on(SOCKET_EVENTS.JOIN_CUSTOM_ROOM, (data: { roomCode: string }) => {
       socket.join(`custom-room:${data.roomCode}`);
       console.log(`Socket ${socket.id} joined custom-room: ${data.roomCode}`);
     });
 
-    socket.on('leave-custom-room', (data: { roomCode: string }) => {
+    socket.on(SOCKET_EVENTS.LEAVE_CUSTOM_ROOM, (data: { roomCode: string }) => {
       socket.leave(`custom-room:${data.roomCode}`);
       console.log(`Socket ${socket.id} left custom-room: ${data.roomCode}`);
     });
 
-    socket.on('disconnect', () => {
+    socket.on(SOCKET_EVENTS.DISCONNECT, () => {
       console.log(`Socket disconnected: ${socket.id}`);
       removeUserFromQueue(socket.data.user.userId);
       redis.srem('online_users', socket.data.user.userId).catch(err => console.error(err));
@@ -120,16 +121,16 @@ export const initSocket = (socketIoServer: Server) => {
   });
 
   // Subscribe to Redis Pub/Sub submission updates
-  pubSubClient.subscribe('submission-updates', (err) => {
+  pubSubClient.subscribe(REDIS_CHANNELS.SUBMISSION_UPDATES, (err) => {
     if (err) {
-      console.error('Failed to subscribe to submission-updates channel:', err);
+      console.error(`Failed to subscribe to ${REDIS_CHANNELS.SUBMISSION_UPDATES} channel:`, err);
     } else {
-      console.log('Subscribed to submission-updates channel successfully');
+      console.log(`Subscribed to ${REDIS_CHANNELS.SUBMISSION_UPDATES} channel successfully`);
     }
   });
 
   pubSubClient.on('message', async (channel, message) => {
-    if (channel === 'submission-updates') {
+    if (channel === REDIS_CHANNELS.SUBMISSION_UPDATES) {
       try {
         const data = JSON.parse(message);
         await handleSubmissionUpdate(data);

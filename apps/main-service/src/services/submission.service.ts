@@ -5,6 +5,7 @@ import { submissionQueue } from '../config/queue';
 import { AppError } from '@ocj/errors';
 import mongoose from 'mongoose';
 import { executeTestCase, LANGUAGE_IDS, LanguageKey } from '@ocj/executor';
+import { DEFAULT_LIMITS } from '@ocj/constants';
 
 export class SubmissionService {
   async submit(
@@ -142,7 +143,7 @@ export class SubmissionService {
         languageId,
         tc.input,
         tc.output,
-        problem.timeLimit || 2000,
+        problem.timeLimit || DEFAULT_LIMITS.TIME_LIMIT_MS,
         {
           judge0Url,
           rapidApiKey,

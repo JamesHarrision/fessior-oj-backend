@@ -1,4 +1,5 @@
 import { io, Socket } from 'socket.io-client';
+import { SOCKET_EVENTS } from '@ocj/constants';
 
 let socket: Socket | null = null;
 
@@ -12,11 +13,11 @@ export const socketService = {
       transports: ['websocket'],
     });
 
-    socket.on('connect', () => {
+    socket.on(SOCKET_EVENTS.CONNECT, () => {
       console.log('Socket connected successfully with ID:', socket?.id);
     });
 
-    socket.on('disconnect', () => {
+    socket.on(SOCKET_EVENTS.DISCONNECT, () => {
       console.log('Socket disconnected');
     });
 
@@ -34,30 +35,30 @@ export const socketService = {
 
   // Matchmaking Emitters
   joinQueue: () => {
-    socket?.emit('join-queue');
+    socket?.emit(SOCKET_EVENTS.JOIN_QUEUE);
   },
 
   leaveQueue: () => {
-    socket?.emit('leave-queue');
+    socket?.emit(SOCKET_EVENTS.LEAVE_QUEUE);
   },
 
   forfeitMatch: (matchId: string) => {
-    socket?.emit('forfeit-match', { matchId });
+    socket?.emit(SOCKET_EVENTS.FORFEIT_MATCH, { matchId });
   },
 
   // Custom Room Emitters
   joinCustomRoom: (roomCode: string) => {
-    socket?.emit('join-custom-room', { roomCode });
+    socket?.emit(SOCKET_EVENTS.JOIN_CUSTOM_ROOM, { roomCode });
   },
 
   leaveCustomRoom: (roomCode: string) => {
-    socket?.emit('leave-custom-room', { roomCode });
+    socket?.emit(SOCKET_EVENTS.LEAVE_CUSTOM_ROOM, { roomCode });
   },
 
   // Listeners
   onQueueStatus: (callback: (data: { status: 'QUEUED' | 'IDLE' | 'MATCHED'; elo?: number; message?: string }) => void) => {
-    socket?.off('queue-status');
-    socket?.on('queue-status', callback);
+    socket?.off(SOCKET_EVENTS.QUEUE_STATUS);
+    socket?.on(SOCKET_EVENTS.QUEUE_STATUS, callback);
   },
 
   onMatchFound: (callback: (data: {
@@ -75,8 +76,8 @@ export const socketService = {
     player1: { userId: string; username: string; elo: number };
     player2: { userId: string; username: string; elo: number };
   }) => void) => {
-    socket?.off('match-found');
-    socket?.on('match-found', callback);
+    socket?.off(SOCKET_EVENTS.MATCH_FOUND);
+    socket?.on(SOCKET_EVENTS.MATCH_FOUND, callback);
   },
 
   onRivalSubmission: (callback: (data: {
@@ -85,8 +86,8 @@ export const socketService = {
     testCasesPassed: number;
     testCasesTotal: number;
   }) => void) => {
-    socket?.off('rival-submission');
-    socket?.on('rival-submission', callback);
+    socket?.off(SOCKET_EVENTS.RIVAL_SUBMISSION);
+    socket?.on(SOCKET_EVENTS.RIVAL_SUBMISSION, callback);
   },
 
   onMatchEnded: (callback: (data: {
@@ -96,28 +97,28 @@ export const socketService = {
       [userId: string]: { elo: number; change: number; streak: number };
     };
   }) => void) => {
-    socket?.off('match-ended');
-    socket?.on('match-ended', callback);
+    socket?.off(SOCKET_EVENTS.MATCH_ENDED);
+    socket?.on(SOCKET_EVENTS.MATCH_ENDED, callback);
   },
 
   // Custom Room Listeners
   onMatchStarted: (callback: (data: { matchId: string; roomId: string; problemId: string }) => void) => {
-    socket?.off('match-started');
-    socket?.on('match-started', callback);
+    socket?.off(SOCKET_EVENTS.MATCH_STARTED);
+    socket?.on(SOCKET_EVENTS.MATCH_STARTED, callback);
   },
 
   onPlayerLeft: (callback: (data: { userId: string }) => void) => {
-    socket?.off('player-left');
-    socket?.on('player-left', callback);
+    socket?.off(SOCKET_EVENTS.PLAYER_LEFT);
+    socket?.on(SOCKET_EVENTS.PLAYER_LEFT, callback);
   },
 
   onConfigUpdated: (callback: (data: any) => void) => {
-    socket?.off('config-updated');
-    socket?.on('config-updated', callback);
+    socket?.off(SOCKET_EVENTS.CONFIG_UPDATED);
+    socket?.on(SOCKET_EVENTS.CONFIG_UPDATED, callback);
   },
 
   onRoomDeleted: (callback: () => void) => {
-    socket?.off('room-deleted');
-    socket?.on('room-deleted', callback);
+    socket?.off(SOCKET_EVENTS.ROOM_DELETED);
+    socket?.on(SOCKET_EVENTS.ROOM_DELETED, callback);
   },
 };

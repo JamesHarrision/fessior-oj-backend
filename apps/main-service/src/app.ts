@@ -16,6 +16,7 @@ import shopRoutes from './routes/shop.route';
 import notificationRoutes from './routes/notification.route';
 import reportRoutes from './routes/report.route';
 import { errorMiddleware } from './middlewares/error.middleware';
+import { API_ROUTES } from '@ocj/constants';
 
 const app = express();
 
@@ -23,19 +24,19 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
-app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/problems', problemRoutes);
-app.use('/api/v1/submissions', submissionRoutes);
-app.use('/api/v1/ai', aiRoutes);
-app.use('/api/v1/leaderboard', leaderboardRoutes);
-app.use('/api/v1/rooms', roomRoutes);
-app.use('/api/v1/matches', matchRoutes);
-app.use('/api/v1/contests', contestRoutes);
-app.use('/api/v1/comments', commentRoutes);
-app.use('/api/v1/friends', friendshipRoutes);
-app.use('/api/v1/shop', shopRoutes);
-app.use('/api/v1/notifications', notificationRoutes);
-app.use('/api/v1/reports', reportRoutes);
+app.use(`/api/v1${API_ROUTES.AUTH}`, authRoutes);
+app.use(`/api/v1${API_ROUTES.PROBLEMS}`, problemRoutes);
+app.use(`/api/v1${API_ROUTES.SUBMISSIONS}`, submissionRoutes);
+app.use(`/api/v1${API_ROUTES.AI}`, aiRoutes);
+app.use(`/api/v1${API_ROUTES.LEADERBOARD}`, leaderboardRoutes);
+app.use(`/api/v1${API_ROUTES.ROOMS}`, roomRoutes);
+app.use(`/api/v1${API_ROUTES.MATCHES}`, matchRoutes);
+app.use(`/api/v1${API_ROUTES.CONTESTS}`, contestRoutes);
+app.use(`/api/v1${API_ROUTES.COMMENTS}`, commentRoutes);
+app.use(`/api/v1${API_ROUTES.FRIENDS}`, friendshipRoutes);
+app.use(`/api/v1${API_ROUTES.SHOP}`, shopRoutes);
+app.use(`/api/v1${API_ROUTES.NOTIFICATIONS}`, notificationRoutes);
+app.use(`/api/v1${API_ROUTES.REPORTS}`, reportRoutes);
 
 app.get('/', async (req, res) => {
   const userCount = await prisma.user.count();

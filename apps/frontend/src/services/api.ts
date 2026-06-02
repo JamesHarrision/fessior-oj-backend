@@ -1,3 +1,5 @@
+import { API_ROUTES } from '@ocj/constants';
+
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:6868/api/v1';
 
 const getHeaders = () => {
@@ -30,101 +32,101 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 
 export const api = {
   // Auth
-  register: (body: any) => request<any>('/auth/register', { method: 'POST', body: JSON.stringify(body) }),
-  login: (body: any) => request<any>('/auth/login', { method: 'POST', body: JSON.stringify(body) }),
-  logout: (body: any = {}) => request<any>('/auth/logout', { method: 'POST', body: JSON.stringify(body) }),
-  getMe: () => request<any>('/auth/me'),
+  register: (body: any) => request<any>(`${API_ROUTES.AUTH}/register`, { method: 'POST', body: JSON.stringify(body) }),
+  login: (body: any) => request<any>(`${API_ROUTES.AUTH}/login`, { method: 'POST', body: JSON.stringify(body) }),
+  logout: (body: any = {}) => request<any>(`${API_ROUTES.AUTH}/logout`, { method: 'POST', body: JSON.stringify(body) }),
+  getMe: () => request<any>(`${API_ROUTES.AUTH}/me`),
 
   // Problems
   getProblems: (params?: { difficulty?: string; tag?: string }) => {
     const query = new URLSearchParams(params as any).toString();
-    return request<any>(`/problems?${query}`);
+    return request<any>(`${API_ROUTES.PROBLEMS}?${query}`);
   },
-  getProblemDetail: (slug: string) => request<any>(`/problems/${slug}`),
-  getProblemTags: () => request<any>('/problems/tags'),
-  createProblem: (body: any) => request<any>('/problems', { method: 'POST', body: JSON.stringify(body) }),
-  deleteProblem: (id: string) => request<any>(`/problems/${id}`, { method: 'DELETE' }),
+  getProblemDetail: (slug: string) => request<any>(`${API_ROUTES.PROBLEMS}/${slug}`),
+  getProblemTags: () => request<any>(`${API_ROUTES.PROBLEMS}/tags`),
+  createProblem: (body: any) => request<any>(`${API_ROUTES.PROBLEMS}`, { method: 'POST', body: JSON.stringify(body) }),
+  deleteProblem: (id: string) => request<any>(`${API_ROUTES.PROBLEMS}/${id}`, { method: 'DELETE' }),
   getTestcases: (problemId: string, exampleOnly = false) =>
-    request<any>(`/problems/${problemId}/testcases${exampleOnly ? '?example=true' : ''}`),
+    request<any>(`${API_ROUTES.PROBLEMS}/${problemId}/testcases${exampleOnly ? '?example=true' : ''}`),
 
   // Submissions
   submitCode: (body: { problemId: string; language: string; code: string }) =>
-    request<any>('/submissions', { method: 'POST', body: JSON.stringify(body) }),
+    request<any>(`${API_ROUTES.SUBMISSIONS}`, { method: 'POST', body: JSON.stringify(body) }),
   runCode: (body: { problemId: string; language: string; code: string; customInput?: string }) =>
-    request<any>('/submissions/run', { method: 'POST', body: JSON.stringify(body) }),
-  getSubmissions: () => request<any>('/submissions'),
-  getSubmissionDetail: (id: string) => request<any>(`/submissions/${id}`),
+    request<any>(`${API_ROUTES.SUBMISSIONS}/run`, { method: 'POST', body: JSON.stringify(body) }),
+  getSubmissions: () => request<any>(`${API_ROUTES.SUBMISSIONS}`),
+  getSubmissionDetail: (id: string) => request<any>(`${API_ROUTES.SUBMISSIONS}/${id}`),
 
   // Rooms
-  getActiveRooms: () => request<any>('/rooms/active'),
+  getActiveRooms: () => request<any>(`${API_ROUTES.ROOMS}/active`),
   createRoom: (body: { problemId?: string; difficulty?: string }) =>
-    request<any>('/rooms/create', { method: 'POST', body: JSON.stringify(body) }),
+    request<any>(`${API_ROUTES.ROOMS}/create`, { method: 'POST', body: JSON.stringify(body) }),
   joinRoom: (body: { roomCode: string }) =>
-    request<any>('/rooms/join', { method: 'POST', body: JSON.stringify(body) }),
+    request<any>(`${API_ROUTES.ROOMS}/join`, { method: 'POST', body: JSON.stringify(body) }),
   leaveRoom: (body: { roomId: string }) =>
-    request<any>('/rooms/leave', { method: 'POST', body: JSON.stringify(body) }),
-  deleteRoom: (roomId: string) => request<any>(`/rooms/${roomId}`, { method: 'DELETE' }),
+    request<any>(`${API_ROUTES.ROOMS}/leave`, { method: 'POST', body: JSON.stringify(body) }),
+  deleteRoom: (roomId: string) => request<any>(`${API_ROUTES.ROOMS}/${roomId}`, { method: 'DELETE' }),
 
   // Friends & Presence
-  getFriends: () => request<any>('/friends'),
-  getPendingRequests: () => request<any>('/friends/requests'),
+  getFriends: () => request<any>(`${API_ROUTES.FRIENDS}`),
+  getPendingRequests: () => request<any>(`${API_ROUTES.FRIENDS}/requests`),
   sendFriendRequest: (receiverId: string) =>
-    request<any>('/friends/request', { method: 'POST', body: JSON.stringify({ receiverId }) }),
+    request<any>(`${API_ROUTES.FRIENDS}/request`, { method: 'POST', body: JSON.stringify({ receiverId }) }),
   acceptFriendRequest: (senderId: string) =>
-    request<any>('/friends/accept', { method: 'POST', body: JSON.stringify({ senderId }) }),
+    request<any>(`${API_ROUTES.FRIENDS}/accept`, { method: 'POST', body: JSON.stringify({ senderId }) }),
   declineFriendRequest: (senderId: string) =>
-    request<any>('/friends/decline', { method: 'POST', body: JSON.stringify({ senderId }) }),
+    request<any>(`${API_ROUTES.FRIENDS}/decline`, { method: 'POST', body: JSON.stringify({ senderId }) }),
   removeFriend: (friendId: string) =>
-    request<any>(`/friends/${friendId}`, { method: 'DELETE' }),
+    request<any>(`${API_ROUTES.FRIENDS}/${friendId}`, { method: 'DELETE' }),
 
   // Leaderboard
-  getLeaderboard: () => request<any>('/leaderboard'),
+  getLeaderboard: () => request<any>(`${API_ROUTES.LEADERBOARD}`),
 
   // Shop & Inventory
-  getShopItems: () => request<any>('/shop'),
-  buyItem: (itemId: string) => request<any>('/shop/buy', { method: 'POST', body: JSON.stringify({ itemId }) }),
-  getInventory: () => request<any>('/shop/inventory'),
+  getShopItems: () => request<any>(`${API_ROUTES.SHOP}`),
+  buyItem: (itemId: string) => request<any>(`${API_ROUTES.SHOP}/buy`, { method: 'POST', body: JSON.stringify({ itemId }) }),
+  getInventory: () => request<any>(`${API_ROUTES.SHOP}/inventory`),
   equipItem: (inventoryItemId: string) =>
-    request<any>('/shop/equip', { method: 'POST', body: JSON.stringify({ inventoryItemId }) }),
+    request<any>(`${API_ROUTES.SHOP}/equip`, { method: 'POST', body: JSON.stringify({ inventoryItemId }) }),
 
   // Reports
   submitReport: (body: { type: string; content: string; problemId?: string }) =>
-    request<any>('/reports', { method: 'POST', body: JSON.stringify(body) }),
-  getReports: () => request<any>('/reports'),
+    request<any>(`${API_ROUTES.REPORTS}`, { method: 'POST', body: JSON.stringify(body) }),
+  getReports: () => request<any>(`${API_ROUTES.REPORTS}`),
   updateReportStatus: (reportId: string, body: { status: string }) =>
-    request<any>(`/reports/${reportId}`, { method: 'PUT', body: JSON.stringify(body) }),
+    request<any>(`${API_ROUTES.REPORTS}/${reportId}`, { method: 'PUT', body: JSON.stringify(body) }),
 
   // Contests
-  getContests: () => request<any>('/contests'),
-  createContest: (body: any) => request<any>('/contests', { method: 'POST', body: JSON.stringify(body) }),
-  deleteContest: (contestId: string) => request<any>(`/contests/${contestId}`, { method: 'DELETE' }),
-  registerContest: (contestId: string) => request<any>(`/contests/${contestId}/register`, { method: 'POST' }),
-  getContestLeaderboard: (contestId: string) => request<any>(`/contests/${contestId}/leaderboard`),
+  getContests: () => request<any>(`${API_ROUTES.CONTESTS}`),
+  createContest: (body: any) => request<any>(`${API_ROUTES.CONTESTS}`, { method: 'POST', body: JSON.stringify(body) }),
+  deleteContest: (contestId: string) => request<any>(`${API_ROUTES.CONTESTS}/${contestId}`, { method: 'DELETE' }),
+  registerContest: (contestId: string) => request<any>(`${API_ROUTES.CONTESTS}/${contestId}/register`, { method: 'POST' }),
+  getContestLeaderboard: (contestId: string) => request<any>(`${API_ROUTES.CONTESTS}/${contestId}/leaderboard`),
 
   // AI
   getAIRoadmap: (body: { skillLevel: string; focusArea: string }) =>
-    request<any>('/ai/roadmap', { method: 'POST', body: JSON.stringify(body) }),
+    request<any>(`${API_ROUTES.AI}/roadmap`, { method: 'POST', body: JSON.stringify(body) }),
   getAIFeedback: (submissionId: string) =>
-    request<any>(`/ai/feedback/${submissionId}`, { method: 'POST' }),
+    request<any>(`${API_ROUTES.AI}/feedback/${submissionId}`, { method: 'POST' }),
 
   // Comments
-  getComments: (problemId: string) => request<any>(`/comments?problemId=${problemId}`),
+  getComments: (problemId: string) => request<any>(`${API_ROUTES.COMMENTS}?problemId=${problemId}`),
   createComment: (body: { problemId: string; content: string }) =>
-    request<any>('/comments', { method: 'POST', body: JSON.stringify(body) }),
+    request<any>(`${API_ROUTES.COMMENTS}`, { method: 'POST', body: JSON.stringify(body) }),
   updateComment: (id: string, body: { content: string }) =>
-    request<any>(`/comments/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
-  deleteComment: (id: string) => request<any>(`/comments/${id}`, { method: 'DELETE' }),
-  toggleLikeComment: (id: string) => request<any>(`/comments/${id}/like`, { method: 'POST' }),
+    request<any>(`${API_ROUTES.COMMENTS}/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+  deleteComment: (id: string) => request<any>(`${API_ROUTES.COMMENTS}/${id}`, { method: 'DELETE' }),
+  toggleLikeComment: (id: string) => request<any>(`${API_ROUTES.COMMENTS}/${id}/like`, { method: 'POST' }),
 
   // Match History
-  getMatchHistory: () => request<any>('/matches/history'),
-  getMatchDetails: (id: string) => request<any>(`/matches/${id}`),
+  getMatchHistory: () => request<any>(`${API_ROUTES.MATCHES}/history`),
+  getMatchDetails: (id: string) => request<any>(`${API_ROUTES.MATCHES}/${id}`),
 
   // Notifications
-  getNotifications: () => request<any>('/notifications'),
+  getNotifications: () => request<any>(`${API_ROUTES.NOTIFICATIONS}`),
   markNotificationsAsRead: (notificationIds: string[]) =>
-    request<any>('/notifications/read', { method: 'PUT', body: JSON.stringify({ notificationIds }) }),
-  deleteNotification: (id: string) => request<any>(`/notifications/${id}`, { method: 'DELETE' }),
+    request<any>(`${API_ROUTES.NOTIFICATIONS}/read`, { method: 'PUT', body: JSON.stringify({ notificationIds }) }),
+  deleteNotification: (id: string) => request<any>(`${API_ROUTES.NOTIFICATIONS}/${id}`, { method: 'DELETE' }),
   request: <T = any>(endpoint: string, options?: RequestInit) => request<T>(endpoint, options),
 };
 

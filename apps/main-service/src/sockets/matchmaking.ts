@@ -2,6 +2,7 @@ import { prisma } from '../config/prisma';
 import { Problem } from '../models/problem.model';
 import { MatchStatus, PlayerMatchStatus } from '@prisma/client';
 import { io } from './socket';
+import { SOCKET_EVENTS } from '@ocj/constants';
 
 export interface QueuePlayer {
   userId: string;
@@ -79,7 +80,7 @@ export const startMatch = async (p1: QueuePlayer, p2: QueuePlayer) => {
     p2Socket?.join(roomName);
 
     // 4. Emit match found event to both players
-    io?.to(roomName).emit('match-found', {
+    io?.to(roomName).emit(SOCKET_EVENTS.MATCH_FOUND, {
       matchId: match.id,
       problem: {
         id: problem._id,
@@ -128,7 +129,7 @@ export const handleSubmissionUpdate = async (data: {
   const roomName = `match:${activeMatch.id}`;
 
   // Broadcast real-time submission progress (failed cases or success)
-  io?.to(roomName).emit('rival-submission', {
+  io?.to(roomName).emit(SOCKET_EVENTS.RIVAL_SUBMISSION, {
     userId: data.userId,
     status: data.status,
     testCasesPassed: data.testCasesPassed,
@@ -196,7 +197,7 @@ export const endMatch = async (matchId: string, winnerId: string) => {
     });
 
     // Broadcast results
-    io?.to(`match:${matchId}`).emit('match-ended', {
+    io?.to(`match:${matchId}`).emit(SOCKET_EVENTS.MATCH_ENDED, {
       winnerId,
       loserId,
       eloUpdates: {
