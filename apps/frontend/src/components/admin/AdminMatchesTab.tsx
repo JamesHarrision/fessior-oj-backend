@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Trophy, Clock, Trash2, Eye, Award } from 'lucide-react';
 import { api } from '../../services/api';
+import type { IMatch } from '@ocj/types';
 
 export const AdminMatchesTab: React.FC = () => {
-  const [history, setHistory] = useState<any[]>([]);
+  const [history, setHistory] = useState<IMatch[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedMatch, setSelectedMatch] = useState<any>(null);
+  const [selectedMatch, setSelectedMatch] = useState<IMatch | null>(null);
 
   const fetchHistory = async () => {
     setLoading(true);

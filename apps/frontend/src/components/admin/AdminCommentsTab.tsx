@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { MessageSquare, Trash2, Heart, Plus, Edit2 } from 'lucide-react';
 import { api } from '../../services/api';
+import type { IProblem } from '@ocj/types';
 
 export const AdminCommentsTab: React.FC = () => {
-  const [problems, setProblems] = useState<any[]>([]);
+  const [problems, setProblems] = useState<IProblem[]>([]);
   const [selectedProblemId, setSelectedProblemId] = useState('');
   const [comments, setComments] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);

@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Play, Eye, FileCode, CheckCircle, AlertTriangle, Cpu } from 'lucide-react';
 import { api } from '../../services/api';
+import type { ISubmission, IProblem } from '@ocj/types';
 
 export const AdminSubmissionsTab: React.FC = () => {
-  const [submissions, setSubmissions] = useState<any[]>([]);
+  const [submissions, setSubmissions] = useState<ISubmission[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedSub, setSelectedSub] = useState<any>(null);
+  const [selectedSub, setSelectedSub] = useState<ISubmission | null>(null);
   
   // Custom Run Code Simulator state
   const [selectedProblemId, setSelectedProblemId] = useState('');
-  const [problems, setProblems] = useState<any[]>([]);
+  const [problems, setProblems] = useState<IProblem[]>([]);
   const [testCode, setTestCode] = useState('');
   const [testLanguage, setTestLanguage] = useState<'cpp' | 'java' | 'python'>('cpp');
   const [customInput, setCustomInput] = useState('');

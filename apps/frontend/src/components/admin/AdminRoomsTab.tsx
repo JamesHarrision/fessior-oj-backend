@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { ShieldAlert, Plus, Users, Trash2, Key } from 'lucide-react';
 import { api } from '../../services/api';
+import type { ICustomRoom, IProblem } from '@ocj/types';
 
 export const AdminRoomsTab: React.FC = () => {
-  const [rooms, setRooms] = useState<any[]>([]);
+  const [rooms, setRooms] = useState<ICustomRoom[]>([]);
   const [loading, setLoading] = useState(false);
   
   // Create Room state
-  const [problems, setProblems] = useState<any[]>([]);
+  const [problems, setProblems] = useState<IProblem[]>([]);
   const [selectedProblemId, setSelectedProblemId] = useState('');
   const [difficulty, setDifficulty] = useState<'EASY' | 'MEDIUM' | 'HARD'>('EASY');
 

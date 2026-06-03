@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Trophy, RefreshCw, Star, Zap } from 'lucide-react';
 import { api } from '../../services/api';
+import type { IUser } from '@ocj/types';
 
 export const AdminLeaderboardTab: React.FC = () => {
-  const [leaderboard, setLeaderboard] = useState<any[]>([]);
+  const [leaderboard, setLeaderboard] = useState<IUser[]>([]);
   const [loading, setLoading] = useState(false);
 
   const fetchLeaderboard = async () => {

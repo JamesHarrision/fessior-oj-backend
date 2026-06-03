@@ -32,7 +32,7 @@ import { AdminLeaderboardTab } from '../components/admin/AdminLeaderboardTab';
 import { AdminNotificationsTab } from '../components/admin/AdminNotificationsTab';
 import { AdminReportsTab } from '../components/admin/AdminReportsTab';
 
-import type { IProblem, IContest, IReport } from '@ocj/types';
+import type { IProblem, IContest, IReport, ProblemDifficulty } from '@ocj/types';
 import './AdminDashboard.css';
 
 interface AdminDashboardProps {
@@ -54,7 +54,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentSubView, 
   // Create form states
   const [probTitle, setProbTitle] = useState('');
   const [probDesc, setProbDesc] = useState('');
-  const [probDiff, setProbDiff] = useState<'EASY' | 'MEDIUM' | 'HARD'>('EASY');
+  const [probDiff, setProbDiff] = useState<ProblemDifficulty>('EASY');
   const [contestTitle, setContestTitle] = useState('');
   const [contestStart, setContestStart] = useState('');
   const [contestEnd, setContestEnd] = useState('');

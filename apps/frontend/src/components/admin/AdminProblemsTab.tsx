@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, X, Edit, FileText, Code, CheckSquare, Trash2, Tag, Watch, HardDrive } from 'lucide-react';
 import { api } from '../../services/api';
-import type { IProblem } from '@ocj/types';
+import type { IProblem, ProblemDifficulty } from '@ocj/types';
 import './AdminProblemsTab.css';
 
 interface AdminProblemsTabProps {
@@ -9,8 +9,8 @@ interface AdminProblemsTabProps {
   setProbTitle: (val: string) => void;
   probDesc: string;
   setProbDesc: (val: string) => void;
-  probDiff: 'EASY' | 'MEDIUM' | 'HARD';
-  setProbDiff: (val: 'EASY' | 'MEDIUM' | 'HARD') => void;
+  probDiff: ProblemDifficulty;
+  setProbDiff: (val: ProblemDifficulty) => void;
   onSubmit: (e: React.FormEvent) => void;
   problems: IProblem[];
   onDelete: (id: string) => void;
