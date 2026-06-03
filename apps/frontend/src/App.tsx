@@ -67,6 +67,18 @@ function AppContent() {
     return <AuthModal />;
   }
 
+  const isAdminView = currentView.startsWith('admin');
+
+  if (isAdminView) {
+    return (
+      <div className="app-container">
+        <main className="view-container" style={{ padding: 0, margin: 0, width: '100%', maxWidth: '100%', minHeight: '100vh' }}>
+          <AdminDashboard currentSubView={currentView} onViewChange={setCurrentView} />
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="app-container">
       <Sidebar currentView={currentView} onViewChange={setCurrentView} />
@@ -113,9 +125,6 @@ function AppContent() {
               setActiveMatch({ id: matchId, problem_id: problemId });
               setCurrentView('editor');
             }} />
-          )}
-          {currentView.startsWith('admin') && (
-            <AdminDashboard currentSubView={currentView} onViewChange={setCurrentView} />
           )}
         </main>
       </div>

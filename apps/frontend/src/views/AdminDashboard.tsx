@@ -14,7 +14,8 @@ import {
   MessageSquare,
   ShoppingBag,
   Bell,
-  Activity
+  Activity,
+  X
 } from 'lucide-react';
 
 import { AdminAuthTab } from '../components/admin/AdminAuthTab';
@@ -184,20 +185,39 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentSubView, 
       <div className="admin-layout-wrapper">
         {/* Admin Navigation Sidebar */}
         <div className="admin-sidebar-nav glass-card">
-          {tabsList.map((tab) => {
-            const TabIcon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => onViewChange(`admin/${tab.id}`)}
-                className={`admin-nav-item-btn ${isActive ? 'active' : ''}`}
-              >
-                <TabIcon size={16} />
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
+            {tabsList.map((tab) => {
+              const TabIcon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => onViewChange(`admin/${tab.id}`)}
+                  className={`admin-nav-item-btn ${isActive ? 'active' : ''}`}
+                >
+                  <TabIcon size={16} />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <button
+            onClick={() => onViewChange('match')}
+            className="admin-nav-item-btn exit-admin-btn"
+            style={{
+              marginTop: '16px',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              background: 'rgba(239, 68, 68, 0.05)',
+              color: '#f87171',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px'
+            }}
+          >
+            <X size={16} />
+            <span>Thoát Admin</span>
+          </button>
         </div>
 
         {/* Admin Tab Content Panel */}
