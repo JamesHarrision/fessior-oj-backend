@@ -24,7 +24,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange }) =
   ];
 
   if (user?.role === 'ADMIN') {
-    items.push({ id: 'admin', icon: Settings, label: 'Admin Panel' });
+    items.push({ id: 'admin/problems', icon: Settings, label: 'Admin Panel' });
   }
 
   return (
@@ -32,7 +32,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange }) =
       <div className="sidebar-icons">
         {items.map((item) => {
           const IconComponent = item.icon;
-          const isActive = currentView === item.id || (currentView === 'editor' && item.id === 'editor');
+          const isActive = currentView === item.id || 
+            (currentView === 'editor' && item.id === 'editor') ||
+            (item.id === 'admin/problems' && currentView.startsWith('admin'));
           return (
             <button
               key={item.id}

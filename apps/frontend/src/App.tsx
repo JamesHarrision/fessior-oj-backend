@@ -21,22 +21,27 @@ function AppContent() {
   const { user, token, loading } = useAuth();
   const [currentView, setCurrentView] = useState<string>(() => {
     const hash = window.location.hash.replace('#', '');
-    const allowed = ['match', 'contest', 'ranking', 'shop', 'editor', 'ai', 'settings', 'tester', 'problems', 'submissions', 'custom-rooms', 'admin'];
-    return allowed.includes(hash) ? hash : 'match';
+    const cleaned = hash.startsWith('/') ? hash.substring(1) : hash;
+    if (cleaned.startsWith('admin')) {
+      return cleaned;
+    }
+    const allowed = ['match', 'contest', 'ranking', 'shop', 'editor', 'ai', 'settings', 'tester', 'problems', 'submissions', 'custom-rooms'];
+    return allowed.includes(cleaned) ? cleaned : 'match';
   });
   const [activeMatch, setActiveMatch] = useState<any>(null);
   const [selectedProblemSlug, setSelectedProblemSlug] = useState<string | null>(null);
 
   useEffect(() => {
-    window.location.hash = currentView;
+    window.location.hash = '/' + currentView;
   }, [currentView]);
 
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
-      const allowed = ['match', 'contest', 'ranking', 'shop', 'editor', 'ai', 'settings', 'tester', 'problems', 'submissions', 'custom-rooms', 'admin'];
-      if (allowed.includes(hash)) {
-        setCurrentView(hash);
+      const cleaned = hash.startsWith('/') ? hash.substring(1) : hash;
+      const allowed = ['match', 'contest', 'ranking', 'shop', 'editor', 'ai', 'settings', 'tester', 'problems', 'submissions', 'custom-rooms'];
+      if (cleaned.startsWith('admin') || allowed.includes(cleaned)) {
+        setCurrentView(cleaned);
       }
     };
     window.addEventListener('hashchange', handleHashChange);
@@ -109,8 +114,8 @@ function AppContent() {
               setCurrentView('editor');
             }} />
           )}
-          {currentView === 'admin' && (
-            <AdminDashboard />
+          {currentView.startsWith('admin') && (
+            <AdminDashboard currentSubView={currentView} onViewChange={setCurrentView} />
           )}
         </main>
       </div>

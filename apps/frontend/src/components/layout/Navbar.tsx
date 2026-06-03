@@ -79,11 +79,11 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, onViewChange }) => 
           { id: 'submissions', label: 'Submissions' },
           { id: 'settings', label: 'Tools' },
           { id: 'tester', label: 'API Tester' },
-          ...(user?.role === 'ADMIN' ? [{ id: 'admin', label: 'Admin Panel' }] : []),
+          ...(user?.role === 'ADMIN' ? [{ id: 'admin/problems', label: 'Admin Panel' }] : []),
         ].map((item) => (
           <button
             key={item.id}
-            className={`nav-link ${currentView === item.id ? 'active' : ''}`}
+            className={`nav-link ${currentView === item.id || (item.id === 'admin/problems' && currentView.startsWith('admin')) ? 'active' : ''}`}
             onClick={() => onViewChange(item.id)}
           >
             {item.label}
