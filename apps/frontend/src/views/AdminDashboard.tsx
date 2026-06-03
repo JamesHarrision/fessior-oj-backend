@@ -69,7 +69,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentSubView, 
         setContests(res.data || []);
       } else if (activeTab === 'reports') {
         const res = await api.getReports();
-        setReports(res.data || []);
+        setReports(res.data?.items || []);
       }
     } catch (err) {
       console.error(err);
