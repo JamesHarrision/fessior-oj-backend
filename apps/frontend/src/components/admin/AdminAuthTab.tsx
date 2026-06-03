@@ -18,7 +18,7 @@ export const AdminAuthTab: React.FC = () => {
       if (profileRes.success) setProfile(profileRes.data);
 
       const sessionRes = await api.getSessions();
-      if (sessionRes.success) setSessions(sessionRes.data || []);
+      if (sessionRes.success) setSessions(sessionRes.data?.sessions || []);
     } catch (err: any) {
       console.error(err);
     } finally {
