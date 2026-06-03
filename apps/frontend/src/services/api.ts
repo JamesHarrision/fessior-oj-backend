@@ -51,9 +51,16 @@ export const api = {
   getProblemDetail: (slug: string) => request<any>(`${API_ROUTES.PROBLEMS}/${slug}`),
   getProblemTags: () => request<any>(`${API_ROUTES.PROBLEMS}/tags`),
   createProblem: (body: any) => request<any>(`${API_ROUTES.PROBLEMS}`, { method: 'POST', body: JSON.stringify(body) }),
+  updateProblem: (id: string, body: any) => request<any>(`${API_ROUTES.PROBLEMS}/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
   deleteProblem: (id: string) => request<any>(`${API_ROUTES.PROBLEMS}/${id}`, { method: 'DELETE' }),
   getTestcases: (problemId: string, exampleOnly = false) =>
     request<any>(`${API_ROUTES.PROBLEMS}/${problemId}/testcases${exampleOnly ? '?example=true' : ''}`),
+  addTestcase: (problemId: string, body: any) =>
+    request<any>(`${API_ROUTES.PROBLEMS}/${problemId}/testcases`, { method: 'POST', body: JSON.stringify(body) }),
+  deleteTestcase: (testcaseId: string) =>
+    request<any>(`${API_ROUTES.PROBLEMS}/testcases/${testcaseId}`, { method: 'DELETE' }),
+  createTag: (body: any) =>
+    request<any>(`${API_ROUTES.PROBLEMS}/tags`, { method: 'POST', body: JSON.stringify(body) }),
 
   // Submissions
   submitCode: (body: { problemId: string; language: string; code: string }) =>
