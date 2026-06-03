@@ -95,7 +95,7 @@
   background-color: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border-primary);
   border-radius: 12px;
-  padding: 12px;
+  padding: 12px 6px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -112,8 +112,9 @@
 
 .stat-value {
   font-family: var(--font-heading);
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .stat-value.elo {
