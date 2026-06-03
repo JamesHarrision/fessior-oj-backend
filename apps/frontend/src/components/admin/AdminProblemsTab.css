@@ -1,10 +1,10 @@
 /* AdminProblemsTab.css - Unique Specific Styles */
 
 .problems-tab-grid {
-  display: grid;
-  grid-template-columns: 1fr 1.2fr;
+  display: flex;
+  flex-direction: column;
   gap: 24px;
-  align-items: start;
+  align-items: stretch;
 }
 
 @media (max-width: 900px) {
