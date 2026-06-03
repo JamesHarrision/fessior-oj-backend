@@ -97,6 +97,7 @@ export const api = {
 
   // Shop & Inventory
   getShopItems: () => request<any>(`${API_ROUTES.SHOP}`),
+  createShopItem: (body: any) => request<any>(`${API_ROUTES.SHOP}`, { method: 'POST', body: JSON.stringify(body) }),
   buyItem: (itemId: string) => request<any>(`${API_ROUTES.SHOP}/buy`, { method: 'POST', body: JSON.stringify({ itemId }) }),
   getInventory: () => request<any>(`${API_ROUTES.SHOP}/inventory`),
   equipItem: (inventoryItemId: string) =>
@@ -112,9 +113,13 @@ export const api = {
   // Contests
   getContests: () => request<any>(`${API_ROUTES.CONTESTS}`),
   createContest: (body: any) => request<any>(`${API_ROUTES.CONTESTS}`, { method: 'POST', body: JSON.stringify(body) }),
+  updateContest: (contestId: string, body: any) => request<any>(`${API_ROUTES.CONTESTS}/${contestId}`, { method: 'PUT', body: JSON.stringify(body) }),
   deleteContest: (contestId: string) => request<any>(`${API_ROUTES.CONTESTS}/${contestId}`, { method: 'DELETE' }),
   registerContest: (contestId: string) => request<any>(`${API_ROUTES.CONTESTS}/${contestId}/register`, { method: 'POST' }),
+  unregisterContest: (contestId: string) => request<any>(`${API_ROUTES.CONTESTS}/${contestId}/unregister`, { method: 'POST' }),
   getContestLeaderboard: (contestId: string) => request<any>(`${API_ROUTES.CONTESTS}/${contestId}/leaderboard`),
+  getContestProblems: (contestId: string) => request<any>(`${API_ROUTES.CONTESTS}/${contestId}/problems`),
+  getContestSubmissions: (contestId: string) => request<any>(`${API_ROUTES.CONTESTS}/${contestId}/submissions`),
 
   // AI
   getAIRoadmap: (body: { skillLevel: string; focusArea: string }) =>
@@ -134,12 +139,14 @@ export const api = {
   // Match History
   getMatchHistory: () => request<any>(`${API_ROUTES.MATCHES}/history`),
   getMatchDetails: (id: string) => request<any>(`${API_ROUTES.MATCHES}/${id}`),
+  deleteMatch: (id: string) => request<any>(`${API_ROUTES.MATCHES}/${id}`, { method: 'DELETE' }),
 
   // Notifications
   getNotifications: () => request<any>(`${API_ROUTES.NOTIFICATIONS}`),
+  createNotification: (body: { title: string; content: string; type: string; userId?: string }) =>
+    request<any>(`${API_ROUTES.NOTIFICATIONS}`, { method: 'POST', body: JSON.stringify(body) }),
   markNotificationsAsRead: (notificationIds: string[]) =>
     request<any>(`${API_ROUTES.NOTIFICATIONS}/read`, { method: 'PUT', body: JSON.stringify({ notificationIds }) }),
   deleteNotification: (id: string) => request<any>(`${API_ROUTES.NOTIFICATIONS}/${id}`, { method: 'DELETE' }),
   request: <T = any>(endpoint: string, options?: RequestInit) => request<T>(endpoint, options),
 };
-
