@@ -1,16 +1,49 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
-import { Settings, FileText, Calendar, ShieldAlert } from 'lucide-react';
+import {
+  Settings,
+  FileText,
+  Calendar,
+  ShieldAlert,
+  Shield,
+  FileCode,
+  Trophy,
+  Users,
+  Sparkles,
+  MessageSquare,
+  ShoppingBag,
+  Bell,
+  Activity
+} from 'lucide-react';
+
+import { AdminAuthTab } from '../components/admin/AdminAuthTab';
 import { AdminProblemsTab } from '../components/admin/AdminProblemsTab';
+import { AdminSubmissionsTab } from '../components/admin/AdminSubmissionsTab';
+import { AdminMatchesTab } from '../components/admin/AdminMatchesTab';
+import { AdminRoomsTab } from '../components/admin/AdminRoomsTab';
+import { AdminAiTab } from '../components/admin/AdminAiTab';
 import { AdminContestsTab } from '../components/admin/AdminContestsTab';
+import { AdminCommentsTab } from '../components/admin/AdminCommentsTab';
+import { AdminFriendsTab } from '../components/admin/AdminFriendsTab';
+import { AdminShopTab } from '../components/admin/AdminShopTab';
+import { AdminLeaderboardTab } from '../components/admin/AdminLeaderboardTab';
+import { AdminNotificationsTab } from '../components/admin/AdminNotificationsTab';
 import { AdminReportsTab } from '../components/admin/AdminReportsTab';
+
 import type { IProblem, IContest, IReport } from '@ocj/types';
 import './AdminDashboard.css';
 
-export const AdminDashboard: React.FC = () => {
+interface AdminDashboardProps {
+  currentSubView: string;
+  onViewChange: (view: string) => void;
+}
+
+export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentSubView, onViewChange }) => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<'problems' | 'contests' | 'reports'>('problems');
+  
+  // Extract active tab from routing segment (e.g. admin/problems -> problems)
+  const activeTab = currentSubView.split('/')[1] || 'problems';
 
   // Lists
   const [problems, setProblems] = useState<IProblem[]>([]);
@@ -125,65 +158,103 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
+  const tabsList = [
+    { id: 'auth', label: 'Xác thực & Tài khoản', icon: Shield },
+    { id: 'problems', label: 'Bài tập & Testcase', icon: FileText },
+    { id: 'submissions', label: 'Nộp bài & Chấm bài', icon: FileCode },
+    { id: 'matches', label: 'Đấu Solo & Lịch sử', icon: Trophy },
+    { id: 'rooms', label: 'Phòng đấu PVP Custom', icon: Users },
+    { id: 'ai', label: 'Trí tuệ Nhân tạo AI', icon: Sparkles },
+    { id: 'contests', label: 'Giải đấu chính thức', icon: Calendar },
+    { id: 'comments', label: 'Thảo luận & Bình luận', icon: MessageSquare },
+    { id: 'friends', label: 'Bạn bè & Mạng xã hội', icon: Users },
+    { id: 'shop', label: 'Cửa hàng vật phẩm', icon: ShoppingBag },
+    { id: 'leaderboard', label: 'Bảng xếp hạng chung', icon: Activity },
+    { id: 'notifications', label: 'Thông báo', icon: Bell },
+    { id: 'reports', label: 'Báo cáo & Tố cáo', icon: ShieldAlert },
+  ];
+
   return (
     <div className="admin-dashboard-container">
       <div className="admin-header glass-card">
         <Settings className="admin-gear-icon" size={24} />
-        <h2>Bảng Điều Hướng Quản Trị (Admin Panel)</h2>
+        <h2>Bảng Quản Trị Hệ Thống (Admin Panel)</h2>
       </div>
 
-      <div className="admin-tabs">
-        <button
-          onClick={() => setActiveTab('problems')}
-          className={`admin-tab-btn ${activeTab === 'problems' ? 'active' : ''}`}
-        >
-          <FileText size={16} /> Đề bài
-        </button>
-        <button
-          onClick={() => setActiveTab('contests')}
-          className={`admin-tab-btn ${activeTab === 'contests' ? 'active' : ''}`}
-        >
-          <Calendar size={16} /> Kỳ thi
-        </button>
-        <button
-          onClick={() => setActiveTab('reports')}
-          className={`admin-tab-btn ${activeTab === 'reports' ? 'active' : ''}`}
-        >
-          <ShieldAlert size={16} /> Báo cáo lỗi
-        </button>
+      <div className="admin-layout-wrapper">
+        {/* Admin Navigation Sidebar */}
+        <div className="admin-sidebar-nav glass-card">
+          {tabsList.map((tab) => {
+            const TabIcon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => onViewChange(`admin/${tab.id}`)}
+                className={`admin-nav-item-btn ${isActive ? 'active' : ''}`}
+              >
+                <TabIcon size={16} />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Admin Tab Content Panel */}
+        <div className="admin-content-pane">
+          {activeTab === 'auth' && <AdminAuthTab />}
+          
+          {activeTab === 'problems' && (
+            <AdminProblemsTab
+              probTitle={probTitle}
+              setProbTitle={setProbTitle}
+              probDesc={probDesc}
+              setProbDesc={setProbDesc}
+              probDiff={probDiff}
+              setProbDiff={setProbDiff}
+              onSubmit={handleCreateProblem}
+              problems={problems}
+              onDelete={handleDeleteProblem}
+            />
+          )}
+
+          {activeTab === 'submissions' && <AdminSubmissionsTab />}
+
+          {activeTab === 'matches' && <AdminMatchesTab />}
+
+          {activeTab === 'rooms' && <AdminRoomsTab />}
+
+          {activeTab === 'ai' && <AdminAiTab />}
+
+          {activeTab === 'contests' && (
+            <AdminContestsTab
+              contestTitle={contestTitle}
+              setContestTitle={setContestTitle}
+              contestStart={contestStart}
+              setContestStart={setContestStart}
+              contestEnd={contestEnd}
+              setContestEnd={setContestEnd}
+              onSubmit={handleCreateContest}
+              contests={contests}
+              onDelete={handleDeleteContest}
+            />
+          )}
+
+          {activeTab === 'comments' && <AdminCommentsTab />}
+
+          {activeTab === 'friends' && <AdminFriendsTab />}
+
+          {activeTab === 'shop' && <AdminShopTab />}
+
+          {activeTab === 'leaderboard' && <AdminLeaderboardTab />}
+
+          {activeTab === 'notifications' && <AdminNotificationsTab />}
+
+          {activeTab === 'reports' && (
+            <AdminReportsTab reports={reports} onUpdateStatus={handleUpdateReport} />
+          )}
+        </div>
       </div>
-
-      {activeTab === 'problems' && (
-        <AdminProblemsTab
-          probTitle={probTitle}
-          setProbTitle={setProbTitle}
-          probDesc={probDesc}
-          setProbDesc={setProbDesc}
-          probDiff={probDiff}
-          setProbDiff={setProbDiff}
-          onSubmit={handleCreateProblem}
-          problems={problems}
-          onDelete={handleDeleteProblem}
-        />
-      )}
-
-      {activeTab === 'contests' && (
-        <AdminContestsTab
-          contestTitle={contestTitle}
-          setContestTitle={setContestTitle}
-          contestStart={contestStart}
-          setContestStart={setContestStart}
-          contestEnd={contestEnd}
-          setContestEnd={setContestEnd}
-          onSubmit={handleCreateContest}
-          contests={contests}
-          onDelete={handleDeleteContest}
-        />
-      )}
-
-      {activeTab === 'reports' && (
-        <AdminReportsTab reports={reports} onUpdateStatus={handleUpdateReport} />
-      )}
     </div>
   );
 };

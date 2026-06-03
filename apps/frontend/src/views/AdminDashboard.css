@@ -254,3 +254,61 @@
 
 .admin-denied h3 { color: #ef4444; margin: 0 0 10px; }
 .admin-denied p { color: #94a3b8; margin: 0; }
+
+.admin-layout-wrapper {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+@media (max-width: 1024px) {
+  .admin-layout-wrapper {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admin-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  background: rgba(10, 15, 30, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.admin-nav-item-btn {
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  color: #94a3b8;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-align: left;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.admin-nav-item-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.admin-nav-item-btn.active {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.08);
+  border-left: 3px solid #3b82f6;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.admin-content-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-height: 500px;
+}
