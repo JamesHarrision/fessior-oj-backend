@@ -68,7 +68,6 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, onViewChange }) => 
           <span className="logo-badge">ARENA</span>
         </div>
       </div>
-
       <nav className="navbar-center">
         {[
           { id: 'match', label: 'Lobby' },
@@ -80,6 +79,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, onViewChange }) => 
           { id: 'submissions', label: 'Submissions' },
           { id: 'settings', label: 'Tools' },
           { id: 'tester', label: 'API Tester' },
+          ...(user?.role === 'ADMIN' ? [{ id: 'admin', label: 'Admin Panel' }] : []),
         ].map((item) => (
           <button
             key={item.id}

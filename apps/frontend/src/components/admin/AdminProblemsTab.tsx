@@ -147,7 +147,6 @@ export const AdminProblemsTab: React.FC<AdminProblemsTabProps> = ({
       if (res.success) {
         alert('Cập nhật bài tập thành công!');
         setEditingProblem(null);
-        // Trigger page refresh (we can call location.reload() or let parent state update)
         window.location.reload();
       }
     } catch (err: any) {
@@ -208,10 +207,10 @@ export const AdminProblemsTab: React.FC<AdminProblemsTabProps> = ({
 
   return (
     <>
-      <div className="admin-section-grid">
+      <div className="problems-tab-grid">
         {/* Left Side: Create Problem & Tags Management */}
-        <div className="admin-left-col">
-          <form onSubmit={onSubmit} className="admin-form-card glass-card">
+        <div className="problems-tab-form-container" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <form onSubmit={onSubmit} className="prob-admin-card">
             <h3>Tạo Đề Bài Mới</h3>
             <input
               type="text"
@@ -219,91 +218,90 @@ export const AdminProblemsTab: React.FC<AdminProblemsTabProps> = ({
               value={probTitle}
               onChange={(e) => setProbTitle(e.target.value)}
               required
-              className="glass-input"
+              className="prob-admin-input"
             />
             <textarea
               placeholder="Mô tả đề bài..."
               value={probDesc}
               onChange={(e) => setProbDesc(e.target.value)}
               required
-              className="glass-input"
+              className="prob-admin-textarea"
               rows={5}
             />
             <select
               value={probDiff}
               onChange={(e: any) => setProbDiff(e.target.value)}
-              className="glass-select"
+              className="prob-admin-select"
             >
               <option value="EASY">Dễ (Easy)</option>
               <option value="MEDIUM">Trung bình (Medium)</option>
               <option value="HARD">Khó (Hard)</option>
             </select>
-            <button type="submit" className="btn-admin-submit glass-button">
+            <button type="submit" className="btn-prob-primary">
               <Plus size={16} /> Tạo bài tập
             </button>
           </form>
 
           {/* Tags management */}
-          <div className="admin-form-card glass-card tags-admin-card">
+          <div className="prob-admin-card tags-manager-card">
             <h3>Quản Lý Thẻ Nhãn (Tags)</h3>
-            <div className="tags-admin-list">
+            <div className="tags-pill-container">
               {tags.map((t) => (
-                <span key={t.id || t.slug} className="tag-admin-pill" style={{ borderColor: t.color }}>
+                <span key={t.id || t.slug} className="prob-tag-pill" style={{ borderColor: t.color }}>
                   {t.name}
                 </span>
               ))}
             </div>
 
-            <form onSubmit={handleCreateTag} className="tag-create-row">
+            <form onSubmit={handleCreateTag} style={{ display: 'flex', gap: '12px' }}>
               <input
                 type="text"
                 placeholder="Nhập tên tag mới..."
                 value={newTagName}
                 onChange={(e) => setNewTagName(e.target.value)}
-                className="glass-input"
-                style={{ marginBottom: 0 }}
+                className="prob-admin-input"
               />
-              <button type="submit" className="btn-admin-submit glass-button" style={{ marginTop: 0 }}>
+              <button type="submit" className="btn-prob-primary" style={{ whiteSpace: 'nowrap' }}>
                 Thêm Tag
               </button>
             </form>
-            {tagError && <p className="error-msg" style={{ fontSize: '0.8rem', marginTop: '8px' }}>{tagError}</p>}
+            {tagError && <p className="error-msg" style={{ fontSize: '0.8rem', color: '#f87171' }}>{tagError}</p>}
           </div>
         </div>
 
         {/* Right Side: List Problems */}
-        <div className="admin-list-card glass-card">
+        <div className="prob-admin-card">
           <h3>Danh Sách Đề Bài</h3>
-          <div className="admin-scroll-list">
+          <div className="prob-list-scroll">
             {problems.map((p) => {
               const probId = p.id || p.mongo_problem_id || (p as any)._id;
               return (
-                <div key={probId} className="admin-list-item">
-                  <div className="admin-list-item-info">
-                    <span style={{ fontWeight: 600 }}>{p.title}</span>
-                    <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                <div key={probId} className="prob-item-row">
+                  <div className="prob-item-details">
+                    <span className="prob-item-title">{p.title}</span>
+                    <div className="prob-item-meta">
                       <span className={`diff-pill diff-${p.difficulty?.toLowerCase()}`}>
                         {p.difficulty}
                       </span>
                       {p.timeLimit && (
-                        <span className="meta-badge" style={{ fontSize: '0.7rem' }}>
+                        <span className="prob-tag-pill" style={{ padding: '2px 8px', fontSize: '0.7rem' }}>
                           {p.timeLimit} ms
                         </span>
                       )}
                     </div>
                   </div>
                   
-                  <div className="admin-list-item-actions">
+                  <div className="action-btn-container">
                     <button
                       onClick={() => openEditModal(p)}
-                      className="btn-admin-edit"
+                      className="btn-action-icon edit"
                       title="Chỉnh sửa bài tập & Testcases"
                     >
                       <Edit size={14} />
                     </button>
                     <button
                       onClick={() => onDelete(probId || '')}
-                      className="btn-admin-delete"
+                      className="btn-action-icon delete"
                       title="Xóa bài tập"
                     >
                       <Trash2 size={14} />
@@ -318,32 +316,32 @@ export const AdminProblemsTab: React.FC<AdminProblemsTabProps> = ({
 
       {/* Edit Problem Overlay Modal */}
       {editingProblem && (
-        <div className="admin-modal-overlay">
-          <div className="admin-modal-card">
+        <div className="problems-modal-overlay">
+          <div className="problems-modal-card">
             {/* Modal Header */}
-            <div className="modal-header">
+            <div className="problems-modal-header">
               <h3>Chỉnh Sửa Bài Tập: {editingProblem.title}</h3>
-              <button onClick={() => setEditingProblem(null)} className="btn-close-modal">
+              <button onClick={() => setEditingProblem(null)} className="problems-modal-close">
                 <X size={20} />
               </button>
             </div>
 
             {/* Modal Tabs */}
-            <div className="modal-tabs">
+            <div className="problems-modal-tabs">
               <button
-                className={`modal-tab-btn ${modalTab === 'info' ? 'active' : ''}`}
+                className={`problems-modal-tab-btn ${modalTab === 'info' ? 'active' : ''}`}
                 onClick={() => setModalTab('info')}
               >
                 <FileText size={16} /> Đề bài & Cấu hình
               </button>
               <button
-                className={`modal-tab-btn ${modalTab === 'code' ? 'active' : ''}`}
+                className={`problems-modal-tab-btn ${modalTab === 'code' ? 'active' : ''}`}
                 onClick={() => setModalTab('code')}
               >
                 <Code size={16} /> starterCodes
               </button>
               <button
-                className={`modal-tab-btn ${modalTab === 'testcases' ? 'active' : ''}`}
+                className={`problems-modal-tab-btn ${modalTab === 'testcases' ? 'active' : ''}`}
                 onClick={() => setModalTab('testcases')}
               >
                 <CheckSquare size={16} /> Testcases ({testcases.length})
@@ -351,38 +349,38 @@ export const AdminProblemsTab: React.FC<AdminProblemsTabProps> = ({
             </div>
 
             {/* Modal Content Area */}
-            <div className="modal-content-scroll">
+            <div className="problems-modal-content">
               {modalTab === 'info' && (
-                <div className="settings-form">
-                  <div className="settings-input-group">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div className="prob-form-group">
                     <label>Tên bài tập</label>
                     <input
                       type="text"
                       value={editTitle}
                       onChange={(e) => setEditTitle(e.target.value)}
-                      className="settings-field-input"
+                      className="prob-admin-input"
                       required
                     />
                   </div>
 
-                  <div className="settings-input-group">
-                    <label>Mô tả bài tập (HTML/Markdown)</label>
+                  <div className="prob-form-group">
+                    <label>Mô tả bài tập (HTML / Markdown)</label>
                     <textarea
                       value={editDesc}
                       onChange={(e) => setEditDesc(e.target.value)}
-                      className="settings-field-input"
+                      className="prob-admin-textarea"
                       rows={6}
                       required
                     />
                   </div>
 
-                  <div className="settings-form-grid">
-                    <div className="settings-input-group">
+                  <div className="prob-form-grid-3">
+                    <div className="prob-form-group">
                       <label>Độ khó</label>
                       <select
                         value={editDiff}
                         onChange={(e: any) => setEditDiff(e.target.value)}
-                        className="settings-field-input"
+                        className="prob-admin-select"
                       >
                         <option value="EASY">Easy</option>
                         <option value="MEDIUM">Medium</option>
@@ -390,35 +388,35 @@ export const AdminProblemsTab: React.FC<AdminProblemsTabProps> = ({
                       </select>
                     </div>
 
-                    <div className="settings-input-group">
+                    <div className="prob-form-group">
                       <label><Watch size={14} /> Giới hạn thời gian (ms)</label>
                       <input
                         type="number"
                         value={editTimeLimit}
                         onChange={(e) => setEditTimeLimit(Number(e.target.value))}
-                        className="settings-field-input"
+                        className="prob-admin-input"
                       />
                     </div>
 
-                    <div className="settings-input-group">
+                    <div className="prob-form-group">
                       <label><HardDrive size={14} /> Giới hạn bộ nhớ (MB)</label>
                       <input
                         type="number"
                         value={editMemoryLimit}
                         onChange={(e) => setEditMemoryLimit(Number(e.target.value))}
-                        className="settings-field-input"
+                        className="prob-admin-input"
                       />
                     </div>
                   </div>
 
                   {/* Assign tags */}
-                  <div className="settings-input-group">
+                  <div className="prob-form-group">
                     <label><Tag size={14} /> Gán Thẻ Nhãn (Tags)</label>
-                    <div className="tag-selection-grid">
+                    <div className="tag-selector-grid">
                       {tags.map((t) => {
                         const isChecked = editSelectedTags.includes(t.id || t._id);
                         return (
-                          <label key={t.id || t.slug} className={`tag-checkbox-label ${isChecked ? 'checked' : ''}`}>
+                          <label key={t.id || t.slug} className={`tag-checkbox-pill ${isChecked ? 'selected' : ''}`}>
                             <input
                               type="checkbox"
                               checked={isChecked}
@@ -435,39 +433,39 @@ export const AdminProblemsTab: React.FC<AdminProblemsTabProps> = ({
               )}
 
               {modalTab === 'code' && (
-                <div className="settings-form">
-                  <div className="settings-input-group">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div className="prob-form-group">
                     <label>Mã nguồn C++ mẫu</label>
                     <textarea
                       value={editCppCode}
                       onChange={(e) => setEditCppCode(e.target.value)}
-                      className="settings-field-input"
-                      style={{ fontFamily: 'monospace', fontSize: '0.85rem' }}
-                      rows={6}
+                      className="prob-admin-textarea"
+                      style={{ fontFamily: 'Fira Code, Courier New, monospace', fontSize: '0.85rem' }}
+                      rows={5}
                       placeholder="// C++ Starter code"
                     />
                   </div>
 
-                  <div className="settings-input-group">
+                  <div className="prob-form-group">
                     <label>Mã nguồn Java mẫu</label>
                     <textarea
                       value={editJavaCode}
                       onChange={(e) => setEditJavaCode(e.target.value)}
-                      className="settings-field-input"
-                      style={{ fontFamily: 'monospace', fontSize: '0.85rem' }}
-                      rows={6}
+                      className="prob-admin-textarea"
+                      style={{ fontFamily: 'Fira Code, Courier New, monospace', fontSize: '0.85rem' }}
+                      rows={5}
                       placeholder="// Java Starter code"
                     />
                   </div>
 
-                  <div className="settings-input-group">
+                  <div className="prob-form-group">
                     <label>Mã nguồn Python mẫu</label>
                     <textarea
                       value={editPythonCode}
                       onChange={(e) => setEditPythonCode(e.target.value)}
-                      className="settings-field-input"
-                      style={{ fontFamily: 'monospace', fontSize: '0.85rem' }}
-                      rows={6}
+                      className="prob-admin-textarea"
+                      style={{ fontFamily: 'Fira Code, Courier New, monospace', fontSize: '0.85rem' }}
+                      rows={5}
                       placeholder="# Python Starter code"
                     />
                   </div>
@@ -475,38 +473,38 @@ export const AdminProblemsTab: React.FC<AdminProblemsTabProps> = ({
               )}
 
               {modalTab === 'testcases' && (
-                <div className="testcases-panel">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   {/* Create Testcase Form */}
-                  <form onSubmit={handleAddTestcase} className="testcase-form">
+                  <form onSubmit={handleAddTestcase} className="tc-admin-form">
                     <h4>Thêm Testcase Mới</h4>
-                    <div className="testcase-row-inputs">
-                      <div className="settings-input-group">
+                    <div className="tc-admin-form-inputs">
+                      <div className="prob-form-group">
                         <label>Dữ liệu đầu vào (Input)</label>
                         <textarea
                           placeholder="Ví dụ: 2 7 11 15\n9"
                           value={newTcInput}
                           onChange={(e) => setNewTcInput(e.target.value)}
-                          className="settings-field-input"
-                          style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}
+                          className="prob-admin-textarea"
+                          style={{ fontFamily: 'Fira Code, Courier New, monospace', fontSize: '0.8rem' }}
                           rows={3}
                           required
                         />
                       </div>
-                      <div className="settings-input-group">
+                      <div className="prob-form-group">
                         <label>Kết quả mong muốn (Output)</label>
                         <textarea
                           placeholder="Ví dụ: 0 1"
                           value={newTcOutput}
                           onChange={(e) => setNewTcOutput(e.target.value)}
-                          className="settings-field-input"
-                          style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}
+                          className="prob-admin-textarea"
+                          style={{ fontFamily: 'Fira Code, Courier New, monospace', fontSize: '0.8rem' }}
                           rows={3}
                           required
                         />
                       </div>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
-                      <label className="testcase-checkbox">
+                    <div className="tc-checkbox-row">
+                      <label className="tc-checkbox-label">
                         <input
                           type="checkbox"
                           checked={newTcIsExample}
@@ -514,54 +512,56 @@ export const AdminProblemsTab: React.FC<AdminProblemsTabProps> = ({
                         />
                         Dùng làm Testcase mẫu (Hiển thị cho học sinh)
                       </label>
-                      <button type="submit" className="btn-admin-submit glass-button" style={{ marginTop: 0 }}>
+                      <button type="submit" className="btn-prob-primary" style={{ padding: '8px 16px' }}>
                         <Plus size={14} /> Thêm Testcase
                       </button>
                     </div>
                   </form>
 
-                  {tcError && <div className="alert-message error-msg">{tcError}</div>}
-                  {tcSuccess && <div className="alert-message success-msg">{tcSuccess}</div>}
+                  {tcError && <div style={{ color: '#f87171', fontSize: '0.85rem' }}>{tcError}</div>}
+                  {tcSuccess && <div style={{ color: '#34d399', fontSize: '0.85rem' }}>{tcSuccess}</div>}
 
                   {/* Testcases list */}
-                  <div className="testcases-list-container">
-                    <h4>Danh Sách Testcases Đang Có</h4>
+                  <div>
+                    <h4 className="tc-list-header">Danh Sách Testcases Đang Có</h4>
                     {tcLoading ? (
                       <p>Đang tải testcases...</p>
                     ) : testcases.length === 0 ? (
-                      <p className="no-sessions-txt">Chưa có testcase nào cho bài tập này.</p>
+                      <p style={{ color: '#64748b', fontSize: '0.85rem' }}>Chưa có testcase nào cho bài tập này.</p>
                     ) : (
-                      testcases.map((tc, index) => {
-                        const tcId = tc.id || tc._id;
-                        return (
-                          <div key={tcId || index} className="testcase-item-card">
-                            <div className="testcase-details">
-                              <span className={`tc-type-badge ${tc.isExample ? 'sample' : 'hidden'}`}>
-                                {tc.isExample ? 'TESTCASE MẪU' : 'TESTCASE ẨN'}
-                              </span>
-                              <div className="tc-io-preview">
-                                <div>
-                                  <span>Input:</span>
-                                  <div className="io-box">{tc.input}</div>
-                                </div>
-                                <div>
-                                  <span>Output:</span>
-                                  <div className="io-box">{tc.output}</div>
+                      <div className="tc-list-scroll">
+                        {testcases.map((tc, index) => {
+                          const tcId = tc.id || tc._id;
+                          return (
+                            <div key={tcId || index} className="tc-item-row">
+                              <div className="tc-item-meta">
+                                <span className={`tc-item-badge ${tc.isExample ? 'sample' : 'hidden'}`}>
+                                  {tc.isExample ? 'TESTCASE MẪU' : 'TESTCASE ẨN'}
+                                </span>
+                                <div className="tc-io-wrapper">
+                                  <div>
+                                    <span>Input:</span>
+                                    <div className="tc-io-box">{tc.input}</div>
+                                  </div>
+                                  <div>
+                                    <span>Output:</span>
+                                    <div className="tc-io-box">{tc.output}</div>
+                                  </div>
                                 </div>
                               </div>
+                              
+                              <button
+                                onClick={() => handleDeleteTestcase(tcId)}
+                                className="btn-action-icon delete"
+                                style={{ marginLeft: '12px' }}
+                                title="Xóa testcase này"
+                              >
+                                <Trash2 size={14} />
+                              </button>
                             </div>
-                            
-                            <button
-                              onClick={() => handleDeleteTestcase(tcId)}
-                              className="btn-admin-delete"
-                              style={{ marginLeft: '12px' }}
-                              title="Xóa testcase này"
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </div>
-                        );
-                      })
+                          );
+                        })}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -569,11 +569,11 @@ export const AdminProblemsTab: React.FC<AdminProblemsTabProps> = ({
             </div>
 
             {/* Modal Footer */}
-            <div className="modal-footer">
-              <button onClick={() => setEditingProblem(null)} className="btn-admin-submit glass-button" style={{ background: 'rgba(255,255,255,0.05)', color: '#94a3b8' }}>
+            <div className="problems-modal-footer">
+              <button onClick={() => setEditingProblem(null)} className="btn-prob-secondary">
                 Hủy
               </button>
-              <button onClick={handleSaveProblemEdit} className="btn-action-primary blue" style={{ marginTop: 0 }}>
+              <button onClick={handleSaveProblemEdit} className="btn-prob-primary">
                 Lưu Thay Đổi
               </button>
             </div>
