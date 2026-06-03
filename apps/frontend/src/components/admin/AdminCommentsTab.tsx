@@ -32,7 +32,7 @@ export const AdminCommentsTab: React.FC = () => {
     try {
       const res = await api.getComments(probId);
       if (res.success) {
-        setComments(res.data || []);
+        setComments(res.data?.items || res.data || []);
       }
     } catch (err) {
       console.error(err);
@@ -56,7 +56,8 @@ export const AdminCommentsTab: React.FC = () => {
     if (!newComment.trim()) return;
     try {
       const res = await api.createComment({
-        problemId: selectedProblemId,
+        targetId: selectedProblemId,
+        targetType: 'PROBLEM',
         content: newComment.trim()
       });
       if (res.success) {

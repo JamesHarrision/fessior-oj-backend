@@ -128,8 +128,8 @@ export const api = {
     request<any>(`${API_ROUTES.AI}/feedback/${submissionId}`, { method: 'POST' }),
 
   // Comments
-  getComments: (problemId: string) => request<any>(`${API_ROUTES.COMMENTS}?problemId=${problemId}`),
-  createComment: (body: { problemId: string; content: string }) =>
+  getComments: (targetId: string, targetType = 'PROBLEM') => request<any>(`${API_ROUTES.COMMENTS}?targetId=${targetId}&targetType=${targetType}`),
+  createComment: (body: { targetId: string; targetType: string; content: string; parentId?: string }) =>
     request<any>(`${API_ROUTES.COMMENTS}`, { method: 'POST', body: JSON.stringify(body) }),
   updateComment: (id: string, body: { content: string }) =>
     request<any>(`${API_ROUTES.COMMENTS}/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
