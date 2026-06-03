@@ -36,6 +36,12 @@ export const api = {
   login: (body: any) => request<any>(`${API_ROUTES.AUTH}/login`, { method: 'POST', body: JSON.stringify(body) }),
   logout: (body: any = {}) => request<any>(`${API_ROUTES.AUTH}/logout`, { method: 'POST', body: JSON.stringify(body) }),
   getMe: () => request<any>(`${API_ROUTES.AUTH}/me`),
+  changePassword: (body: any) => request<any>(`${API_ROUTES.AUTH}/change-password`, { method: 'POST', body: JSON.stringify(body) }),
+  getSessions: () => request<any>(`${API_ROUTES.AUTH}/sessions`),
+  revokeSession: (sessionId: string) => request<any>(`${API_ROUTES.AUTH}/sessions/${sessionId}`, { method: 'DELETE' }),
+  revokeAllSessions: () => request<any>(`${API_ROUTES.AUTH}/sessions`, { method: 'DELETE' }),
+  forgotPassword: (body: any) => request<any>(`${API_ROUTES.AUTH}/forgot-password`, { method: 'POST', body: JSON.stringify(body) }),
+  resetPassword: (body: any) => request<any>(`${API_ROUTES.AUTH}/reset-password`, { method: 'POST', body: JSON.stringify(body) }),
 
   // Problems
   getProblems: (params?: { difficulty?: string; tag?: string }) => {
