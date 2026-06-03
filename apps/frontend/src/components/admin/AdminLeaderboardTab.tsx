@@ -11,7 +11,7 @@ export const AdminLeaderboardTab: React.FC = () => {
     try {
       const res = await api.getLeaderboard();
       if (res.success) {
-        setLeaderboard(res.data || []);
+        setLeaderboard(res.data?.items || []);
       }
     } catch (err) {
       console.error(err);
@@ -68,7 +68,7 @@ export const AdminLeaderboardTab: React.FC = () => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Zap size={14} style={{ color: '#f59e0b' }} />
                   <span className="diff-pill diff-easy" style={{ fontSize: '0.88rem', background: 'rgba(245,158,11,0.15)', color: '#f59e0b', padding: '4px 12px', borderRadius: '12px', fontWeight: 700 }}>
-                    {user.elo_rating || user.eloRating || 1000} ELO
+                    {user.elo !== undefined ? user.elo : (user.elo_rating || user.eloRating || 1000)} ELO
                   </span>
                 </div>
               </div>
