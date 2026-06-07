@@ -41,7 +41,7 @@ export class CommentController {
       const userId = req.user.userId;
       const { commentId } = req.params;
       const { content } = req.body;
-      const updated = await commentService.updateComment(commentId, userId, content);
+      const updated = await commentService.updateComment(commentId as string, userId, content);
       res.status(200).json({
         success: true,
         data: updated,
@@ -56,7 +56,7 @@ export class CommentController {
       const userId = req.user.userId;
       const userRole = req.user.role;
       const { commentId } = req.params;
-      await commentService.deleteComment(commentId, userId, userRole);
+      await commentService.deleteComment(commentId as string, userId, userRole);
       res.status(200).json({
         success: true,
         message: 'Comment deleted successfully',
@@ -70,7 +70,7 @@ export class CommentController {
     try {
       const userId = req.user.userId;
       const { commentId } = req.params;
-      const result = await commentService.toggleLike(commentId, userId);
+      const result = await commentService.toggleLike(commentId as string, userId);
       res.status(200).json({
         success: true,
         data: result,

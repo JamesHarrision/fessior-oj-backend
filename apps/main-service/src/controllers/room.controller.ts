@@ -30,7 +30,7 @@ export class RoomController {
   async getRoomDetails(req: Request, res: Response) {
     try {
       const { roomId } = req.params;
-      const room = await roomService.getRoomDetails(roomId);
+      const room = await roomService.getRoomDetails(roomId as string);
       res.status(200).json({
         success: true,
         data: room,
@@ -72,7 +72,7 @@ export class RoomController {
     try {
       const creatorId = req.user.userId;
       const { roomId } = req.params;
-      const updated = await roomService.updateRoomConfig(roomId, creatorId, req.body);
+      const updated = await roomService.updateRoomConfig(roomId as string, creatorId, req.body);
       res.status(200).json({
         success: true,
         data: updated,
@@ -86,7 +86,7 @@ export class RoomController {
     try {
       const creatorId = req.user.userId;
       const { roomId } = req.params;
-      const result = await roomService.deleteRoom(roomId, creatorId);
+      const result = await roomService.deleteRoom(roomId as string, creatorId);
       res.status(200).json({
         success: true,
         message: 'Room deleted successfully',

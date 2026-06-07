@@ -50,7 +50,7 @@ export class NotificationController {
     try {
       const userId = req.user.userId;
       const { notificationId } = req.params;
-      await notificationService.deleteNotification(notificationId, userId);
+      await notificationService.deleteNotification(notificationId as string, userId);
       res.status(200).json({
         success: true,
         message: 'Notification deleted successfully',
