@@ -8,9 +8,29 @@ const router = Router();
 
 router.use(requireAuth);
 
-router.post('/', validateRequest(submitCodeSchema), submissionController.submit);
+router.post('/',
+	/* #swagger.tags = ['Submissions']
+		 #swagger.summary = 'Submit code for a problem'
+		 #swagger.security = [{ "bearerAuth": [] }]
+		 #swagger.requestBody = { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/SubmitCode' } } } }
+	*/
+	validateRequest(submitCodeSchema), submissionController.submit);
+
 router.post('/run', submissionController.runCode);
-router.get('/', submissionController.getUserSubmissions);
-router.get('/:id', submissionController.getSubmissionDetails);
+
+router.get('/',
+	/* #swagger.tags = ['Submissions']
+		 #swagger.summary = 'List submissions for current user'
+		 #swagger.security = [{ "bearerAuth": [] }]
+	*/
+	submissionController.getUserSubmissions);
+
+router.get('/:id',
+	/* #swagger.tags = ['Submissions']
+		 #swagger.summary = 'Get submission details'
+		 #swagger.security = [{ "bearerAuth": [] }]
+		 #swagger.parameters['id'] = { in: 'path', required: true, schema: { type: 'string' } }
+	*/
+	submissionController.getSubmissionDetails);
 
 export default router;

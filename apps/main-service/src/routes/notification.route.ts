@@ -8,9 +8,35 @@ const router = Router();
 
 router.use(requireAuth);
 
-router.post('/', requireAdmin, validateRequest(createNotificationSchema), notificationController.createNotification);
-router.get('/', notificationController.getNotifications);
-router.put('/read', validateRequest(readNotificationsSchema), notificationController.markAsRead);
-router.delete('/:notificationId', notificationController.deleteNotification);
+router.post('/',
+	/* #swagger.tags = ['Notifications']
+		 #swagger.summary = 'Create notification (admin)'
+		 #swagger.security = [{ "bearerAuth": [] }]
+		 #swagger.requestBody = { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/CreateNotification' } } } }
+	*/
+	requireAdmin, validateRequest(createNotificationSchema), notificationController.createNotification);
+
+router.get('/',
+	/* #swagger.tags = ['Notifications']
+		 #swagger.summary = 'List notifications for current user'
+		 #swagger.security = [{ "bearerAuth": [] }]
+	*/
+	notificationController.getNotifications);
+
+router.put('/read',
+	/* #swagger.tags = ['Notifications']
+		 #swagger.summary = 'Mark notifications as read'
+		 #swagger.security = [{ "bearerAuth": [] }]
+		 #swagger.requestBody = { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/ReadNotifications' } } } }
+	*/
+	validateRequest(readNotificationsSchema), notificationController.markAsRead);
+
+router.delete('/:notificationId',
+	/* #swagger.tags = ['Notifications']
+		 #swagger.summary = 'Delete a notification'
+		 #swagger.security = [{ "bearerAuth": [] }]
+		 #swagger.parameters['notificationId'] = { in: 'path', required: true, schema: { type: 'string' } }
+	*/
+	notificationController.deleteNotification);
 
 export default router;

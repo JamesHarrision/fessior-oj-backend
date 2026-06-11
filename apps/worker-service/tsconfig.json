@@ -1,9 +1,10 @@
 {
   "extends": "@ocj/tsconfig/base.json",
   "compilerOptions": {
+    "module": "Node16",
+    "moduleResolution": "node16",
     "outDir": "./dist",
-    "rootDir": "./src",
-    "ignoreDeprecations": "6.0"
+    "rootDir": "./src"
   },
   "include": [
     "src/**/*"
