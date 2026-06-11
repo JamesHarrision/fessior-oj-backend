@@ -28,7 +28,7 @@ export class ShopController {
 
   async buyItem(req: Request, res: Response) {
     try {
-      const userId = req.user.userId;
+      const userId = (req as any).user.userId;
       const { itemId } = req.body;
       const bought = await shopService.buyItem(userId, itemId);
       res.status(200).json({
@@ -42,7 +42,7 @@ export class ShopController {
 
   async getInventory(req: Request, res: Response) {
     try {
-      const userId = req.user.userId;
+      const userId = (req as any).user.userId;
       const inventory = await shopService.getInventory(userId);
       res.status(200).json({
         success: true,
@@ -55,7 +55,7 @@ export class ShopController {
 
   async equipOrUnequip(req: Request, res: Response) {
     try {
-      const userId = req.user.userId;
+      const userId = (req as any).user.userId;
       const { inventoryItemId, equip } = req.body;
       const updated = await shopService.equipOrUnequip(userId, inventoryItemId, equip);
       res.status(200).json({

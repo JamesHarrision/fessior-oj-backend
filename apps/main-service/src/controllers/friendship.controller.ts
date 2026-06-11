@@ -47,8 +47,8 @@ export class FriendshipController {
   async removeFriendship(req: Request, res: Response) {
     try {
       const userId = req.user.userId;
-      const { friendId } = req.params;
-      await friendshipService.removeFriendship(userId, friendId as string);
+      const friendId = req.params.friendId as string;
+      await friendshipService.removeFriendship(userId, friendId);
       res.status(200).json({
         success: true,
         message: 'Friend removed successfully',

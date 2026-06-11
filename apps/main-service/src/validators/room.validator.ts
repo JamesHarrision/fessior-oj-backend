@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ROOM_CODE_REGEX } from '@ocj/validators';
 
 export const createRoomSchema = z.object({
   problemId: z.string().length(24, 'Invalid problem ID format').optional(),
@@ -8,7 +9,7 @@ export const createRoomSchema = z.object({
 });
 
 export const joinRoomSchema = z.object({
-  roomCode: z.string().min(3, 'Room code must be at least 3 characters').max(20),
+  roomCode: z.string().regex(ROOM_CODE_REGEX, 'Room code must be exactly 6 alphanumeric characters'),
 });
 
 export const updateRoomSchema = createRoomSchema.partial();

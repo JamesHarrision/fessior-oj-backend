@@ -17,6 +17,8 @@ import notificationRoutes from './routes/notification.route';
 import reportRoutes from './routes/report.route';
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from '../swagger-output.json';
+import { errorMiddleware } from './middlewares/error.middleware';
+import { API_ROUTES } from '@ocj/constants';
 
 const app = express();
 
@@ -26,23 +28,22 @@ app.use(express.json());
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/problems', problemRoutes);
-app.use('/api/v1/submissions', submissionRoutes);
-app.use('/api/v1/ai', aiRoutes);
-app.use('/api/v1/leaderboard', leaderboardRoutes);
-app.use('/api/v1/rooms', roomRoutes);
-app.use('/api/v1/matches', matchRoutes);
-app.use('/api/v1/contests', contestRoutes);
-app.use('/api/v1/comments', commentRoutes);
-app.use('/api/v1/friends', friendshipRoutes);
-app.use('/api/v1/shop', shopRoutes);
-app.use('/api/v1/notifications', notificationRoutes);
-app.use('/api/v1/reports', reportRoutes);
-
+app.use(`/api/v1${API_ROUTES.AUTH}`, authRoutes);
+app.use(`/api/v1${API_ROUTES.PROBLEMS}`, problemRoutes);
+app.use(`/api/v1${API_ROUTES.SUBMISSIONS}`, submissionRoutes);
+app.use(`/api/v1${API_ROUTES.AI}`, aiRoutes);
+app.use(`/api/v1${API_ROUTES.LEADERBOARD}`, leaderboardRoutes);
+app.use(`/api/v1${API_ROUTES.ROOMS}`, roomRoutes);
+app.use(`/api/v1${API_ROUTES.MATCHES}`, matchRoutes);
+app.use(`/api/v1${API_ROUTES.CONTESTS}`, contestRoutes);
+app.use(`/api/v1${API_ROUTES.COMMENTS}`, commentRoutes);
+app.use(`/api/v1${API_ROUTES.FRIENDS}`, friendshipRoutes);
+app.use(`/api/v1${API_ROUTES.SHOP}`, shopRoutes);
+app.use(`/api/v1${API_ROUTES.NOTIFICATIONS}`, notificationRoutes);
+app.use(`/api/v1${API_ROUTES.REPORTS}`, reportRoutes);
 
 app.get('/', async (req, res) => {
-  const userCount = await prisma.user.findMany();
+  const userCount = await prisma.user.count();
   return res.status(200).json({
     status: "Success",
     message: "Welcome x 3.14",
@@ -50,6 +51,7 @@ app.get('/', async (req, res) => {
   })
 });
 
-
+// Global error handler middleware should be at the end of route declarations
+app.use(errorMiddleware);
 
 export default app;

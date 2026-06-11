@@ -1,0 +1,12 @@
+{
+  "extends": "@ocj/tsconfig/base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "ignoreDeprecations": "6.0",
+    "types": ["node"]
+  },
+  "include": [
+    "src/**/*"
+  ]
+}

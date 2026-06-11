@@ -1,8 +1,11 @@
 import { Problem } from '../models/problem.model';
 import { Submission } from '../models/submission.model';
+import { Testcase } from '../models/testcase.model';
 import { submissionQueue } from '../config/queue';
 import { AppError } from '@ocj/errors';
 import mongoose from 'mongoose';
+import { executeTestCase, LANGUAGE_IDS, LanguageKey } from '@ocj/executor';
+import { DEFAULT_LIMITS } from '@ocj/constants';
 
 export class SubmissionService {
   async submit(
@@ -54,7 +57,7 @@ export class SubmissionService {
       throw new AppError('Invalid submission ID format', 400);
     }
 
-    const submission = await Submission.findById(submissionId).populate('problemId', 'title slug');
+    const submission = await Submission.findById(submissionId).populate('problemId', 'title slug difficulty');
     if (!submission) {
       throw new AppError('Submission not found', 404);
     }
@@ -99,6 +102,66 @@ export class SubmissionService {
       limit,
       items,
     };
+  }
+
+  async runCode(data: {
+    problemId: string;
+    code: string;
+    language: 'cpp' | 'java' | 'python';
+    customInput?: string;
+  }) {
+    let problem = null;
+    if (mongoose.Types.ObjectId.isValid(data.problemId)) {
+      problem = await Problem.findById(data.problemId);
+    }
+    if (!problem) {
+      problem = await Problem.findOne({ slug: data.problemId });
+    }
+    if (!problem) {
+      throw new AppError('Problem not found', 404);
+    }
+
+    let testcasesToRun: Array<{ input: string; output: string; isExample: boolean }> = [];
+    if (data.customInput !== undefined && data.customInput !== null) {
+      testcasesToRun = [{ input: data.customInput, output: '', isExample: false }];
+    } else {
+      testcasesToRun = await Testcase.find({ problemId: problem._id, isExample: true });
+      if (testcasesToRun.length === 0) {
+        testcasesToRun = [{ input: '', output: '', isExample: true }];
+      }
+    }
+
+    const rapidApiKey = process.env.RAPIDAPI_KEY || '';
+    const rapidApiHost = process.env.RAPIDAPI_HOST || 'judge0-ce.p.rapidapi.com';
+    const judge0Url = process.env.JUDGE0_URL || `https://${rapidApiHost}`;
+    const languageId = LANGUAGE_IDS[data.language as LanguageKey] || 71;
+
+    const results = [];
+    for (const tc of testcasesToRun) {
+      const result = await executeTestCase(
+        data.code,
+        languageId,
+        tc.input,
+        tc.output,
+        problem.timeLimit || DEFAULT_LIMITS.TIME_LIMIT_MS,
+        {
+          judge0Url,
+          rapidApiKey,
+          rapidApiHost,
+        }
+      );
+      results.push({
+        status: result.status,
+        input: tc.input,
+        expectedOutput: tc.output,
+        actualOutput: result.actualOutput,
+        time: result.time,
+        memory: result.memory,
+        error: result.error,
+      });
+    }
+
+    return results;
   }
 }
 

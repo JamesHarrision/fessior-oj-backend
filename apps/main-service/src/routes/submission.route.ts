@@ -16,6 +16,8 @@ router.post('/',
 	*/
 	validateRequest(submitCodeSchema), submissionController.submit);
 
+router.post('/run', submissionController.runCode);
+
 router.get('/',
 	/* #swagger.tags = ['Submissions']
 		 #swagger.summary = 'List submissions for current user'

@@ -3,16 +3,25 @@ import { prisma } from '../config/prisma';
 import { redis } from '../config/redis';
 
 export class FriendshipService {
-  async sendRequest(senderId: string, receiverId: string) {
-    if (senderId === receiverId) {
-      throw new Error('You cannot send a friend request to yourself');
+  async sendRequest(senderId: string, receiverIdOrUsername: string) {
+    let receiver = await prisma.user.findUnique({
+      where: { id: receiverIdOrUsername },
+    });
+
+    if (!receiver) {
+      receiver = await prisma.user.findUnique({
+        where: { username: receiverIdOrUsername },
+      });
     }
 
-    const receiver = await prisma.user.findUnique({
-      where: { id: receiverId },
-    });
     if (!receiver) {
       throw new Error('Receiver user not found');
+    }
+
+    const receiverId = receiver.id;
+
+    if (senderId === receiverId) {
+      throw new Error('You cannot send a friend request to yourself');
     }
 
     const existing = await friendshipRepository.findFriendship(senderId, receiverId);

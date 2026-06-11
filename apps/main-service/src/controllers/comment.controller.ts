@@ -39,7 +39,7 @@ export class CommentController {
   async updateComment(req: Request, res: Response) {
     try {
       const userId = req.user.userId;
-      const { commentId } = req.params;
+      const commentId = req.params.commentId as string;
       const { content } = req.body;
       const updated = await commentService.updateComment(commentId as string, userId, content);
       res.status(200).json({
@@ -55,8 +55,8 @@ export class CommentController {
     try {
       const userId = req.user.userId;
       const userRole = req.user.role;
-      const { commentId } = req.params;
-      await commentService.deleteComment(commentId as string, userId, userRole);
+      const commentId = req.params.commentId as string;
+      await commentService.deleteComment(commentId, userId, userRole);
       res.status(200).json({
         success: true,
         message: 'Comment deleted successfully',
@@ -69,8 +69,8 @@ export class CommentController {
   async toggleLike(req: Request, res: Response) {
     try {
       const userId = req.user.userId;
-      const { commentId } = req.params;
-      const result = await commentService.toggleLike(commentId as string, userId);
+      const commentId = req.params.commentId as string;
+      const result = await commentService.toggleLike(commentId, userId);
       res.status(200).json({
         success: true,
         data: result,

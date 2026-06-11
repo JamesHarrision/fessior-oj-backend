@@ -3,6 +3,7 @@ import { CustomRoomStatus, Difficulty, MatchStatus } from '@prisma/client';
 import { Problem } from '../models/problem.model';
 import { prisma } from '../config/prisma';
 import { io } from '../sockets/socket';
+import { SOCKET_EVENTS } from '@ocj/constants';
 
 export class RoomService {
   async createRoom(
@@ -89,11 +90,11 @@ export class RoomService {
         }
         const randomIndex = Math.floor(Math.random() * fallbackCount);
         const randomProblem = await Problem.findOne().skip(randomIndex);
-        problemId = randomProblem?._id.toString();
+        problemId = randomProblem?._id.toString() as string;
       } else {
         const randomIndex = Math.floor(Math.random() * count);
         const problem = await Problem.findOne(query).skip(randomIndex);
-        problemId = problem?._id.toString();
+        problemId = problem?._id.toString() as string;
       }
     }
 
@@ -116,7 +117,7 @@ export class RoomService {
 
     // 5. Emit socket events to both players if they are connected
     const roomSocketName = `custom-room:${room.room_code}`;
-    io?.to(roomSocketName).emit('match-started', {
+    io?.to(roomSocketName).emit(SOCKET_EVENTS.MATCH_STARTED, {
       matchId: match.id,
       roomId: room.id,
       problemId,
@@ -146,7 +147,7 @@ export class RoomService {
 
     // Notify other players via socket
     const roomSocketName = `custom-room:${room.room_code}`;
-    io?.to(roomSocketName).emit('player-left', { userId });
+    io?.to(roomSocketName).emit(SOCKET_EVENTS.PLAYER_LEFT, { userId });
 
     return result;
   }
@@ -185,7 +186,7 @@ export class RoomService {
 
     // Notify room of configuration change
     const roomSocketName = `custom-room:${room.room_code}`;
-    io?.to(roomSocketName).emit('config-updated', updated);
+    io?.to(roomSocketName).emit(SOCKET_EVENTS.CONFIG_UPDATED, updated);
 
     return updated;
   }
@@ -204,7 +205,7 @@ export class RoomService {
 
     // Notify room of deletion
     const roomSocketName = `custom-room:${room.room_code}`;
-    io?.to(roomSocketName).emit('room-deleted');
+    io?.to(roomSocketName).emit(SOCKET_EVENTS.ROOM_DELETED);
 
     return { success: true };
   }

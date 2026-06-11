@@ -1,0 +1,142 @@
+.opponent-status-card {
+  padding: 18px 24px !important;
+  border-radius: 16px !important;
+  width: 100%;
+}
+
+.status-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-primary);
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.icon-title {
+  color: var(--color-purple);
+}
+
+.timer-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.03);
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border-primary);
+}
+
+.icon-timer {
+  color: var(--color-orange);
+  animation: pulse-slow 2s infinite;
+}
+
+.status-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+}
+
+@media (max-width: 576px) {
+  .status-body {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+}
+
+.opponent-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.opponent-avatar-small {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 2px solid var(--color-orange);
+}
+
+.profile-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.opponent-label {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.opponent-verdict {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.opponent-verdict.pending {
+  color: var(--color-orange);
+}
+
+.opponent-verdict.submitted {
+  color: var(--color-green);
+}
+
+.progress-comparison {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.user-score {
+  color: var(--color-purple);
+}
+
+.opponent-score {
+  color: var(--color-orange);
+}
+
+.bar-wrapper {
+  height: 10px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  width: 100%;
+}
+
+.user-bar {
+  background: linear-gradient(90deg, var(--color-purple) 0%, #7c3aed 100%);
+  height: 100%;
+  border-radius: 6px 0 0 6px;
+}
+
+.opponent-bar {
+  background: linear-gradient(90deg, #f97316 0%, #ea580c 100%);
+  height: 100%;
+  border-radius: 0 6px 6px 0;
+}

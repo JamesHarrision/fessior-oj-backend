@@ -19,6 +19,22 @@ export class SubmissionController {
     }
   }
 
+  async runCode(req: Request, res: Response, next: NextFunction) {
+    try {
+      if (!req.user) {
+        throw new AppError('Unauthorized', 401);
+      }
+
+      const results = await submissionService.runCode(req.body);
+      res.status(200).json({
+        status: 'Success',
+        data: results,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getSubmissionDetails(req: Request, res: Response, next: NextFunction) {
     try {
       if (!req.user) {
