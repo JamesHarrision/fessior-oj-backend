@@ -8,8 +8,27 @@ const router = Router();
 
 router.use(requireAuth);
 
-router.post('/', validateRequest(createReportSchema), reportController.createReport);
-router.get('/', reportController.getReports);
-router.put('/:reportId', requireAdmin, validateRequest(updateReportSchema), reportController.updateReportStatus);
+router.post('/',
+	/* #swagger.tags = ['Reports']
+		 #swagger.summary = 'Create a report (user)'
+		 #swagger.security = [{ "bearerAuth": [] }]
+		 #swagger.requestBody = { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/CreateReport' } } } }
+	*/
+	validateRequest(createReportSchema), reportController.createReport);
+
+router.get('/',
+	/* #swagger.tags = ['Reports']
+		 #swagger.summary = 'Get reports for admin'
+		 #swagger.security = [{ "bearerAuth": [] }]
+	*/
+	reportController.getReports);
+
+router.put('/:reportId',
+	/* #swagger.tags = ['Reports']
+		 #swagger.summary = 'Update report status (admin)'
+		 #swagger.security = [{ "bearerAuth": [] }]
+		 #swagger.parameters['reportId'] = { in: 'path', required: true, schema: { type: 'string' } }
+	*/
+	requireAdmin, validateRequest(updateReportSchema), reportController.updateReportStatus);
 
 export default router;
