@@ -17,3 +17,7 @@ export const adminUpdateUserSchema = z.object({
 export const updateRoleSchema = z.object({
   role: z.enum(['USER', 'ADMIN']),
 });
+
+export const banUserSchema = z.object({
+  reason: z.string().max(255).optional(),
+});

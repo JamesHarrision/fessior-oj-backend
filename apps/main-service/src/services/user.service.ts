@@ -242,3 +242,16 @@ export const updateUserRole = async (id: string, role: 'USER' | 'ADMIN') => {
   
   return await userRepo.updateUserRole(id, role);
 };
+
+export const banUser = async (id: string, reason?: string) => {
+  const existingUser = await userRepo.findUserByIdAdmin(id);
+  if (!existingUser) {
+    throw new AppError('User not found', 404);
+  }
+
+  if (existingUser.is_banned) {
+    throw new AppError('User is already banned', 400);
+  }
+  
+  return await userRepo.banUser(id, reason);
+};

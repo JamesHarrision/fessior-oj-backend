@@ -366,3 +366,25 @@ export const updateUserRole = async (req: Request, res: Response, next: NextFunc
     next(error);
   }
 };
+
+export const banUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+    
+    if (!id || typeof id !== 'string') {
+      res.status(400).json({ status: 'Error', message: 'Invalid user ID' });
+      return;
+    }
+    
+    const bannedUser = await userService.banUser(id, reason);
+    
+    res.status(200).json({
+      status: 'Success',
+      message: 'User banned successfully',
+      data: bannedUser,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

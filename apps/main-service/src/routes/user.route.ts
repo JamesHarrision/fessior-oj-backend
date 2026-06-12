@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { requireAuth, requireAdmin } from '../middlewares/auth.middleware';
 import { validateRequest } from '../middlewares/validate.middleware';
-import { updateMeSchema, adminUpdateUserSchema, updateRoleSchema } from '../validators/user.validator';
+import { updateMeSchema, adminUpdateUserSchema, updateRoleSchema, banUserSchema } from '../validators/user.validator';
 import * as userController from '../controllers/user.controller';
 import { upload } from '../middlewares/upload.middleware';
 
@@ -1021,6 +1021,69 @@ router.patch('/:id/role', requireAuth, requireAdmin, validateRequest(updateRoleS
      }
   */
   userController.updateUserRole(req, res, next);
+});
+
+// POST /api/v1/users/:id/ban - Admin ban user
+router.post('/:id/ban', requireAuth, requireAdmin, validateRequest(banUserSchema), (req, res, next) => {
+  /* #swagger.tags = ['Admin']
+     #swagger.summary = 'Admin ban user'
+     #swagger.description = 'Locks a user account. Banned users cannot authenticate or access protected APIs.'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.parameters['id'] = {
+       in: 'path',
+       required: true,
+       description: 'User ID',
+       type: 'string'
+     }
+     #swagger.requestBody = {
+       required: false,
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               reason: { type: 'string', example: 'Violation of community guidelines' }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[200] = {
+       description: 'User banned successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string' },
+               data: {
+                 type: 'object',
+                 properties: {
+                   id: { type: 'string' },
+                   username: { type: 'string' },
+                   email: { type: 'string' },
+                   is_banned: { type: 'boolean' },
+                   banned_at: { type: 'string' },
+                   banned_reason: { type: 'string', nullable: true }
+                 }
+               }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[400] = {
+       description: 'User is already banned'
+     }
+     #swagger.responses[403] = {
+       description: 'Forbidden - Admin access required'
+     }
+     #swagger.responses[404] = {
+       description: 'User not found'
+     }
+  */
+  userController.banUser(req, res, next);
 });
 
 export default router;

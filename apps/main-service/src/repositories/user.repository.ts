@@ -319,3 +319,22 @@ export const updateUserRole = async (id: string, role: 'USER' | 'ADMIN') => {
     },
   });
 };
+
+export const banUser = async (id: string, reason?: string) => {
+  return prisma.user.update({
+    where: { id },
+    data: {
+      is_banned: true,
+      banned_at: new Date(),
+      banned_reason: reason || null,
+    },
+    select: {
+      id: true,
+      username: true,
+      email: true,
+      is_banned: true,
+      banned_at: true,
+      banned_reason: true,
+    },
+  });
+};
