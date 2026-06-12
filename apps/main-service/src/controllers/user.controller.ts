@@ -257,3 +257,24 @@ export const getAllUsers = async (req: Request, res: Response, next: NextFunctio
     next(error);
   }
 };
+
+export const getUserByIdAdmin = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    
+    if (!id || typeof id !== 'string') {
+      res.status(400).json({ status: 'Error', message: 'Invalid user ID' });
+      return;
+    }
+    
+    const user = await userService.getUserByIdAdmin(id);
+    
+    res.status(200).json({
+      status: 'Success',
+      message: 'User retrieved successfully',
+      data: user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

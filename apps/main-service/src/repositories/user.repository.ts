@@ -243,3 +243,28 @@ export const getAllUsers = async (page: number = 1, limit: number = 10, search?:
     },
   };
 };
+
+export const findUserByIdAdmin = async (id: string) => {
+  return prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      username: true,
+      email: true,
+      avatar_url: true,
+      role: true,
+      elo_rating: true,
+      streak_count: true,
+      max_streak: true,
+      code_coins: true,
+      bio: true,
+      full_name: true,
+      is_banned: true,
+      banned_at: true,
+      banned_reason: true,
+      last_active_date: true,
+      created_at: true,
+      updated_at: true,
+    },
+  });
+};

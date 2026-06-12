@@ -138,3 +138,11 @@ export const getUserStreak = async (userId: string) => {
 export const getAllUsers = async (page: number, limit: number, search?: string) => {
   return await userRepo.getAllUsers(page, limit, search);
 };
+
+export const getUserByIdAdmin = async (userId: string) => {
+  const user = await userRepo.findUserByIdAdmin(userId);
+  if (!user) {
+    throw new AppError('User not found', 404);
+  }
+  return user;
+};

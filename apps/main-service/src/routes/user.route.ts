@@ -11,7 +11,7 @@ const router = Router();
  * GET /api/v1/users/:username
  * Get public user profile by username
  */
-router.get('/:username', (req, res, next) => {
+router.get('/profile/:username', (req, res, next) => {
   /* #swagger.tags = ['User']
      #swagger.summary = 'Get public user profile'
      #swagger.description = 'Returns public profile information of a user by username. Does not require authentication.'
@@ -134,6 +134,65 @@ router.get('/', requireAuth, requireAdmin, (req, res, next) => {
      }
   */
   userController.getAllUsers(req, res, next);
+});
+
+// GET /api/v1/users/:id - Get user by ID (Admin only)
+router.get('/:id', requireAuth, requireAdmin, (req, res, next) => {
+  /* #swagger.tags = ['Admin']
+     #swagger.summary = 'Get user by ID (Admin only)'
+     #swagger.description = 'Returns detailed information of a specific user including email and ban status.'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.parameters['id'] = {
+       in: 'path',
+       required: true,
+       description: 'User ID',
+       type: 'string',
+       example: 'uuid-123'
+     }
+     #swagger.responses[200] = {
+       description: 'User retrieved successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string' },
+               data: {
+                 type: 'object',
+                 properties: {
+                   id: { type: 'string' },
+                   username: { type: 'string' },
+                   email: { type: 'string' },
+                   avatar_url: { type: 'string', nullable: true },
+                   role: { type: 'string', enum: ['USER', 'ADMIN'] },
+                   elo_rating: { type: 'number' },
+                   streak_count: { type: 'number' },
+                   max_streak: { type: 'number' },
+                   code_coins: { type: 'number' },
+                   bio: { type: 'string', nullable: true },
+                   full_name: { type: 'string', nullable: true },
+                   is_banned: { type: 'boolean' },
+                   banned_at: { type: 'string', nullable: true },
+                   banned_reason: { type: 'string', nullable: true },
+                   last_active_date: { type: 'string', nullable: true },
+                   created_at: { type: 'string', format: 'date-time' },
+                   updated_at: { type: 'string', format: 'date-time' }
+                 }
+               }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[404] = {
+       description: 'User not found'
+     }
+     #swagger.responses[403] = {
+       description: 'Forbidden - Admin access required'
+     }
+  */
+  userController.getUserByIdAdmin(req, res, next);
 });
 
 router.use(requireAuth);
