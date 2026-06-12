@@ -255,3 +255,16 @@ export const banUser = async (id: string, reason?: string) => {
   
   return await userRepo.banUser(id, reason);
 };
+
+export const unbanUser = async (id: string) => {
+  const existingUser = await userRepo.findUserByIdAdmin(id);
+  if (!existingUser) {
+    throw new AppError('User not found', 404);
+  }
+  
+  if (!existingUser.is_banned) {
+    throw new AppError('User is not banned', 400);
+  }
+  
+  return await userRepo.unbanUser(id);
+};

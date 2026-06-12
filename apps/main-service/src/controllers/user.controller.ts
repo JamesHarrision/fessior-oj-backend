@@ -388,3 +388,24 @@ export const banUser = async (req: Request, res: Response, next: NextFunction) =
     next(error);
   }
 };
+
+export const unbanUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    
+    if (!id || typeof id !== 'string') {
+      res.status(400).json({ status: 'Error', message: 'Invalid user ID' });
+      return;
+    }
+    
+    const unbannedUser = await userService.unbanUser(id);
+    
+    res.status(200).json({
+      status: 'Success',
+      message: 'User unbanned successfully',
+      data: unbannedUser,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

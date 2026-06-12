@@ -338,3 +338,22 @@ export const banUser = async (id: string, reason?: string) => {
     },
   });
 };
+
+export const unbanUser = async (id: string) => {
+  return prisma.user.update({
+    where: { id },
+    data: {
+      is_banned: false,
+      banned_at: null,
+      banned_reason: null,
+    },
+    select: {
+      id: true,
+      username: true,
+      email: true,
+      is_banned: true,
+      banned_at: true,
+      banned_reason: true,
+    },
+  });
+};

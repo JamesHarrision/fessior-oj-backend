@@ -1086,4 +1086,54 @@ router.post('/:id/ban', requireAuth, requireAdmin, validateRequest(banUserSchema
   userController.banUser(req, res, next);
 });
 
+// POST /api/v1/users/:id/unban - Admin unban user
+router.post('/:id/unban', requireAuth, requireAdmin, (req, res, next) => {
+  /* #swagger.tags = ['Admin']
+     #swagger.summary = 'Admin unban user'
+     #swagger.description = 'Restores a banned user account. User can login and access protected APIs again.'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.parameters['id'] = {
+       in: 'path',
+       required: true,
+       description: 'User ID',
+       type: 'string'
+     }
+     #swagger.responses[200] = {
+       description: 'User unbanned successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string' },
+               data: {
+                 type: 'object',
+                 properties: {
+                   id: { type: 'string' },
+                   username: { type: 'string' },
+                   email: { type: 'string' },
+                   is_banned: { type: 'boolean' },
+                   banned_at: { type: 'string', nullable: true },
+                   banned_reason: { type: 'string', nullable: true }
+                 }
+               }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[400] = {
+       description: 'User is not banned'
+     }
+     #swagger.responses[403] = {
+       description: 'Forbidden - Admin access required'
+     }
+     #swagger.responses[404] = {
+       description: 'User not found'
+     }
+  */
+  userController.unbanUser(req, res, next);
+});
+
 export default router;
