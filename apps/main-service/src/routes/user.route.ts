@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { requireAuth, requireAdmin } from '../middlewares/auth.middleware';
 import { validateRequest } from '../middlewares/validate.middleware';
-import { updateMeSchema } from '../validators/user.validator';
+import { updateMeSchema, adminUpdateUserSchema } from '../validators/user.validator';
 import * as userController from '../controllers/user.controller';
 import { upload } from '../middlewares/upload.middleware';
 
@@ -918,6 +918,49 @@ router.get('/:id', requireAuth, requireAdmin, (req, res, next) => {
      }
   */
   userController.getUserByIdAdmin(req, res, next);
+});
+
+// PATCH /api/v1/users/:id - Admin update user
+router.patch('/:id', requireAuth, requireAdmin, validateRequest(adminUpdateUserSchema), (req, res, next) => {
+  /* #swagger.tags = ['Admin']
+     #swagger.summary = 'Admin update user'
+     #swagger.description = 'Allows admin to update user information (username, email, full_name, bio, elo_rating, code_coins).'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.parameters['id'] = {
+       in: 'path',
+       required: true,
+       description: 'User ID',
+       type: 'string'
+     }
+     #swagger.requestBody = {
+       required: true,
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               username: { type: 'string', example: 'new_username' },
+               email: { type: 'string', example: 'newemail@example.com' },
+               full_name: { type: 'string', example: 'New Full Name' },
+               bio: { type: 'string', example: 'Updated bio' },
+               elo_rating: { type: 'number', example: 1500 },
+               code_coins: { type: 'number', example: 500 }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[200] = {
+       description: 'User updated successfully'
+     }
+     #swagger.responses[403] = {
+       description: 'Forbidden - Admin access required'
+     }
+     #swagger.responses[404] = {
+       description: 'User not found'
+     }
+  */
+  userController.adminUpdateUser(req, res, next);
 });
 
 export default router;

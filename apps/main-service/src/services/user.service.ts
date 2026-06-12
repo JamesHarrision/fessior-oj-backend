@@ -1,4 +1,5 @@
 import * as userRepo from '../repositories/user.repository';
+import * as authRepo from '../repositories/auth.repository';
 import { AppError } from '@ocj/errors';
 import { deleteAvatar, uploadAvatar } from './cloudinary.service';
 import { Submission } from '../models/submission.model';
@@ -201,4 +202,34 @@ export const getUserTagStatsByUsername = async (username: string) => {
       problems_solved: ts.problems_solved,
     })),
   };
+};
+
+export const adminUpdateUser = async (id: string, data: {
+  username?: string;
+  email?: string;
+  full_name?: string;
+  bio?: string;
+  elo_rating?: number;
+  code_coins?: number;
+}) => {
+  const existingUser = await userRepo.findUserByIdAdmin(id);
+  if (!existingUser) {
+    throw new AppError('User not found', 404);
+  }
+  
+  if (data.username) {
+    const userWithSameUsername = await userRepo.findUserByUsername(data.username);
+    if (userWithSameUsername && userWithSameUsername.id !== id) {
+      throw new AppError('Username already taken', 400);
+    }
+  }
+  
+  if (data.email) {
+    const userWithSameEmail = await authRepo.findUserByEmail(data.email);
+    if (userWithSameEmail && userWithSameEmail.id !== id) {
+      throw new AppError('Email already in use', 400);
+    }
+  }
+  
+  return await userRepo.adminUpdateUser(id, data);
 };

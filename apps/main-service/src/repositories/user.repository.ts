@@ -268,3 +268,40 @@ export const findUserByIdAdmin = async (id: string) => {
     },
   });
 };
+
+export const adminUpdateUser = async (id: string, data: {
+  username?: string;
+  email?: string;
+  full_name?: string;
+  bio?: string;
+  elo_rating?: number;
+  code_coins?: number;
+}) => {
+  return prisma.user.update({
+    where: { id },
+    data: {
+      username: data.username,
+      email: data.email,
+      full_name: data.full_name,
+      bio: data.bio,
+      elo_rating: data.elo_rating,
+      code_coins: data.code_coins,
+    },
+    select: {
+      id: true,
+      username: true,
+      email: true,
+      avatar_url: true,
+      role: true,
+      elo_rating: true,
+      streak_count: true,
+      max_streak: true,
+      code_coins: true,
+      bio: true,
+      full_name: true,
+      is_banned: true,
+      created_at: true,
+      updated_at: true,
+    },
+  });
+};

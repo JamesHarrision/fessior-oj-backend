@@ -323,3 +323,24 @@ export const getUserTagStatsByUsername = async (req: Request, res: Response, nex
     next(error);
   }
 };
+
+export const adminUpdateUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    
+    if (!id || typeof id !== 'string') {
+      res.status(400).json({ status: 'Error', message: 'Invalid user ID' });
+      return;
+    }
+    
+    const updatedUser = await userService.adminUpdateUser(id, req.body);
+    
+    res.status(200).json({
+      status: 'Success',
+      message: 'User updated successfully',
+      data: updatedUser,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
