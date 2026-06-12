@@ -6,8 +6,8 @@ const doc = {
     description: 'Tài liệu API cho hệ thống Online Code Judge',
     version: '1.0.0',
   },
-  host: 'localhost:6868', // Đổi lại thành domain deploy sau này 
-  schemes: ['http'],
+  host: process.env.SWAGGER_HOST || 'localhost:6868',
+  schemes: process.env.NODE_ENV === 'production' ? ['https'] : ['http'],
   securityDefinitions: {
     bearerAuth: {
       type: 'apiKey',
