@@ -238,10 +238,57 @@
           "Auth"
         ],
         "summary": "Register new user",
-        "description": "",
+        "description": "Create a new user account with email and password. Returns created user object (without password).",
         "responses": {
           "201": {
-            "description": "User created"
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "username": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "status": "Success",
+                  "message": "User registered successfully",
+                  "data": {
+                    "id": "user_123",
+                    "name": "Jane Doe",
+                    "username": "janedoe",
+                    "email": "jane@example.com",
+                    "createdAt": "2026-06-12T12:00:00Z"
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -252,7 +299,35 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Register"
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Full name of the user"
+                  },
+                  "username": {
+                    "type": "string",
+                    "description": "Unique username (optional)"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "Plain text password (min length depends on validator)"
+                  }
+                },
+                "required": [
+                  "email",
+                  "password"
+                ]
+              },
+              "example": {
+                "name": "Jane Doe",
+                "username": "janedoe",
+                "email": "jane@example.com",
+                "password": "s3cretPass"
               }
             }
           }
@@ -265,10 +340,48 @@
           "Auth"
         ],
         "summary": "User login",
-        "description": "",
+        "description": "Authenticate with email (or username) and password. Returns access and refresh tokens.",
         "responses": {
           "200": {
-            "description": "Returns access and refresh tokens"
+            "description": "Authentication successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "accessToken": {
+                          "type": "string"
+                        },
+                        "refreshToken": {
+                          "type": "string"
+                        },
+                        "expiresIn": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "status": "Success",
+                  "message": "Login successful",
+                  "data": {
+                    "accessToken": "eyJ...",
+                    "refreshToken": "rftkn...",
+                    "expiresIn": 3600
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -279,7 +392,24 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Login"
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "description": "Email or username"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email",
+                  "password"
+                ]
+              },
+              "example": {
+                "email": "jane@example.com",
+                "password": "s3cretPass"
               }
             }
           }
@@ -292,7 +422,7 @@
           "Auth"
         ],
         "summary": "Logout (revoke refresh token)",
-        "description": "",
+        "description": "Invalidate a refresh token to log out a session. Requires Authorization header.",
         "parameters": [
           {
             "name": "authorization",
@@ -304,7 +434,15 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Logged out successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Logged out successfully"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -319,15 +457,22 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
                   "refreshToken": {
-                    "example": "any"
+                    "type": "string"
                   }
-                }
+                },
+                "required": [
+                  "refreshToken"
+                ]
+              },
+              "example": {
+                "refreshToken": "rftkn..."
               }
             }
           }
@@ -340,10 +485,22 @@
           "Auth"
         ],
         "summary": "Refresh access token",
-        "description": "",
+        "description": "Exchange a valid refresh token for a new access token.",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "New access token",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Token refreshed successfully",
+                  "data": {
+                    "accessToken": "eyJ...",
+                    "expiresIn": 3600
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -354,7 +511,18 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RefreshToken"
+                "type": "object",
+                "properties": {
+                  "refreshToken": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "refreshToken"
+                ]
+              },
+              "example": {
+                "refreshToken": "rftkn..."
               }
             }
           }
@@ -367,7 +535,7 @@
           "Auth"
         ],
         "summary": "Get current user profile",
-        "description": "",
+        "description": "Return the profile of the currently authenticated user.",
         "parameters": [
           {
             "name": "authorization",
@@ -379,7 +547,49 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "User profile returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "username": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "status": "Success",
+                  "message": "User fetched successfully",
+                  "data": {
+                    "id": "user_123",
+                    "name": "Jane Doe",
+                    "username": "janedoe",
+                    "email": "jane@example.com"
+                  }
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -398,7 +608,7 @@
           "Auth"
         ],
         "summary": "Change current user password",
-        "description": "",
+        "description": "Change the password for the authenticated user. Requires current password.",
         "parameters": [
           {
             "name": "authorization",
@@ -410,7 +620,15 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Password changed",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Password changed successfully"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -429,7 +647,23 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ChangePassword"
+                "type": "object",
+                "properties": {
+                  "oldPassword": {
+                    "type": "string"
+                  },
+                  "newPassword": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "oldPassword",
+                  "newPassword"
+                ]
+              },
+              "example": {
+                "oldPassword": "oldPass",
+                "newPassword": "newPass123"
               }
             }
           }
@@ -442,7 +676,7 @@
           "Auth"
         ],
         "summary": "Revoke a specific session",
-        "description": "",
+        "description": "Revoke a previously issued session (by sessionId). Requires Authorization header.",
         "parameters": [
           {
             "name": "sessionId",
@@ -450,7 +684,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the session to revoke"
           },
           {
             "name": "authorization",
@@ -462,7 +697,15 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Session revoked",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Session revoked successfully"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -484,7 +727,7 @@
           "Auth"
         ],
         "summary": "Revoke all sessions for current user",
-        "description": "",
+        "description": "Invalidate all refresh tokens / sessions for the authenticated user.",
         "parameters": [
           {
             "name": "authorization",
@@ -496,7 +739,15 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "All sessions revoked",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "All sessions revoked successfully"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -513,7 +764,7 @@
           "Auth"
         ],
         "summary": "List active sessions for current user",
-        "description": "",
+        "description": "Return a list of active sessions (id, ip, userAgent, createdAt, lastActive). Requires Authorization header.",
         "parameters": [
           {
             "name": "authorization",
@@ -525,7 +776,24 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Sessions retrieved",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Sessions retrieved successfully",
+                  "data": [
+                    {
+                      "id": "sess_1",
+                      "ip": "127.0.0.1",
+                      "userAgent": "Mozilla/5.0",
+                      "createdAt": "2026-06-12T12:00:00Z",
+                      "lastActive": "2026-06-12T12:00:00Z"
+                    }
+                  ]
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -544,10 +812,18 @@
           "Auth"
         ],
         "summary": "Request password reset email",
-        "description": "",
+        "description": "Send a password reset email with a one-time token to the provided email address.",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Reset email requested",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Password reset email sent if account exists"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -558,7 +834,19 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ForgotPassword"
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              },
+              "example": {
+                "email": "jane@example.com"
               }
             }
           }
@@ -571,10 +859,18 @@
           "Auth"
         ],
         "summary": "Reset password using token",
-        "description": "",
+        "description": "Reset a user password using the token sent to email via forgot-password.",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Password reset successful",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Password has been reset"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -585,7 +881,23 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ResetPassword"
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  },
+                  "newPassword": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "token",
+                  "newPassword"
+                ]
+              },
+              "example": {
+                "token": "reset_token_123",
+                "newPassword": "newSecurePass"
               }
             }
           }
@@ -2088,6 +2400,28 @@
                 "$ref": "#/components/schemas/EquipItem"
               }
             }
+          }
+        }
+      }
+    },
+    "/run": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
