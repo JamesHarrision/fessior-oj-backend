@@ -219,3 +219,23 @@ export const getUserEloHistory = async (req: Request, res: Response, next: NextF
     next(error);
   }
 };
+
+export const getUserStreak = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      res.status(401).json({ status: 'Error', message: 'Unauthorized' });
+      return;
+    }
+    
+    const streakData = await userService.getUserStreak(userId);
+    
+    res.status(200).json({
+      status: 'Success',
+      message: 'User streak and heatmap retrieved successfully',
+      data: streakData,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

@@ -674,4 +674,45 @@ router.get('/me/elo-history', (req, res, next) => {
   userController.getUserEloHistory(req, res, next);
 });
 
+// GET /api/v1/users/me/streak - Get user streak and heatmap
+router.get('/me/streak', (req, res, next) => {
+  /* #swagger.tags = ['User']
+     #swagger.summary = 'Get current user streak and heatmap'
+     #swagger.description = 'Returns current streak, max streak, and calendar heatmap of problem-solving activity for the last 365 days.'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.responses[200] = {
+       description: 'User streak and heatmap retrieved successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string' },
+               data: {
+                 type: 'object',
+                 properties: {
+                   current_streak: { type: 'number', example: 5 },
+                   max_streak: { type: 'number', example: 10 },
+                   last_active_date: { type: 'string', format: 'date', nullable: true },
+                   heatmap: {
+                     type: 'object',
+                     additionalProperties: { type: 'number' },
+                     description: 'Map of date (YYYY-MM-DD) to number of problems solved',
+                     example: { "2024-01-15": 3, "2024-01-16": 1 }
+                   }
+                 }
+               }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[401] = {
+       description: 'Unauthorized'
+     }
+  */
+  userController.getUserStreak(req, res, next);
+});
+
 export default router;

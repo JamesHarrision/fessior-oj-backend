@@ -16,6 +16,7 @@ export const findUserById = async (id: string) => {
       bio: true,
       full_name: true,
       created_at: true,
+      last_active_date: true,
     },
   });
 };
@@ -177,4 +178,19 @@ export const getUserEloHistory = async (userId: string, page: number = 1, limit:
       totalPages: Math.ceil(total / limit),
     },
   };
+};
+
+export const getUserActivities = async (userId: string, startDate: Date, endDate: Date) => {
+  return prisma.userActivity.findMany({
+    where: {
+      user_id: userId,
+      activity_date: {
+        gte: startDate,
+        lte: endDate,
+      },
+    },
+    orderBy: {
+      activity_date: 'asc',
+    },
+  });
 };

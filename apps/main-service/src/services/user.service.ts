@@ -108,3 +108,29 @@ export const getUserTagStats = async (userId: string) => {
 export const getUserEloHistory = async (userId: string, page: number = 1, limit: number = 10) => {
   return await userRepo.getUserEloHistory(userId, page, limit);
 };
+
+export const getUserStreak = async (userId: string) => {
+  const user = await userRepo.findUserById(userId);
+  if (!user) {
+    throw new AppError('User not found', 404);
+  }
+  
+  const endDate = new Date();
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - 364); 
+  
+  const activities = await userRepo.getUserActivities(userId, startDate, endDate);
+  
+  const heatmap: Record<string, number> = {};
+  activities.forEach(activity => {
+    const dateStr = activity.activity_date.toISOString().split('T')[0];
+    heatmap[dateStr] = activity.problems_solved_count;
+  });
+  
+  return {
+    current_streak: user.streak_count,
+    max_streak: user.max_streak,
+    last_active_date: user.last_active_date,
+    heatmap,
+  };
+};
