@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { requireAuth, requireAdmin } from '../middlewares/auth.middleware';
 import { validateRequest } from '../middlewares/validate.middleware';
-import { updateMeSchema, adminUpdateUserSchema } from '../validators/user.validator';
+import { updateMeSchema, adminUpdateUserSchema, updateRoleSchema } from '../validators/user.validator';
 import * as userController from '../controllers/user.controller';
 import { upload } from '../middlewares/upload.middleware';
 
@@ -961,6 +961,66 @@ router.patch('/:id', requireAuth, requireAdmin, validateRequest(adminUpdateUserS
      }
   */
   userController.adminUpdateUser(req, res, next);
+});
+
+// PATCH /api/v1/users/:id/role - Admin update user role
+router.patch('/:id/role', requireAuth, requireAdmin, validateRequest(updateRoleSchema), (req, res, next) => {
+  /* #swagger.tags = ['Admin']
+     #swagger.summary = 'Admin update user role'
+     #swagger.description = 'Allows admin to change a user\'s role between USER and ADMIN.'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.parameters['id'] = {
+       in: 'path',
+       required: true,
+       description: 'User ID',
+       type: 'string'
+     }
+     #swagger.requestBody = {
+       required: true,
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               role: { type: 'string', enum: ['USER', 'ADMIN'], example: 'ADMIN' }
+             },
+             required: ['role']
+           }
+         }
+       }
+     }
+     #swagger.responses[200] = {
+       description: 'User role updated successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string' },
+               data: {
+                 type: 'object',
+                 properties: {
+                   id: { type: 'string' },
+                   username: { type: 'string' },
+                   email: { type: 'string' },
+                   role: { type: 'string' },
+                   updated_at: { type: 'string' }
+                 }
+               }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[403] = {
+       description: 'Forbidden - Admin access required'
+     }
+     #swagger.responses[404] = {
+       description: 'User not found'
+     }
+  */
+  userController.updateUserRole(req, res, next);
 });
 
 export default router;

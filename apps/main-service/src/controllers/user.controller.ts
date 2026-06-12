@@ -344,3 +344,25 @@ export const adminUpdateUser = async (req: Request, res: Response, next: NextFun
     next(error);
   }
 };
+
+export const updateUserRole = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    const { role } = req.body;
+    
+    if (!id || typeof id !== 'string') {
+      res.status(400).json({ status: 'Error', message: 'Invalid user ID' });
+      return;
+    }
+    
+    const updatedUser = await userService.updateUserRole(id, role);
+    
+    res.status(200).json({
+      status: 'Success',
+      message: 'User role updated successfully',
+      data: updatedUser,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

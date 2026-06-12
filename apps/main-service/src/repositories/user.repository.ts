@@ -305,3 +305,17 @@ export const adminUpdateUser = async (id: string, data: {
     },
   });
 };
+
+export const updateUserRole = async (id: string, role: 'USER' | 'ADMIN') => {
+  return prisma.user.update({
+    where: { id },
+    data: { role },
+    select: {
+      id: true,
+      username: true,
+      email: true,
+      role: true,
+      updated_at: true,
+    },
+  });
+};

@@ -233,3 +233,12 @@ export const adminUpdateUser = async (id: string, data: {
   
   return await userRepo.adminUpdateUser(id, data);
 };
+
+export const updateUserRole = async (id: string, role: 'USER' | 'ADMIN') => {
+  const existingUser = await userRepo.findUserByIdAdmin(id);
+  if (!existingUser) {
+    throw new AppError('User not found', 404);
+  }
+  
+  return await userRepo.updateUserRole(id, role);
+};

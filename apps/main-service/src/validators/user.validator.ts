@@ -13,3 +13,7 @@ export const adminUpdateUserSchema = z.object({
   elo_rating: z.number().int().min(0).max(3000).optional(),
   code_coins: z.number().int().min(0).optional(),
 });
+
+export const updateRoleSchema = z.object({
+  role: z.enum(['USER', 'ADMIN']),
+});
