@@ -62,3 +62,28 @@ export const getUserByUsername = async (req: Request, res: Response, next: NextF
     next(error);
   }
 };
+
+export const uploadAvatar = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      res.status(401).json({ status: 'Error', message: 'Unauthorized' });
+      return;
+    }
+
+    if (!req.file) {
+      res.status(400).json({ status: 'Error', message: 'No file uploaded' });
+      return;
+    }
+
+    const user = await userService.uploadUserAvatar(userId, req.file.buffer);
+
+    res.status(200).json({
+      status: 'Success',
+      message: 'Avatar uploaded successfully',
+      data: user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

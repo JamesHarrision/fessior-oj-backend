@@ -63,3 +63,11 @@ export const findUserByUsername = async (username: string) => {
     },
   });
 };
+
+export const updateUserAvatar = async (id: string, avatarUrl: string) => {
+  return prisma.user.update({
+    where: { id },
+    data: { avatar_url: avatarUrl },
+    select: { id: true, username: true, avatar_url: true },
+  });
+};

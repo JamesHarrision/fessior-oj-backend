@@ -3,6 +3,7 @@ import { requireAuth } from '../middlewares/auth.middleware';
 import { validateRequest } from '../middlewares/validate.middleware';
 import { updateMeSchema } from '../validators/user.validator';
 import * as userController from '../controllers/user.controller';
+import { upload } from '../middlewares/upload.middleware';
 
 const router = Router();
 
@@ -228,6 +229,62 @@ router.patch('/me', validateRequest(updateMeSchema), (req, res, next) => {
      }
   */
   userController.updateMe(req, res, next);
+});
+
+router.post('/me/avatar', upload.single('avatar'), (req, res, next) => {
+  /* #swagger.tags = ['User']
+     #swagger.summary = 'Upload user avatar'
+     #swagger.description = 'Upload an image file to set as user avatar. Supports JPEG, PNG, JPG, WEBP (max 5MB).'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.consumes = ['multipart/form-data']
+     #swagger.requestBody = {
+       required: true,
+       content: {
+         'multipart/form-data': {
+           schema: {
+             type: 'object',
+             properties: {
+               avatar: {
+                 type: 'string',
+                 format: 'binary',
+                 description: 'Image file (JPEG, PNG, JPG, WEBP)'
+               }
+             },
+             required: ['avatar']
+           }
+         }
+       }
+     }
+     #swagger.responses[200] = {
+       description: 'Avatar uploaded successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string', example: 'Avatar uploaded successfully' },
+               data: {
+                 type: 'object',
+                 properties: {
+                   id: { type: 'string' },
+                   username: { type: 'string' },
+                   avatar_url: { type: 'string' }
+                 }
+               }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[400] = {
+       description: 'No file uploaded or invalid file type'
+     }
+     #swagger.responses[401] = {
+       description: 'Unauthorized'
+     }
+  */
+  userController.uploadAvatar(req, res, next);
 });
 
 export default router;
