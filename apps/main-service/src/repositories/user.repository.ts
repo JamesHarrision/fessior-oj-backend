@@ -123,3 +123,13 @@ export const getUserContests = async (userId: string, page: number = 1, limit: n
     },
   };
 };
+
+export const getUserBadges = async (userId: string) => {
+  return prisma.userBadge.findMany({
+    where: { user_id: userId },
+    include: {
+      badge: true,
+    },
+    orderBy: { earned_at: 'desc' },
+  });
+};

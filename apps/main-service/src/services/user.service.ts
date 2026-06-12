@@ -78,3 +78,17 @@ export const getUserSubmissions = async (userId: string, page: number = 1, limit
 export const getUserContests = async (userId: string, page: number = 1, limit: number = 10) => {
   return await userRepo.getUserContests(userId, page, limit);
 };
+
+export const getUserBadges = async (userId: string) => {
+  const userBadges = await userRepo.getUserBadges(userId);
+  
+  return userBadges.map(ub => ({
+    id: ub.badge.id,
+    name: ub.badge.name,
+    slug: ub.badge.slug,
+    description: ub.badge.description,
+    icon_url: ub.badge.icon_url,
+    type: ub.badge.type,
+    earned_at: ub.earned_at,
+  }));
+};

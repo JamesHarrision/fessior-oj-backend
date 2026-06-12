@@ -466,4 +466,61 @@ router.get('/me/contests', (req, res, next) => {
   userController.getUserContests(req, res, next);
 });
 
+// GET /api/v1/users/me/badges - Get user badges
+router.get('/me/badges', (req, res, next) => {
+  /* #swagger.tags = ['User']
+     #swagger.summary = 'Get current user badges'
+     #swagger.description = 'Returns list of badges that the authenticated user has earned.'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.responses[200] = {
+       description: 'User badges retrieved successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string', example: 'User badges retrieved successfully' },
+               data: {
+                 type: 'array',
+                 items: {
+                   type: 'object',
+                   properties: {
+                     id: { type: 'string' },
+                     name: { type: 'string' },
+                     slug: { type: 'string' },
+                     description: { type: 'string', nullable: true },
+                     icon_url: { type: 'string', nullable: true },
+                     type: { type: 'string', enum: ['ACHIEVEMENT', 'STREAK', 'CONTEST', 'RANKING'] },
+                     earned_at: { type: 'string', format: 'date-time' }
+                   }
+                 }
+               }
+             }
+           },
+           example: {
+             status: 'Success',
+             message: 'User badges retrieved successfully',
+             data: [
+               {
+                 id: 'badge-id-1',
+                 name: '100 Problems Solved',
+                 slug: '100-problems',
+                 description: 'Solved 100 problems',
+                 icon_url: null,
+                 type: 'ACHIEVEMENT',
+                 earned_at: '2024-01-15T00:00:00.000Z'
+               }
+             ]
+           }
+         }
+       }
+     }
+     #swagger.responses[401] = {
+       description: 'Unauthorized'
+     }
+  */
+  userController.getUserBadges(req, res, next);
+});
+
 export default router;
