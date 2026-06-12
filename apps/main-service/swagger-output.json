@@ -238,10 +238,57 @@
           "Auth"
         ],
         "summary": "Register new user",
-        "description": "",
+        "description": "Create a new user account with email and password. Returns created user object (without password).",
         "responses": {
           "201": {
-            "description": "User created"
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "username": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "status": "Success",
+                  "message": "User registered successfully",
+                  "data": {
+                    "id": "user_123",
+                    "name": "Jane Doe",
+                    "username": "janedoe",
+                    "email": "jane@example.com",
+                    "createdAt": "2026-06-12T12:00:00Z"
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -252,7 +299,35 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Register"
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Full name of the user"
+                  },
+                  "username": {
+                    "type": "string",
+                    "description": "Unique username (optional)"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "Plain text password (min length depends on validator)"
+                  }
+                },
+                "required": [
+                  "email",
+                  "password"
+                ]
+              },
+              "example": {
+                "name": "Jane Doe",
+                "username": "janedoe",
+                "email": "jane@example.com",
+                "password": "s3cretPass"
               }
             }
           }
@@ -265,10 +340,48 @@
           "Auth"
         ],
         "summary": "User login",
-        "description": "",
+        "description": "Authenticate with email (or username) and password. Returns access and refresh tokens.",
         "responses": {
           "200": {
-            "description": "Returns access and refresh tokens"
+            "description": "Authentication successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "accessToken": {
+                          "type": "string"
+                        },
+                        "refreshToken": {
+                          "type": "string"
+                        },
+                        "expiresIn": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "status": "Success",
+                  "message": "Login successful",
+                  "data": {
+                    "accessToken": "eyJ...",
+                    "refreshToken": "rftkn...",
+                    "expiresIn": 3600
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -279,7 +392,24 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Login"
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "description": "Email or username"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email",
+                  "password"
+                ]
+              },
+              "example": {
+                "email": "jane@example.com",
+                "password": "s3cretPass"
               }
             }
           }
@@ -292,7 +422,7 @@
           "Auth"
         ],
         "summary": "Logout (revoke refresh token)",
-        "description": "",
+        "description": "Invalidate a refresh token to log out a session. Requires Authorization header.",
         "parameters": [
           {
             "name": "authorization",
@@ -304,7 +434,15 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Logged out successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Logged out successfully"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -319,15 +457,22 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
                   "refreshToken": {
-                    "example": "any"
+                    "type": "string"
                   }
-                }
+                },
+                "required": [
+                  "refreshToken"
+                ]
+              },
+              "example": {
+                "refreshToken": "rftkn..."
               }
             }
           }
@@ -340,10 +485,22 @@
           "Auth"
         ],
         "summary": "Refresh access token",
-        "description": "",
+        "description": "Exchange a valid refresh token for a new access token.",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "New access token",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Token refreshed successfully",
+                  "data": {
+                    "accessToken": "eyJ...",
+                    "expiresIn": 3600
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -354,7 +511,18 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RefreshToken"
+                "type": "object",
+                "properties": {
+                  "refreshToken": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "refreshToken"
+                ]
+              },
+              "example": {
+                "refreshToken": "rftkn..."
               }
             }
           }
@@ -367,7 +535,7 @@
           "Auth"
         ],
         "summary": "Get current user profile",
-        "description": "",
+        "description": "Return the profile of the currently authenticated user.",
         "parameters": [
           {
             "name": "authorization",
@@ -379,7 +547,49 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "User profile returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "username": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "status": "Success",
+                  "message": "User fetched successfully",
+                  "data": {
+                    "id": "user_123",
+                    "name": "Jane Doe",
+                    "username": "janedoe",
+                    "email": "jane@example.com"
+                  }
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -398,7 +608,7 @@
           "Auth"
         ],
         "summary": "Change current user password",
-        "description": "",
+        "description": "Change the password for the authenticated user. Requires current password.",
         "parameters": [
           {
             "name": "authorization",
@@ -410,7 +620,15 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Password changed",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Password changed successfully"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -429,7 +647,23 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ChangePassword"
+                "type": "object",
+                "properties": {
+                  "oldPassword": {
+                    "type": "string"
+                  },
+                  "newPassword": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "oldPassword",
+                  "newPassword"
+                ]
+              },
+              "example": {
+                "oldPassword": "oldPass",
+                "newPassword": "newPass123"
               }
             }
           }
@@ -442,7 +676,7 @@
           "Auth"
         ],
         "summary": "Revoke a specific session",
-        "description": "",
+        "description": "Revoke a previously issued session (by sessionId). Requires Authorization header.",
         "parameters": [
           {
             "name": "sessionId",
@@ -450,7 +684,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the session to revoke"
           },
           {
             "name": "authorization",
@@ -462,7 +697,15 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Session revoked",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Session revoked successfully"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -484,7 +727,7 @@
           "Auth"
         ],
         "summary": "Revoke all sessions for current user",
-        "description": "",
+        "description": "Invalidate all refresh tokens / sessions for the authenticated user.",
         "parameters": [
           {
             "name": "authorization",
@@ -496,7 +739,15 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "All sessions revoked",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "All sessions revoked successfully"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -513,7 +764,7 @@
           "Auth"
         ],
         "summary": "List active sessions for current user",
-        "description": "",
+        "description": "Return a list of active sessions (id, ip, userAgent, createdAt, lastActive). Requires Authorization header.",
         "parameters": [
           {
             "name": "authorization",
@@ -525,7 +776,24 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Sessions retrieved",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Sessions retrieved successfully",
+                  "data": [
+                    {
+                      "id": "sess_1",
+                      "ip": "127.0.0.1",
+                      "userAgent": "Mozilla/5.0",
+                      "createdAt": "2026-06-12T12:00:00Z",
+                      "lastActive": "2026-06-12T12:00:00Z"
+                    }
+                  ]
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -544,10 +812,18 @@
           "Auth"
         ],
         "summary": "Request password reset email",
-        "description": "",
+        "description": "Send a password reset email with a one-time token to the provided email address.",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Reset email requested",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Password reset email sent if account exists"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -558,7 +834,19 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ForgotPassword"
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              },
+              "example": {
+                "email": "jane@example.com"
               }
             }
           }
@@ -571,10 +859,18 @@
           "Auth"
         ],
         "summary": "Reset password using token",
-        "description": "",
+        "description": "Reset a user password using the token sent to email via forgot-password.",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Password reset successful",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Password has been reset"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -585,7 +881,23 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ResetPassword"
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  },
+                  "newPassword": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "token",
+                  "newPassword"
+                ]
+              },
+              "example": {
+                "token": "reset_token_123",
+                "newPassword": "newSecurePass"
               }
             }
           }
@@ -598,13 +910,47 @@
           "Submissions"
         ],
         "summary": "List submissions for current user",
-        "description": "",
+        "description": "Return paginated submissions created by the authenticated user.",
         "parameters": [
           {
             "name": "authorization",
             "in": "header",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "integer"
+                },
+                "default": {
+                  "type": "number",
+                  "example": 1
+                }
+              }
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "integer"
+                },
+                "default": {
+                  "type": "number",
+                  "example": 20
+                }
+              }
             }
           },
           {
@@ -615,23 +961,125 @@
             }
           },
           {
-            "name": "page",
+            "name": "status",
             "in": "query",
             "schema": {
               "type": "string"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
+            },
+            "description": "Filter by verdict/status"
           }
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "User submissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "items": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "authorId": {
+                                "type": "string"
+                              },
+                              "content": {
+                                "type": "string"
+                              },
+                              "parentId": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "likesCount": {
+                                "type": "integer"
+                              },
+                              "createdAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "startAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "endAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "status": {
+                                "type": "string"
+                              },
+                              "rank": {
+                                "type": "integer"
+                              },
+                              "userId": {
+                                "type": "string"
+                              },
+                              "username": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "points": {
+                                "type": "number"
+                              },
+                              "solved": {
+                                "type": "integer"
+                              }
+                            }
+                          }
+                        },
+                        "total": {
+                          "type": "integer"
+                        },
+                        "page": {
+                          "type": "integer"
+                        },
+                        "limit": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "status": "Success",
+                  "message": "Submissions fetched",
+                  "data": {
+                    "items": [
+                      {
+                        "submissionId": "s_1",
+                        "problemId": "prob_1",
+                        "status": "accepted",
+                        "language": "cpp",
+                        "time": 0.12,
+                        "memory": 1024
+                      }
+                    ],
+                    "total": 1,
+                    "page": 1,
+                    "limit": 20
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -651,7 +1099,7 @@
           "Submissions"
         ],
         "summary": "Submit code for a problem",
-        "description": "",
+        "description": "Create a submission for a problem; code is queued for judging.",
         "parameters": [
           {
             "name": "authorization",
@@ -663,7 +1111,25 @@
         ],
         "responses": {
           "201": {
-            "description": "Created"
+            "description": "Shop item created",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Item created",
+                  "data": {
+                    "id": "prob_1",
+                    "title": "Two Sum",
+                    "slug": "two-sum",
+                    "reportId": "r_1",
+                    "status": "PENDING",
+                    "itemId": "i_1",
+                    "name": "Starter Badge",
+                    "price": 100
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -675,17 +1141,159 @@
             "description": "Forbidden"
           }
         },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SubmitCode"
+                "type": "object",
+                "properties": {
+                  "entityId": {
+                    "type": "string",
+                    "description": "ID of the parent entity (problem or submission)"
+                  },
+                  "entityType": {
+                    "type": "string",
+                    "enum": [
+                      "problem",
+                      "submission"
+                    ],
+                    "description": "Type of parent entity"
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "Comment text"
+                  },
+                  "parentId": {
+                    "type": "string",
+                    "description": "Optional parent comment id for replies"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "startAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "endAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "problems": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "body": {
+                    "type": "string"
+                  },
+                  "targetUserIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Optional list of user IDs; leave empty to broadcast"
+                  },
+                  "meta": {
+                    "type": "object"
+                  },
+                  "slug": {
+                    "type": "string"
+                  },
+                  "difficulty": {
+                    "type": "string",
+                    "enum": [
+                      "EASY",
+                      "MEDIUM",
+                      "HARD"
+                    ]
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "timeLimitMs": {
+                    "type": "integer"
+                  },
+                  "memoryLimitMb": {
+                    "type": "integer"
+                  },
+                  "targetId": {
+                    "type": "string"
+                  },
+                  "targetType": {
+                    "type": "string",
+                    "description": "e.g., problem, submission, comment"
+                  },
+                  "reason": {
+                    "type": "string"
+                  },
+                  "details": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "price": {
+                    "type": "integer"
+                  },
+                  "stock": {
+                    "type": "integer"
+                  },
+                  "category": {
+                    "type": "string"
+                  },
+                  "metadata": {
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "name",
+                  "price"
+                ]
+              },
+              "example": {
+                "entityId": "prob_123",
+                "entityType": "problem",
+                "content": "Great explanation!",
+                "parentId": null,
+                "title": "Two Sum",
+                "description": "Awarded for first 10 solves",
+                "startAt": "2026-06-20T10:00:00Z",
+                "endAt": "2026-06-20T13:00:00Z",
+                "problems": [
+                  "prob_1",
+                  "prob_2"
+                ],
+                "body": "Scheduled maintenance at 00:00 UTC",
+                "targetUserIds": [],
+                "meta": {
+                  "severity": "info"
+                },
+                "slug": "two-sum",
+                "difficulty": "EASY",
+                "tags": [
+                  "arrays"
+                ],
+                "timeLimitMs": 1000,
+                "memoryLimitMb": 256,
+                "targetId": "prob_1",
+                "targetType": "problem",
+                "reason": "Plagiarism",
+                "details": "This solution seems copied.",
+                "name": "Starter Badge",
+                "price": 100,
+                "stock": 100,
+                "category": "badge",
+                "metadata": {
+                  "rarity": "common"
+                }
               }
             }
           }
@@ -698,7 +1306,7 @@
           "Comments"
         ],
         "summary": "Update a comment",
-        "description": "",
+        "description": "Edit your own comment. Requires authentication.",
         "parameters": [
           {
             "name": "commentId",
@@ -706,7 +1314,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the comment to update"
           },
           {
             "name": "authorization",
@@ -718,7 +1327,19 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Comment updated",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Comment updated successfully",
+                  "data": {
+                    "id": "c1",
+                    "content": "Updated text"
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -737,7 +1358,18 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateComment"
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "content"
+                ]
+              },
+              "example": {
+                "content": "Updated text"
               }
             }
           }
@@ -748,7 +1380,7 @@
           "Comments"
         ],
         "summary": "Delete a comment",
-        "description": "",
+        "description": "Delete your own comment. Requires authentication.",
         "parameters": [
           {
             "name": "commentId",
@@ -756,7 +1388,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the comment to delete"
           },
           {
             "name": "authorization",
@@ -768,7 +1401,15 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Comment deleted",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Comment deleted successfully"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -790,7 +1431,7 @@
           "Comments"
         ],
         "summary": "Toggle like on a comment",
-        "description": "",
+        "description": "Like or unlike a comment. Returns new like status and count. Requires authentication.",
         "parameters": [
           {
             "name": "commentId",
@@ -798,7 +1439,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the comment to like/unlike"
           },
           {
             "name": "authorization",
@@ -810,7 +1452,19 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Like toggled",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Like toggled",
+                  "data": {
+                    "liked": true,
+                    "likesCount": 3
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -845,7 +1499,63 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Contest details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "startAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "endAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "durationMinutes": {
+                          "type": "integer"
+                        },
+                        "status": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "status": "Success",
+                  "message": "Contest fetched",
+                  "data": {
+                    "id": "contest_1",
+                    "title": "June Challenge",
+                    "description": "Monthly contest",
+                    "startAt": "2026-06-20T10:00:00Z",
+                    "endAt": "2026-06-20T13:00:00Z",
+                    "durationMinutes": 180,
+                    "status": "UPCOMING"
+                  }
+                }
+              }
+            }
           },
           "404": {
             "description": "Not Found"
@@ -857,7 +1567,7 @@
           "Contests"
         ],
         "summary": "Update contest (admin)",
-        "description": "",
+        "description": "Update contest metadata. Requires admin privileges.",
         "parameters": [
           {
             "name": "contestId",
@@ -877,7 +1587,19 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Contest updated",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Contest updated",
+                  "data": {
+                    "id": "contest_1",
+                    "title": "Updated Title"
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -893,14 +1615,44 @@
           {
             "bearerAuth": []
           }
-        ]
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "startAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "endAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "example": {
+                  "title": "Updated Title",
+                  "description": "Updated desc"
+                }
+              }
+            }
+          }
+        }
       },
       "delete": {
         "tags": [
           "Contests"
         ],
         "summary": "Delete contest (admin)",
-        "description": "",
+        "description": "Remove a contest. Requires admin privileges.",
         "parameters": [
           {
             "name": "contestId",
@@ -920,7 +1672,15 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Contest deleted",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Contest deleted"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -954,11 +1714,68 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "integer"
+                },
+                "default": {
+                  "type": "number",
+                  "example": 1
+                }
+              }
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Items per page",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "integer"
+                },
+                "default": {
+                  "type": "number",
+                  "example": 50
+                }
+              }
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Leaderboard",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Leaderboard fetched",
+                  "data": {
+                    "items": [
+                      {
+                        "rank": 1,
+                        "userId": "user_1",
+                        "score": 500,
+                        "solved": 3
+                      }
+                    ],
+                    "total": 1,
+                    "page": 1,
+                    "limit": 50
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -972,7 +1789,7 @@
           "Contests"
         ],
         "summary": "Register current user to contest",
-        "description": "",
+        "description": "Register the authenticated user to participate in the contest.",
         "parameters": [
           {
             "name": "contestId",
@@ -992,7 +1809,15 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Registered",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Registered to contest"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -1014,7 +1839,7 @@
           "Contests"
         ],
         "summary": "Unregister current user from contest",
-        "description": "",
+        "description": "Remove the authenticated user from contest participation.",
         "parameters": [
           {
             "name": "contestId",
@@ -1034,7 +1859,15 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Unregistered",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Unregistered from contest"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -1055,8 +1888,8 @@
         "tags": [
           "Contests"
         ],
-        "summary": "List problems in contest for user",
-        "description": "",
+        "summary": "Unregister current user from contest",
+        "description": "Remove the authenticated user from contest participation.",
         "parameters": [
           {
             "name": "contestId",
@@ -1076,7 +1909,15 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Unregistered",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Unregistered from contest"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -1098,7 +1939,7 @@
           "Contests"
         ],
         "summary": "Get submissions for contest by current user",
-        "description": "",
+        "description": "List submissions made by the authenticated user within the contest.",
         "parameters": [
           {
             "name": "contestId",
@@ -1118,7 +1959,23 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Submissions list",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Submissions fetched",
+                  "data": [
+                    {
+                      "id": "sub_1",
+                      "problemId": "prob_1",
+                      "verdict": "AC",
+                      "submittedAt": "2026-06-20T10:15:00Z"
+                    }
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -1140,7 +1997,7 @@
           "Friendship"
         ],
         "summary": "Send friend request",
-        "description": "",
+        "description": "Send a friend request to another user by id or username. Requires authentication.",
         "parameters": [
           {
             "name": "authorization",
@@ -1152,7 +2009,19 @@
         ],
         "responses": {
           "201": {
-            "description": "Created"
+            "description": "Friend request sent",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Friend request sent",
+                  "data": {
+                    "requestId": "fr_1",
+                    "status": "PENDING"
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -1171,7 +2040,22 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/FriendRequest"
+                "type": "object",
+                "properties": {
+                  "targetUserId": {
+                    "type": "string"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "targetUserId"
+                ]
+              },
+              "example": {
+                "targetUserId": "user_123",
+                "message": "Hi, let's connect!"
               }
             }
           }
@@ -1184,7 +2068,7 @@
           "Friendship"
         ],
         "summary": "Accept friend request",
-        "description": "",
+        "description": "Accept an incoming friend request. Requires authentication.",
         "parameters": [
           {
             "name": "authorization",
@@ -1196,7 +2080,18 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Friend request accepted",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Friend request accepted",
+                  "data": {
+                    "friendId": "user_123"
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -1215,7 +2110,18 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/FriendAccept"
+                "type": "object",
+                "properties": {
+                  "requestId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "requestId"
+                ]
+              },
+              "example": {
+                "requestId": "fr_1"
               }
             }
           }
@@ -1228,7 +2134,7 @@
           "Friendship"
         ],
         "summary": "Decline friend request",
-        "description": "",
+        "description": "Decline an incoming friend request. Requires authentication.",
         "parameters": [
           {
             "name": "authorization",
@@ -1240,7 +2146,15 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Friend request declined",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Friend request declined"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -1259,7 +2173,18 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/FriendDecline"
+                "type": "object",
+                "properties": {
+                  "requestId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "requestId"
+                ]
+              },
+              "example": {
+                "requestId": "fr_1"
               }
             }
           }
@@ -1272,7 +2197,7 @@
           "Friendship"
         ],
         "summary": "Remove friend",
-        "description": "",
+        "description": "Remove an existing friend relationship by friendId. Requires authentication.",
         "parameters": [
           {
             "name": "friendId",
@@ -1280,7 +2205,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the friend to remove"
           },
           {
             "name": "authorization",
@@ -1292,7 +2218,15 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Friend removed",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Friend removed"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -1314,7 +2248,7 @@
           "Friendship"
         ],
         "summary": "Get pending friend requests",
-        "description": "",
+        "description": "Get incoming friend requests for the authenticated user.",
         "parameters": [
           {
             "name": "authorization",
@@ -1326,7 +2260,23 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Pending requests",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Pending requests fetched",
+                  "data": [
+                    {
+                      "requestId": "fr_1",
+                      "fromUserId": "user_2",
+                      "message": "Please add me",
+                      "createdAt": "2026-06-12T12:00:00Z"
+                    }
+                  ]
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -1348,7 +2298,7 @@
           "MatchHistory"
         ],
         "summary": "Get match history for current user",
-        "description": "",
+        "description": "Return a paginated list of past matches for the authenticated user.",
         "parameters": [
           {
             "name": "authorization",
@@ -1361,20 +2311,64 @@
             "name": "page",
             "in": "query",
             "schema": {
-              "type": "string"
-            }
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "integer"
+                },
+                "default": {
+                  "type": "number",
+                  "example": 1
+                }
+              }
+            },
+            "description": "Page number"
           },
           {
             "name": "limit",
             "in": "query",
             "schema": {
-              "type": "string"
-            }
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "integer"
+                },
+                "default": {
+                  "type": "number",
+                  "example": 20
+                }
+              }
+            },
+            "description": "Items per page"
           }
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Match history",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Match history fetched",
+                  "data": {
+                    "items": [
+                      {
+                        "matchId": "m1",
+                        "opponentId": "user_2",
+                        "result": "WIN",
+                        "score": 1200,
+                        "playedAt": "2026-06-12T11:00:00Z"
+                      }
+                    ],
+                    "total": 1,
+                    "page": 1,
+                    "limit": 20
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -1396,7 +2390,7 @@
           "MatchHistory"
         ],
         "summary": "Get details for a match",
-        "description": "",
+        "description": "Return detailed information for a specific match including moves, verdicts, and participants.",
         "parameters": [
           {
             "name": "matchId",
@@ -1416,7 +2410,31 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Match details",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Match details fetched",
+                  "data": {
+                    "matchId": "m1",
+                    "participants": [
+                      {
+                        "userId": "user_1",
+                        "username": "alice"
+                      },
+                      {
+                        "userId": "user_2",
+                        "username": "bob"
+                      }
+                    ],
+                    "result": "WIN",
+                    "moves": [],
+                    "playedAt": "2026-06-12T11:00:00Z"
+                  }
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -1436,7 +2454,7 @@
           "MatchHistory"
         ],
         "summary": "Delete match (admin)",
-        "description": "",
+        "description": "Remove a match record. Admin only.",
         "parameters": [
           {
             "name": "matchId",
@@ -1456,7 +2474,15 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Match deleted",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Match deleted"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -1481,7 +2507,7 @@
           "Notifications"
         ],
         "summary": "Mark notifications as read",
-        "description": "",
+        "description": "Mark one or more notifications as read for the authenticated user.",
         "parameters": [
           {
             "name": "authorization",
@@ -1493,7 +2519,18 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Marked as read",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Notifications marked as read",
+                  "data": {
+                    "updated": 2
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -1512,7 +2549,24 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ReadNotifications"
+                "type": "object",
+                "properties": {
+                  "notificationIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "notificationIds"
+                ]
+              },
+              "example": {
+                "notificationIds": [
+                  "ntf_1",
+                  "ntf_2"
+                ]
               }
             }
           }
@@ -1525,7 +2579,7 @@
           "Notifications"
         ],
         "summary": "Delete a notification",
-        "description": "",
+        "description": "Delete a notification by id (user can remove their own; admin may remove any).",
         "parameters": [
           {
             "name": "notificationId",
@@ -1545,7 +2599,15 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Notification deleted",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Notification deleted"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -1567,10 +2629,22 @@
           "Problems"
         ],
         "summary": "List available tags",
-        "description": "",
+        "description": "Return all available problem tags used for filtering and categorization.",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Tags list",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Tags fetched",
+                  "data": [
+                    "arrays",
+                    "dp"
+                  ]
+                }
+              }
+            }
           }
         }
       },
@@ -1579,7 +2653,7 @@
           "Problems"
         ],
         "summary": "Create a tag (admin)",
-        "description": "",
+        "description": "Create a new problem tag. Requires admin privileges.",
         "parameters": [
           {
             "name": "authorization",
@@ -1591,7 +2665,18 @@
         ],
         "responses": {
           "201": {
-            "description": "Created"
+            "description": "Tag created",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Tag created",
+                  "data": {
+                    "name": "graphs"
+                  }
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -1606,18 +2691,22 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
                   "name": {
-                    "example": "any"
-                  },
-                  "color": {
-                    "example": "any"
+                    "type": "string"
                   }
-                }
+                },
+                "required": [
+                  "name"
+                ]
+              },
+              "example": {
+                "name": "graphs"
               }
             }
           }
@@ -1643,7 +2732,25 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Problem details",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Problem fetched",
+                  "data": {
+                    "id": "prob_1",
+                    "slug": "two-sum",
+                    "title": "Two Sum",
+                    "description": "Given an array...",
+                    "difficulty": "EASY",
+                    "tags": [
+                      "arrays"
+                    ]
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1654,7 +2761,7 @@
           "Problems"
         ],
         "summary": "Update problem (admin)",
-        "description": "",
+        "description": "Update problem metadata and statement. Admin only.",
         "parameters": [
           {
             "name": "id",
@@ -1674,129 +2781,19 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "Problems"
-        ],
-        "summary": "Delete problem (admin)",
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
+            "description": "Problem updated",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Problem updated",
+                  "data": {
+                    "id": "prob_1",
+                    "title": "Two Sum (updated)"
+                  }
+                }
+              }
             }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      },
-      "get": {
-        "tags": [
-          "Submissions"
-        ],
-        "summary": "Get submission details",
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/{problemId}/testcases": {
-      "post": {
-        "tags": [
-          "Problems"
-        ],
-        "summary": "Add testcase to problem (admin)",
-        "description": "",
-        "parameters": [
-          {
-            "name": "problemId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created"
           },
           "400": {
             "description": "Bad Request"
@@ -1818,7 +2815,239 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateTestcase"
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "difficulty": {
+                    "type": "string",
+                    "enum": [
+                      "EASY",
+                      "MEDIUM",
+                      "HARD"
+                    ]
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "title": "Two Sum (updated)",
+                  "description": "Updated statement"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Problems"
+        ],
+        "summary": "Delete problem (admin)",
+        "description": "Remove a problem and associated testcases. Admin only.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Problem deleted",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Problem deleted"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "Submissions"
+        ],
+        "summary": "Get submission details",
+        "description": "Get detailed result for a submission including per-testcase results.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Submission details",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Submission fetched",
+                  "data": {
+                    "submissionId": "s_1",
+                    "problemId": "prob_1",
+                    "status": "accepted",
+                    "language": "cpp",
+                    "time": 0.12,
+                    "memory": 1024,
+                    "tests": [
+                      {
+                        "caseId": 1,
+                        "verdict": "accepted",
+                        "time": 0.03,
+                        "memory": 256
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Error",
+                  "message": "Submission not found"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/{problemId}/testcases": {
+      "post": {
+        "tags": [
+          "Problems"
+        ],
+        "summary": "Add testcase to problem (admin)",
+        "description": "Add input/output testcase for a problem. Admin only.",
+        "parameters": [
+          {
+            "name": "problemId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Testcase added",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Testcase added",
+                  "data": {
+                    "testcaseId": "tc_1"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "string"
+                  },
+                  "output": {
+                    "type": "string"
+                  },
+                  "weight": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "input",
+                  "output"
+                ]
+              },
+              "example": {
+                "input": "1 2\n",
+                "output": "3\n",
+                "weight": 1
               }
             }
           }
@@ -1829,7 +3058,7 @@
           "Problems"
         ],
         "summary": "Get testcases for a problem",
-        "description": "",
+        "description": "Return public metadata about testcases (not secret answers) — admin may access full data.",
         "parameters": [
           {
             "name": "problemId",
@@ -1856,7 +3085,22 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Testcases list",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Testcases fetched",
+                  "data": [
+                    {
+                      "testcaseId": "tc_1",
+                      "inputPreview": "1 2",
+                      "weight": 1
+                    }
+                  ]
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -1875,7 +3119,7 @@
           "Problems"
         ],
         "summary": "Delete a testcase (admin)",
-        "description": "",
+        "description": "Delete a testcase by id. Admin only.",
         "parameters": [
           {
             "name": "testcaseId",
@@ -1895,7 +3139,15 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Testcase deleted",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Testcase deleted"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -1917,7 +3169,7 @@
           "Reports"
         ],
         "summary": "Update report status (admin)",
-        "description": "",
+        "description": "Change status of a report (e.g., RESOLVED, REJECTED). Admin only.",
         "parameters": [
           {
             "name": "reportId",
@@ -1937,7 +3189,19 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Report updated",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Report updated",
+                  "data": {
+                    "reportId": "r_1",
+                    "status": "RESOLVED"
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -1955,15 +3219,31 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
                   "status": {
-                    "example": "any"
+                    "type": "string",
+                    "enum": [
+                      "PENDING",
+                      "RESOLVED",
+                      "REJECTED"
+                    ]
+                  },
+                  "note": {
+                    "type": "string"
                   }
-                }
+                },
+                "required": [
+                  "status"
+                ]
+              },
+              "example": {
+                "status": "RESOLVED",
+                "note": "Issue addressed"
               }
             }
           }
@@ -1976,7 +3256,7 @@
           "Shop"
         ],
         "summary": "Buy an item from shop",
-        "description": "",
+        "description": "Purchase an item using user balance. Requires authentication.",
         "parameters": [
           {
             "name": "authorization",
@@ -1988,10 +3268,32 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Purchase successful",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Purchase completed",
+                  "data": {
+                    "purchaseId": "p_1",
+                    "itemId": "i_1",
+                    "quantity": 1,
+                    "remainingBalance": 900
+                  }
+                }
+              }
+            }
           },
           "400": {
-            "description": "Bad Request"
+            "description": "Insufficient funds or invalid request",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Error",
+                  "message": "Insufficient balance"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -2007,7 +3309,23 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/BuyItem"
+                "type": "object",
+                "properties": {
+                  "itemId": {
+                    "type": "string"
+                  },
+                  "quantity": {
+                    "type": "integer",
+                    "default": 1
+                  }
+                },
+                "required": [
+                  "itemId"
+                ]
+              },
+              "example": {
+                "itemId": "i_1",
+                "quantity": 1
               }
             }
           }
@@ -2020,7 +3338,7 @@
           "Shop"
         ],
         "summary": "Get user inventory",
-        "description": "",
+        "description": "Return items owned by the authenticated user.",
         "parameters": [
           {
             "name": "authorization",
@@ -2032,7 +3350,25 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "User inventory",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Inventory fetched",
+                  "data": {
+                    "items": [
+                      {
+                        "itemId": "i_1",
+                        "name": "Starter Badge",
+                        "equipped": true,
+                        "quantity": 1
+                      }
+                    ]
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -2054,7 +3390,7 @@
           "Shop"
         ],
         "summary": "Equip or unequip an item",
-        "description": "",
+        "description": "Equip or unequip an owned item. Requires authentication.",
         "parameters": [
           {
             "name": "authorization",
@@ -2066,10 +3402,30 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Equip/Unequip result",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Item equipped",
+                  "data": {
+                    "itemId": "i_1",
+                    "equipped": true
+                  }
+                }
+              }
+            }
           },
           "400": {
-            "description": "Bad Request"
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Error",
+                  "message": "Item not owned"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -2085,7 +3441,106 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/EquipItem"
+                "type": "object",
+                "properties": {
+                  "itemId": {
+                    "type": "string"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "equip",
+                      "unequip"
+                    ]
+                  }
+                },
+                "required": [
+                  "itemId",
+                  "action"
+                ]
+              },
+              "example": {
+                "itemId": "i_1",
+                "action": "equip"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/run": {
+      "post": {
+        "tags": [
+          "Submissions"
+        ],
+        "summary": "Run code (sandbox)",
+        "description": "Execute code ad-hoc without creating a persistent submission. Useful for quick testing.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Run result",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Run completed",
+                  "data": {
+                    "stdout": "hello\n",
+                    "stderr": "",
+                    "exitCode": 0,
+                    "time": 0.12,
+                    "memory": 1024
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "language": {
+                    "type": "string"
+                  },
+                  "code": {
+                    "type": "string"
+                  },
+                  "stdin": {
+                    "type": "string"
+                  },
+                  "timeLimit": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "language",
+                  "code"
+                ]
+              },
+              "example": {
+                "language": "python",
+                "code": "print(input())",
+                "stdin": "hello"
               }
             }
           }
