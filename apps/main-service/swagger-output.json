@@ -943,7 +943,83 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "items": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "authorId": {
+                                "type": "string"
+                              },
+                              "content": {
+                                "type": "string"
+                              },
+                              "parentId": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "likesCount": {
+                                "type": "integer"
+                              },
+                              "createdAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              }
+                            }
+                          }
+                        },
+                        "total": {
+                          "type": "integer"
+                        },
+                        "page": {
+                          "type": "integer"
+                        },
+                        "limit": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "status": "Success",
+                  "message": "Comments fetched",
+                  "data": {
+                    "items": [
+                      {
+                        "id": "c1",
+                        "authorId": "user_1",
+                        "content": "Nice problem",
+                        "parentId": null,
+                        "likesCount": 2,
+                        "createdAt": "2026-06-12T12:00:00Z"
+                      }
+                    ],
+                    "total": 1,
+                    "page": 1,
+                    "limit": 20
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -997,7 +1073,41 @@
           "content": {
             "application/json": {
               "schema": {
+                "type": "object",
+                "properties": {
+                  "entityId": {
+                    "type": "string",
+                    "description": "ID of the parent entity (problem or submission)"
+                  },
+                  "entityType": {
+                    "type": "string",
+                    "enum": [
+                      "problem",
+                      "submission"
+                    ],
+                    "description": "Type of parent entity"
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "Comment text"
+                  },
+                  "parentId": {
+                    "type": "string",
+                    "description": "Optional parent comment id for replies"
+                  }
+                },
+                "required": [
+                  "entityId",
+                  "entityType",
+                  "content"
+                ],
                 "$ref": "#/components/schemas/SubmitCode"
+              },
+              "example": {
+                "entityId": "prob_123",
+                "entityType": "problem",
+                "content": "Great explanation!",
+                "parentId": null
               }
             }
           }
@@ -1010,7 +1120,7 @@
           "Comments"
         ],
         "summary": "Update a comment",
-        "description": "",
+        "description": "Edit your own comment. Requires authentication.",
         "parameters": [
           {
             "name": "commentId",
@@ -1018,7 +1128,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the comment to update"
           },
           {
             "name": "authorization",
@@ -1030,7 +1141,19 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Comment updated",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Comment updated successfully",
+                  "data": {
+                    "id": "c1",
+                    "content": "Updated text"
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -1049,7 +1172,18 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateComment"
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "content"
+                ]
+              },
+              "example": {
+                "content": "Updated text"
               }
             }
           }
@@ -1060,7 +1194,7 @@
           "Comments"
         ],
         "summary": "Delete a comment",
-        "description": "",
+        "description": "Delete your own comment. Requires authentication.",
         "parameters": [
           {
             "name": "commentId",
@@ -1068,7 +1202,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the comment to delete"
           },
           {
             "name": "authorization",
@@ -1080,7 +1215,15 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Comment deleted",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Comment deleted successfully"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
@@ -1102,7 +1245,7 @@
           "Comments"
         ],
         "summary": "Toggle like on a comment",
-        "description": "",
+        "description": "Like or unlike a comment. Returns new like status and count. Requires authentication.",
         "parameters": [
           {
             "name": "commentId",
@@ -1110,7 +1253,8 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
+            },
+            "description": "ID of the comment to like/unlike"
           },
           {
             "name": "authorization",
@@ -1122,7 +1266,19 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Like toggled",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Success",
+                  "message": "Like toggled",
+                  "data": {
+                    "liked": true,
+                    "likesCount": 3
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request"
