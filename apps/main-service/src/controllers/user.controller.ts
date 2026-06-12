@@ -41,3 +41,24 @@ export const updateMe = async (req: Request, res: Response, next: NextFunction) 
     next(error);
   }
 };
+
+export const getUserByUsername = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { username } = req.params;
+    
+    if (!username || typeof username !== 'string') {
+      res.status(400).json({ status: 'Error', message: 'Invalid username' });
+      return;
+    }
+    
+    const user = await userService.getUserByUsername(username);
+    
+    res.status(200).json({
+      status: 'Success',
+      message: 'User profile retrieved successfully',
+      data: user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

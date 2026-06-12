@@ -20,3 +20,13 @@ export const updateMe = async (userId: string, data: { full_name?: string; bio?:
   
   return user;
 };
+
+export const getUserByUsername = async (username: string) => {
+  const user = await userRepo.findUserByUsername(username);
+  
+  if (!user) {
+    throw new AppError('User not found', 404);
+  }
+  
+  return user;
+};

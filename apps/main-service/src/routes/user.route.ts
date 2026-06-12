@@ -6,6 +6,75 @@ import * as userController from '../controllers/user.controller';
 
 const router = Router();
 
+/**
+ * GET /api/v1/users/:username
+ * Get public user profile by username
+ */
+router.get('/:username', (req, res, next) => {
+  /* #swagger.tags = ['User']
+     #swagger.summary = 'Get public user profile'
+     #swagger.description = 'Returns public profile information of a user by username. Does not require authentication.'
+     #swagger.parameters['username'] = {
+       in: 'path',
+       required: true,
+       description: 'Username of the user to retrieve',
+       type: 'string',
+       example: 'john_doe'
+     }
+     #swagger.responses[200] = {
+       description: 'User profile retrieved successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string', example: 'User profile retrieved successfully' },
+               data: {
+                 type: 'object',
+                 properties: {
+                   id: { type: 'string' },
+                   username: { type: 'string' },
+                   avatar_url: { type: 'string', nullable: true },
+                   role: { type: 'string', enum: ['USER', 'ADMIN'] },
+                   elo_rating: { type: 'number' },
+                   streak_count: { type: 'number' },
+                   max_streak: { type: 'number' },
+                   code_coins: { type: 'number' },
+                   bio: { type: 'string', nullable: true },
+                   full_name: { type: 'string', nullable: true },
+                   created_at: { type: 'string', format: 'date-time' }
+                 }
+               }
+             }
+           },
+           example: {
+             status: 'Success',
+             message: 'User profile retrieved successfully',
+             data: {
+               id: 'uuid-123',
+               username: 'john_doe',
+               avatar_url: null,
+               role: 'USER',
+               elo_rating: 1200,
+               streak_count: 5,
+               max_streak: 10,
+               code_coins: 100,
+               bio: 'I love coding!',
+               full_name: 'John Doe',
+               created_at: '2024-01-01T00:00:00.000Z'
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[404] = {
+       description: 'User not found'
+     }
+  */
+  userController.getUserByUsername(req, res, next);
+});
+
 router.use(requireAuth);
 
 /**
