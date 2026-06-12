@@ -287,4 +287,39 @@ router.post('/me/avatar', upload.single('avatar'), (req, res, next) => {
   userController.uploadAvatar(req, res, next);
 });
 
+// DELETE /api/v1/users/me/avatar - Delete user avatar
+router.delete('/me/avatar', (req, res, next) => {
+  /* #swagger.tags = ['User']
+     #swagger.summary = 'Delete user avatar'
+     #swagger.description = 'Deletes the current user avatar from Cloudinary and resets avatar_url to null.'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.responses[200] = {
+       description: 'Avatar deleted successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string', example: 'Avatar deleted successfully' },
+               data: {
+                 type: 'object',
+                 properties: {
+                   id: { type: 'string' },
+                   username: { type: 'string' },
+                   avatar_url: { type: 'string', nullable: true, example: null }
+                 }
+               }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[401] = {
+       description: 'Unauthorized - Invalid or missing token'
+     }
+  */
+  userController.deleteAvatar(req, res, next);
+});
+
 export default router;

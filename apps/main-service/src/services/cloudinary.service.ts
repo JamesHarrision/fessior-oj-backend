@@ -18,6 +18,24 @@ export const uploadAvatar = async (fileBuffer: Buffer, userId: string): Promise<
 
 export const deleteAvatar = async (avatarUrl: string) => {
   if (!avatarUrl) return;
-  const publicId = avatarUrl.split('/').slice(-2).join('/').split('.')[0];
-  await cloudinary.uploader.destroy(publicId);
+
+  const urlParts = avatarUrl.split('/');
+  const uploadIndex = urlParts.indexOf('upload');
+  
+  if (uploadIndex === -1 || uploadIndex + 1 >= urlParts.length) {
+    console.error('Invalid Cloudinary URL format:', avatarUrl);
+    return;
+  }
+  
+  const publicIdWithVersion = urlParts.slice(uploadIndex + 2).join('/');
+  const publicId = publicIdWithVersion.split('.').slice(0, -1).join('.');
+  
+  console.log('Deleting avatar with public_id:', publicId);
+  
+  const result = await cloudinary.uploader.destroy(publicId);
+  console.log('Cloudinary delete result:', result);
+  
+  if (result.result !== 'ok') {
+    console.error('Failed to delete from Cloudinary:', result);
+  }
 };

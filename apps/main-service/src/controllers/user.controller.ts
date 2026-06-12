@@ -87,3 +87,26 @@ export const uploadAvatar = async (req: Request, res: Response, next: NextFuncti
     next(error);
   }
 };
+
+export const deleteAvatar = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      res.status(401).json({ status: 'Error', message: 'Unauthorized' });
+      return;
+    }
+
+    const currentUser = await userService.getMe(userId);
+    const currentAvatarUrl = currentUser.avatar_url;
+
+    const user = await userService.deleteUserAvatar(userId, currentAvatarUrl);
+
+    res.status(200).json({
+      status: 'Success',
+      message: 'Avatar deleted successfully',
+      data: user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

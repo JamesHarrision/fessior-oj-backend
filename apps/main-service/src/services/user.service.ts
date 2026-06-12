@@ -1,6 +1,6 @@
 import * as userRepo from '../repositories/user.repository';
 import { AppError } from '@ocj/errors';
-import { uploadAvatar } from './cloudinary.service';
+import { deleteAvatar, uploadAvatar } from './cloudinary.service';
 
 export const getMe = async (userId: string) => {
   const user = await userRepo.findUserById(userId);
@@ -35,5 +35,18 @@ export const getUserByUsername = async (username: string) => {
 export const uploadUserAvatar = async (userId: string, fileBuffer: Buffer) => {
   const avatarUrl = await uploadAvatar(fileBuffer, userId);
   const user = await userRepo.updateUserAvatar(userId, avatarUrl);
+  return user;
+};
+
+export const deleteUserAvatar = async (userId: string, currentAvatarUrl: string | null) => {
+  try {
+    if (currentAvatarUrl) {
+      await deleteAvatar(currentAvatarUrl);
+    }
+  } catch (error) {
+    console.error('Cloudinary deletion error:', error);
+  }
+  
+  const user = await userRepo.removeUserAvatar(userId);
   return user;
 };

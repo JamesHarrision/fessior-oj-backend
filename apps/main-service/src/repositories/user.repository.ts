@@ -71,3 +71,15 @@ export const updateUserAvatar = async (id: string, avatarUrl: string) => {
     select: { id: true, username: true, avatar_url: true },
   });
 };
+
+export const removeUserAvatar = async (id: string) => {
+  return prisma.user.update({
+    where: { id },
+    data: { avatar_url: null },
+    select: {
+      id: true,
+      username: true,
+      avatar_url: true,
+    },
+  });
+};
