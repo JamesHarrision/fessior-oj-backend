@@ -76,6 +76,40 @@ router.get('/profile/:username', (req, res, next) => {
   userController.getUserByUsername(req, res, next);
 });
 
+// GET /api/v1/users/:username/submissions - Get public submissions by username
+router.get('/:username/submissions', (req, res, next) => {
+  /* #swagger.tags = ['User']
+     #swagger.summary = 'Get public submissions by username'
+     #swagger.description = 'Returns paginated list of accepted submissions by a specific user (code is hidden).'
+     #swagger.parameters['username'] = {
+       in: 'path',
+       required: true,
+       description: 'Username',
+       type: 'string',
+       example: 'khankh'
+     }
+     #swagger.parameters['page'] = {
+       in: 'query',
+       description: 'Page number (default: 1)',
+       type: 'integer',
+       example: 1
+     }
+     #swagger.parameters['limit'] = {
+       in: 'query',
+       description: 'Items per page (default: 10)',
+       type: 'integer',
+       example: 10
+     }
+     #swagger.responses[200] = {
+       description: 'User submissions retrieved successfully'
+     }
+     #swagger.responses[404] = {
+       description: 'User not found'
+     }
+  */
+  userController.getUserSubmissionsByUsername(req, res, next);
+});
+
 // GET /api/v1/users - Get all users (Admin only)
 router.get('/', requireAuth, requireAdmin, (req, res, next) => {
   /* #swagger.tags = ['Admin']
@@ -134,65 +168,6 @@ router.get('/', requireAuth, requireAdmin, (req, res, next) => {
      }
   */
   userController.getAllUsers(req, res, next);
-});
-
-// GET /api/v1/users/:id - Get user by ID (Admin only)
-router.get('/:id', requireAuth, requireAdmin, (req, res, next) => {
-  /* #swagger.tags = ['Admin']
-     #swagger.summary = 'Get user by ID (Admin only)'
-     #swagger.description = 'Returns detailed information of a specific user including email and ban status.'
-     #swagger.security = [{ "bearerAuth": [] }]
-     #swagger.parameters['id'] = {
-       in: 'path',
-       required: true,
-       description: 'User ID',
-       type: 'string',
-       example: 'uuid-123'
-     }
-     #swagger.responses[200] = {
-       description: 'User retrieved successfully',
-       content: {
-         'application/json': {
-           schema: {
-             type: 'object',
-             properties: {
-               status: { type: 'string', example: 'Success' },
-               message: { type: 'string' },
-               data: {
-                 type: 'object',
-                 properties: {
-                   id: { type: 'string' },
-                   username: { type: 'string' },
-                   email: { type: 'string' },
-                   avatar_url: { type: 'string', nullable: true },
-                   role: { type: 'string', enum: ['USER', 'ADMIN'] },
-                   elo_rating: { type: 'number' },
-                   streak_count: { type: 'number' },
-                   max_streak: { type: 'number' },
-                   code_coins: { type: 'number' },
-                   bio: { type: 'string', nullable: true },
-                   full_name: { type: 'string', nullable: true },
-                   is_banned: { type: 'boolean' },
-                   banned_at: { type: 'string', nullable: true },
-                   banned_reason: { type: 'string', nullable: true },
-                   last_active_date: { type: 'string', nullable: true },
-                   created_at: { type: 'string', format: 'date-time' },
-                   updated_at: { type: 'string', format: 'date-time' }
-                 }
-               }
-             }
-           }
-         }
-       }
-     }
-     #swagger.responses[404] = {
-       description: 'User not found'
-     }
-     #swagger.responses[403] = {
-       description: 'Forbidden - Admin access required'
-     }
-  */
-  userController.getUserByIdAdmin(req, res, next);
 });
 
 router.use(requireAuth);
@@ -832,6 +807,65 @@ router.get('/me/streak', (req, res, next) => {
      }
   */
   userController.getUserStreak(req, res, next);
+});
+
+// GET /api/v1/users/:id - Get user by ID (Admin only)
+router.get('/:id', requireAuth, requireAdmin, (req, res, next) => {
+  /* #swagger.tags = ['Admin']
+     #swagger.summary = 'Get user by ID (Admin only)'
+     #swagger.description = 'Returns detailed information of a specific user including email and ban status.'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.parameters['id'] = {
+       in: 'path',
+       required: true,
+       description: 'User ID',
+       type: 'string',
+       example: 'uuid-123'
+     }
+     #swagger.responses[200] = {
+       description: 'User retrieved successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string' },
+               data: {
+                 type: 'object',
+                 properties: {
+                   id: { type: 'string' },
+                   username: { type: 'string' },
+                   email: { type: 'string' },
+                   avatar_url: { type: 'string', nullable: true },
+                   role: { type: 'string', enum: ['USER', 'ADMIN'] },
+                   elo_rating: { type: 'number' },
+                   streak_count: { type: 'number' },
+                   max_streak: { type: 'number' },
+                   code_coins: { type: 'number' },
+                   bio: { type: 'string', nullable: true },
+                   full_name: { type: 'string', nullable: true },
+                   is_banned: { type: 'boolean' },
+                   banned_at: { type: 'string', nullable: true },
+                   banned_reason: { type: 'string', nullable: true },
+                   last_active_date: { type: 'string', nullable: true },
+                   created_at: { type: 'string', format: 'date-time' },
+                   updated_at: { type: 'string', format: 'date-time' }
+                 }
+               }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[404] = {
+       description: 'User not found'
+     }
+     #swagger.responses[403] = {
+       description: 'Forbidden - Admin access required'
+     }
+  */
+  userController.getUserByIdAdmin(req, res, next);
 });
 
 export default router;

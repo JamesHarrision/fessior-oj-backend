@@ -278,3 +278,27 @@ export const getUserByIdAdmin = async (req: Request, res: Response, next: NextFu
     next(error);
   }
 };
+
+export const getUserSubmissionsByUsername = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { username } = req.params;
+    
+    if (!username || typeof username !== 'string') {
+      res.status(400).json({ status: 'Error', message: 'Invalid username' });
+      return;
+    }
+    
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    
+    const result = await userService.getUserSubmissionsByUsername(username, page, limit);
+    
+    res.status(200).json({
+      status: 'Success',
+      message: 'User submissions retrieved successfully',
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

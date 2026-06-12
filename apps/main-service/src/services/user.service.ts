@@ -146,3 +146,39 @@ export const getUserByIdAdmin = async (userId: string) => {
   }
   return user;
 };
+
+export const getUserSubmissionsByUsername = async (username: string, page: number = 1, limit: number = 10) => {
+  const user = await userRepo.findUserByUsername(username);
+  if (!user) {
+    throw new AppError('User not found', 404);
+  }
+  
+  const skip = (page - 1) * limit;
+  
+  const [submissions, total] = await Promise.all([
+    Submission.find({ 
+      userId: user.id,
+      status: 'ACCEPTED',
+    })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate('problemId', 'title slug difficulty')
+      .select('-code'),
+    Submission.countDocuments({ 
+      userId: user.id,
+      status: 'ACCEPTED',
+    }),
+  ]);
+  
+  return {
+    username: user.username,
+    submissions,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+};
