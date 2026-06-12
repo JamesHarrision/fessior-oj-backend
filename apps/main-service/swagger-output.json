@@ -532,10 +532,10 @@
     "/me": {
       "get": {
         "tags": [
-          "Auth"
+          "User"
         ],
         "summary": "Get current user profile",
-        "description": "Return the profile of the currently authenticated user.",
+        "description": "Returns the profile information of the authenticated user.",
         "parameters": [
           {
             "name": "authorization",
@@ -547,17 +547,19 @@
         ],
         "responses": {
           "200": {
-            "description": "User profile returned",
+            "description": "User profile retrieved successfully",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "status": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Success"
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "User profile retrieved successfully"
                     },
                     "data": {
                       "type": "object",
@@ -573,6 +575,41 @@
                         },
                         "email": {
                           "type": "string"
+                        },
+                        "avatar_url": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "role": {
+                          "type": "string",
+                          "enum": [
+                            "USER",
+                            "ADMIN"
+                          ]
+                        },
+                        "elo_rating": {
+                          "type": "number"
+                        },
+                        "streak_count": {
+                          "type": "number"
+                        },
+                        "max_streak": {
+                          "type": "number"
+                        },
+                        "code_coins": {
+                          "type": "number"
+                        },
+                        "bio": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "full_name": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "format": "date-time"
                         }
                       }
                     }
@@ -580,19 +617,28 @@
                 },
                 "example": {
                   "status": "Success",
-                  "message": "User fetched successfully",
+                  "message": "User profile retrieved successfully",
                   "data": {
-                    "id": "user_123",
+                    "id": "uuid-123",
                     "name": "Jane Doe",
-                    "username": "janedoe",
-                    "email": "jane@example.com"
+                    "username": "john_doe",
+                    "email": "john@example.com",
+                    "avatar_url": null,
+                    "role": "USER",
+                    "elo_rating": 1200,
+                    "streak_count": 5,
+                    "max_streak": 10,
+                    "code_coins": 100,
+                    "bio": "I love coding",
+                    "full_name": "John Doe",
+                    "created_at": "2024-01-01T00:00:00.000Z"
                   }
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized - Invalid or missing token"
           }
         },
         "security": [
@@ -600,6 +646,155 @@
             "bearerAuth": []
           }
         ]
+      },
+      "patch": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Update current user profile",
+        "description": "Updates the profile information (full_name, bio) of the authenticated user.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User profile updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "User profile updated successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "username": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "avatar_url": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "role": {
+                          "type": "string",
+                          "enum": [
+                            "USER",
+                            "ADMIN"
+                          ]
+                        },
+                        "elo_rating": {
+                          "type": "number"
+                        },
+                        "streak_count": {
+                          "type": "number"
+                        },
+                        "max_streak": {
+                          "type": "number"
+                        },
+                        "code_coins": {
+                          "type": "number"
+                        },
+                        "bio": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "full_name": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "status": "Success",
+                  "message": "User profile updated successfully",
+                  "data": {
+                    "id": "uuid-123",
+                    "username": "john_doe",
+                    "email": "john@example.com",
+                    "avatar_url": null,
+                    "role": "USER",
+                    "elo_rating": 1200,
+                    "streak_count": 5,
+                    "max_streak": 10,
+                    "code_coins": 100,
+                    "bio": "I love coding and solving problems!",
+                    "full_name": "John Doe",
+                    "created_at": "2024-01-01T00:00:00.000Z",
+                    "updated_at": "2024-01-15T00:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error - Invalid input data"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing token"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "full_name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "description": "User full name",
+                    "example": "John Doe"
+                  },
+                  "bio": {
+                    "type": "string",
+                    "maxLength": 500,
+                    "description": "Short biography",
+                    "example": "I love coding and solving problems!"
+                  }
+                }
+              },
+              "example": {
+                "full_name": "John Doe",
+                "bio": "I love coding and solving problems!"
+              }
+            }
+          }
+        }
       }
     },
     "/change-password": {
