@@ -39,6 +39,10 @@ export const login = async (data: LoginInput) => {
     throw new AppError('Invalid email or password', 401);
   }
 
+  if (user.is_banned) {
+    throw new AppError('Your account has been banned. Please contact support.', 401);
+  }
+
   const isPasswordValid = await comparePassword(data.password, user.password_hash);
   if (!isPasswordValid) {
     throw new AppError('Invalid email or password', 401);

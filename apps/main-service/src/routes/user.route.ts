@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { requireAuth } from '../middlewares/auth.middleware';
+import { requireAuth, requireAdmin } from '../middlewares/auth.middleware';
 import { validateRequest } from '../middlewares/validate.middleware';
-import { updateMeSchema } from '../validators/user.validator';
+import { updateMeSchema, adminUpdateUserSchema, updateRoleSchema, banUserSchema } from '../validators/user.validator';
 import * as userController from '../controllers/user.controller';
 import { upload } from '../middlewares/upload.middleware';
 
@@ -11,7 +11,7 @@ const router = Router();
  * GET /api/v1/users/:username
  * Get public user profile by username
  */
-router.get('/:username', (req, res, next) => {
+router.get('/profile/:username', (req, res, next) => {
   /* #swagger.tags = ['User']
      #swagger.summary = 'Get public user profile'
      #swagger.description = 'Returns public profile information of a user by username. Does not require authentication.'
@@ -74,6 +74,152 @@ router.get('/:username', (req, res, next) => {
      }
   */
   userController.getUserByUsername(req, res, next);
+});
+
+// GET /api/v1/users/:username/submissions - Get public submissions by username
+router.get('/:username/submissions', (req, res, next) => {
+  /* #swagger.tags = ['User']
+     #swagger.summary = 'Get public submissions by username'
+     #swagger.description = 'Returns paginated list of accepted submissions by a specific user (code is hidden).'
+     #swagger.parameters['username'] = {
+       in: 'path',
+       required: true,
+       description: 'Username',
+       type: 'string',
+       example: 'khankh'
+     }
+     #swagger.parameters['page'] = {
+       in: 'query',
+       description: 'Page number (default: 1)',
+       type: 'integer',
+       example: 1
+     }
+     #swagger.parameters['limit'] = {
+       in: 'query',
+       description: 'Items per page (default: 10)',
+       type: 'integer',
+       example: 10
+     }
+     #swagger.responses[200] = {
+       description: 'User submissions retrieved successfully'
+     }
+     #swagger.responses[404] = {
+       description: 'User not found'
+     }
+  */
+  userController.getUserSubmissionsByUsername(req, res, next);
+});
+
+// GET /api/v1/users/:username/tag-stats - Get public tag stats by username
+router.get('/:username/tag-stats', (req, res, next) => {
+  /* #swagger.tags = ['User']
+     #swagger.summary = 'Get public tag statistics by username'
+     #swagger.description = 'Returns number of problems solved by tag for a specific user.'
+     #swagger.parameters['username'] = {
+       in: 'path',
+       required: true,
+       description: 'Username',
+       type: 'string',
+       example: 'khankh'
+     }
+     #swagger.responses[200] = {
+       description: 'User tag statistics retrieved successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string' },
+               data: {
+                 type: 'object',
+                 properties: {
+                   username: { type: 'string' },
+                   tag_stats: {
+                     type: 'array',
+                     items: {
+                       type: 'object',
+                       properties: {
+                         tag_id: { type: 'string' },
+                         tag_name: { type: 'string' },
+                         tag_slug: { type: 'string' },
+                         tag_color: { type: 'string', nullable: true },
+                         problems_solved: { type: 'number' }
+                       }
+                     }
+                   }
+                 }
+               }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[404] = {
+       description: 'User not found'
+     }
+  */
+  userController.getUserTagStatsByUsername(req, res, next);
+});
+
+// GET /api/v1/users - Get all users (Admin only)
+router.get('/', requireAuth, requireAdmin, (req, res, next) => {
+  /* #swagger.tags = ['Admin']
+     #swagger.summary = 'Get all users (Admin only)'
+     #swagger.description = 'Returns paginated list of all users with search and filter capabilities.'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.parameters['page'] = {
+       in: 'query',
+       description: 'Page number (default: 1)',
+       type: 'integer',
+       example: 1
+     }
+     #swagger.parameters['limit'] = {
+       in: 'query',
+       description: 'Items per page (default: 10)',
+       type: 'integer',
+       example: 10
+     }
+     #swagger.parameters['search'] = {
+       in: 'query',
+       description: 'Search by username, email, or full name',
+       type: 'string',
+       example: 'john'
+     }
+     #swagger.responses[200] = {
+       description: 'Users retrieved successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string' },
+               data: {
+                 type: 'object',
+                 properties: {
+                   users: { type: 'array', items: { type: 'object' } },
+                   pagination: {
+                     type: 'object',
+                     properties: {
+                       page: { type: 'number' },
+                       limit: { type: 'number' },
+                       total: { type: 'number' },
+                       totalPages: { type: 'number' }
+                     }
+                   }
+                 }
+               }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[403] = {
+       description: 'Forbidden - Admin access required'
+     }
+  */
+  userController.getAllUsers(req, res, next);
 });
 
 router.use(requireAuth);
@@ -581,6 +727,413 @@ router.get('/me/tag-stats', (req, res, next) => {
      }
   */
   userController.getUserTagStats(req, res, next);
+});
+
+// GET /api/v1/users/me/elo-history - Get user ELO history
+router.get('/me/elo-history', (req, res, next) => {
+  /* #swagger.tags = ['User']
+     #swagger.summary = 'Get current user ELO history'
+     #swagger.description = 'Returns paginated history of ELO rating changes for the authenticated user.'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.parameters['page'] = {
+       in: 'query',
+       description: 'Page number (default: 1)',
+       type: 'integer',
+       example: 1
+     }
+     #swagger.parameters['limit'] = {
+       in: 'query',
+       description: 'Items per page (default: 10)',
+       type: 'integer',
+       example: 10
+     }
+     #swagger.responses[200] = {
+       description: 'User ELO history retrieved successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string' },
+               data: {
+                 type: 'object',
+                 properties: {
+                   history: {
+                     type: 'array',
+                     items: {
+                       type: 'object',
+                       properties: {
+                         id: { type: 'string' },
+                         old_elo: { type: 'number' },
+                         new_elo: { type: 'number' },
+                         change: { type: 'number' },
+                         reason: { type: 'string' },
+                         match_id: { type: 'string', nullable: true },
+                         created_at: { type: 'string', format: 'date-time' }
+                       }
+                     }
+                   },
+                   pagination: {
+                     type: 'object',
+                     properties: {
+                       page: { type: 'number' },
+                       limit: { type: 'number' },
+                       total: { type: 'number' },
+                       totalPages: { type: 'number' }
+                     }
+                   }
+                 }
+               }
+             }
+           },
+           example: {
+             status: 'Success',
+             message: 'User ELO history retrieved successfully',
+             data: {
+               history: [
+                 {
+                   id: 'history-id-1',
+                   old_elo: 1200,
+                   new_elo: 1225,
+                   change: 25,
+                   reason: 'MATCH_WIN',
+                   match_id: 'match-123',
+                   created_at: '2024-01-15T00:00:00.000Z'
+                 }
+               ],
+               pagination: {
+                 page: 1,
+                 limit: 10,
+                 total: 1,
+                 totalPages: 1
+               }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[401] = {
+       description: 'Unauthorized'
+     }
+  */
+  userController.getUserEloHistory(req, res, next);
+});
+
+// GET /api/v1/users/me/streak - Get user streak and heatmap
+router.get('/me/streak', (req, res, next) => {
+  /* #swagger.tags = ['User']
+     #swagger.summary = 'Get current user streak and heatmap'
+     #swagger.description = 'Returns current streak, max streak, and calendar heatmap of problem-solving activity for the last 365 days.'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.responses[200] = {
+       description: 'User streak and heatmap retrieved successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string' },
+               data: {
+                 type: 'object',
+                 properties: {
+                   current_streak: { type: 'number', example: 5 },
+                   max_streak: { type: 'number', example: 10 },
+                   last_active_date: { type: 'string', format: 'date', nullable: true },
+                   heatmap: {
+                     type: 'object',
+                     additionalProperties: { type: 'number' },
+                     description: 'Map of date (YYYY-MM-DD) to number of problems solved',
+                     example: { "2024-01-15": 3, "2024-01-16": 1 }
+                   }
+                 }
+               }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[401] = {
+       description: 'Unauthorized'
+     }
+  */
+  userController.getUserStreak(req, res, next);
+});
+
+// GET /api/v1/users/:id - Get user by ID (Admin only)
+router.get('/:id', requireAuth, requireAdmin, (req, res, next) => {
+  /* #swagger.tags = ['Admin']
+     #swagger.summary = 'Get user by ID (Admin only)'
+     #swagger.description = 'Returns detailed information of a specific user including email and ban status.'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.parameters['id'] = {
+       in: 'path',
+       required: true,
+       description: 'User ID',
+       type: 'string',
+       example: 'uuid-123'
+     }
+     #swagger.responses[200] = {
+       description: 'User retrieved successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string' },
+               data: {
+                 type: 'object',
+                 properties: {
+                   id: { type: 'string' },
+                   username: { type: 'string' },
+                   email: { type: 'string' },
+                   avatar_url: { type: 'string', nullable: true },
+                   role: { type: 'string', enum: ['USER', 'ADMIN'] },
+                   elo_rating: { type: 'number' },
+                   streak_count: { type: 'number' },
+                   max_streak: { type: 'number' },
+                   code_coins: { type: 'number' },
+                   bio: { type: 'string', nullable: true },
+                   full_name: { type: 'string', nullable: true },
+                   is_banned: { type: 'boolean' },
+                   banned_at: { type: 'string', nullable: true },
+                   banned_reason: { type: 'string', nullable: true },
+                   last_active_date: { type: 'string', nullable: true },
+                   created_at: { type: 'string', format: 'date-time' },
+                   updated_at: { type: 'string', format: 'date-time' }
+                 }
+               }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[404] = {
+       description: 'User not found'
+     }
+     #swagger.responses[403] = {
+       description: 'Forbidden - Admin access required'
+     }
+  */
+  userController.getUserByIdAdmin(req, res, next);
+});
+
+// PATCH /api/v1/users/:id - Admin update user
+router.patch('/:id', requireAuth, requireAdmin, validateRequest(adminUpdateUserSchema), (req, res, next) => {
+  /* #swagger.tags = ['Admin']
+     #swagger.summary = 'Admin update user'
+     #swagger.description = 'Allows admin to update user information (username, email, full_name, bio, elo_rating, code_coins).'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.parameters['id'] = {
+       in: 'path',
+       required: true,
+       description: 'User ID',
+       type: 'string'
+     }
+     #swagger.requestBody = {
+       required: true,
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               username: { type: 'string', example: 'new_username' },
+               email: { type: 'string', example: 'newemail@example.com' },
+               full_name: { type: 'string', example: 'New Full Name' },
+               bio: { type: 'string', example: 'Updated bio' },
+               elo_rating: { type: 'number', example: 1500 },
+               code_coins: { type: 'number', example: 500 }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[200] = {
+       description: 'User updated successfully'
+     }
+     #swagger.responses[403] = {
+       description: 'Forbidden - Admin access required'
+     }
+     #swagger.responses[404] = {
+       description: 'User not found'
+     }
+  */
+  userController.adminUpdateUser(req, res, next);
+});
+
+// PATCH /api/v1/users/:id/role - Admin update user role
+router.patch('/:id/role', requireAuth, requireAdmin, validateRequest(updateRoleSchema), (req, res, next) => {
+  /* #swagger.tags = ['Admin']
+     #swagger.summary = 'Admin update user role'
+     #swagger.description = 'Allows admin to change a user\'s role between USER and ADMIN.'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.parameters['id'] = {
+       in: 'path',
+       required: true,
+       description: 'User ID',
+       type: 'string'
+     }
+     #swagger.requestBody = {
+       required: true,
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               role: { type: 'string', enum: ['USER', 'ADMIN'], example: 'ADMIN' }
+             },
+             required: ['role']
+           }
+         }
+       }
+     }
+     #swagger.responses[200] = {
+       description: 'User role updated successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string' },
+               data: {
+                 type: 'object',
+                 properties: {
+                   id: { type: 'string' },
+                   username: { type: 'string' },
+                   email: { type: 'string' },
+                   role: { type: 'string' },
+                   updated_at: { type: 'string' }
+                 }
+               }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[403] = {
+       description: 'Forbidden - Admin access required'
+     }
+     #swagger.responses[404] = {
+       description: 'User not found'
+     }
+  */
+  userController.updateUserRole(req, res, next);
+});
+
+// POST /api/v1/users/:id/ban - Admin ban user
+router.post('/:id/ban', requireAuth, requireAdmin, validateRequest(banUserSchema), (req, res, next) => {
+  /* #swagger.tags = ['Admin']
+     #swagger.summary = 'Admin ban user'
+     #swagger.description = 'Locks a user account. Banned users cannot authenticate or access protected APIs.'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.parameters['id'] = {
+       in: 'path',
+       required: true,
+       description: 'User ID',
+       type: 'string'
+     }
+     #swagger.requestBody = {
+       required: false,
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               reason: { type: 'string', example: 'Violation of community guidelines' }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[200] = {
+       description: 'User banned successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string' },
+               data: {
+                 type: 'object',
+                 properties: {
+                   id: { type: 'string' },
+                   username: { type: 'string' },
+                   email: { type: 'string' },
+                   is_banned: { type: 'boolean' },
+                   banned_at: { type: 'string' },
+                   banned_reason: { type: 'string', nullable: true }
+                 }
+               }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[400] = {
+       description: 'User is already banned'
+     }
+     #swagger.responses[403] = {
+       description: 'Forbidden - Admin access required'
+     }
+     #swagger.responses[404] = {
+       description: 'User not found'
+     }
+  */
+  userController.banUser(req, res, next);
+});
+
+// POST /api/v1/users/:id/unban - Admin unban user
+router.post('/:id/unban', requireAuth, requireAdmin, (req, res, next) => {
+  /* #swagger.tags = ['Admin']
+     #swagger.summary = 'Admin unban user'
+     #swagger.description = 'Restores a banned user account. User can login and access protected APIs again.'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.parameters['id'] = {
+       in: 'path',
+       required: true,
+       description: 'User ID',
+       type: 'string'
+     }
+     #swagger.responses[200] = {
+       description: 'User unbanned successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string' },
+               data: {
+                 type: 'object',
+                 properties: {
+                   id: { type: 'string' },
+                   username: { type: 'string' },
+                   email: { type: 'string' },
+                   is_banned: { type: 'boolean' },
+                   banned_at: { type: 'string', nullable: true },
+                   banned_reason: { type: 'string', nullable: true }
+                 }
+               }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[400] = {
+       description: 'User is not banned'
+     }
+     #swagger.responses[403] = {
+       description: 'Forbidden - Admin access required'
+     }
+     #swagger.responses[404] = {
+       description: 'User not found'
+     }
+  */
+  userController.unbanUser(req, res, next);
 });
 
 export default router;

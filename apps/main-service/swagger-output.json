@@ -1492,6 +1492,320 @@
         ]
       }
     },
+    "/me/contests": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Get current user contests",
+        "description": "Returns paginated list of contests that the authenticated user has registered for.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (default: 1)",
+            "example": 1,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Items per page (default: 10)",
+            "example": 10,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User contests retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "contests": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "registered_at": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "contest": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "string"
+                                  },
+                                  "title": {
+                                    "type": "string"
+                                  },
+                                  "description": {
+                                    "type": "string"
+                                  },
+                                  "start_time": {
+                                    "type": "string",
+                                    "format": "date-time"
+                                  },
+                                  "end_time": {
+                                    "type": "string",
+                                    "format": "date-time"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "pagination": {
+                          "type": "object",
+                          "properties": {
+                            "page": {
+                              "type": "number"
+                            },
+                            "limit": {
+                              "type": "number"
+                            },
+                            "total": {
+                              "type": "number"
+                            },
+                            "totalPages": {
+                              "type": "number"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/me/badges": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Get current user badges",
+        "description": "Returns list of badges that the authenticated user has earned.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User badges retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "User badges retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "slug": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "icon_url": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "ACHIEVEMENT",
+                              "STREAK",
+                              "CONTEST",
+                              "RANKING"
+                            ]
+                          },
+                          "earned_at": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "status": "Success",
+                  "message": "User badges retrieved successfully",
+                  "data": [
+                    {
+                      "id": "badge-id-1",
+                      "name": "100 Problems Solved",
+                      "slug": "100-problems",
+                      "description": "Solved 100 problems",
+                      "icon_url": null,
+                      "type": "ACHIEVEMENT",
+                      "earned_at": "2024-01-15T00:00:00.000Z"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/me/tag-stats": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Get current user tag statistics",
+        "description": "Returns number of problems solved by the authenticated user, grouped by tag.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User tag statistics retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "User tag statistics retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "tag_id": {
+                            "type": "string"
+                          },
+                          "tag_name": {
+                            "type": "string"
+                          },
+                          "tag_slug": {
+                            "type": "string"
+                          },
+                          "tag_color": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "problems_solved": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "status": "Success",
+                  "message": "User tag statistics retrieved successfully",
+                  "data": [
+                    {
+                      "tag_id": "tag-id-1",
+                      "tag_name": "Array",
+                      "tag_slug": "array",
+                      "tag_color": "#FF0000",
+                      "problems_solved": 15
+                    },
+                    {
+                      "tag_id": "tag-id-2",
+                      "tag_name": "Dynamic Programming",
+                      "tag_slug": "dp",
+                      "tag_color": "#00FF00",
+                      "problems_solved": 8
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/": {
       "get": {
         "tags": [

@@ -1,4 +1,5 @@
 import * as userRepo from '../repositories/user.repository';
+import * as authRepo from '../repositories/auth.repository';
 import { AppError } from '@ocj/errors';
 import { deleteAvatar, uploadAvatar } from './cloudinary.service';
 import { Submission } from '../models/submission.model';
@@ -103,4 +104,167 @@ export const getUserTagStats = async (userId: string) => {
     tag_color: ts.tag.color,
     problems_solved: ts.problems_solved,
   }));
+};
+
+export const getUserEloHistory = async (userId: string, page: number = 1, limit: number = 10) => {
+  return await userRepo.getUserEloHistory(userId, page, limit);
+};
+
+export const getUserStreak = async (userId: string) => {
+  const user = await userRepo.findUserById(userId);
+  if (!user) {
+    throw new AppError('User not found', 404);
+  }
+  
+  const endDate = new Date();
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - 364); 
+  
+  const activities = await userRepo.getUserActivities(userId, startDate, endDate);
+  
+  const heatmap: Record<string, number> = {};
+  activities.forEach(activity => {
+    const dateStr = activity.activity_date.toISOString().split('T')[0];
+    heatmap[dateStr] = activity.problems_solved_count;
+  });
+  
+  return {
+    current_streak: user.streak_count,
+    max_streak: user.max_streak,
+    last_active_date: user.last_active_date,
+    heatmap,
+  };
+};
+
+export const getAllUsers = async (page: number, limit: number, search?: string) => {
+  return await userRepo.getAllUsers(page, limit, search);
+};
+
+export const getUserByIdAdmin = async (userId: string) => {
+  const user = await userRepo.findUserByIdAdmin(userId);
+  if (!user) {
+    throw new AppError('User not found', 404);
+  }
+  return user;
+};
+
+export const getUserSubmissionsByUsername = async (username: string, page: number = 1, limit: number = 10) => {
+  const user = await userRepo.findUserByUsername(username);
+  if (!user) {
+    throw new AppError('User not found', 404);
+  }
+  
+  const skip = (page - 1) * limit;
+  
+  const [submissions, total] = await Promise.all([
+    Submission.find({ 
+      userId: user.id,
+      status: 'ACCEPTED',
+    })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate('problemId', 'title slug difficulty')
+      .select('-code'),
+    Submission.countDocuments({ 
+      userId: user.id,
+      status: 'ACCEPTED',
+    }),
+  ]);
+  
+  return {
+    username: user.username,
+    submissions,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+};
+
+export const getUserTagStatsByUsername = async (username: string) => {
+  const user = await userRepo.findUserByUsername(username);
+  if (!user) {
+    throw new AppError('User not found', 404);
+  }
+  
+  const tagStats = await userRepo.getUserTagStats(user.id);
+  
+  return {
+    username: user.username,
+    tag_stats: tagStats.map(ts => ({
+      tag_id: ts.tag.id,
+      tag_name: ts.tag.name,
+      tag_slug: ts.tag.slug,
+      tag_color: ts.tag.color,
+      problems_solved: ts.problems_solved,
+    })),
+  };
+};
+
+export const adminUpdateUser = async (id: string, data: {
+  username?: string;
+  email?: string;
+  full_name?: string;
+  bio?: string;
+  elo_rating?: number;
+  code_coins?: number;
+}) => {
+  const existingUser = await userRepo.findUserByIdAdmin(id);
+  if (!existingUser) {
+    throw new AppError('User not found', 404);
+  }
+  
+  if (data.username) {
+    const userWithSameUsername = await userRepo.findUserByUsername(data.username);
+    if (userWithSameUsername && userWithSameUsername.id !== id) {
+      throw new AppError('Username already taken', 400);
+    }
+  }
+  
+  if (data.email) {
+    const userWithSameEmail = await authRepo.findUserByEmail(data.email);
+    if (userWithSameEmail && userWithSameEmail.id !== id) {
+      throw new AppError('Email already in use', 400);
+    }
+  }
+  
+  return await userRepo.adminUpdateUser(id, data);
+};
+
+export const updateUserRole = async (id: string, role: 'USER' | 'ADMIN') => {
+  const existingUser = await userRepo.findUserByIdAdmin(id);
+  if (!existingUser) {
+    throw new AppError('User not found', 404);
+  }
+  
+  return await userRepo.updateUserRole(id, role);
+};
+
+export const banUser = async (id: string, reason?: string) => {
+  const existingUser = await userRepo.findUserByIdAdmin(id);
+  if (!existingUser) {
+    throw new AppError('User not found', 404);
+  }
+
+  if (existingUser.is_banned) {
+    throw new AppError('User is already banned', 400);
+  }
+  
+  return await userRepo.banUser(id, reason);
+};
+
+export const unbanUser = async (id: string) => {
+  const existingUser = await userRepo.findUserByIdAdmin(id);
+  if (!existingUser) {
+    throw new AppError('User not found', 404);
+  }
+  
+  if (!existingUser.is_banned) {
+    throw new AppError('User is not banned', 400);
+  }
+  
+  return await userRepo.unbanUser(id);
 };
