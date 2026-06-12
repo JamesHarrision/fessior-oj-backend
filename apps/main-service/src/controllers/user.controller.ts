@@ -239,3 +239,21 @@ export const getUserStreak = async (req: Request, res: Response, next: NextFunct
     next(error);
   }
 };
+
+export const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const search = req.query.search as string | undefined;
+    
+    const result = await userService.getAllUsers(page, limit, search);
+    
+    res.status(200).json({
+      status: 'Success',
+      message: 'Users retrieved successfully',
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

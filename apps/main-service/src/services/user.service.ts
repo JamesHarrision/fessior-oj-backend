@@ -134,3 +134,7 @@ export const getUserStreak = async (userId: string) => {
     heatmap,
   };
 };
+
+export const getAllUsers = async (page: number, limit: number, search?: string) => {
+  return await userRepo.getAllUsers(page, limit, search);
+};

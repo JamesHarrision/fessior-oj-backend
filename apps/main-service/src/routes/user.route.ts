@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { requireAuth } from '../middlewares/auth.middleware';
+import { requireAuth, requireAdmin } from '../middlewares/auth.middleware';
 import { validateRequest } from '../middlewares/validate.middleware';
 import { updateMeSchema } from '../validators/user.validator';
 import * as userController from '../controllers/user.controller';
@@ -74,6 +74,66 @@ router.get('/:username', (req, res, next) => {
      }
   */
   userController.getUserByUsername(req, res, next);
+});
+
+// GET /api/v1/users - Get all users (Admin only)
+router.get('/', requireAuth, requireAdmin, (req, res, next) => {
+  /* #swagger.tags = ['Admin']
+     #swagger.summary = 'Get all users (Admin only)'
+     #swagger.description = 'Returns paginated list of all users with search and filter capabilities.'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.parameters['page'] = {
+       in: 'query',
+       description: 'Page number (default: 1)',
+       type: 'integer',
+       example: 1
+     }
+     #swagger.parameters['limit'] = {
+       in: 'query',
+       description: 'Items per page (default: 10)',
+       type: 'integer',
+       example: 10
+     }
+     #swagger.parameters['search'] = {
+       in: 'query',
+       description: 'Search by username, email, or full name',
+       type: 'string',
+       example: 'john'
+     }
+     #swagger.responses[200] = {
+       description: 'Users retrieved successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string' },
+               data: {
+                 type: 'object',
+                 properties: {
+                   users: { type: 'array', items: { type: 'object' } },
+                   pagination: {
+                     type: 'object',
+                     properties: {
+                       page: { type: 'number' },
+                       limit: { type: 'number' },
+                       total: { type: 'number' },
+                       totalPages: { type: 'number' }
+                     }
+                   }
+                 }
+               }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[403] = {
+       description: 'Forbidden - Admin access required'
+     }
+  */
+  userController.getAllUsers(req, res, next);
 });
 
 router.use(requireAuth);

@@ -194,3 +194,52 @@ export const getUserActivities = async (userId: string, startDate: Date, endDate
     },
   });
 };
+
+export const getAllUsers = async (page: number = 1, limit: number = 10, search?: string) => {
+  const skip = (page - 1) * limit;
+  
+  const whereClause: any = {};
+  if (search) {
+    whereClause.OR = [
+      { username: { contains: search } },
+      { email: { contains: search } },
+      { full_name: { contains: search } },
+    ];
+  }
+  
+  const [users, total] = await Promise.all([
+    prisma.user.findMany({
+      where: whereClause,
+      skip,
+      take: limit,
+      orderBy: { created_at: 'desc' },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        avatar_url: true,
+        role: true,
+        elo_rating: true,
+        streak_count: true,
+        max_streak: true,
+        code_coins: true,
+        bio: true,
+        full_name: true,
+        is_banned: true,
+        created_at: true,
+        last_active_date: true,
+      },
+    }),
+    prisma.user.count({ where: whereClause }),
+  ]);
+  
+  return {
+    users,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+};
