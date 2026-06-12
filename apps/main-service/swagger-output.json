@@ -532,10 +532,10 @@
     "/me": {
       "get": {
         "tags": [
-          "Auth"
+          "User"
         ],
         "summary": "Get current user profile",
-        "description": "Return the profile of the currently authenticated user.",
+        "description": "Returns the profile information of the authenticated user.",
         "parameters": [
           {
             "name": "authorization",
@@ -547,17 +547,19 @@
         ],
         "responses": {
           "200": {
-            "description": "User profile returned",
+            "description": "User profile retrieved successfully",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "status": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "Success"
                     },
                     "message": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "User profile retrieved successfully"
                     },
                     "data": {
                       "type": "object",
@@ -573,6 +575,41 @@
                         },
                         "email": {
                           "type": "string"
+                        },
+                        "avatar_url": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "role": {
+                          "type": "string",
+                          "enum": [
+                            "USER",
+                            "ADMIN"
+                          ]
+                        },
+                        "elo_rating": {
+                          "type": "number"
+                        },
+                        "streak_count": {
+                          "type": "number"
+                        },
+                        "max_streak": {
+                          "type": "number"
+                        },
+                        "code_coins": {
+                          "type": "number"
+                        },
+                        "bio": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "full_name": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "format": "date-time"
                         }
                       }
                     }
@@ -580,19 +617,28 @@
                 },
                 "example": {
                   "status": "Success",
-                  "message": "User fetched successfully",
+                  "message": "User profile retrieved successfully",
                   "data": {
-                    "id": "user_123",
+                    "id": "uuid-123",
                     "name": "Jane Doe",
-                    "username": "janedoe",
-                    "email": "jane@example.com"
+                    "username": "john_doe",
+                    "email": "john@example.com",
+                    "avatar_url": null,
+                    "role": "USER",
+                    "elo_rating": 1200,
+                    "streak_count": 5,
+                    "max_streak": 10,
+                    "code_coins": 100,
+                    "bio": "I love coding",
+                    "full_name": "John Doe",
+                    "created_at": "2024-01-01T00:00:00.000Z"
                   }
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized - Invalid or missing token"
           }
         },
         "security": [
@@ -600,6 +646,155 @@
             "bearerAuth": []
           }
         ]
+      },
+      "patch": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Update current user profile",
+        "description": "Updates the profile information (full_name, bio) of the authenticated user.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User profile updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "User profile updated successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "username": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "avatar_url": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "role": {
+                          "type": "string",
+                          "enum": [
+                            "USER",
+                            "ADMIN"
+                          ]
+                        },
+                        "elo_rating": {
+                          "type": "number"
+                        },
+                        "streak_count": {
+                          "type": "number"
+                        },
+                        "max_streak": {
+                          "type": "number"
+                        },
+                        "code_coins": {
+                          "type": "number"
+                        },
+                        "bio": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "full_name": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "updated_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "status": "Success",
+                  "message": "User profile updated successfully",
+                  "data": {
+                    "id": "uuid-123",
+                    "username": "john_doe",
+                    "email": "john@example.com",
+                    "avatar_url": null,
+                    "role": "USER",
+                    "elo_rating": 1200,
+                    "streak_count": 5,
+                    "max_streak": 10,
+                    "code_coins": 100,
+                    "bio": "I love coding and solving problems!",
+                    "full_name": "John Doe",
+                    "created_at": "2024-01-01T00:00:00.000Z",
+                    "updated_at": "2024-01-15T00:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error - Invalid input data"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing token"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "full_name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "description": "User full name",
+                    "example": "John Doe"
+                  },
+                  "bio": {
+                    "type": "string",
+                    "maxLength": 500,
+                    "description": "Short biography",
+                    "example": "I love coding and solving problems!"
+                  }
+                }
+              },
+              "example": {
+                "full_name": "John Doe",
+                "bio": "I love coding and solving problems!"
+              }
+            }
+          }
+        }
       }
     },
     "/change-password": {
@@ -902,6 +1097,399 @@
             }
           }
         }
+      }
+    },
+    "/{username}": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Get public user profile",
+        "description": "Returns public profile information of a user by username. Does not require authentication.",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Username of the user to retrieve",
+            "example": "john_doe"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User profile retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "User profile retrieved successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "username": {
+                          "type": "string"
+                        },
+                        "avatar_url": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "role": {
+                          "type": "string",
+                          "enum": [
+                            "USER",
+                            "ADMIN"
+                          ]
+                        },
+                        "elo_rating": {
+                          "type": "number"
+                        },
+                        "streak_count": {
+                          "type": "number"
+                        },
+                        "max_streak": {
+                          "type": "number"
+                        },
+                        "code_coins": {
+                          "type": "number"
+                        },
+                        "bio": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "full_name": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "created_at": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "status": "Success",
+                  "message": "User profile retrieved successfully",
+                  "data": {
+                    "id": "uuid-123",
+                    "username": "john_doe",
+                    "avatar_url": null,
+                    "role": "USER",
+                    "elo_rating": 1200,
+                    "streak_count": 5,
+                    "max_streak": 10,
+                    "code_coins": 100,
+                    "bio": "I love coding!",
+                    "full_name": "John Doe",
+                    "created_at": "2024-01-01T00:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/me/avatar": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Upload user avatar",
+        "description": "Upload an image file to set as user avatar. Supports JPEG, PNG, JPG, WEBP (max 5MB).",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Avatar uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Avatar uploaded successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "username": {
+                          "type": "string"
+                        },
+                        "avatar_url": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No file uploaded or invalid file type"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "avatar": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Image file (JPEG, PNG, JPG, WEBP)"
+                  }
+                },
+                "required": [
+                  "avatar"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Delete user avatar",
+        "description": "Deletes the current user avatar from Cloudinary and resets avatar_url to null.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Avatar deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Avatar deleted successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "username": {
+                          "type": "string"
+                        },
+                        "avatar_url": {
+                          "type": "string",
+                          "nullable": true,
+                          "example": null
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing token"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/me/submissions": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Get current user submissions",
+        "description": "Returns paginated list of code submissions by the authenticated user.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (default: 1)",
+            "example": 1,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Items per page (default: 10)",
+            "example": 10,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User submissions retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "Success"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "submissions": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "_id": {
+                                "type": "string"
+                              },
+                              "userId": {
+                                "type": "string"
+                              },
+                              "problemId": {
+                                "type": "object"
+                              },
+                              "code": {
+                                "type": "string"
+                              },
+                              "language": {
+                                "type": "string",
+                                "enum": [
+                                  "cpp",
+                                  "java",
+                                  "python"
+                                ]
+                              },
+                              "status": {
+                                "type": "string"
+                              },
+                              "executionTime": {
+                                "type": "number"
+                              },
+                              "memoryUsed": {
+                                "type": "number"
+                              },
+                              "testCasesPassed": {
+                                "type": "number"
+                              },
+                              "testCasesTotal": {
+                                "type": "number"
+                              },
+                              "createdAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              }
+                            }
+                          }
+                        },
+                        "pagination": {
+                          "type": "object",
+                          "properties": {
+                            "page": {
+                              "type": "number"
+                            },
+                            "limit": {
+                              "type": "number"
+                            },
+                            "total": {
+                              "type": "number"
+                            },
+                            "totalPages": {
+                              "type": "number"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/": {

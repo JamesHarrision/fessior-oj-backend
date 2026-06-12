@@ -1,0 +1,198 @@
+import { Request, Response, NextFunction } from 'express';
+import * as userService from '../services/user.service';
+
+export const getMe = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      res.status(401).json({ status: 'Error', message: 'Unauthorized' });
+      return;
+    }
+    
+    const user = await userService.getMe(userId);
+    
+    res.status(200).json({
+      status: 'Success',
+      message: 'User profile retrieved successfully',
+      data: user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateMe = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      res.status(401).json({ status: 'Error', message: 'Unauthorized' });
+      return;
+    }
+    
+    const { full_name, bio } = req.body;
+    const updatedUser = await userService.updateMe(userId, { full_name, bio });
+    
+    res.status(200).json({
+      status: 'Success',
+      message: 'User profile updated successfully',
+      data: updatedUser,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUserByUsername = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { username } = req.params;
+    
+    if (!username || typeof username !== 'string') {
+      res.status(400).json({ status: 'Error', message: 'Invalid username' });
+      return;
+    }
+    
+    const user = await userService.getUserByUsername(username);
+    
+    res.status(200).json({
+      status: 'Success',
+      message: 'User profile retrieved successfully',
+      data: user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const uploadAvatar = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      res.status(401).json({ status: 'Error', message: 'Unauthorized' });
+      return;
+    }
+
+    if (!req.file) {
+      res.status(400).json({ status: 'Error', message: 'No file uploaded' });
+      return;
+    }
+
+    const user = await userService.uploadUserAvatar(userId, req.file.buffer);
+
+    res.status(200).json({
+      status: 'Success',
+      message: 'Avatar uploaded successfully',
+      data: user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteAvatar = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      res.status(401).json({ status: 'Error', message: 'Unauthorized' });
+      return;
+    }
+
+    const currentUser = await userService.getMe(userId);
+    const currentAvatarUrl = currentUser.avatar_url;
+
+    const user = await userService.deleteUserAvatar(userId, currentAvatarUrl);
+
+    res.status(200).json({
+      status: 'Success',
+      message: 'Avatar deleted successfully',
+      data: user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUserSubmissions = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      res.status(401).json({ status: 'Error', message: 'Unauthorized' });
+      return;
+    }
+    
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    
+    const result = await userService.getUserSubmissions(userId, page, limit);
+    
+    res.status(200).json({
+      status: 'Success',
+      message: 'User submissions retrieved successfully',
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUserContests = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      res.status(401).json({ status: 'Error', message: 'Unauthorized' });
+      return;
+    }
+    
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    
+    const result = await userService.getUserContests(userId, page, limit);
+    
+    res.status(200).json({
+      status: 'Success',
+      message: 'User contests retrieved successfully',
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUserBadges = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      res.status(401).json({ status: 'Error', message: 'Unauthorized' });
+      return;
+    }
+    
+    const badges = await userService.getUserBadges(userId);
+    
+    res.status(200).json({
+      status: 'Success',
+      message: 'User badges retrieved successfully',
+      data: badges,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUserTagStats = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      res.status(401).json({ status: 'Error', message: 'Unauthorized' });
+      return;
+    }
+    
+    const tagStats = await userService.getUserTagStats(userId);
+    
+    res.status(200).json({
+      status: 'Success',
+      message: 'User tag statistics retrieved successfully',
+      data: tagStats,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

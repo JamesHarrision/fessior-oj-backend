@@ -22,6 +22,7 @@ const outputFile = './swagger-output.json';
 const endpointsFiles = [
     './src/routes/ai.route.ts',
     './src/routes/auth.route.ts',
+    './src/routes/user.route.ts',
     './src/routes/comment.route.ts',
     './src/routes/contest.route.ts',
     './src/routes/friendship.route.ts',

@@ -1,0 +1,586 @@
+import { Router } from 'express';
+import { requireAuth } from '../middlewares/auth.middleware';
+import { validateRequest } from '../middlewares/validate.middleware';
+import { updateMeSchema } from '../validators/user.validator';
+import * as userController from '../controllers/user.controller';
+import { upload } from '../middlewares/upload.middleware';
+
+const router = Router();
+
+/**
+ * GET /api/v1/users/:username
+ * Get public user profile by username
+ */
+router.get('/:username', (req, res, next) => {
+  /* #swagger.tags = ['User']
+     #swagger.summary = 'Get public user profile'
+     #swagger.description = 'Returns public profile information of a user by username. Does not require authentication.'
+     #swagger.parameters['username'] = {
+       in: 'path',
+       required: true,
+       description: 'Username of the user to retrieve',
+       type: 'string',
+       example: 'john_doe'
+     }
+     #swagger.responses[200] = {
+       description: 'User profile retrieved successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string', example: 'User profile retrieved successfully' },
+               data: {
+                 type: 'object',
+                 properties: {
+                   id: { type: 'string' },
+                   username: { type: 'string' },
+                   avatar_url: { type: 'string', nullable: true },
+                   role: { type: 'string', enum: ['USER', 'ADMIN'] },
+                   elo_rating: { type: 'number' },
+                   streak_count: { type: 'number' },
+                   max_streak: { type: 'number' },
+                   code_coins: { type: 'number' },
+                   bio: { type: 'string', nullable: true },
+                   full_name: { type: 'string', nullable: true },
+                   created_at: { type: 'string', format: 'date-time' }
+                 }
+               }
+             }
+           },
+           example: {
+             status: 'Success',
+             message: 'User profile retrieved successfully',
+             data: {
+               id: 'uuid-123',
+               username: 'john_doe',
+               avatar_url: null,
+               role: 'USER',
+               elo_rating: 1200,
+               streak_count: 5,
+               max_streak: 10,
+               code_coins: 100,
+               bio: 'I love coding!',
+               full_name: 'John Doe',
+               created_at: '2024-01-01T00:00:00.000Z'
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[404] = {
+       description: 'User not found'
+     }
+  */
+  userController.getUserByUsername(req, res, next);
+});
+
+router.use(requireAuth);
+
+/**
+ * GET /api/v1/users/me
+ * Get current user profile
+ */
+router.get('/me', (req, res, next) => {
+  /* #swagger.tags = ['User']
+     #swagger.summary = 'Get current user profile'
+     #swagger.description = 'Returns the profile information of the authenticated user.'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.responses[200] = {
+       description: 'User profile retrieved successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string', example: 'User profile retrieved successfully' },
+               data: {
+                 type: 'object',
+                 properties: {
+                   id: { type: 'string' },
+                   username: { type: 'string' },
+                   email: { type: 'string' },
+                   avatar_url: { type: 'string', nullable: true },
+                   role: { type: 'string', enum: ['USER', 'ADMIN'] },
+                   elo_rating: { type: 'number' },
+                   streak_count: { type: 'number' },
+                   max_streak: { type: 'number' },
+                   code_coins: { type: 'number' },
+                   bio: { type: 'string', nullable: true },
+                   full_name: { type: 'string', nullable: true },
+                   created_at: { type: 'string', format: 'date-time' }
+                 }
+               }
+             }
+           },
+           example: {
+             status: 'Success',
+             message: 'User profile retrieved successfully',
+             data: {
+               id: 'uuid-123',
+               username: 'john_doe',
+               email: 'john@example.com',
+               avatar_url: null,
+               role: 'USER',
+               elo_rating: 1200,
+               streak_count: 5,
+               max_streak: 10,
+               code_coins: 100,
+               bio: 'I love coding',
+               full_name: 'John Doe',
+               created_at: '2024-01-01T00:00:00.000Z'
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[401] = {
+       description: 'Unauthorized - Invalid or missing token'
+     }
+  */
+  userController.getMe(req, res, next);
+});
+
+/**
+ * PATCH /api/v1/users/me
+ * Update current user profile
+ */
+router.patch('/me', validateRequest(updateMeSchema), (req, res, next) => {
+  /* #swagger.tags = ['User']
+     #swagger.summary = 'Update current user profile'
+     #swagger.description = 'Updates the profile information (full_name, bio) of the authenticated user.'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.requestBody = {
+       required: true,
+       content: {
+         "application/json": {
+           schema: {
+             type: 'object',
+             properties: {
+               full_name: { type: 'string', maxLength: 100, description: 'User full name', example: 'John Doe' },
+               bio: { type: 'string', maxLength: 500, description: 'Short biography', example: 'I love coding and solving problems!' }
+             }
+           },
+           example: {
+             full_name: 'John Doe',
+             bio: 'I love coding and solving problems!'
+           }
+         }
+       }
+     }
+     #swagger.responses[200] = {
+       description: 'User profile updated successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string', example: 'User profile updated successfully' },
+               data: {
+                 type: 'object',
+                 properties: {
+                   id: { type: 'string' },
+                   username: { type: 'string' },
+                   email: { type: 'string' },
+                   avatar_url: { type: 'string', nullable: true },
+                   role: { type: 'string', enum: ['USER', 'ADMIN'] },
+                   elo_rating: { type: 'number' },
+                   streak_count: { type: 'number' },
+                   max_streak: { type: 'number' },
+                   code_coins: { type: 'number' },
+                   bio: { type: 'string', nullable: true },
+                   full_name: { type: 'string', nullable: true },
+                   created_at: { type: 'string', format: 'date-time' },
+                   updated_at: { type: 'string', format: 'date-time' }
+                 }
+               }
+             }
+           },
+           example: {
+             status: 'Success',
+             message: 'User profile updated successfully',
+             data: {
+               id: 'uuid-123',
+               username: 'john_doe',
+               email: 'john@example.com',
+               avatar_url: null,
+               role: 'USER',
+               elo_rating: 1200,
+               streak_count: 5,
+               max_streak: 10,
+               code_coins: 100,
+               bio: 'I love coding and solving problems!',
+               full_name: 'John Doe',
+               created_at: '2024-01-01T00:00:00.000Z',
+               updated_at: '2024-01-15T00:00:00.000Z'
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[400] = {
+       description: 'Validation error - Invalid input data'
+     }
+     #swagger.responses[401] = {
+       description: 'Unauthorized - Invalid or missing token'
+     }
+  */
+  userController.updateMe(req, res, next);
+});
+
+router.post('/me/avatar', upload.single('avatar'), (req, res, next) => {
+  /* #swagger.tags = ['User']
+     #swagger.summary = 'Upload user avatar'
+     #swagger.description = 'Upload an image file to set as user avatar. Supports JPEG, PNG, JPG, WEBP (max 5MB).'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.consumes = ['multipart/form-data']
+     #swagger.requestBody = {
+       required: true,
+       content: {
+         'multipart/form-data': {
+           schema: {
+             type: 'object',
+             properties: {
+               avatar: {
+                 type: 'string',
+                 format: 'binary',
+                 description: 'Image file (JPEG, PNG, JPG, WEBP)'
+               }
+             },
+             required: ['avatar']
+           }
+         }
+       }
+     }
+     #swagger.responses[200] = {
+       description: 'Avatar uploaded successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string', example: 'Avatar uploaded successfully' },
+               data: {
+                 type: 'object',
+                 properties: {
+                   id: { type: 'string' },
+                   username: { type: 'string' },
+                   avatar_url: { type: 'string' }
+                 }
+               }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[400] = {
+       description: 'No file uploaded or invalid file type'
+     }
+     #swagger.responses[401] = {
+       description: 'Unauthorized'
+     }
+  */
+  userController.uploadAvatar(req, res, next);
+});
+
+// DELETE /api/v1/users/me/avatar - Delete user avatar
+router.delete('/me/avatar', (req, res, next) => {
+  /* #swagger.tags = ['User']
+     #swagger.summary = 'Delete user avatar'
+     #swagger.description = 'Deletes the current user avatar from Cloudinary and resets avatar_url to null.'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.responses[200] = {
+       description: 'Avatar deleted successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string', example: 'Avatar deleted successfully' },
+               data: {
+                 type: 'object',
+                 properties: {
+                   id: { type: 'string' },
+                   username: { type: 'string' },
+                   avatar_url: { type: 'string', nullable: true, example: null }
+                 }
+               }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[401] = {
+       description: 'Unauthorized - Invalid or missing token'
+     }
+  */
+  userController.deleteAvatar(req, res, next);
+});
+
+// GET /api/v1/users/me/submissions - Get user submissions
+router.get('/me/submissions', (req, res, next) => {
+  /* #swagger.tags = ['User']
+     #swagger.summary = 'Get current user submissions'
+     #swagger.description = 'Returns paginated list of code submissions by the authenticated user.'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.parameters['page'] = {
+       in: 'query',
+       description: 'Page number (default: 1)',
+       type: 'integer',
+       example: 1
+     }
+     #swagger.parameters['limit'] = {
+       in: 'query',
+       description: 'Items per page (default: 10)',
+       type: 'integer',
+       example: 10
+     }
+     #swagger.responses[200] = {
+       description: 'User submissions retrieved successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string' },
+               data: {
+                 type: 'object',
+                 properties: {
+                   submissions: { 
+                     type: 'array', 
+                     items: { 
+                       type: 'object',
+                       properties: {
+                         _id: { type: 'string' },
+                         userId: { type: 'string' },
+                         problemId: { type: 'object' },
+                         code: { type: 'string' },
+                         language: { type: 'string', enum: ['cpp', 'java', 'python'] },
+                         status: { type: 'string' },
+                         executionTime: { type: 'number' },
+                         memoryUsed: { type: 'number' },
+                         testCasesPassed: { type: 'number' },
+                         testCasesTotal: { type: 'number' },
+                         createdAt: { type: 'string', format: 'date-time' }
+                       }
+                     }
+                   },
+                   pagination: {
+                     type: 'object',
+                     properties: {
+                       page: { type: 'number' },
+                       limit: { type: 'number' },
+                       total: { type: 'number' },
+                       totalPages: { type: 'number' }
+                     }
+                   }
+                 }
+               }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[401] = {
+       description: 'Unauthorized'
+     }
+  */
+  userController.getUserSubmissions(req, res, next);
+});
+
+// GET /api/v1/users/me/contests - Get user contests
+router.get('/me/contests', (req, res, next) => {
+  /* #swagger.tags = ['User']
+     #swagger.summary = 'Get current user contests'
+     #swagger.description = 'Returns paginated list of contests that the authenticated user has registered for.'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.parameters['page'] = {
+       in: 'query',
+       description: 'Page number (default: 1)',
+       type: 'integer',
+       example: 1
+     }
+     #swagger.parameters['limit'] = {
+       in: 'query',
+       description: 'Items per page (default: 10)',
+       type: 'integer',
+       example: 10
+     }
+     #swagger.responses[200] = {
+       description: 'User contests retrieved successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string' },
+               data: {
+                 type: 'object',
+                 properties: {
+                   contests: {
+                     type: 'array',
+                     items: {
+                       type: 'object',
+                       properties: {
+                         registered_at: { type: 'string', format: 'date-time' },
+                         contest: {
+                           type: 'object',
+                           properties: {
+                             id: { type: 'string' },
+                             title: { type: 'string' },
+                             description: { type: 'string' },
+                             start_time: { type: 'string', format: 'date-time' },
+                             end_time: { type: 'string', format: 'date-time' }
+                           }
+                         }
+                       }
+                     }
+                   },
+                   pagination: {
+                     type: 'object',
+                     properties: {
+                       page: { type: 'number' },
+                       limit: { type: 'number' },
+                       total: { type: 'number' },
+                       totalPages: { type: 'number' }
+                     }
+                   }
+                 }
+               }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[401] = {
+       description: 'Unauthorized'
+     }
+  */
+  userController.getUserContests(req, res, next);
+});
+
+// GET /api/v1/users/me/badges - Get user badges
+router.get('/me/badges', (req, res, next) => {
+  /* #swagger.tags = ['User']
+     #swagger.summary = 'Get current user badges'
+     #swagger.description = 'Returns list of badges that the authenticated user has earned.'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.responses[200] = {
+       description: 'User badges retrieved successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string', example: 'User badges retrieved successfully' },
+               data: {
+                 type: 'array',
+                 items: {
+                   type: 'object',
+                   properties: {
+                     id: { type: 'string' },
+                     name: { type: 'string' },
+                     slug: { type: 'string' },
+                     description: { type: 'string', nullable: true },
+                     icon_url: { type: 'string', nullable: true },
+                     type: { type: 'string', enum: ['ACHIEVEMENT', 'STREAK', 'CONTEST', 'RANKING'] },
+                     earned_at: { type: 'string', format: 'date-time' }
+                   }
+                 }
+               }
+             }
+           },
+           example: {
+             status: 'Success',
+             message: 'User badges retrieved successfully',
+             data: [
+               {
+                 id: 'badge-id-1',
+                 name: '100 Problems Solved',
+                 slug: '100-problems',
+                 description: 'Solved 100 problems',
+                 icon_url: null,
+                 type: 'ACHIEVEMENT',
+                 earned_at: '2024-01-15T00:00:00.000Z'
+               }
+             ]
+           }
+         }
+       }
+     }
+     #swagger.responses[401] = {
+       description: 'Unauthorized'
+     }
+  */
+  userController.getUserBadges(req, res, next);
+});
+
+// GET /api/v1/users/me/tag-stats - Get user tag statistics
+router.get('/me/tag-stats', (req, res, next) => {
+  /* #swagger.tags = ['User']
+     #swagger.summary = 'Get current user tag statistics'
+     #swagger.description = 'Returns number of problems solved by the authenticated user, grouped by tag.'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.responses[200] = {
+       description: 'User tag statistics retrieved successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string', example: 'User tag statistics retrieved successfully' },
+               data: {
+                 type: 'array',
+                 items: {
+                   type: 'object',
+                   properties: {
+                     tag_id: { type: 'string' },
+                     tag_name: { type: 'string' },
+                     tag_slug: { type: 'string' },
+                     tag_color: { type: 'string', nullable: true },
+                     problems_solved: { type: 'number' }
+                   }
+                 }
+               }
+             }
+           },
+           example: {
+             status: 'Success',
+             message: 'User tag statistics retrieved successfully',
+             data: [
+               {
+                 tag_id: 'tag-id-1',
+                 tag_name: 'Array',
+                 tag_slug: 'array',
+                 tag_color: '#FF0000',
+                 problems_solved: 15
+               },
+               {
+                 tag_id: 'tag-id-2',
+                 tag_name: 'Dynamic Programming',
+                 tag_slug: 'dp',
+                 tag_color: '#00FF00',
+                 problems_solved: 8
+               }
+             ]
+           }
+         }
+       }
+     }
+     #swagger.responses[401] = {
+       description: 'Unauthorized'
+     }
+  */
+  userController.getUserTagStats(req, res, next);
+});
+
+export default router;
