@@ -176,3 +176,23 @@ export const getUserBadges = async (req: Request, res: Response, next: NextFunct
     next(error);
   }
 };
+
+export const getUserTagStats = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      res.status(401).json({ status: 'Error', message: 'Unauthorized' });
+      return;
+    }
+    
+    const tagStats = await userService.getUserTagStats(userId);
+    
+    res.status(200).json({
+      status: 'Success',
+      message: 'User tag statistics retrieved successfully',
+      data: tagStats,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

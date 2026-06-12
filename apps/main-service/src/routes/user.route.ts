@@ -523,4 +523,64 @@ router.get('/me/badges', (req, res, next) => {
   userController.getUserBadges(req, res, next);
 });
 
+// GET /api/v1/users/me/tag-stats - Get user tag statistics
+router.get('/me/tag-stats', (req, res, next) => {
+  /* #swagger.tags = ['User']
+     #swagger.summary = 'Get current user tag statistics'
+     #swagger.description = 'Returns number of problems solved by the authenticated user, grouped by tag.'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.responses[200] = {
+       description: 'User tag statistics retrieved successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string', example: 'User tag statistics retrieved successfully' },
+               data: {
+                 type: 'array',
+                 items: {
+                   type: 'object',
+                   properties: {
+                     tag_id: { type: 'string' },
+                     tag_name: { type: 'string' },
+                     tag_slug: { type: 'string' },
+                     tag_color: { type: 'string', nullable: true },
+                     problems_solved: { type: 'number' }
+                   }
+                 }
+               }
+             }
+           },
+           example: {
+             status: 'Success',
+             message: 'User tag statistics retrieved successfully',
+             data: [
+               {
+                 tag_id: 'tag-id-1',
+                 tag_name: 'Array',
+                 tag_slug: 'array',
+                 tag_color: '#FF0000',
+                 problems_solved: 15
+               },
+               {
+                 tag_id: 'tag-id-2',
+                 tag_name: 'Dynamic Programming',
+                 tag_slug: 'dp',
+                 tag_color: '#00FF00',
+                 problems_solved: 8
+               }
+             ]
+           }
+         }
+       }
+     }
+     #swagger.responses[401] = {
+       description: 'Unauthorized'
+     }
+  */
+  userController.getUserTagStats(req, res, next);
+});
+
 export default router;

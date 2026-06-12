@@ -133,3 +133,22 @@ export const getUserBadges = async (userId: string) => {
     orderBy: { earned_at: 'desc' },
   });
 };
+
+export const getUserTagStats = async (userId: string) => {
+  return prisma.userTagStat.findMany({
+    where: { user_id: userId },
+    include: {
+      tag: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          color: true,
+        },
+      },
+    },
+    orderBy: {
+      problems_solved: 'desc',
+    },
+  });
+};
