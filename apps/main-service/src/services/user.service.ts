@@ -182,3 +182,23 @@ export const getUserSubmissionsByUsername = async (username: string, page: numbe
     },
   };
 };
+
+export const getUserTagStatsByUsername = async (username: string) => {
+  const user = await userRepo.findUserByUsername(username);
+  if (!user) {
+    throw new AppError('User not found', 404);
+  }
+  
+  const tagStats = await userRepo.getUserTagStats(user.id);
+  
+  return {
+    username: user.username,
+    tag_stats: tagStats.map(ts => ({
+      tag_id: ts.tag.id,
+      tag_name: ts.tag.name,
+      tag_slug: ts.tag.slug,
+      tag_color: ts.tag.color,
+      problems_solved: ts.problems_solved,
+    })),
+  };
+};

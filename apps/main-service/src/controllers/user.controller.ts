@@ -302,3 +302,24 @@ export const getUserSubmissionsByUsername = async (req: Request, res: Response, 
     next(error);
   }
 };
+
+export const getUserTagStatsByUsername = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { username } = req.params;
+    
+    if (!username || typeof username !== 'string') {
+      res.status(400).json({ status: 'Error', message: 'Invalid username' });
+      return;
+    }
+    
+    const result = await userService.getUserTagStatsByUsername(username);
+    
+    res.status(200).json({
+      status: 'Success',
+      message: 'User tag statistics retrieved successfully',
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

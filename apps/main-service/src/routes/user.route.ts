@@ -110,6 +110,58 @@ router.get('/:username/submissions', (req, res, next) => {
   userController.getUserSubmissionsByUsername(req, res, next);
 });
 
+// GET /api/v1/users/:username/tag-stats - Get public tag stats by username
+router.get('/:username/tag-stats', (req, res, next) => {
+  /* #swagger.tags = ['User']
+     #swagger.summary = 'Get public tag statistics by username'
+     #swagger.description = 'Returns number of problems solved by tag for a specific user.'
+     #swagger.parameters['username'] = {
+       in: 'path',
+       required: true,
+       description: 'Username',
+       type: 'string',
+       example: 'khankh'
+     }
+     #swagger.responses[200] = {
+       description: 'User tag statistics retrieved successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string' },
+               data: {
+                 type: 'object',
+                 properties: {
+                   username: { type: 'string' },
+                   tag_stats: {
+                     type: 'array',
+                     items: {
+                       type: 'object',
+                       properties: {
+                         tag_id: { type: 'string' },
+                         tag_name: { type: 'string' },
+                         tag_slug: { type: 'string' },
+                         tag_color: { type: 'string', nullable: true },
+                         problems_solved: { type: 'number' }
+                       }
+                     }
+                   }
+                 }
+               }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[404] = {
+       description: 'User not found'
+     }
+  */
+  userController.getUserTagStatsByUsername(req, res, next);
+});
+
 // GET /api/v1/users - Get all users (Admin only)
 router.get('/', requireAuth, requireAdmin, (req, res, next) => {
   /* #swagger.tags = ['Admin']
