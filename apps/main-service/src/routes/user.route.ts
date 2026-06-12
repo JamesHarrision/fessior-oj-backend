@@ -322,4 +322,76 @@ router.delete('/me/avatar', (req, res, next) => {
   userController.deleteAvatar(req, res, next);
 });
 
+// GET /api/v1/users/me/submissions - Get user submissions
+router.get('/me/submissions', (req, res, next) => {
+  /* #swagger.tags = ['User']
+     #swagger.summary = 'Get current user submissions'
+     #swagger.description = 'Returns paginated list of code submissions by the authenticated user.'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.parameters['page'] = {
+       in: 'query',
+       description: 'Page number (default: 1)',
+       type: 'integer',
+       example: 1
+     }
+     #swagger.parameters['limit'] = {
+       in: 'query',
+       description: 'Items per page (default: 10)',
+       type: 'integer',
+       example: 10
+     }
+     #swagger.responses[200] = {
+       description: 'User submissions retrieved successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string' },
+               data: {
+                 type: 'object',
+                 properties: {
+                   submissions: { 
+                     type: 'array', 
+                     items: { 
+                       type: 'object',
+                       properties: {
+                         _id: { type: 'string' },
+                         userId: { type: 'string' },
+                         problemId: { type: 'object' },
+                         code: { type: 'string' },
+                         language: { type: 'string', enum: ['cpp', 'java', 'python'] },
+                         status: { type: 'string' },
+                         executionTime: { type: 'number' },
+                         memoryUsed: { type: 'number' },
+                         testCasesPassed: { type: 'number' },
+                         testCasesTotal: { type: 'number' },
+                         createdAt: { type: 'string', format: 'date-time' }
+                       }
+                     }
+                   },
+                   pagination: {
+                     type: 'object',
+                     properties: {
+                       page: { type: 'number' },
+                       limit: { type: 'number' },
+                       total: { type: 'number' },
+                       totalPages: { type: 'number' }
+                     }
+                   }
+                 }
+               }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[401] = {
+       description: 'Unauthorized'
+     }
+  */
+  userController.getUserSubmissions(req, res, next);
+});
+
 export default router;

@@ -1,6 +1,7 @@
 import * as userRepo from '../repositories/user.repository';
 import { AppError } from '@ocj/errors';
 import { deleteAvatar, uploadAvatar } from './cloudinary.service';
+import { Submission } from '../models/submission.model';
 
 export const getMe = async (userId: string) => {
   const user = await userRepo.findUserById(userId);
@@ -49,4 +50,27 @@ export const deleteUserAvatar = async (userId: string, currentAvatarUrl: string 
   
   const user = await userRepo.removeUserAvatar(userId);
   return user;
+};
+
+export const getUserSubmissions = async (userId: string, page: number = 1, limit: number = 10) => {
+  const skip = (page - 1) * limit;
+  
+  const [submissions, total] = await Promise.all([
+    Submission.find({ userId })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate('problemId', 'title slug difficulty'),
+    Submission.countDocuments({ userId }),
+  ]);
+  
+  return {
+    submissions,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 };
