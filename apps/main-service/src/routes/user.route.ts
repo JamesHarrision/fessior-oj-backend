@@ -394,4 +394,76 @@ router.get('/me/submissions', (req, res, next) => {
   userController.getUserSubmissions(req, res, next);
 });
 
+// GET /api/v1/users/me/contests - Get user contests
+router.get('/me/contests', (req, res, next) => {
+  /* #swagger.tags = ['User']
+     #swagger.summary = 'Get current user contests'
+     #swagger.description = 'Returns paginated list of contests that the authenticated user has registered for.'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.parameters['page'] = {
+       in: 'query',
+       description: 'Page number (default: 1)',
+       type: 'integer',
+       example: 1
+     }
+     #swagger.parameters['limit'] = {
+       in: 'query',
+       description: 'Items per page (default: 10)',
+       type: 'integer',
+       example: 10
+     }
+     #swagger.responses[200] = {
+       description: 'User contests retrieved successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string' },
+               data: {
+                 type: 'object',
+                 properties: {
+                   contests: {
+                     type: 'array',
+                     items: {
+                       type: 'object',
+                       properties: {
+                         registered_at: { type: 'string', format: 'date-time' },
+                         contest: {
+                           type: 'object',
+                           properties: {
+                             id: { type: 'string' },
+                             title: { type: 'string' },
+                             description: { type: 'string' },
+                             start_time: { type: 'string', format: 'date-time' },
+                             end_time: { type: 'string', format: 'date-time' }
+                           }
+                         }
+                       }
+                     }
+                   },
+                   pagination: {
+                     type: 'object',
+                     properties: {
+                       page: { type: 'number' },
+                       limit: { type: 'number' },
+                       total: { type: 'number' },
+                       totalPages: { type: 'number' }
+                     }
+                   }
+                 }
+               }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[401] = {
+       description: 'Unauthorized'
+     }
+  */
+  userController.getUserContests(req, res, next);
+});
+
 export default router;

@@ -74,3 +74,7 @@ export const getUserSubmissions = async (userId: string, page: number = 1, limit
     },
   };
 };
+
+export const getUserContests = async (userId: string, page: number = 1, limit: number = 10) => {
+  return await userRepo.getUserContests(userId, page, limit);
+};
