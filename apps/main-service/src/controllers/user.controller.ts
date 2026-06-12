@@ -196,3 +196,26 @@ export const getUserTagStats = async (req: Request, res: Response, next: NextFun
     next(error);
   }
 };
+
+export const getUserEloHistory = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) {
+      res.status(401).json({ status: 'Error', message: 'Unauthorized' });
+      return;
+    }
+    
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    
+    const result = await userService.getUserEloHistory(userId, page, limit);
+    
+    res.status(200).json({
+      status: 'Success',
+      message: 'User ELO history retrieved successfully',
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

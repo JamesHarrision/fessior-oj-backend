@@ -104,3 +104,7 @@ export const getUserTagStats = async (userId: string) => {
     problems_solved: ts.problems_solved,
   }));
 };
+
+export const getUserEloHistory = async (userId: string, page: number = 1, limit: number = 10) => {
+  return await userRepo.getUserEloHistory(userId, page, limit);
+};

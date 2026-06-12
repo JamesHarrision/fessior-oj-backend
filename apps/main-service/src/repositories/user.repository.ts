@@ -152,3 +152,29 @@ export const getUserTagStats = async (userId: string) => {
     },
   });
 };
+
+export const getUserEloHistory = async (userId: string, page: number = 1, limit: number = 10) => {
+  const skip = (page - 1) * limit;
+  
+  const [history, total] = await Promise.all([
+    prisma.eloHistory.findMany({
+      where: { user_id: userId },
+      skip,
+      take: limit,
+      orderBy: { created_at: 'desc' },
+    }),
+    prisma.eloHistory.count({
+      where: { user_id: userId },
+    }),
+  ]);
+  
+  return {
+    history,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+};

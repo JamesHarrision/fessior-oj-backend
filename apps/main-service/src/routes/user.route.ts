@@ -583,4 +583,95 @@ router.get('/me/tag-stats', (req, res, next) => {
   userController.getUserTagStats(req, res, next);
 });
 
+// GET /api/v1/users/me/elo-history - Get user ELO history
+router.get('/me/elo-history', (req, res, next) => {
+  /* #swagger.tags = ['User']
+     #swagger.summary = 'Get current user ELO history'
+     #swagger.description = 'Returns paginated history of ELO rating changes for the authenticated user.'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.parameters['page'] = {
+       in: 'query',
+       description: 'Page number (default: 1)',
+       type: 'integer',
+       example: 1
+     }
+     #swagger.parameters['limit'] = {
+       in: 'query',
+       description: 'Items per page (default: 10)',
+       type: 'integer',
+       example: 10
+     }
+     #swagger.responses[200] = {
+       description: 'User ELO history retrieved successfully',
+       content: {
+         'application/json': {
+           schema: {
+             type: 'object',
+             properties: {
+               status: { type: 'string', example: 'Success' },
+               message: { type: 'string' },
+               data: {
+                 type: 'object',
+                 properties: {
+                   history: {
+                     type: 'array',
+                     items: {
+                       type: 'object',
+                       properties: {
+                         id: { type: 'string' },
+                         old_elo: { type: 'number' },
+                         new_elo: { type: 'number' },
+                         change: { type: 'number' },
+                         reason: { type: 'string' },
+                         match_id: { type: 'string', nullable: true },
+                         created_at: { type: 'string', format: 'date-time' }
+                       }
+                     }
+                   },
+                   pagination: {
+                     type: 'object',
+                     properties: {
+                       page: { type: 'number' },
+                       limit: { type: 'number' },
+                       total: { type: 'number' },
+                       totalPages: { type: 'number' }
+                     }
+                   }
+                 }
+               }
+             }
+           },
+           example: {
+             status: 'Success',
+             message: 'User ELO history retrieved successfully',
+             data: {
+               history: [
+                 {
+                   id: 'history-id-1',
+                   old_elo: 1200,
+                   new_elo: 1225,
+                   change: 25,
+                   reason: 'MATCH_WIN',
+                   match_id: 'match-123',
+                   created_at: '2024-01-15T00:00:00.000Z'
+                 }
+               ],
+               pagination: {
+                 page: 1,
+                 limit: 10,
+                 total: 1,
+                 totalPages: 1
+               }
+             }
+           }
+         }
+       }
+     }
+     #swagger.responses[401] = {
+       description: 'Unauthorized'
+     }
+  */
+  userController.getUserEloHistory(req, res, next);
+});
+
 export default router;
