@@ -4,7 +4,7 @@ import { hashPassword, comparePassword } from '../utils/password.util';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/jwt.util';
 import { z } from 'zod';
 import { registerSchema, loginSchema } from '../validators/auth.validator';
-import { v4 as uuidv4 } from 'uuid';
+import crypto from 'crypto';
 import { sendResetPasswordEmail } from './email.service';
 
 type RegisterInput = z.infer<typeof registerSchema>;
@@ -163,7 +163,7 @@ export const forgotPassword = async (email: string) => {
     return { message: 'If email exists, reset link has been sent' };
   }
 
-  const resetToken = uuidv4();
+  const resetToken = crypto.randomUUID();
   const expiresAt = new Date();
   expiresAt.setMinutes(expiresAt.getMinutes() + 15); // Expires in 15 minutes
 

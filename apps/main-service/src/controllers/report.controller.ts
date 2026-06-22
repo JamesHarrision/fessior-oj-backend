@@ -37,7 +37,7 @@ export class ReportController {
     try {
       const reportId = req.params.reportId as string;
       const { status } = req.body;
-      const updated = await reportService.updateReportStatus(reportId, status);
+      const updated = await reportService.updateReportStatus(reportId as string, status);
       res.status(200).json({
         success: true,
         data: updated,
