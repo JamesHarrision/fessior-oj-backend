@@ -46,6 +46,9 @@ export const executeInDocker = async (
         resolve({ stdout: stdout.toString(), stderr: stderr.toString(), error });
       });
       if (inputData !== undefined && child.stdin) {
+        child.stdin.on('error', (err) => {
+          // Suppress write errors
+        });
         child.stdin.write(inputData);
         child.stdin.end();
       }
@@ -213,6 +216,9 @@ export const executeOnHost = async (
     });
 
     if (child.stdin) {
+      child.stdin.on('error', (err) => {
+        // Suppress EPIPE or other write errors when child process exits early
+      });
       child.stdin.write(stdin);
       child.stdin.end();
     }
