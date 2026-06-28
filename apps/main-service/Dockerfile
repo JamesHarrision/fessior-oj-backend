@@ -48,6 +48,8 @@ COPY --from=builder /app/packages ./packages
 COPY --from=builder /app/apps/main-service/package.json ./apps/main-service/package.json
 COPY --from=builder /app/apps/main-service/dist ./apps/main-service/dist
 COPY --from=builder /app/apps/main-service/prisma ./apps/main-service/prisma
+COPY --from=builder /app/apps/main-service/swagger-output.json ./apps/main-service/swagger-output.json
+
 
 
 EXPOSE 6868
