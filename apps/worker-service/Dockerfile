@@ -18,7 +18,8 @@ COPY apps/main-service/package.json ./apps/main-service/
 COPY apps/worker-service/package.json ./apps/worker-service/
 
 # Install all monorepo dependencies
-RUN npm ci
+RUN npm install --no-audit --no-fund
+
 
 # Copy workspace source files
 COPY packages/ ./packages/
