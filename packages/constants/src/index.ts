@@ -11,6 +11,7 @@ export type SupportedLanguage = typeof SUPPORTED_LANGUAGES[number];
 // Các API endpoint routes chính
 export const API_ROUTES = {
   AUTH: '/auth',
+  USER: '/users',
   PROBLEMS: '/problems',
   SUBMISSIONS: '/submissions',
   AI: '/ai',

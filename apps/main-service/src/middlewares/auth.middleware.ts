@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyAccessToken, JwtPayload } from '../utils/jwt.util';
+import { prisma } from '../config/prisma';
 
 declare global {
   namespace Express {
@@ -12,7 +13,7 @@ declare global {
   }
 }
 
-export const requireAuth = (req: Request, res: Response, next: NextFunction) => {
+export const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -22,6 +23,16 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction) => 
 
     const token = authHeader.split(' ')[1];
     const decoded = verifyAccessToken(token);
+
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: { is_banned: true },
+    });
+
+    if (!user || user.is_banned) {
+      res.status(401).json({ status: 'Error', message: 'Your account has been banned.' });
+      return;
+    }
 
     req.user = decoded;
     next();
@@ -33,9 +44,8 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction) => 
 
 export const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
   if (!req.user || req.user.role !== 'ADMIN') {
-     res.status(403).json({ status: 'Error', message: 'Forbidden: Admin access required' });
-     return;
+    res.status(403).json({ status: 'Error', message: 'Forbidden: Admin access required' });
+    return;
   }
   next();
 };
-

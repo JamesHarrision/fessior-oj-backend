@@ -41,7 +41,7 @@ export class CommentController {
       const userId = req.user.userId;
       const commentId = req.params.commentId as string;
       const { content } = req.body;
-      const updated = await commentService.updateComment(commentId, userId, content);
+      const updated = await commentService.updateComment(commentId as string, userId, content);
       res.status(200).json({
         success: true,
         data: updated,
