@@ -31,7 +31,10 @@ RUN npm run build -- --filter=main-service...
 # Runner stage
 FROM node:20-alpine AS runner
 
+RUN apk add --no-cache openssl libc6-compat
+
 WORKDIR /app
+
 
 # Copy files required to start the workspace
 COPY package*.json ./
@@ -40,7 +43,7 @@ COPY --from=builder /app/packages ./packages
 COPY --from=builder /app/apps/main-service/package.json ./apps/main-service/package.json
 COPY --from=builder /app/apps/main-service/dist ./apps/main-service/dist
 COPY --from=builder /app/apps/main-service/prisma ./apps/main-service/prisma
-COPY --from=builder /app/apps/main-service/node_modules ./apps/main-service/node_modules
+
 
 EXPOSE 6868
 
