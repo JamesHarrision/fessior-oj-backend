@@ -1,7 +1,7 @@
 {
   "name": "@ocj/utils",
   "version": "1.0.0",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
   "types": "src/index.ts",
   "private": true,
   "scripts": {
