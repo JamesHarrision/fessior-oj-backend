@@ -82,7 +82,7 @@ flowchart LR
   Service --> Queue[BullMQ submission_queue]
   Queue --> Worker[worker-service]
   Worker --> MongoProblem[(Problem / Testcase)]
-  Worker --> Executor[@ocj/executor / Judge0]
+  Worker --> Executor["@ocj/executor / Judge0"]
   Worker --> MongoResult[(Submission result)]
   Worker --> PubSub[Redis submission-updates]
   PubSub --> Socket[main-service socket subscriber]
@@ -123,7 +123,7 @@ flowchart LR
   SocketServer --> Queue[In-memory matchmakingQueue]
   Queue --> Mongo[(Random Problem)]
   Queue --> MySQL[(Match / User ELO)]
-  MySQL --> Room[match:{matchId}]
+  MySQL --> Room["match:{matchId}"]
   Room --> FE
   JudgeUpdate[submission-updates] --> EndMatch[endMatch]
   EndMatch --> Elo[Update ELO / streak]
@@ -162,7 +162,7 @@ flowchart LR
   Repo --> MySQL[(custom_rooms / matches)]
   Service --> Mongo[(Problem)]
   FE <-->|join-custom-room| Socket[Socket.io]
-  Socket --> Room[custom-room:{roomCode}]
+  Socket --> Room["custom-room:{roomCode}"]
 ```
 
 Files lien quan:
@@ -297,7 +297,7 @@ flowchart LR
   Controller --> Service[notification.service]
   Service --> Repo[notification.repository]
   Repo --> MySQL[(notifications)]
-  Service --> Socket[Socket.io user:{userId}]
+  Service --> Socket["Socket.io user:{userId}"]
   Socket --> FE[Notification UI]
 ```
 
