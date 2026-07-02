@@ -128,8 +128,8 @@ flowchart LR
   Worker[apps/worker-service] --> Queue
   Worker --> Mongo
   Worker --> Redis
-  Worker --> Executor[@ocj/executor / Judge0]
-  API --> Shared[packages/*]
+  Worker --> Executor["@ocj/executor / Judge0"]
+  API --> Shared["packages/*"]
   FE --> Shared
   Worker --> Shared
 ```
