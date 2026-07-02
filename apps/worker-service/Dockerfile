@@ -10,11 +10,16 @@ COPY turbo.json ./
 COPY packages/tsconfig/package.json ./packages/tsconfig/
 COPY packages/types/package.json ./packages/types/
 COPY packages/errors/package.json ./packages/errors/
+COPY packages/constants/package.json ./packages/constants/
+COPY packages/utils/package.json ./packages/utils/
+COPY packages/validators/package.json ./packages/validators/
+COPY packages/executor/package.json ./packages/executor/
 COPY apps/main-service/package.json ./apps/main-service/
 COPY apps/worker-service/package.json ./apps/worker-service/
 
 # Install all monorepo dependencies
-RUN npm ci
+RUN npm install --no-audit --no-fund
+
 
 # Copy workspace source files
 COPY packages/ ./packages/

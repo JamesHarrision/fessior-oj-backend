@@ -10,11 +10,16 @@ COPY turbo.json ./
 COPY packages/tsconfig/package.json ./packages/tsconfig/
 COPY packages/types/package.json ./packages/types/
 COPY packages/errors/package.json ./packages/errors/
+COPY packages/constants/package.json ./packages/constants/
+COPY packages/utils/package.json ./packages/utils/
+COPY packages/validators/package.json ./packages/validators/
+COPY packages/executor/package.json ./packages/executor/
 COPY apps/main-service/package.json ./apps/main-service/
 COPY apps/worker-service/package.json ./apps/worker-service/
 
 # Install all monorepo dependencies
-RUN npm ci
+RUN npm install --no-audit --no-fund
+
 
 # Copy workspace source files
 COPY packages/ ./packages/
@@ -31,7 +36,10 @@ RUN npm run build -- --filter=main-service...
 # Runner stage
 FROM node:20-alpine AS runner
 
+RUN apk add --no-cache openssl libc6-compat
+
 WORKDIR /app
+
 
 # Copy files required to start the workspace
 COPY package*.json ./
@@ -40,7 +48,9 @@ COPY --from=builder /app/packages ./packages
 COPY --from=builder /app/apps/main-service/package.json ./apps/main-service/package.json
 COPY --from=builder /app/apps/main-service/dist ./apps/main-service/dist
 COPY --from=builder /app/apps/main-service/prisma ./apps/main-service/prisma
-COPY --from=builder /app/apps/main-service/node_modules ./apps/main-service/node_modules
+COPY --from=builder /app/apps/main-service/swagger-output.json ./apps/main-service/swagger-output.json
+
+
 
 EXPOSE 6868
 

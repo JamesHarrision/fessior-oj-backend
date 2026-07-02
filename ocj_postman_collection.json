@@ -1,0 +1,1323 @@
+{
+	"info": {
+		"_postman_id": "9a7852c0-8df9-42b7-872f-5eb274e1d13f",
+		"name": "Online Code Judge (OCJ) API",
+		"description": "Postman Collection for testing Online Code Judge (OCJ) Backend system. Set up your {{baseUrl}} to point to local (http://localhost:6868) or VPS (http://IP_VPS:6868).",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Authentication & Profile",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"testuser@example.com\",\n  \"password\": \"Password123!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.data && jsonData.data.accessToken) {",
+									"    pm.collectionVariables.set(\"accessToken\", jsonData.data.accessToken);",
+									"    pm.collectionVariables.set(\"refreshToken\", jsonData.data.refreshToken);",
+									"} else if (jsonData.accessToken) {",
+									"    pm.collectionVariables.set(\"accessToken\", jsonData.accessToken);",
+									"    pm.collectionVariables.set(\"refreshToken\", jsonData.refreshToken);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"testuser@example.com\",\n  \"password\": \"Password123!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Profile (Me)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/refresh",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"oldPassword\": \"Password123!\",\n  \"newPassword\": \"NewPassword123!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/change-password",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"change-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Sessions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/sessions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"sessions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Revoke Session by ID",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/sessions/:sessionId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"sessions",
+								":sessionId"
+							],
+							"variable": [
+								{
+									"key": "sessionId",
+									"value": "enter-session-uuid-here"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Revoke All Sessions",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/sessions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"sessions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"testuser@example.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/forgot-password",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"forgot-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"token\": \"enter-reset-token-here\",\n  \"newPassword\": \"NewPassword123!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/reset-password",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"reset-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/logout",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2. Problems & Tags",
+			"item": [
+				{
+					"name": "List Tags",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/problems/tags",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"problems",
+								"tags"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Tag (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Dynamic Programming\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/problems/tags",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"problems",
+								"tags"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Problems",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/problems?difficulty=EASY&page=1&limit=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"problems"
+							],
+							"query": [
+								{
+									"key": "difficulty",
+									"value": "EASY"
+								},
+								{
+									"key": "tag",
+									"value": "Dynamic Programming",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Problem Details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/problems/:slug",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"problems",
+								":slug"
+							],
+							"variable": [
+								{
+									"key": "slug",
+									"value": "two-sum"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Problem (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Two Sum\",\n  \"description\": \"Find two numbers that add up to a specific target.\",\n  \"difficulty\": \"EASY\",\n  \"timeLimit\": 1000,\n  \"memoryLimit\": 256,\n  \"tags\": [\"Array\", \"Hash Table\"],\n  \"testCases\": [\n    {\n      \"input\": \"[2,7,11,15]\\n9\",\n      \"output\": \"[0,1]\",\n      \"isPublic\": true\n    }\n  ],\n  \"starterCodes\": {\n    \"python\": \"def twoSum(nums, target):\\n    pass\",\n    \"cpp\": \"vector<int> twoSum(vector<int>& nums, int target) {\\n    }\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/problems",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"problems"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Testcase (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"isExample\": true,\n  \"input\": \"4\\n2 7 11 15\\n9\",\n  \"output\": \"0 1\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/problems/:problemId/testcases",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"problems",
+								":problemId",
+								"testcases"
+							],
+							"variable": [
+								{
+									"key": "problemId",
+									"value": "enter-problem-mongodb-id-here"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Problem Testcases",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/problems/:problemId/testcases",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"problems",
+								":problemId",
+								"testcases"
+							],
+							"variable": [
+								{
+									"key": "problemId",
+									"value": "enter-problem-mongodb-id-here"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Testcase (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/problems/testcases/:testcaseId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"problems",
+								"testcases",
+								":testcaseId"
+							],
+							"variable": [
+								{
+									"key": "testcaseId",
+									"value": "enter-testcase-mongodb-id-here"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "3. Submissions",
+			"item": [
+				{
+					"name": "Submit Code",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"problemId\": \"enter-problem-mongodb-id-here\",\n  \"language\": \"python\",\n  \"code\": \"import sys\\nlines = sys.stdin.read().split()\\n# your solution logic\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/submissions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"submissions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Submissions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/submissions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"submissions"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4. AI Tools",
+			"item": [
+				{
+					"name": "Generate DSA Roadmap",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"currentLevel\": \"BEGINNER\",\n  \"targetGoal\": \"FAANG Preparation\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/ai/roadmap",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"ai",
+								"roadmap"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get AI Mock Interview Feedback",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/ai/feedback/:submissionId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"ai",
+								"feedback",
+								":submissionId"
+							],
+							"variable": [
+								{
+									"key": "submissionId",
+									"value": "enter-submission-mongodb-id-here"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "5. Rooms & Matchmaking",
+			"item": [
+				{
+					"name": "Create Custom Room",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"difficulty\": \"EASY\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/rooms/create",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"rooms",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Active Rooms",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/rooms/active",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"rooms",
+								"active"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Join Custom Room",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"roomCode\": \"ENTER_ROOM_CODE_HERE\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/rooms/join",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"rooms",
+								"join"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Room Config",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"difficulty\": \"MEDIUM\",\n  \"problemId\": \"optional-problem-mongodb-id\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/rooms/:roomId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"rooms",
+								":roomId"
+							],
+							"variable": [
+								{
+									"key": "roomId",
+									"value": "enter-room-uuid-here"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Leave Room",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/rooms/leave",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"rooms",
+								"leave"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "6. Contests",
+			"item": [
+				{
+					"name": "Create Contest (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Weekly Coding Contest #1\",\n  \"description\": \"Compete with other programmers in this weekly coding challenge.\",\n  \"startTime\": \"2026-07-01T12:00:00.000Z\",\n  \"endTime\": \"2026-07-01T14:00:00.000Z\",\n  \"problems\": [\n    {\n      \"problemId\": \"enter-problem-mongodb-id-here\",\n      \"points\": 100,\n      \"order\": 1\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/contests",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"contests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register for Contest",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/contests/:contestId/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"contests",
+								":contestId",
+								"register"
+							],
+							"variable": [
+								{
+									"key": "contestId",
+									"value": "enter-contest-uuid-here"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Contest Standings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/contests/:contestId/leaderboard",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"contests",
+								":contestId",
+								"leaderboard"
+							],
+							"variable": [
+								{
+									"key": "contestId",
+									"value": "enter-contest-uuid-here"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "7. Comments & Discussions",
+			"item": [
+				{
+					"name": "Create Comment",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"targetId\": \"enter-problem-mongodb-id-or-other-target-uuid-here\",\n  \"targetType\": \"PROBLEM\",\n  \"content\": \"I solved this using a hash table in O(N) time!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/comments",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"comments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Comments",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/comments?targetId=enter-target-id-here&targetType=PROBLEM",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"comments"
+							],
+							"query": [
+								{
+									"key": "targetId",
+									"value": "enter-target-id-here"
+								},
+								{
+									"key": "targetType",
+									"value": "PROBLEM"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "8. Social & Friends",
+			"item": [
+				{
+					"name": "Get Friends & Presence",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/friends",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"friends"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Friend Request",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"receiverId\": \"enter-friend-user-uuid-here\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/friends/request",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"friends",
+								"request"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Respond to Friend Request",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"senderId\": \"enter-sender-user-uuid-here\",\n  \"action\": \"ACCEPT\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/friends/respond",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"friends",
+								"respond"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "9. Shop & Inventory",
+			"item": [
+				{
+					"name": "Get Shop Items",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shop/items",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"shop",
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buy Shop Item",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"itemId\": \"enter-shop-item-uuid-here\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shop/buy",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"shop",
+								"buy"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Inventory",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shop/inventory",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"shop",
+								"inventory"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Equip Inventory Item",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"inventoryItemId\": \"enter-inventory-item-uuid-here\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/shop/inventory/equip",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"shop",
+								"inventory",
+								"equip"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "10. Notifications",
+			"item": [
+				{
+					"name": "Get Notifications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/notifications?page=1&limit=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"notifications"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mark Notifications as Read",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"notificationIds\": [\n    \"enter-notification-uuid-here\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/notifications/read",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"notifications",
+								"read"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "11. Reports",
+			"item": [
+				{
+					"name": "Submit Bug / Feedback Report",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"BUG\",\n  \"content\": \"Found a critical memory leak in worker thread when evaluating infinite loops.\",\n  \"problemId\": \"optional-problem-mongodb-id-here\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/reports",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"reports"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Report Status (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"RESOLVED\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/reports/:reportId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"reports",
+								":reportId"
+							],
+							"variable": [
+								{
+									"key": "reportId",
+									"value": "enter-report-uuid-here"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{accessToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:6868",
+			"type": "string"
+		},
+		{
+			"key": "accessToken",
+			"value": "your-access-token-placeholder",
+			"type": "string"
+		},
+		{
+			"key": "refreshToken",
+			"value": "your-refresh-token-placeholder",
+			"type": "string"
+		}
+	]
+}

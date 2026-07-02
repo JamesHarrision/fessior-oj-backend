@@ -47,6 +47,7 @@
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "@ocj/constants": "^1.0.0",
+    "@ocj/errors": "^1.0.0",
     "@ocj/executor": "*",
     "@ocj/utils": "^1.0.0",
     "@ocj/validators": "^1.0.0",
