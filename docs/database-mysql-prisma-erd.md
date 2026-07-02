@@ -129,8 +129,8 @@ erDiagram
   }
 
   USER_TAG_STAT {
-    string user_id PK FK
-    string tag_id PK FK
+    string user_id PK "FK users.id"
+    string tag_id PK "FK tags.id"
     int problems_solved
   }
 
@@ -143,8 +143,8 @@ erDiagram
   }
 
   PROBLEM_INDEX_TAG {
-    string mongo_problem_id PK FK
-    string tag_id PK FK
+    string mongo_problem_id PK "FK problem_index.mongo_problem_id"
+    string tag_id PK "FK tags.id"
   }
 
   CUSTOM_ROOM {
@@ -173,14 +173,14 @@ erDiagram
   }
 
   CONTEST_PROBLEM {
-    string contest_id PK FK
+    string contest_id PK "FK contests.id"
     string mongo_problem_id PK
     int points
     int order
   }
 
   CONTEST_REGISTRATION {
-    string contest_id PK FK
+    string contest_id PK "FK contests.id"
     string user_id PK
     datetime registered_at
   }
@@ -197,7 +197,7 @@ erDiagram
   }
 
   COMMENT_LIKE {
-    string comment_id PK FK
+    string comment_id PK "FK comments.id"
     string user_id PK
     datetime created_at
   }
