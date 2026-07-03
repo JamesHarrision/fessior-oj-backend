@@ -1,6 +1,70 @@
 # FE Design System — OCJ (Online Code Judge)
 
-> Phiên bản 1.0 — áp dụng cho toàn bộ frontend refactor
+> Phiên bản 1.1 — áp dụng cho toàn bộ frontend refactor
+
+---
+
+## 0. QUY TẮC VÀNG: THẰNG CHA PHẢI CÓ PADDING, THẰNG CON PHẢI CÓ MARGIN
+
+> **Đây là rule bất di bất dịch, áp dụng cho TOÀN BỘ FE.**
+
+### Nguyên lý
+
+```
+┌── <div class="p-6">          ← THẰNG CHA: luôn có padding
+│  ┌── <div class="mb-4">      ← THẰNG CON: luôn có margin-bottom
+│  └── <div class="mb-4">
+│  └── <div>                    ← THẰNG CON CUỐI CÙNG: margin = 0
+└──────────────────────────
+```
+
+### Luật cụ thể
+
+| Vị trí | Luật |
+|--------|------|
+| **Block container** (card, panel, section) | Phải có `padding` (`p-*`). Không block nào được để `p-0`. |
+| **Con bên trong block** | Phải có `margin-bottom` (`mb-*`). Không con nào được đứng sát con tiếp theo. |
+| **Con cuối cùng trong block** | `margin-bottom: 0` (dùng `last:mb-0` hoặc `[&>:last-child]:mb-0`) |
+| **Inline elements** (badge, pill, tag) | Phải có `gap-*` hoặc `space-x-*` / `space-y-*` trên cha, hoặc `margin-right` trên mỗi con. |
+| **Form items** | `<Form.Item>` mặc định có margin-bottom của Ant Design. Nếu cần ghi đè, dùng `className="mb-5"`. |
+| **Page sections** | Mỗi section cách nhau ít nhất `space-y-8` hoặc `gap-8`. |
+| **Text block** (heading, paragraph) | Heading + paragraph kề nhau: paragraph phải có `mt-2` hoặc cha có `space-y-2`. |
+
+### Mẫu chuẩn
+
+```tsx
+// ✅ ĐÚNG — cha có padding, con có margin
+<div className="p-6">
+  <h2 className="mb-3">Title</h2>
+  <p className="mb-4">Description</p>
+  <Button className="mb-0">Action</Button>
+</div>
+
+// ✅ ĐÚNG — dùng space-y trên cha thay vì gán mb từng con
+<div className="p-6 space-y-4">
+  <h2>Title</h2>
+  <p>Description</p>
+  <Button>Action</Button>
+</div>
+
+// ❌ SAI — cha không có padding, con không có margin
+<div>
+  <h2>Title</h2>
+  <p>Description</p>
+</div>
+```
+
+### Spacing mặc định theo ngữ cảnh
+
+| Ngữ cảnh | Cha padding | Con margin | Ghi chú |
+|----------|------------|------------|---------|
+| Card | `p-6` | `mb-4` | Tăng lên `p-8` cho form |
+| Form card | `p-8 lg:p-10` | `mb-5` (Form.Item) | |
+| Section | `space-y-8` | — | Dùng space-y thay vì mb |
+| Stat row | `gap-3` | — | Grid container |
+| Button group | `gap-2` | — | Flex container |
+| Inline pills | `gap-2` | — | Flex wrap |
+| Page container | `space-y-10` | — | |
 
 ---
 
