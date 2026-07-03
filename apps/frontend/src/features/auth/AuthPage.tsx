@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Alert, Button, Form, Input, Segmented } from 'antd';
-import { ArrowRightOutlined, CheckCircleFilled, ThunderboltFilled, UserCheck, Flame, Trophy } from '@ant-design/icons';
+import { ArrowRightOutlined, CheckCircleFilled, FireFilled, ThunderboltFilled, TrophyFilled, UserOutlined } from '@ant-design/icons';
 import { AppLogo } from '@ocj/ui';
 import { validateEmail, validateUsername, checkPasswordStrength } from '@ocj/validators';
 import { parseErrorMessage } from '@ocj/utils';
@@ -106,9 +106,9 @@ function TerminalPreview() {
 
 function LiveStats() {
   const stats = [
-    { icon: <UserCheck />, label: 'Active Coders', value: '1,482' },
-    { icon: <Flame />, label: 'Streak Record', value: '07 days' },
-    { icon: <Trophy />, label: 'Rank', value: '#128' },
+    { icon: <UserOutlined />, label: 'Active Coders', value: '1,482' },
+    { icon: <FireFilled />, label: 'Streak Record', value: '07 days' },
+    { icon: <TrophyFilled />, label: 'Rank', value: '#128' },
   ];
 
   return (
