@@ -1,5 +1,5 @@
 import type { IUser } from '@ocj/types';
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { authRepository } from '../app/api/client';
 import { useAuthStore } from '../features/auth/auth.store';
 import { socketService } from '../services/socket';
@@ -18,6 +18,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [loading, setLoading] = useState(true);
+  const hasBootstrappedLegacySession = useRef(false);
 
   const accessToken = useAuthStore((s) => s.accessToken);
   const refreshToken = useAuthStore((s) => s.refreshToken);
@@ -26,6 +27,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const setSession = useAuthStore((s) => s.setSession);
   const setUser = useAuthStore((s) => s.setUser);
   const clear = useAuthStore((s) => s.clear);
+
+  const clearSession = React.useCallback(() => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+    clear();
+    socketService.disconnect();
+  }, [clear]);
 
   useEffect(() => {
     if (accessToken) {
@@ -36,6 +44,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [accessToken]);
 
   useEffect(() => {
+    if (hasBootstrappedLegacySession.current) {
+      return;
+    }
+
+    hasBootstrappedLegacySession.current = true;
     const legacyToken = localStorage.getItem('token');
     const legacyRefreshToken = localStorage.getItem('refreshToken');
     if (!accessToken && legacyToken && legacyRefreshToken) {
@@ -79,7 +92,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       } catch {
         if (!cancelled) {
-          clear();
+          clearSession();
         }
       } finally {
         if (!cancelled) {
@@ -93,7 +106,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       cancelled = true;
     };
-  }, [accessToken, clear, setUser, user]);
+  }, [accessToken, clearSession, setUser, user]);
 
   const login = async (email: string, password: string) => {
     const res = await authRepository.login({ email, password });
@@ -113,8 +126,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch {
       void 0;
     } finally {
-      clear();
-      socketService.disconnect();
+      clearSession();
     }
   };
 
@@ -123,7 +135,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const me = await authRepository.me();
       setUser(me);
     } catch {
-      clear();
+      clearSession();
     }
   };
 
