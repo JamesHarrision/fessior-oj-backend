@@ -303,7 +303,9 @@ code, pre, kbd {
   animation: fade-in 0.15s ease-out forwards;
 }
 
-.terminal-cursor::after {
+/* Terminal cursor */
+.terminal-cursor::after,
+.ocj-cursor::after {
   content: '▊';
   animation: terminal-cursor 1s infinite;
   color: var(--color-emerald-500);
