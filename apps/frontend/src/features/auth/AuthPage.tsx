@@ -35,6 +35,25 @@ function DotGrid() {
    ══════════════════════════════════════════════════════════ */
 
 function TerminalPreview() {
+  const codePreviewHtml = [
+    '<span style="color:#64748B">// O(n) solution</span>',
+    '<span style="color:#C4B5FD">int</span> ',
+    '<span style="color:#FCD34D">solve</span>',
+    '(<span style="color:#C4B5FD">vector</span>&lt;int&gt;&amp; a, ',
+    '<span style="color:#C4B5FD">int</span> target) {',
+    '',
+    '  <span style="color:#C4B5FD">unordered_map</span>&lt;int,int&gt; seen;',
+    '',
+    '  <span style="color:#67E8F9">for</span> ',
+    '(<span style="color:#C4B5FD">int</span> i=0; i&lt;a.size(); ++i) {',
+    '    <span style="color:#C4B5FD">int</span> need = target - a[i];',
+    '    <span style="color:#64748B">// ...</span>',
+    '    <span style="color:#67E8F9">return</span> i;',
+    '  }',
+    '}',
+    '<span class="terminal-cursor"></span>',
+  ].join('\n');
+
   return (
     <div className="relative overflow-hidden rounded-xl border border-white/[0.08] bg-[#060b14] shadow-[0_24px_80px_rgba(0,0,0,0.5)]">
       {/* Window chrome */}
@@ -49,34 +68,13 @@ function TerminalPreview() {
 
       {/* Code + Verdict */}
       <div className="grid grid-cols-[1fr_180px]">
-        <pre
+        <div
           className="h-[172px] overflow-hidden p-4 text-[12px] leading-[1.7] text-slate-300"
           style={{ fontFamily: "'JetBrains Mono', monospace" }}
-        >
-          <span className="text-surface-500">{'// O(n) solution\n'}</span>
-          <span className="text-violet-300">{'int'}</span>{' '}
-          <span className="text-amber-300">{'solve'}</span>
-          <span>(</span>
-          <span className="text-violet-300">{'vector'}</span>
-          <span>{'<int>& a, '}</span>
-          <span className="text-violet-300">{'int'}</span>
-          <span>{' target)'}</span>
-          {' {'}
-          {'\n'}  <span className="text-violet-300">{'unordered_map'}</span>
-          <span>{'<int,int> seen;\n'}</span>
-          {'\n'}  <span className="text-cyan-300">{'for'}</span>
-          <span>{' (</span>
-          <span className="text-violet-300">{'int'}</span>
-          <span>{' i=0; i<a.size(); ++i) {'}</span>
-          {'\n'}    <span className="text-violet-300">{'int'}</span>
-          <span>{' need = target - a[i];\n'}</span>
-          <span className="text-surface-500">{'    // ...\n'}</span>
-          <span className="text-cyan-300">{'  return'}</span>
-          <span>{' i;\n'}</span>
-          {'  }\n'}
-          {'}\n'}
-          <span className="terminal-cursor" />
-        </pre>
+          dangerouslySetInnerHTML={{
+            __html: codePreviewHtml,
+          }}
+        />
 
         {/* Verdict panel */}
         <div className="border-l border-white/[0.06] bg-white/[0.025] p-4 flex flex-col justify-center">
