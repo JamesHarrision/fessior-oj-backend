@@ -1,13 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Alert, Button, Form, Input } from 'antd';
-import {
-  ArrowRightOutlined,
-  CheckCircleFilled,
-  FireFilled,
-  ThunderboltFilled,
-  TrophyFilled,
-  UserOutlined,
-} from '@ant-design/icons';
+import { ArrowRightOutlined, ThunderboltFilled } from '@ant-design/icons';
 import { AppLogo } from '@ocj/ui';
 import { validateEmail, validateUsername, checkPasswordStrength } from '@ocj/validators';
 import { parseErrorMessage } from '@ocj/utils';
@@ -16,141 +9,87 @@ import { useNavigate } from 'react-router-dom';
 
 type AuthMode = 'login' | 'register';
 
-/* ─── Dot Grid Background ─── */
+/* ─── Background Canvas ─── */
 
-function DotGrid() {
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
-      <div
-        className="absolute inset-0 opacity-[0.04]"
-        style={{
-          backgroundImage:
-            'radial-gradient(circle, rgba(5,150,105,0.5) 1px, transparent 1px)',
-          backgroundSize: '32px 32px',
-        }}
-      />
-      <div className="absolute -top-40 -left-32 w-[500px] h-[500px] rounded-full bg-emerald-900/12 blur-[130px]" />
-      <div className="absolute -bottom-40 -right-32 w-[500px] h-[500px] rounded-full bg-navy-700/15 blur-[130px]" />
-    </div>
-  );
-}
-
-/* ─── Terminal Preview ─── */
-
-function TerminalPreview() {
-  const codePreviewHtml = [
-    '<span style="color:#64748B">// O(n) solution</span>',
-    '<span style="color:#A5B4FC">int</span> ',
-    '<span style="color:#FCD34D">solve</span>',
-    '(<span style="color:#A5B4FC">vector</span>&lt;int&gt;&amp; a, ',
-    '<span style="color:#A5B4FC">int</span> target) {',
-    '',
-    '  <span style="color:#A5B4FC">unordered_map</span>&lt;int,int&gt; seen;',
-    '',
-    '  <span style="color:#67E8F9">for</span> ',
-    '(<span style="color:#A5B4FC">int</span> i=0; i&lt;a.size(); ++i) {',
-    '    <span style="color:#A5B4FC">int</span> need = target - a[i];',
-    '    <span style="color:#64748B">// ...</span>',
-    '    <span style="color:#67E8F9">return</span> i;',
-    '  }',
-    '}',
-    '<span class="ocj-cursor"></span>',
-  ].join('\n');
+function Canvas() {
+  const lines = [
+    { text: 'ACCEPTED  two-sum.cpp  42ms  12.8MB', color: 'text-emerald-400', indent: 0 },
+    { text: 'PENDING   merge-sort.py  —     —',     color: 'text-amber-400',  indent: 2 },
+    { text: 'WA        binary-search.java  3ms  8.1MB', color: 'text-red-400',  indent: 4 },
+    { text: 'ACCEPTED  bfs-graph.cpp  18ms  22.3MB', color: 'text-emerald-400', indent: 1 },
+    { text: 'TLE       fibonacci.py  2001ms  256MB', color: 'text-red-400',  indent: 3 },
+    { text: 'PROCESSING  dp-knapsack.py  —     —',  color: 'text-amber-400',  indent: 0 },
+    { text: 'ACCEPTED  quick-sort.java  6ms  11.2MB', color: 'text-emerald-400', indent: 5 },
+    { text: 'COMPILE_ERROR  syntax.cpp  —     —',   color: 'text-red-400',  indent: 2 },
+    { text: 'ACCEPTED  dijkstra.py  31ms  18.9MB',   color: 'text-emerald-400', indent: 1 },
+    { text: 'ACCEPTED  linked-list.c  2ms  4.1MB',    color: 'text-emerald-400', indent: 0 },
+    { text: 'WA        prime-check.cpp  12ms  8.4MB', color: 'text-red-400',  indent: 3 },
+    { text: 'ACCEPTED  n-queens.py  47ms  25.7MB',    color: 'text-emerald-400', indent: 4 },
+    { text: 'PENDING   palindrome.java  —     —',     color: 'text-amber-400',  indent: 1 },
+    { text: 'ACCEPTED  trie-search.cpp  9ms  5.3MB',  color: 'text-emerald-400', indent: 2 },
+    { text: 'MLE        large-array.py  145ms  512MB', color: 'text-red-400',  indent: 0 },
+    { text: 'ACCEPTED  sliding-window.java  22ms  14.1MB', color: 'text-emerald-400', indent: 3 },
+  ];
 
   return (
-    <div className="overflow-hidden rounded-xl border border-white/10 bg-white/5 backdrop-blur-md shadow-2xl shadow-black/40">
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.06] bg-white/[0.02]">
-        <span className="h-2.5 w-2.5 rounded-full bg-red-400/80" />
-        <span className="h-2.5 w-2.5 rounded-full bg-amber-400/70" />
-        <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/70" />
-        <span
-          className="ml-3 text-xs text-surface-500"
-          style={{ fontFamily: "'JetBrains Mono', monospace" }}
-        >
-          two-sum.cpp
-        </span>
-      </div>
+    <div className="absolute inset-0 overflow-hidden pointer-events-none select-none" aria-hidden>
+      {/* Noise texture overlay */}
+      <div className="absolute inset-0 opacity-[0.03]" style={{
+        backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\'/%3E%3C/svg%3E")',
+      }} />
 
-      <div className="grid grid-cols-[1fr_160px]">
-        <div
-          className="h-[156px] overflow-hidden p-4 text-[12px] leading-[1.65] text-slate-300"
-          style={{ fontFamily: "'JetBrains Mono', monospace" }}
-          dangerouslySetInnerHTML={{ __html: codePreviewHtml }}
-        />
-
-        <div className="border-l border-white/[0.05] bg-white/[0.02] p-3.5 flex flex-col justify-center">
-          <div className="flex items-center gap-1.5 mb-3 text-emerald-400">
-            <CheckCircleFilled className="text-xs" />
-            <span className="text-[11px] font-semibold tracking-wide">Accepted</span>
-          </div>
-          <div className="space-y-2 text-[11px]">
-            {(
-              [
-                ['Runtime', '42 ms'],
-                ['Memory', '12.8 MB'],
-                ['Tests', '24 / 24'],
-              ] as const
-            ).map(([label, val]) => (
-              <div key={label} className="flex justify-between">
-                <span className="text-surface-500">{label}</span>
-                <span className="text-slate-300 tabular-nums">{val}</span>
-              </div>
-            ))}
-          </div>
+      {/* Live Judge Feed */}
+      <div className="absolute inset-y-0 right-0 w-[480px] flex flex-col justify-center opacity-[0.12]">
+        <div className="space-y-1 px-8">
+          {lines.map((line, i) => (
+            <div
+              key={i}
+              className={`font-mono text-[11px] leading-relaxed ${line.color}`}
+              style={{
+                fontFamily: "'JetBrains Mono', monospace",
+                paddingLeft: `${line.indent * 16}px`,
+                animationDelay: `${i * 0.3}s`,
+                opacity: 0,
+                animation: 'fade-in 0.8s ease-out forwards',
+              }}
+            >
+              {line.text}
+            </div>
+          ))}
         </div>
       </div>
+
+      {/* Glow orbs */}
+      <div className="absolute -top-60 -left-60 w-[700px] h-[700px] rounded-full bg-emerald-900/8 blur-[150px]" />
+      <div className="absolute -bottom-80 left-1/3 w-[600px] h-[600px] rounded-full bg-navy-800/30 blur-[150px]" />
     </div>
   );
 }
 
-/* ─── Live Stats ─── */
+/* ─── Stat Strip ─── */
 
-type StatItem = { icon: React.ReactNode; label: string; value: string };
-
-const STATS: StatItem[] = [
-  { icon: <UserOutlined />, label: 'Active Coders', value: '1,482' },
-  { icon: <FireFilled />, label: 'Streak Record', value: '07 days' },
-  { icon: <TrophyFilled />, label: 'Global Rank', value: '#128' },
+const METRICS = [
+  { value: '1,482', label: 'Active Coders' },
+  { value: '847',  label: 'Problems Solved Today' },
+  { value: '32ms', label: 'Avg. Judge Time' },
+  { value: '24/7', label: 'Arena Uptime' },
 ];
 
-function LiveStats() {
+function StatStrip() {
   return (
-    <div className="grid grid-cols-3 gap-3">
-      {STATS.map((s) => (
-        <div
-          key={s.label}
-          className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-md shadow-2xl shadow-black/40 px-4 py-3.5 hover:bg-white/[0.07] hover:border-white/15 transition-all duration-300"
-        >
-          <div className="flex items-center gap-1.5 text-surface-500 mb-1.5 text-[10px] uppercase tracking-[0.12em] font-semibold">
-            <span className="text-emerald-500/60 text-xs">{s.icon}</span>
-            {s.label}
-          </div>
+    <div className="flex justify-center gap-8 mt-8 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+      {METRICS.map((m) => (
+        <div key={m.label} className="text-center">
           <div
-            className="text-xl font-semibold text-slate-100 tabular-nums"
+            className="text-2xl font-bold text-slate-100 tabular-nums"
             style={{ fontFamily: "'Clash Display', sans-serif" }}
           >
-            {s.value}
+            {m.value}
+          </div>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.15em] text-surface-500 mt-1">
+            {m.label}
           </div>
         </div>
-      ))}
-    </div>
-  );
-}
-
-/* ─── Trust Badges ─── */
-
-const TECH_BADGES = ['Repository API', 'React Query', 'Zustand', 'Ant Design', 'Tailwind', 'Monaco'];
-
-function TrustBadges() {
-  return (
-    <div className="mt-8 flex flex-wrap gap-3">
-      {TECH_BADGES.map((b) => (
-        <span
-          key={b}
-          className="rounded-md border border-white/[0.05] bg-white/[0.02] px-2.5 py-1 text-[10px] text-surface-500 font-medium tracking-wide hover:border-white/[0.1] hover:text-surface-300 transition-colors duration-300"
-        >
-          {b}
-        </span>
       ))}
     </div>
   );
@@ -213,95 +152,89 @@ export function AuthPage() {
   };
 
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center p-4 lg:p-8 bg-black/90 overflow-hidden">
-      <DotGrid />
+    <div className="relative min-h-screen bg-navy-950 flex flex-col items-center justify-center overflow-hidden">
+      <Canvas />
 
-      <div className="relative z-10 w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
+      {/* ═══════════ MAIN CONTENT ═══════════ */}
+      <div className="relative z-10 w-full max-w-lg mx-auto px-6 py-16 flex flex-col items-center">
 
-        {/* ═══════════════ LEFT COLUMN: HERO ═══════════════ */}
-        <div className="flex flex-col gap-6 justify-center animate-slide-in-left">
-
-          <div className="stagger-1 animate-fade-in-up">
-            <AppLogo />
-            <div className="mt-4 inline-flex items-center gap-1.5 rounded-md border border-emerald-500/15 bg-emerald-500/[0.05] px-3 py-1 text-[11px] font-semibold text-emerald-300/80">
-              <ThunderboltFilled className="text-emerald-400/70 text-xs" />
-              Realtime PvP Coding Arena
-            </div>
-          </div>
-
-          <div className="stagger-2 animate-fade-in-up space-y-5">
-            <h1
-              className="text-[40px] sm:text-[48px] lg:text-[54px] font-bold leading-[1.1] tracking-[-0.025em] text-slate-50"
-              style={{ fontFamily: "'Clash Display', sans-serif" }}
-            >
-              Code.
-              <br />
-              Submit.
-              <br />
-              <span className="text-emerald-300/90">Conquer.</span>
-            </h1>
-
-            <p className="text-[14px] leading-relaxed text-slate-300 max-w-[440px]">
-              Vào lobby, nhận bài, chạy test, submit và xem verdict realtime. Nơi mọi coder đều có thể leo rank.
-            </p>
-          </div>
-
-          <div className="stagger-3 animate-fade-in-up">
-            <LiveStats />
-          </div>
-
-          <div className="stagger-4 animate-fade-in-up">
-            <TerminalPreview />
-          </div>
-
-          <div className="stagger-5 animate-fade-in-up">
-            <TrustBadges />
-          </div>
+        {/* Logo */}
+        <div className="animate-fade-in-up" style={{ animationDelay: '0s' }}>
+          <AppLogo />
         </div>
 
-        {/* ═══════════════ RIGHT COLUMN: AUTH FORM ═══════════════ */}
-        <div className="w-full max-w-md mx-auto lg:mr-auto lg:ml-0 animate-scale-in stagger-3">
-          <div className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl shadow-black/50 rounded-2xl p-8 lg:p-10">
+        {/* Badge */}
+        <div
+          className="mt-6 inline-flex items-center gap-1.5 rounded-md border border-emerald-500/15 bg-emerald-500/[0.05] px-3 py-1 text-[11px] font-semibold text-emerald-300/80 animate-fade-in-up"
+          style={{ animationDelay: '0.1s' }}
+        >
+          <ThunderboltFilled className="text-emerald-400/70 text-xs" />
+          Realtime PvP Coding Arena
+        </div>
 
-            <div className="mb-6">
-              <div className="text-xs font-bold tracking-widest text-emerald-400 mb-3">
+        {/* Headline */}
+        <h1
+          className="mt-6 text-center text-[36px] sm:text-[44px] font-bold leading-[1.08] tracking-[-0.03em] text-slate-50 animate-fade-in-up"
+          style={{ fontFamily: "'Clash Display', sans-serif", animationDelay: '0.2s' }}
+        >
+          Ready to
+          <br />
+          <span className="text-emerald-300/90">ship code</span>
+          {' & '}
+          <span className="text-emerald-300/90">climb ranks</span>?
+        </h1>
+
+        {/* Subtext */}
+        <p
+          className="mt-4 text-center text-[14px] leading-relaxed text-surface-400 max-w-sm animate-fade-in-up"
+          style={{ animationDelay: '0.3s' }}
+        >
+          Join the arena. Pick a problem. Submit your solution. Watch the verdict in realtime.
+        </p>
+
+        {/* ═══════ AUTH FORM ═══════ */}
+        <div
+          className="w-full mt-10 animate-fade-in-up"
+          style={{ animationDelay: '0.4s' }}
+        >
+          <div className="bg-navy-900/80 backdrop-blur-xl border border-white/[0.06] shadow-2xl shadow-black/60 rounded-2xl p-8">
+            {/* Header */}
+            <div className="text-center mb-6">
+              <div className="text-xs font-bold tracking-widest text-emerald-400 mb-2">
                 MEMBER ACCESS
               </div>
               <h2
-                className="text-[26px] font-semibold text-slate-100 mb-1.5"
+                className="text-[22px] font-semibold text-slate-100"
                 style={{ fontFamily: "'Clash Display', sans-serif" }}
               >
                 {title}
               </h2>
-              <p className="text-[13px] text-surface-400 leading-relaxed">
-                {mode === 'login'
-                  ? 'Tiếp tục phiên luyện tập hoặc vào hàng chờ PvP.'
-                  : 'Tạo hồ sơ để lưu rank, submissions và inventory.'}
-              </p>
             </div>
 
+            {/* Mode Tabs */}
             <div className="mt-6 mb-8">
-              <div className="flex bg-white/[0.04] rounded-lg p-1 border border-white/[0.05]">
-              {(['login', 'register'] as AuthMode[]).map((v) => (
-                <button
-                  key={v}
-                  type="button"
-                  onClick={() => {
-                    setMode(v);
-                    setError(null);
-                  }}
-                  className={`flex-1 py-2 text-[13px] font-medium rounded-md transition-all duration-200 cursor-pointer
-                    ${mode === v
-                      ? 'bg-emerald-500 text-white shadow-[0_2px_8px_rgba(16,185,129,0.3)]'
-                      : 'text-surface-400 hover:text-surface-200'
-                    }`}
-                >
-                  {v === 'login' ? 'Login' : 'Register'}
-                </button>
-              ))}
+              <div className="flex bg-white/[0.03] rounded-lg p-1 border border-white/[0.04]">
+                {(['login', 'register'] as AuthMode[]).map((v) => (
+                  <button
+                    key={v}
+                    type="button"
+                    onClick={() => {
+                      setMode(v);
+                      setError(null);
+                    }}
+                    className={`flex-1 py-2 text-[13px] font-medium rounded-md transition-all duration-200 cursor-pointer
+                      ${mode === v
+                        ? 'bg-emerald-500/90 text-white shadow-[0_2px_8px_rgba(16,185,129,0.25)]'
+                        : 'text-surface-400 hover:text-surface-200'
+                      }`}
+                  >
+                    {v === 'login' ? 'Sign In' : 'Create Account'}
+                  </button>
+                ))}
               </div>
             </div>
 
+            {/* Error */}
             {error && (
               <Alert
                 type={error.includes('thành công') ? 'success' : 'error'}
@@ -311,12 +244,13 @@ export function AuthPage() {
               />
             )}
 
+            {/* Form */}
             <Form
               layout="vertical"
               onFinish={handleFinish}
               requiredMark={false}
               size="large"
-              className="flex flex-col gap-6"
+              className="flex flex-col gap-5"
             >
               {mode === 'register' && (
                 <Form.Item
@@ -328,7 +262,7 @@ export function AuthPage() {
                   <Input
                     placeholder="luffy_gear5"
                     autoComplete="nickname"
-                    className="!bg-[#0f172a] !border-slate-700 hover:!border-emerald-500 focus:!border-emerald-500 !text-slate-200 !px-4 !py-3 rounded-lg !shadow-none"
+                    className="!bg-navy-950 !border-slate-700 hover:!border-emerald-500 focus:!border-emerald-500 !text-slate-200 !px-4 !py-3 rounded-lg !shadow-none"
                   />
                 </Form.Item>
               )}
@@ -345,7 +279,7 @@ export function AuthPage() {
                 <Input
                   placeholder="you@example.com"
                   autoComplete="email"
-                  className="!bg-[#0f172a] !border-slate-700 hover:!border-emerald-500 focus:!border-emerald-500 !text-slate-200 !px-4 !py-3 rounded-lg !shadow-none"
+                  className="!bg-navy-950 !border-slate-700 hover:!border-emerald-500 focus:!border-emerald-500 !text-slate-200 !px-4 !py-3 rounded-lg !shadow-none"
                 />
               </Form.Item>
 
@@ -358,7 +292,7 @@ export function AuthPage() {
                 <Input.Password
                   placeholder="••••••••"
                   autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-                  className="!bg-[#0f172a] !border-slate-700 hover:!border-emerald-500 focus:!border-emerald-500 !text-slate-200 !px-4 !py-3 rounded-lg !shadow-none [&_.ant-input-suffix]:!text-slate-400"
+                  className="!bg-navy-950 !border-slate-700 hover:!border-emerald-500 focus:!border-emerald-500 !text-slate-200 !px-4 !py-3 rounded-lg !shadow-none [&_.ant-input-suffix]:!text-slate-400"
                 />
               </Form.Item>
 
@@ -368,27 +302,17 @@ export function AuthPage() {
                   loading={loading}
                   block
                   icon={<ArrowRightOutlined />}
-                  className="w-full !bg-emerald-500 hover:!bg-emerald-600 !text-white font-semibold !h-12 rounded-lg !border-none mt-4 flex justify-center items-center gap-2"
+                  className="w-full !bg-emerald-500 hover:!bg-emerald-600 !text-white font-semibold !h-12 rounded-lg !border-none mt-2 flex justify-center items-center gap-2"
                 >
-                  {mode === 'login' ? 'Vào đấu trường' : 'Tạo tài khoản'}
+                  {mode === 'login' ? 'Enter the Arena' : 'Create Account'}
                 </Button>
               </Form.Item>
             </Form>
-
-            <div className="mt-5 rounded-lg border border-white/[0.04] bg-white/[0.015] p-3 text-[11px] leading-5 text-surface-500 text-center">
-              Backend:{' '}
-              <span
-                className="text-surface-300"
-                style={{ fontFamily: "'JetBrains Mono', monospace" }}
-              >
-                localhost:6868
-              </span>
-              {' · '}
-              Seed admin để test
-            </div>
           </div>
         </div>
 
+        {/* Stats */}
+        <StatStrip />
       </div>
     </div>
   );
