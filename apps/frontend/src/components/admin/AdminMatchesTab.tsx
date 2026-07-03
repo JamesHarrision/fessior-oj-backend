@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Trophy, Clock, Trash2, Eye, Award } from 'lucide-react';
+import { Trophy, Trash2, Eye, Award } from 'lucide-react';
 import { api } from '../../services/api';
 import type { IMatch } from '@ocj/types';
 
@@ -42,8 +42,8 @@ export const AdminMatchesTab: React.FC = () => {
     try {
       const res = await api.deleteMatch(mid);
       if (res.success) {
-        setHistory(prev => prev.filter(m => m.id !== mid && m._id !== mid));
-        if (selectedMatch?.id === mid || selectedMatch?._id === mid) {
+        setHistory(prev => prev.filter(m => m.id !== mid));
+        if (selectedMatch?.id === mid) {
           setSelectedMatch(null);
         }
         alert('Đã xóa trận đấu thành công.');
@@ -65,7 +65,7 @@ export const AdminMatchesTab: React.FC = () => {
             <p style={{ color: '#64748b' }}>Chưa có trận đấu nào được lưu trữ.</p>
           ) : (
             history.map((m, idx) => {
-              const mid = m.id || m._id;
+              const mid = m.id;
               return (
                 <div key={mid || idx} className="prob-item-row">
                   <div className="prob-item-details">
@@ -78,7 +78,7 @@ export const AdminMatchesTab: React.FC = () => {
                         Trạng thái: {m.status || 'FINISHED'}
                       </span>
                       <span className="prob-tag-pill" style={{ fontSize: '0.7rem' }}>
-                        {new Date(m.createdAt || m.created_at).toLocaleDateString()}
+                        {m.started_at ? new Date(m.started_at).toLocaleDateString() : '—'}
                       </span>
                     </div>
                   </div>
@@ -103,30 +103,28 @@ export const AdminMatchesTab: React.FC = () => {
         <h3>Chi Tiết Trận Đấu</h3>
         {selectedMatch ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontSize: '0.9rem', color: '#cbd5e1' }}>
-            <div><strong>Mã trận đấu:</strong> {selectedMatch.id || selectedMatch._id}</div>
+            <div><strong>Mã trận đấu:</strong> {selectedMatch.id}</div>
             <div><strong>Trạng thái:</strong> <span className="diff-pill diff-easy">{selectedMatch.status}</span></div>
-            <div><strong>Bài tập:</strong> {selectedMatch.problemId?.title || 'Hai Sum'}</div>
+            <div><strong>Bài tập:</strong> {selectedMatch.problem?.title || selectedMatch.problem_id}</div>
             
             <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '12px' }}>
               <h4 style={{ color: '#fff', fontSize: '0.95rem', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}><Award size={14} /> Danh sách người chơi</h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {(selectedMatch.players || []).map((p: any, index: number) => (
+                {[selectedMatch.player1, selectedMatch.player2].map((p, index) => p && (
                   <div key={index} style={{ background: 'rgba(15,23,42,0.4)', padding: '10px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.04)' }}>
-                    <div><strong>User ID:</strong> {p.userId || p.user_id || p}</div>
-                    <div><strong>Điểm số:</strong> {p.score !== undefined ? p.score : 0} điểm</div>
-                    {p.eloChange !== undefined && (
-                      <div style={{ color: p.eloChange >= 0 ? '#34d399' : '#f87171' }}>
-                        <strong>Thay đổi ELO:</strong> {p.eloChange >= 0 ? `+${p.eloChange}` : p.eloChange}
-                      </div>
-                    )}
+                    <div><strong>Người chơi {index + 1}:</strong> {p.username || p.id}</div>
+                    <div><strong>ELO:</strong> {p.elo_rating ?? p.eloRating ?? '—'}</div>
                   </div>
                 ))}
+                {!selectedMatch.player1 && !selectedMatch.player2 && (
+                  <div style={{ color: '#64748b' }}>Player IDs: {selectedMatch.player1_id} vs {selectedMatch.player2_id}</div>
+                )}
               </div>
             </div>
 
             <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '12px', fontSize: '0.8rem', color: '#64748b' }}>
-              <div>Bắt đầu: {new Date(selectedMatch.createdAt || selectedMatch.created_at).toLocaleString()}</div>
-              {selectedMatch.updatedAt && <div>Kết thúc: {new Date(selectedMatch.updatedAt).toLocaleString()}</div>}
+              <div>Bắt đầu: {selectedMatch.started_at ? new Date(selectedMatch.started_at).toLocaleString() : '—'}</div>
+              {selectedMatch.ended_at && <div>Kết thúc: {new Date(selectedMatch.ended_at).toLocaleString()}</div>}
             </div>
           </div>
         ) : (
@@ -136,3 +134,5 @@ export const AdminMatchesTab: React.FC = () => {
     </div>
   );
 };
+
+

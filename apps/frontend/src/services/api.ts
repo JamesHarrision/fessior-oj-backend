@@ -2,8 +2,23 @@ import { API_ROUTES } from '@ocj/constants';
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:6868/api/v1';
 
+const getAccessToken = () => {
+  const legacyToken = localStorage.getItem('token');
+  if (legacyToken) return legacyToken;
+
+  const raw = localStorage.getItem('ocj_auth_v1');
+  if (!raw) return null;
+
+  try {
+    const parsed = JSON.parse(raw) as { state?: { accessToken?: string | null } };
+    return parsed?.state?.accessToken ?? null;
+  } catch {
+    return null;
+  }
+};
+
 const getHeaders = () => {
-  const token = localStorage.getItem('token');
+  const token = getAccessToken();
   return {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),

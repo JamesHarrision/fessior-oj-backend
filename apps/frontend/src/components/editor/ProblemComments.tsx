@@ -35,7 +35,7 @@ export const ProblemComments: React.FC<ProblemCommentsProps> = ({ problemId }) =
     if (!newComment.trim() || loading) return;
     setLoading(true);
     try {
-      const res = await api.createComment({ problemId, content: newComment });
+      const res = await api.createComment({ targetId: problemId, targetType: 'PROBLEM', content: newComment });
       if (res.success) {
         setNewComment('');
         fetchComments();

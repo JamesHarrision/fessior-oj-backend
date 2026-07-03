@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { UserCheck, UserX, UserPlus, Users, MessageSquare } from 'lucide-react';
+import { UserCheck, UserX, UserPlus, Users } from 'lucide-react';
 import { api } from '../../services/api';
 
 export const AdminFriendsTab: React.FC = () => {
@@ -178,3 +178,5 @@ export const AdminFriendsTab: React.FC = () => {
     </div>
   );
 };
+
+

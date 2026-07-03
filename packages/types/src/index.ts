@@ -49,6 +49,10 @@ export interface IUser {
   role: Role | 'USER' | 'ADMIN';
   elo_rating?: number;
   eloRating?: number;
+  streak_count?: number;
+  streakCount?: number;
+  max_streak?: number;
+  maxStreak?: number;
   avatar_url?: string;
   avatarUrl?: string;
 }

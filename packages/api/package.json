@@ -1,5 +1,5 @@
 {
-  "name": "@ocj/types",
+  "name": "@ocj/api",
   "version": "1.0.0",
   "main": "src/index.ts",
   "types": "src/index.ts",
@@ -9,7 +9,11 @@
     "dev": "tsc -w"
   },
   "devDependencies": {
-    "typescript": "^5.0.0",
-    "@ocj/tsconfig": "*"
+    "@ocj/tsconfig": "*",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@ocj/constants": "^1.0.0",
+    "@ocj/types": "^1.0.0"
   }
 }

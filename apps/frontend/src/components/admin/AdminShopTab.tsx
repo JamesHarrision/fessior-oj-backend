@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ShoppingBag, Plus, Eye, ShoppingCart, Award } from 'lucide-react';
+import { ShoppingBag, Plus, ShoppingCart } from 'lucide-react';
 import { api } from '../../services/api';
 
 export const AdminShopTab: React.FC = () => {
@@ -227,3 +227,5 @@ export const AdminShopTab: React.FC = () => {
     </div>
   );
 };
+
+

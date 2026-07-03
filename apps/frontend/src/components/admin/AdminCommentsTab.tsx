@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { MessageSquare, Trash2, Heart, Plus, Edit2 } from 'lucide-react';
+import { Trash2, Heart, Plus, Edit2 } from 'lucide-react';
 import { api } from '../../services/api';
 import type { IProblem } from '@ocj/types';
 
@@ -216,3 +216,4 @@ export const AdminCommentsTab: React.FC = () => {
     </div>
   );
 };
+

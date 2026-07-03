@@ -11,15 +11,26 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@ant-design/icons": "^6.3.2",
     "@monaco-editor/react": "^4.7.0",
-    "@ocj/types": "^1.0.0",
+    "@ocj/api": "^1.0.0",
     "@ocj/constants": "^1.0.0",
-    "@ocj/validators": "^1.0.0",
+    "@ocj/types": "^1.0.0",
+    "@ocj/ui": "^1.0.0",
     "@ocj/utils": "^1.0.0",
+    "@ocj/validators": "^1.0.0",
+    "@tailwindcss/postcss": "^4.3.2",
+    "@tanstack/react-query": "^5.101.2",
+    "antd": "^6.5.0",
+    "autoprefixer": "^10.5.2",
     "lucide-react": "^1.17.0",
+    "postcss": "^8.5.16",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
-    "socket.io-client": "^4.8.3"
+    "react-router-dom": "^7.18.1",
+    "socket.io-client": "^4.8.3",
+    "tailwindcss": "^4.3.2",
+    "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, X, Edit, Calendar, Trophy, Users, BookOpen } from 'lucide-react';
+import { Plus, X, Edit, Calendar, Trophy, BookOpen } from 'lucide-react';
 import { api } from '../../services/api';
 import type { IContest, IProblem } from '@ocj/types';
 import './AdminProblemsTab.css'; // Reuse form/modal styles
@@ -372,3 +372,4 @@ export const AdminContestsTab: React.FC<AdminContestsTabProps> = ({
     </>
   );
 };
+

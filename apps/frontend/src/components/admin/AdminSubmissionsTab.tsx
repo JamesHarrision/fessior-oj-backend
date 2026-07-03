@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Play, Eye, FileCode, CheckCircle, AlertTriangle, Cpu } from 'lucide-react';
+import { Play, Eye, FileCode, AlertTriangle } from 'lucide-react';
 import { api } from '../../services/api';
 import type { ISubmission, IProblem } from '@ocj/types';
 
@@ -106,7 +106,7 @@ export const AdminSubmissionsTab: React.FC = () => {
                 <div key={subId || idx} className="prob-item-row">
                   <div className="prob-item-details">
                     <span className="prob-item-title">
-                      ID: {subId?.slice(-8)} (Bài: {sub.problemId?.title || 'Đang tải'})
+                      ID: {subId?.slice(-8)} (Bài: {typeof sub.problemId === 'string' ? sub.problemId.slice(-6) : 'Đang tải'})
                     </span>
                     <div className="prob-item-meta">
                       <span className="diff-pill" style={{ background: 'rgba(255,255,255,0.03)', color: getStatusColor(sub.status) }}>
@@ -116,12 +116,12 @@ export const AdminSubmissionsTab: React.FC = () => {
                         {sub.language?.toUpperCase()}
                       </span>
                       <span className="prob-tag-pill" style={{ fontSize: '0.7rem' }}>
-                        {new Date(sub.createdAt).toLocaleTimeString()}
+                        {sub.createdAt ? new Date(sub.createdAt).toLocaleTimeString() : ''}
                       </span>
                     </div>
                   </div>
 
-                  <button onClick={() => handleInspect(subId)} className="btn-action-icon edit" title="Xem chi tiết & Code">
+                  <button onClick={() => handleInspect(subId!)} className="btn-action-icon edit" title="Xem chi tiết & Code">
                     <Eye size={14} />
                   </button>
                 </div>
@@ -158,11 +158,11 @@ export const AdminSubmissionsTab: React.FC = () => {
                 />
               </div>
 
-              {selectedSub.error && (
+              {selectedSub.errorMessage && (
                 <div className="prob-form-group">
                   <label>Thông báo lỗi (Compilation/Runtime Error)</label>
                   <pre style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#f87171', padding: '10px', borderRadius: '6px', fontSize: '0.78rem', whiteSpace: 'pre-wrap' }}>
-                    {selectedSub.error}
+                    {selectedSub.errorMessage}
                   </pre>
                 </div>
               )}

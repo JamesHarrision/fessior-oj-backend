@@ -44,7 +44,7 @@ export const ProblemDescription: React.FC<ProblemProps> = ({ problem }) => {
     e.preventDefault();
     if (!newComment.trim() || !problemId) return;
     try {
-      const res = await api.createComment({ problemId, content: newComment });
+      const res = await api.createComment({ targetId: problemId, targetType: 'PROBLEM', content: newComment });
       if (res.success) {
         setNewComment('');
         loadComments();
