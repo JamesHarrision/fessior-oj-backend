@@ -301,6 +301,77 @@ Không dùng `Segmented` của Ant Design trên dark theme — thay bằng custo
 
 ---
 
+## 11. Landing Page Template (Auth)
+
+### Outer Wrapper
+
+```html
+<div class="relative min-h-screen w-full flex items-center justify-center p-4 lg:p-8 bg-black/90 overflow-hidden">
+  <DotGrid />
+  <div class="relative z-10 w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
+    <!-- LEFT: Hero -->
+    <!-- RIGHT: Form -->
+  </div>
+</div>
+```
+
+### Cột Trái (Hero)
+
+```html
+<div class="flex flex-col gap-6 justify-center">
+  <!-- Logo → Heading → Stats → Terminal → Trust Badges -->
+</div>
+```
+
+### Cột Phải (Form Card)
+
+```html
+<div class="w-full max-w-md mx-auto lg:mr-auto lg:ml-0">
+  <div class="bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl shadow-black/50 rounded-2xl p-8 lg:p-10">
+    <!-- MEMBER ACCESS → Mode Tabs → Form → Footer -->
+  </div>
+</div>
+```
+
+### Form Input Rules (Native HTML)
+
+| Element | Classes |
+|---------|---------|
+| `<form>` | `flex flex-col gap-5 mt-8` |
+| `<label>` | `block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider` |
+| `<input>` | `w-full bg-[#0B1120] border border-slate-700/60 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all` |
+| Submit `<button>` | `mt-2 w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex justify-center items-center gap-2` |
+
+### Mode Tabs
+
+```html
+<div class="flex bg-white/[0.04] rounded-lg p-1 mb-6 border border-white/[0.05]">
+  <!-- active: bg-emerald-500 text-white shadow-[0_2px_8px_rgba(16,185,129,0.3)] -->
+  <!-- inactive: text-surface-400 hover:text-surface-200 -->
+</div>
+```
+
+### Trust Badges (Footer cột trái)
+
+```html
+<div class="mt-8 flex flex-wrap gap-3">
+```
+
+### Card Depth Standard
+
+Tất cả card trên dark bg dùng chung:
+```
+border border-white/10 bg-white/5 backdrop-blur-md shadow-2xl shadow-black/40
+```
+
+### MEMBER ACCESS Label
+
+```html
+<div class="text-xs font-bold tracking-widest text-emerald-400">MEMBER ACCESS</div>
+```
+
+---
+
 ## 9. Trạng thái (States)
 
 Mọi page phải xử lý đủ 4 trạng thái:

@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Alert, Button, Form, Input } from 'antd';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Alert } from 'antd';
 import {
   ArrowRightOutlined,
   CheckCircleFilled,
@@ -143,7 +143,7 @@ const TECH_BADGES = ['Repository API', 'React Query', 'Zustand', 'Ant Design', '
 
 function TrustBadges() {
   return (
-    <div className="flex flex-wrap gap-2 pb-8 pl-8">
+    <div className="mt-8 flex flex-wrap gap-3">
       {TECH_BADGES.map((b) => (
         <span
           key={b}
@@ -165,6 +165,12 @@ export function AuthPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
+
+  const emailRef = useRef<HTMLInputElement>(null);
+
   const isAuthed = Boolean(token && user);
   const title = useMemo(
     () => (mode === 'login' ? 'Đăng nhập' : 'Tạo tài khoản'),
@@ -175,42 +181,55 @@ export function AuthPage() {
     if (isAuthed) navigate('/match', { replace: true });
   }, [isAuthed, navigate]);
 
-  const handleFinish = async (values: {
-    email: string;
-    password: string;
-    username?: string;
-  }) => {
+  useEffect(() => {
     setError(null);
-    setLoading(true);
-    try {
-      if (mode === 'login') {
-        await login(values.email, values.password);
-        navigate('/match', { replace: true });
-        return;
+    setEmail('');
+    setPassword('');
+    setUsername('');
+    emailRef.current?.focus();
+  }, [mode]);
+
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      setError(null);
+      setLoading(true);
+      try {
+        if (mode === 'login') {
+          if (!email.trim() || !password) {
+            setError('Vui lòng nhập email và mật khẩu.');
+            return;
+          }
+          await login(email.trim(), password);
+          navigate('/match', { replace: true });
+          return;
+        }
+
+        const trimmed = username.trim();
+        if (!validateUsername(trimmed)) {
+          setError('Tên hiển thị không hợp lệ (3-30 ký tự, chữ/số/_).');
+          return;
+        }
+        if (!validateEmail(email.trim())) {
+          setError('Email không hợp lệ.');
+          return;
+        }
+        const strength = checkPasswordStrength(password);
+        if (!strength.isStrong) {
+          setError(`Mật khẩu quá yếu: ${strength.feedback.join(' ')}`);
+          return;
+        }
+        await register(trimmed, email.trim(), password);
+        setMode('login');
+        setError('Đăng ký thành công. Hãy đăng nhập.');
+      } catch (e: unknown) {
+        setError(parseErrorMessage(e));
+      } finally {
+        setLoading(false);
       }
-      const username = values.username?.trim() ?? '';
-      if (!validateUsername(username)) {
-        setError('Tên hiển thị không hợp lệ (3-30 ký tự, chữ/số/_).');
-        return;
-      }
-      if (!validateEmail(values.email)) {
-        setError('Email không hợp lệ.');
-        return;
-      }
-      const strength = checkPasswordStrength(values.password);
-      if (!strength.isStrong) {
-        setError(`Mật khẩu quá yếu: ${strength.feedback.join(' ')}`);
-        return;
-      }
-      await register(username, values.email, values.password);
-      setMode('login');
-      setError('Đăng ký thành công. Hãy đăng nhập.');
-    } catch (e) {
-      setError(parseErrorMessage(e));
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [mode, email, password, username, login, register, navigate],
+  );
 
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center p-4 lg:p-8 bg-black/90 overflow-hidden">
@@ -262,7 +281,7 @@ export function AuthPage() {
 
         {/* ═══════════════ RIGHT COLUMN: AUTH FORM ═══════════════ */}
         <div className="w-full max-w-md mx-auto lg:mr-auto lg:ml-0 animate-scale-in stagger-3">
-          <div className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl shadow-black/50 rounded-2xl p-6 lg:p-8">
+          <div className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl shadow-black/50 rounded-2xl p-8 lg:p-10">
 
             <div className="mb-6">
               <div className="mb-3 text-xs font-bold tracking-widest text-emerald-400">
@@ -286,10 +305,7 @@ export function AuthPage() {
                 <button
                   key={v}
                   type="button"
-                  onClick={() => {
-                    setMode(v);
-                    setError(null);
-                  }}
+                  onClick={() => setMode(v)}
                   className={`flex-1 py-2 text-[13px] font-medium rounded-md transition-all duration-200 cursor-pointer
                     ${mode === v
                       ? 'bg-emerald-500 text-white shadow-[0_2px_8px_rgba(16,185,129,0.3)]'
@@ -310,75 +326,70 @@ export function AuthPage() {
               />
             )}
 
-            <Form
-              className="ocj-auth-form"
-              layout="vertical"
-              onFinish={handleFinish}
-              requiredMark={false}
-              size="large"
-            >
+            <form className="flex flex-col gap-5 mt-8" onSubmit={handleSubmit} noValidate>
               {mode === 'register' && (
-                <Form.Item
-                  label={
-                    <span className="text-surface-400 text-[11px] font-semibold uppercase tracking-wider">
-                      Username
-                    </span>
-                  }
-                  name="username"
-                  rules={[{ required: true, message: 'Nhập tên hiển thị' }]}
-                >
-                  <Input
+                <div>
+                  <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                    Username
+                  </label>
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     placeholder="luffy_gear5"
                     autoComplete="nickname"
-                    className="!h-[44px] !rounded-lg"
+                    required
+                    className="w-full bg-[#0B1120] border border-slate-700/60 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
                   />
-                </Form.Item>
+                </div>
               )}
 
-              <Form.Item
-                label={
-                  <span className="text-surface-400 text-[11px] font-semibold uppercase tracking-wider">
-                    Email
-                  </span>
-                }
-                name="email"
-                rules={[{ required: true, message: 'Nhập email' }]}
-              >
-                <Input
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                  Email
+                </label>
+                <input
+                  ref={emailRef}
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
                   autoComplete="email"
-                  className="!h-[44px] !rounded-lg"
+                  required
+                  className="w-full bg-[#0B1120] border border-slate-700/60 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
                 />
-              </Form.Item>
+              </div>
 
-              <Form.Item
-                label={
-                  <span className="text-surface-400 text-[11px] font-semibold uppercase tracking-wider">
-                    Password
-                  </span>
-                }
-                name="password"
-                rules={[{ required: true, message: 'Nhập mật khẩu' }]}
-              >
-                <Input.Password
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wider">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-                  className="!h-[44px] !rounded-lg"
+                  required
+                  className="w-full bg-[#0B1120] border border-slate-700/60 rounded-lg px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
                 />
-              </Form.Item>
+              </div>
 
-              <Button
-                htmlType="submit"
-                type="primary"
-                size="large"
-                loading={loading}
-                block
-                icon={<ArrowRightOutlined />}
-                className="!h-[44px] !rounded-lg !text-[14px] !font-semibold mt-2 !bg-emerald-500 hover:!bg-emerald-600 !border-emerald-500 shadow-[0_4px_14px_rgba(16,185,129,0.25)] hover:shadow-[0_6px_20px_rgba(16,185,129,0.35)] transition-all duration-200"
+              <button
+                type="submit"
+                disabled={loading}
+                className="mt-2 w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {mode === 'login' ? 'Vào đấu trường' : 'Tạo tài khoản'}
-              </Button>
-            </Form>
+                {loading ? (
+                  <span>Đang xử lý...</span>
+                ) : (
+                  <>
+                    {mode === 'login' ? 'Vào đấu trường' : 'Tạo tài khoản'}
+                    <ArrowRightOutlined />
+                  </>
+                )}
+              </button>
+            </form>
 
             <div className="mt-5 rounded-lg border border-white/[0.04] bg-white/[0.015] p-3 text-[11px] leading-5 text-surface-500 text-center">
               Backend:{' '}
