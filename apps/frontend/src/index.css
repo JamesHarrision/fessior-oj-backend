@@ -341,3 +341,13 @@ code, pre, kbd {
 .ant-menu-item-selected {
   border-radius: 8px !important;
 }
+
+/* OCJ Auth Form — Label override */
+.ocj-auth-form .ant-form-item-label > label {
+  color: #94a3b8 !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-bottom: 0.5rem !important;
+}

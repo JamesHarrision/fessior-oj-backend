@@ -280,7 +280,8 @@ export function AuthPage() {
               </p>
             </div>
 
-            <div className="flex bg-white/[0.04] rounded-lg p-1 mb-6 border border-white/[0.05]">
+            <div className="mt-6 mb-8">
+              <div className="flex bg-white/[0.04] rounded-lg p-1 border border-white/[0.05]">
               {(['login', 'register'] as AuthMode[]).map((v) => (
                 <button
                   key={v}
@@ -298,6 +299,7 @@ export function AuthPage() {
                   {v === 'login' ? 'Login' : 'Register'}
                 </button>
               ))}
+              </div>
             </div>
 
             {error && (
@@ -314,61 +316,49 @@ export function AuthPage() {
               onFinish={handleFinish}
               requiredMark={false}
               size="large"
-              className="mt-8"
+              className="flex flex-col gap-6"
             >
               {mode === 'register' && (
                 <Form.Item
-                  label={
-                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                      Username
-                    </span>
-                  }
+                  label="Username"
                   name="username"
                   rules={[{ required: true, message: 'Nhập tên hiển thị' }]}
-                  className="mb-5"
+                  className="!mb-0"
                 >
                   <Input
                     placeholder="luffy_gear5"
                     autoComplete="nickname"
-                    className="!bg-[#0B1120] !border-slate-700/60 hover:!border-emerald-500 focus:!border-emerald-500 !text-slate-200 !py-2.5 !px-4 !rounded-lg !shadow-none [&_input]:!bg-[#0B1120] [&_input]:!text-slate-200"
+                    className="!bg-[#0f172a] !border-slate-700 hover:!border-emerald-500 focus:!border-emerald-500 !text-slate-200 !px-4 !py-3 rounded-lg !shadow-none"
                   />
                 </Form.Item>
               )}
 
               <Form.Item
-                label={
-                  <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                    Email
-                  </span>
-                }
+                label="Email"
                 name="email"
                 rules={[
                   { required: true, message: 'Nhập email' },
                   { type: 'email', message: 'Email không hợp lệ' },
                 ]}
-                className="mb-5"
+                className="!mb-0"
               >
                 <Input
                   placeholder="you@example.com"
                   autoComplete="email"
-                  className="!bg-[#0B1120] !border-slate-700/60 hover:!border-emerald-500 focus:!border-emerald-500 !text-slate-200 !py-2.5 !px-4 !rounded-lg !shadow-none [&_input]:!bg-[#0B1120] [&_input]:!text-slate-200"
+                  className="!bg-[#0f172a] !border-slate-700 hover:!border-emerald-500 focus:!border-emerald-500 !text-slate-200 !px-4 !py-3 rounded-lg !shadow-none"
                 />
               </Form.Item>
 
               <Form.Item
-                label={
-                  <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                    Password
-                  </span>
-                }
+                label="Password"
                 name="password"
                 rules={[{ required: true, message: 'Nhập mật khẩu' }]}
-                className="mb-5"
+                className="!mb-0"
               >
                 <Input.Password
                   placeholder="••••••••"
                   autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-                  className="!bg-[#0B1120] !border-slate-700/60 hover:!border-emerald-500 focus:!border-emerald-500 !text-slate-200 !py-2.5 !px-4 !rounded-lg !shadow-none [&_input]:!bg-[#0B1120] [&_input]:!text-slate-200 [&_.anticon]:!text-slate-400"
+                  className="!bg-[#0f172a] !border-slate-700 hover:!border-emerald-500 focus:!border-emerald-500 !text-slate-200 !px-4 !py-3 rounded-lg !shadow-none [&_.ant-input-suffix]:!text-slate-400"
                 />
               </Form.Item>
 
@@ -378,7 +368,7 @@ export function AuthPage() {
                   loading={loading}
                   block
                   icon={<ArrowRightOutlined />}
-                  className="!w-full !bg-emerald-500 hover:!bg-emerald-600 !text-white !font-semibold !h-12 !rounded-lg !border-none !mt-2 !flex !justify-center !items-center !gap-2 !text-[14px]"
+                  className="w-full !bg-emerald-500 hover:!bg-emerald-600 !text-white font-semibold !h-12 rounded-lg !border-none mt-4 flex justify-center items-center gap-2"
                 >
                   {mode === 'login' ? 'Vào đấu trường' : 'Tạo tài khoản'}
                 </Button>
