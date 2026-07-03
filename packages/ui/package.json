@@ -5,8 +5,7 @@
   "types": "src/index.ts",
   "private": true,
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc -w"
+    "build": "tsc"
   },
   "devDependencies": {
     "@ocj/tsconfig": "*",
@@ -15,10 +14,9 @@
     "typescript": "^5.0.0"
   },
   "peerDependencies": {
+    "antd": "^6.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
-  "dependencies": {
-    "antd": "^5.27.4"
-  }
+  "dependencies": {}
 }
