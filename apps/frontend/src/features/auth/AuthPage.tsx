@@ -223,14 +223,13 @@ export function AuthPage() {
 
           <div className="stagger-1 animate-fade-in-up">
             <AppLogo />
-          </div>
-
-          <div className="stagger-2 animate-fade-in-up space-y-5">
-            <div className="inline-flex items-center gap-1.5 rounded-md border border-emerald-500/15 bg-emerald-500/[0.05] px-3 py-1 text-[11px] font-semibold text-emerald-300/80">
+            <div className="mt-4 inline-flex items-center gap-1.5 rounded-md border border-emerald-500/15 bg-emerald-500/[0.05] px-3 py-1 text-[11px] font-semibold text-emerald-300/80">
               <ThunderboltFilled className="text-emerald-400/70 text-xs" />
               Realtime PvP Coding Arena
             </div>
+          </div>
 
+          <div className="stagger-2 animate-fade-in-up space-y-5">
             <h1
               className="text-[40px] sm:text-[48px] lg:text-[54px] font-bold leading-[1.1] tracking-[-0.025em] text-slate-50"
               style={{ fontFamily: "'Clash Display', sans-serif" }}
