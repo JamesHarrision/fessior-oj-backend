@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes, useNavigate, useParams } from 'react-router-dom';
+import type { IMatch, IProblem } from '@ocj/types';
 import { ProtectedRoute } from './ProtectedRoute';
 import { AppShellLayout } from '../layouts/AppShellLayout';
 import { AuthPage } from '../../features/auth/AuthPage';
@@ -14,84 +15,127 @@ import { ProblemsView } from '../../views/ProblemsView';
 import { SubmissionsView } from '../../views/SubmissionsView';
 import { CustomRoomsView } from '../../views/CustomRoomsView';
 import { AdminDashboard } from '../../views/AdminDashboard';
-import { useState } from 'react';
-import type { IMatch } from '@ocj/types';
+import { FriendsView } from '../../views/FriendsView';
+import { useMatchStore } from '../../stores/match.store';
 
-function MatchRoute(props: { onStartMatch: (m: IMatch) => void }) {
-  const navigate = useNavigate();
+/* =====================================================
+   Route Wrappers — bridge legacy views to Zustand stores
+   ===================================================== */
+
+function MatchRouteWrapper() {
+  const nav = useNavigate();
+  const setActiveMatch = useMatchStore((s) => s.setActiveMatch);
+  const setSelectedProblem = useMatchStore((s) => s.setSelectedProblem);
+
   return (
     <MatchFindingView
       onStartMatch={(m) => {
-        props.onStartMatch(m as unknown as IMatch);
-        navigate('/editor');
+        setActiveMatch(m as unknown as IMatch);
+        setSelectedProblem(null);
+        nav('/editor');
       }}
     />
   );
 }
 
-function ProblemsRoute(props: { onSelectProblem: (slug: string) => void }) {
-  const navigate = useNavigate();
+function EditorRouteWrapper() {
+  const activeMatch = useMatchStore((s) => s.activeMatch);
+  const selectedProblem = useMatchStore((s) => s.selectedProblem);
+
+  return (
+    <SoloEditorView
+      activeMatch={activeMatch ?? undefined}
+      problemSlug={selectedProblem?.slug ?? null}
+    />
+  );
+}
+
+function ProblemsRouteWrapper() {
+  const nav = useNavigate();
+  const setSelectedProblem = useMatchStore((s) => s.setSelectedProblem);
+
   return (
     <ProblemsView
       onSelectProblem={(slug) => {
-        props.onSelectProblem(slug);
-        navigate('/editor');
+        setSelectedProblem({ slug } as unknown as IProblem);
+        nav('/editor');
       }}
     />
   );
 }
 
-function CustomRoomsRoute(props: { onStartCustomMatch: (matchId: string, problemId: string) => void }) {
-  const navigate = useNavigate();
+function CustomRoomsRouteWrapper() {
+  const nav = useNavigate();
+  const setActiveMatch = useMatchStore((s) => s.setActiveMatch);
+
   return (
     <CustomRoomsView
       onStartCustomMatch={(matchId, problemId) => {
-        props.onStartCustomMatch(matchId, problemId);
-        navigate('/editor');
+        setActiveMatch({ id: matchId, problem_id: problemId } as unknown as IMatch);
+        nav('/editor');
       }}
     />
   );
 }
 
-function AdminRoute() {
-  const navigate = useNavigate();
+function AdminRouteWrapper() {
+  const nav = useNavigate();
   const params = useParams<{ subview?: string }>();
   const currentSubView = `admin/${params.subview ?? 'problems'}`;
-  return <AdminDashboard currentSubView={currentSubView} onViewChange={(view) => navigate(`/${view}`)} />;
+
+  return (
+    <AdminDashboard
+      currentSubView={currentSubView}
+      onViewChange={(view) => nav(`/${view}`)}
+    />
+  );
 }
 
-export function AppRouter() {
-  const [activeMatch, setActiveMatch] = useState<IMatch | undefined>(undefined);
-  const [selectedProblemSlug, setSelectedProblemSlug] = useState<string | null>(null);
+/* =====================================================
+   AppRouter — main application router
+   ===================================================== */
 
+export function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* ── Public ── */}
         <Route path="/auth" element={<AuthPage />} />
-        <Route element={<ProtectedRoute><AppShellLayout /></ProtectedRoute>}>
+
+        {/* ── Protected App Shell ── */}
+        <Route
+          element={
+            <ProtectedRoute>
+              <AppShellLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route path="/" element={<Navigate to="/match" replace />} />
-          <Route
-            path="/match"
-            element={
-              <MatchRoute
-                onStartMatch={(m) => {
-                  setActiveMatch(m);
-                  setSelectedProblemSlug(null);
-                }}
-              />
-            }
-          />
-          <Route path="/editor" element={<SoloEditorView activeMatch={activeMatch} problemSlug={selectedProblemSlug} />} />
-          <Route path="/ranking" element={<RankingView />} />
-          <Route path="/shop" element={<ShopView />} />
+
+          {/* ── Match & Editor ── */}
+          <Route path="/match" element={<MatchRouteWrapper />} />
+          <Route path="/editor" element={<EditorRouteWrapper />} />
+
+          {/* ── Problems ── */}
+          <Route path="/problems" element={<ProblemsRouteWrapper />} />
+
+          {/* ── Competitions ── */}
           <Route path="/contest" element={<ContestView />} />
-          <Route path="/settings" element={<SettingsView />} />
-          <Route path="/ai" element={<AIView />} />
-          <Route path="/tester" element={<ApiTesterView />} />
-          <Route path="/problems" element={<ProblemsRoute onSelectProblem={(slug) => setSelectedProblemSlug(slug)} />} />
+          <Route path="/ranking" element={<RankingView />} />
+          <Route path="/custom-rooms" element={<CustomRoomsRouteWrapper />} />
+
+          {/* ── Community ── */}
           <Route path="/submissions" element={<SubmissionsView />} />
-          <Route path="/custom-rooms" element={<CustomRoomsRoute onStartCustomMatch={(matchId, problemId) => setActiveMatch({ id: matchId, problem_id: problemId } as unknown as IMatch)} />} />
-          <Route path="/admin/:subview" element={<AdminRoute />} />
+          <Route path="/friends" element={<FriendsView />} />
+
+          {/* ── Tools ── */}
+          <Route path="/shop" element={<ShopView />} />
+          <Route path="/ai" element={<AIView />} />
+          <Route path="/settings" element={<SettingsView />} />
+          <Route path="/tester" element={<ApiTesterView />} />
+
+          {/* ── Admin ── */}
+          <Route path="/admin/:subview" element={<AdminRouteWrapper />} />
           <Route path="/admin" element={<Navigate to="/admin/problems" replace />} />
         </Route>
       </Routes>

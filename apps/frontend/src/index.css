@@ -1,55 +1,114 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=clash-display@200,300,400,500,600,700&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-:root {
-  /* Dark Premium Palette (Figma inspired) */
-  --bg-main: #0b0a0e;
-  --bg-card: rgba(18, 16, 26, 0.7);
-  --bg-sidebar: #12101a;
-  --bg-navbar: rgba(18, 16, 26, 0.85);
-  
-  --border-primary: rgba(255, 255, 255, 0.08);
-  --border-active: rgba(168, 85, 247, 0.4);
-  
-  --text-primary: #f3f4f6;
-  --text-secondary: #9ca3af;
-  --text-muted: #6b7280;
-  
-  --color-purple: #a855f7;
-  --color-purple-glow: rgba(168, 85, 247, 0.25);
-  --color-orange: #f97316;
-  --color-green: #22c55e;
-  --color-red: #ef4444;
-  
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --font-heading: 'Outfit', sans-serif;
-  --font-mono: 'Fira Code', monospace;
-  
-  --shadow-premium: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 15px rgba(168, 85, 247, 0.3);
+@source "./**/*.{ts,tsx,html}";
+@source "../../../packages/ui/src/**/*.{ts,tsx}";
+
+/* ============================================
+   OCJ Design System — Navy / Slate / Emerald / Amber
+   ============================================ */
+
+@theme {
+  /* ── Typography ── */
+  --font-display: 'Clash Display', system-ui, sans-serif;
+  --font-body: 'Satoshi', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* ── Primary: Dark Navy ── */
+  --color-navy-950: #020617;
+  --color-navy-900: #0A0F1F;
+  --color-navy-850: #0F172A;
+  --color-navy-800: #16233D;
+  --color-navy-750: #1E293B;
+  --color-navy-700: #2D3A54;
+  --color-navy-600: #45597D;
+
+  /* ── Surface: Slate ── */
+  --color-surface-50:  #F8FAFC;
+  --color-surface-100: #F1F5F9;
+  --color-surface-200: #E2E8F0;
+  --color-surface-300: #CBD5E1;
+  --color-surface-400: #94A3B8;
+  --color-surface-500: #64748B;
+  --color-surface-600: #475569;
+
+  /* ── Accent: Emerald ── */
+  --color-emerald-400: #34D399;
+  --color-emerald-500: #10B981;
+  --color-emerald-600: #059669;
+  --color-emerald-900: #064E3B;
+
+  /* ── Accent: Amber ── */
+  --color-amber-400: #FBBF24;
+  --color-amber-500: #F59E0B;
+  --color-amber-600: #D97706;
+
+  /* ── Accent: Danger ── */
+  --color-danger-400: #F87171;
+  --color-danger-500: #EF4444;
+  --color-danger-600: #DC2626;
+
+  /* ── Terminal (Live Judge Feed) ── */
+  --color-terminal: #0A0E14;
+  --color-terminal-text: #E5E7EB;
+
+  /* ── Glassmorphism ── */
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-blur: 12px;
+
+  /* ── Shadows ── */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-card-hover: 0 10px 25px rgba(0, 0, 0, 0.12);
+  --shadow-glow-emerald: 0 0 20px rgba(16, 185, 129, 0.25);
+  --shadow-glow-amber: 0 0 20px rgba(245, 158, 11, 0.25);
 }
 
-* {
+/* ============================================
+   Global Reset & Base
+   ============================================ */
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+html {
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
 }
 
 body {
-  font-family: var(--font-sans);
-  background-color: var(--bg-main);
-  color: var(--text-primary);
+  font-family: var(--font-body);
+  background-color: var(--color-surface-100);
+  color: var(--color-navy-850);
   min-height: 100vh;
   overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
+  line-height: 1.6;
 }
 
-/* Scrollbar Customization */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+code, pre, kbd {
+  font-family: var(--font-mono);
+}
+
+/* ============================================
+   Scrollbar
+   ============================================ */
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -58,37 +117,225 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--color-surface-300);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-surface-400);
+}
+
+/* Sidebar dark scrollbar */
+.ocj-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+}
+.ocj-sidebar::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* Animations */
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+/* ============================================
+   Animations
+   ============================================ */
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-@keyframes pulse-slow {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.03); }
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
-@keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 10px var(--color-purple-glow); }
-  50% { box-shadow: 0 0 25px rgba(168, 85, 247, 0.6); }
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
-.animate-spin-slow {
-  animation: spin-slow 15s linear infinite;
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.3); }
+  50%      { box-shadow: 0 0 0 12px rgba(16, 185, 129, 0); }
 }
 
-.animate-pulse-slow {
-  animation: pulse-slow 3s ease-in-out infinite;
+@keyframes pulse-glow-amber {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.3); }
+  50%      { box-shadow: 0 0 0 12px rgba(245, 158, 11, 0); }
 }
 
-.animate-glow-pulse {
-  animation: glow-pulse 2s infinite alternate;
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes terminal-cursor {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0; }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ============================================
+   Animation Utility Classes
+   ============================================ */
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out forwards;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.4s ease-out forwards;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite;
+}
+
+.animate-pulse-glow-amber {
+  animation: pulse-glow-amber 2s infinite;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out forwards;
+}
+
+/* Staggered children — add delay classes */
+.stagger-1  { animation-delay: 0.05s; }
+.stagger-2  { animation-delay: 0.10s; }
+.stagger-3  { animation-delay: 0.15s; }
+.stagger-4  { animation-delay: 0.20s; }
+.stagger-5  { animation-delay: 0.25s; }
+.stagger-6  { animation-delay: 0.30s; }
+.stagger-7  { animation-delay: 0.35s; }
+.stagger-8  { animation-delay: 0.40s; }
+
+/* ============================================
+   OCJ Auth Form Overrides
+   ============================================ */
+
+.ocj-auth-form input:-webkit-autofill,
+.ocj-auth-form input:-webkit-autofill:hover,
+.ocj-auth-form input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--color-surface-100);
+  caret-color: var(--color-surface-100);
+  box-shadow: 0 0 0 1000px #0F172A inset;
+  transition: background-color 9999s ease-out;
+}
+
+.ocj-auth-form .ant-input,
+.ocj-auth-form .ant-input-password {
+  background-color: #0F172A;
+  border-color: var(--color-navy-600);
+  color: var(--color-surface-100);
+}
+
+.ocj-auth-form .ant-input:hover,
+.ocj-auth-form .ant-input:focus,
+.ocj-auth-form .ant-input-password:hover,
+.ocj-auth-form .ant-input-password:focus {
+  border-color: var(--color-emerald-500);
+}
+
+/* ============================================
+   Terminal Theme (Live Judge Feed)
+   ============================================ */
+
+.terminal-window {
+  background-color: var(--color-terminal);
+  color: var(--color-terminal-text);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.7;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.terminal-window .terminal-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.terminal-window .terminal-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.terminal-window .terminal-dot.red   { background: #FF5F56; }
+.terminal-window .terminal-dot.yellow { background: #FFBD2E; }
+.terminal-window .terminal-dot.green  { background: #27C93F; }
+
+.terminal-window .terminal-body {
+  padding: 16px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.terminal-line {
+  opacity: 0;
+  animation: fade-in 0.15s ease-out forwards;
+}
+
+.terminal-cursor::after {
+  content: '▊';
+  animation: terminal-cursor 1s infinite;
+  color: var(--color-emerald-500);
+}
+
+/* ============================================
+   Glassmorphism Utility
+   ============================================ */
+
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+}
+
+/* ============================================
+   Ant Design Overrides
+   ============================================ */
+
+/* Make Ant Design buttons prettier */
+.ant-btn-primary {
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  transition: all 0.2s ease;
+}
+
+.ant-btn-primary:hover {
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.45);
+  transform: translateY(-1px);
+}
+
+.ant-menu-item-selected {
+  border-radius: 8px !important;
 }

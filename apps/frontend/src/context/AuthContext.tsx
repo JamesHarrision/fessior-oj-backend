@@ -108,19 +108,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, [accessToken, clearSession, setUser, user]);
 
-  const login = async (email: string, password: string) => {
+  const login = React.useCallback(async (email: string, password: string) => {
     const res = await authRepository.login({ email, password });
     setSession({ accessToken: res.accessToken, refreshToken: res.refreshToken, user: res.user });
-  };
+  }, [setSession]);
 
-  const register = async (username: string, email: string, password: string) => {
+  const register = React.useCallback(async (username: string, email: string, password: string) => {
     const res = await authRepository.register({ username, email, password });
     if (res.accessToken && res.refreshToken && res.user) {
       setSession({ accessToken: res.accessToken, refreshToken: res.refreshToken, user: res.user });
     }
-  };
+  }, [setSession]);
 
-  const logout = async () => {
+  const logout = React.useCallback(async () => {
     try {
       await authRepository.logout({ refreshToken });
     } catch {
@@ -128,16 +128,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       clearSession();
     }
-  };
+  }, [clearSession, refreshToken]);
 
-  const refreshProfile = async () => {
+  const refreshProfile = React.useCallback(async () => {
     try {
       const me = await authRepository.me();
       setUser(me);
     } catch {
       clearSession();
     }
-  };
+  }, [clearSession, setUser]);
 
   const value = useMemo<AuthContextType>(() => {
     return {
