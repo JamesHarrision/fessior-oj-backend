@@ -10,12 +10,14 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
+    "seed": "npm --workspace main-service run seed",
     "test": "turbo run test",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
+    "concurrently": "^10.0.3",
     "prettier": "^3.0.0",
-    "turbo": "latest",
+    "turbo": "2.0.0",
     "typescript": "^6.0.3"
   },
   "dependencies": {

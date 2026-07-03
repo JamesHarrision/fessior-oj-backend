@@ -17,6 +17,7 @@ Thu muc nay tong hop tai lieu ky thuat cho du an Online Code Judge (OCJ), duoc v
 | [realtime-and-matchmaking.md](realtime-and-matchmaking.md) | Socket.io events, matchmaking, custom room, Redis Pub/Sub. |
 | [auth-and-permissions.md](auth-and-permissions.md) | Authentication, refresh token, session revoke, role/permission. |
 | [development-setup.md](development-setup.md) | Huong dan chay local/dev. |
+| [hybrid-local-docker-setup.md](hybrid-local-docker-setup.md) | Huong dan hybrid: FE/main-service/worker-service chay local, MySQL/MongoDB/Redis/Judge0 chay Docker. |
 | [testing.md](testing.md) | Cau truc va cach chay test. |
 | [deployment.md](deployment.md) | Docker Compose, VPS scripts, env va cac luu y trien khai. |
 | [ai-agent-docs-rules.md](ai-agent-docs-rules.md) | Rule cho AI agent: moi thay doi repo phai sync docs. |

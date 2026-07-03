@@ -102,6 +102,26 @@ Prisma schema:
 apps/main-service/prisma/schema.prisma
 ```
 
+## Seed Data
+
+Sau khi da co `apps/main-service/.env` dung va database local da chay, co the seed du lieu mau tu root repo:
+
+```bash
+npm run seed
+```
+
+Lenh root nay se forward sang workspace `main-service` de chay file:
+
+```text
+apps/main-service/src/scripts/seed.ts
+```
+
+Luu y:
+
+- Script seed se xoa mot so data hien co trong MySQL va MongoDB truoc khi tao lai bo du lieu mau.
+- Nen chay `npm run db:push` trong `apps/main-service` truoc khi seed neu schema MySQL vua thay doi.
+- Chi dung cho local/dev, khong dung tren moi truong co data that.
+
 ## Run All Dev Services
 
 Chay tu root:
