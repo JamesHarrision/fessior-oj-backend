@@ -1,6 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Alert, Button, Form, Input } from 'antd';
-import { ArrowRightOutlined, CheckCircleFilled, FireFilled, ThunderboltFilled, TrophyFilled, UserOutlined } from '@ant-design/icons';
+import {
+  ArrowRightOutlined,
+  CheckCircleFilled,
+  FireFilled,
+  ThunderboltFilled,
+  TrophyFilled,
+  UserOutlined,
+} from '@ant-design/icons';
 import { AppLogo } from '@ocj/ui';
 import { validateEmail, validateUsername, checkPasswordStrength } from '@ocj/validators';
 import { parseErrorMessage } from '@ocj/utils';
@@ -9,9 +16,7 @@ import { useNavigate } from 'react-router-dom';
 
 type AuthMode = 'login' | 'register';
 
-/* ══════════════════════════════════════════════════════════
-   Dot Grid Background
-   ══════════════════════════════════════════════════════════ */
+/* ─── Dot Grid Background ─── */
 
 function DotGrid() {
   return (
@@ -19,19 +24,18 @@ function DotGrid() {
       <div
         className="absolute inset-0 opacity-[0.04]"
         style={{
-          backgroundImage: 'radial-gradient(circle, rgba(5,150,105,0.5) 1px, transparent 1px)',
+          backgroundImage:
+            'radial-gradient(circle, rgba(5,150,105,0.5) 1px, transparent 1px)',
           backgroundSize: '32px 32px',
         }}
       />
-      <div className="absolute -top-40 -left-32 w-[500px] h-[500px] rounded-full bg-emerald-900/15 blur-[130px]" />
-      <div className="absolute -bottom-40 -right-32 w-[500px] h-[500px] rounded-full bg-navy-700/20 blur-[130px]" />
+      <div className="absolute -top-40 -left-32 w-[500px] h-[500px] rounded-full bg-emerald-900/12 blur-[130px]" />
+      <div className="absolute -bottom-40 -right-32 w-[500px] h-[500px] rounded-full bg-navy-700/15 blur-[130px]" />
     </div>
   );
 }
 
-/* ══════════════════════════════════════════════════════════
-   Terminal Preview
-   ══════════════════════════════════════════════════════════ */
+/* ─── Terminal Preview ─── */
 
 function TerminalPreview() {
   const codePreviewHtml = [
@@ -54,16 +58,27 @@ function TerminalPreview() {
   ].join('\n');
 
   return (
-    <div className="terminal-window shadow-[0_16px_48px_rgba(0,0,0,0.4)] ring-1 ring-white/[0.06]">
-      <div className="terminal-header">
-        <span className="terminal-dot red" />
-        <span className="terminal-dot yellow" />
-        <span className="terminal-dot green" />
-        <span className="ml-3 text-xs text-surface-500" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+    <div
+      className="
+        overflow-hidden rounded-xl
+        border border-white/10 bg-white/5 backdrop-blur-md
+        shadow-2xl shadow-black/40
+      "
+    >
+      {/* Window chrome */}
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.06] bg-white/[0.02]">
+        <span className="h-2.5 w-2.5 rounded-full bg-red-400/80" />
+        <span className="h-2.5 w-2.5 rounded-full bg-amber-400/70" />
+        <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/70" />
+        <span
+          className="ml-3 text-xs text-surface-500"
+          style={{ fontFamily: "'JetBrains Mono', monospace" }}
+        >
           two-sum.cpp
         </span>
       </div>
 
+      {/* Code + Verdict */}
       <div className="grid grid-cols-[1fr_160px]">
         <div
           className="h-[156px] overflow-hidden p-4 text-[12px] leading-[1.65] text-slate-300"
@@ -77,11 +92,13 @@ function TerminalPreview() {
             <span className="text-[11px] font-semibold tracking-wide">Accepted</span>
           </div>
           <div className="space-y-2 text-[11px]">
-            {[
-              ['Runtime', '42 ms'],
-              ['Memory', '12.8 MB'],
-              ['Tests', '24 / 24'],
-            ].map(([label, val]) => (
+            {(
+              [
+                ['Runtime', '42 ms'],
+                ['Memory', '12.8 MB'],
+                ['Tests', '24 / 24'],
+              ] as const
+            ).map(([label, val]) => (
               <div key={label} className="flex justify-between">
                 <span className="text-surface-500">{label}</span>
                 <span className="text-slate-300 tabular-nums">{val}</span>
@@ -94,26 +111,30 @@ function TerminalPreview() {
   );
 }
 
-/* ══════════════════════════════════════════════════════════
-   Live Stats
-   ══════════════════════════════════════════════════════════ */
+/* ─── Live Stats ─── */
+
+type StatItem = { icon: React.ReactNode; label: string; value: string };
+
+const STATS: StatItem[] = [
+  { icon: <UserOutlined />, label: 'Active Coders', value: '1,482' },
+  { icon: <FireFilled />, label: 'Streak Record', value: '07 days' },
+  { icon: <TrophyFilled />, label: 'Global Rank', value: '#128' },
+];
 
 function LiveStats() {
-  const stats = [
-    { icon: <UserOutlined />, label: 'Active Coders', value: '1,482' },
-    { icon: <FireFilled />, label: 'Streak Record', value: '07 days' },
-    { icon: <TrophyFilled />, label: 'Global Rank', value: '#128' },
-  ];
-
   return (
     <div className="grid grid-cols-3 gap-3">
-      {stats.map((s) => (
+      {STATS.map((s) => (
         <div
           key={s.label}
-          className="rounded-xl border border-white/[0.06] bg-white/[0.025] px-4 py-3.5
-                     shadow-[0_2px_8px_rgba(0,0,0,0.15)]
-                     hover:bg-white/[0.04] hover:border-emerald-500/10 hover:shadow-[0_4px_16px_rgba(16,185,129,0.06)]
-                     transition-all duration-300"
+          className="
+            rounded-xl
+            border border-white/10 bg-white/5 backdrop-blur-md
+            shadow-2xl shadow-black/40
+            px-4 py-3.5
+            hover:bg-white/[0.07] hover:border-white/15
+            transition-all duration-300
+          "
         >
           <div className="flex items-center gap-1.5 text-surface-500 mb-1.5 text-[10px] uppercase tracking-[0.12em] font-semibold">
             <span className="text-emerald-500/60 text-xs">{s.icon}</span>
@@ -131,20 +152,24 @@ function LiveStats() {
   );
 }
 
-/* ══════════════════════════════════════════════════════════
-   Trust Badges
-   ══════════════════════════════════════════════════════════ */
+/* ─── Trust Badges ─── */
+
+const TECH_BADGES = ['Repository API', 'React Query', 'Zustand', 'Ant Design', 'Tailwind', 'Monaco'];
 
 function TrustBadges() {
-  const badges = ['Repository API', 'React Query', 'Zustand', 'Ant Design', 'Tailwind', 'Monaco'];
-
   return (
-    <div className="flex flex-wrap gap-2 pb-2">
-      {badges.map((b) => (
+    <div className="flex flex-wrap gap-2 pb-8 pl-8">
+      {TECH_BADGES.map((b) => (
         <span
           key={b}
-          className="rounded-md border border-white/[0.05] bg-white/[0.02] px-2.5 py-1 text-[10px] text-surface-500 font-medium tracking-wide
-                     hover:border-white/[0.1] hover:text-surface-300 transition-colors duration-300"
+          className="
+            rounded-md
+            border border-white/[0.05] bg-white/[0.02]
+            px-2.5 py-1
+            text-[10px] text-surface-500 font-medium tracking-wide
+            hover:border-white/[0.1] hover:text-surface-300
+            transition-colors duration-300
+          "
         >
           {b}
         </span>
@@ -153,9 +178,7 @@ function TrustBadges() {
   );
 }
 
-/* ══════════════════════════════════════════════════════════
-   AuthPage
-   ══════════════════════════════════════════════════════════ */
+/* ─── AuthPage ─── */
 
 export function AuthPage() {
   const navigate = useNavigate();
@@ -165,13 +188,20 @@ export function AuthPage() {
   const [loading, setLoading] = useState(false);
 
   const isAuthed = Boolean(token && user);
-  const title = useMemo(() => (mode === 'login' ? 'Đăng nhập' : 'Tạo tài khoản'), [mode]);
+  const title = useMemo(
+    () => (mode === 'login' ? 'Đăng nhập' : 'Tạo tài khoản'),
+    [mode],
+  );
 
   useEffect(() => {
     if (isAuthed) navigate('/match', { replace: true });
   }, [isAuthed, navigate]);
 
-  const handleFinish = async (values: { email: string; password: string; username?: string }) => {
+  const handleFinish = async (values: {
+    email: string;
+    password: string;
+    username?: string;
+  }) => {
     setError(null);
     setLoading(true);
     try {
@@ -209,8 +239,8 @@ export function AuthPage() {
       <DotGrid />
 
       {/* ─── Container ─── */}
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 sm:px-10 lg:px-14 py-16 sm:py-20">
-        <div className="grid lg:grid-cols-[1fr_380px] gap-14 items-start">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-8 py-16 sm:py-20">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
           {/* ═══════════════ LEFT: HERO ═══════════════ */}
           <div className="space-y-8 animate-slide-in-left">
@@ -228,7 +258,7 @@ export function AuthPage() {
               </div>
 
               <h1
-                className="text-[40px] sm:text-[48px] lg:text-[54px] font-bold leading-[1.12] tracking-[-0.025em] text-slate-50"
+                className="text-[40px] sm:text-[48px] lg:text-[54px] font-bold leading-[1.1] tracking-[-0.025em] text-slate-50"
                 style={{ fontFamily: "'Clash Display', sans-serif" }}
               >
                 Code.
@@ -238,7 +268,7 @@ export function AuthPage() {
                 <span className="text-emerald-300/90">Conquer.</span>
               </h1>
 
-              <p className="text-[14px] leading-relaxed text-surface-300 max-w-[440px]">
+              <p className="text-[14px] leading-relaxed text-slate-300 max-w-[440px]">
                 Vào lobby, nhận bài, chạy test, submit và xem verdict realtime. Nơi mọi coder đều có thể leo rank.
               </p>
             </div>
@@ -260,10 +290,14 @@ export function AuthPage() {
           </div>
 
           {/* ═══════════════ RIGHT: AUTH FORM ═══════════════ */}
-          <div className="animate-scale-in stagger-3 lg:sticky lg:top-20">
+          <div className="animate-scale-in stagger-3">
             <div
-              className="rounded-2xl border border-white/[0.07] bg-white/[0.03] backdrop-blur-xl
-                          shadow-[0_8px_32px_rgba(0,0,0,0.3)] p-7 sm:p-8"
+              className="
+                rounded-2xl
+                border border-white/10 bg-white/5 backdrop-blur-md
+                shadow-2xl shadow-black/40
+                p-7 sm:p-8
+              "
             >
               {/* Header */}
               <div className="mb-6">
@@ -283,7 +317,7 @@ export function AuthPage() {
                 </p>
               </div>
 
-              {/* Mode Tabs — custom pill buttons replacing Segmented */}
+              {/* Mode Tabs */}
               <div className="flex bg-white/[0.04] rounded-lg p-1 mb-6 border border-white/[0.05]">
                 {(['login', 'register'] as AuthMode[]).map((v) => (
                   <button
@@ -324,24 +358,44 @@ export function AuthPage() {
               >
                 {mode === 'register' && (
                   <Form.Item
-                    label={<span className="text-surface-400 text-[11px] font-semibold uppercase tracking-wider">Username</span>}
+                    label={
+                      <span className="text-surface-400 text-[11px] font-semibold uppercase tracking-wider">
+                        Username
+                      </span>
+                    }
                     name="username"
                     rules={[{ required: true, message: 'Nhập tên hiển thị' }]}
                   >
-                    <Input placeholder="luffy_gear5" autoComplete="nickname" className="!h-[44px] !rounded-lg" />
+                    <Input
+                      placeholder="luffy_gear5"
+                      autoComplete="nickname"
+                      className="!h-[44px] !rounded-lg"
+                    />
                   </Form.Item>
                 )}
 
                 <Form.Item
-                  label={<span className="text-surface-400 text-[11px] font-semibold uppercase tracking-wider">Email</span>}
+                  label={
+                    <span className="text-surface-400 text-[11px] font-semibold uppercase tracking-wider">
+                      Email
+                    </span>
+                  }
                   name="email"
                   rules={[{ required: true, message: 'Nhập email' }]}
                 >
-                  <Input placeholder="you@example.com" autoComplete="email" className="!h-[44px] !rounded-lg" />
+                  <Input
+                    placeholder="you@example.com"
+                    autoComplete="email"
+                    className="!h-[44px] !rounded-lg"
+                  />
                 </Form.Item>
 
                 <Form.Item
-                  label={<span className="text-surface-400 text-[11px] font-semibold uppercase tracking-wider">Password</span>}
+                  label={
+                    <span className="text-surface-400 text-[11px] font-semibold uppercase tracking-wider">
+                      Password
+                    </span>
+                  }
                   name="password"
                   rules={[{ required: true, message: 'Nhập mật khẩu' }]}
                 >
@@ -359,11 +413,13 @@ export function AuthPage() {
                   loading={loading}
                   block
                   icon={<ArrowRightOutlined />}
-                  className="!h-[44px] !rounded-lg !text-[14px] !font-semibold mt-2
-                             !bg-emerald-500 hover:!bg-emerald-400 !border-emerald-500
-                             shadow-[0_4px_14px_rgba(16,185,129,0.25)]
-                             hover:shadow-[0_6px_20px_rgba(16,185,129,0.35)]
-                             transition-all duration-200"
+                  className="
+                    !h-[44px] !rounded-lg !text-[14px] !font-semibold mt-2
+                    !bg-emerald-500 hover:!bg-emerald-400 !border-emerald-500
+                    shadow-[0_4px_14px_rgba(16,185,129,0.25)]
+                    hover:shadow-[0_6px_20px_rgba(16,185,129,0.35)]
+                    transition-all duration-200
+                  "
                 >
                   {mode === 'login' ? 'Vào đấu trường' : 'Tạo tài khoản'}
                 </Button>
@@ -372,7 +428,10 @@ export function AuthPage() {
               {/* Footer hint */}
               <div className="mt-5 rounded-lg border border-white/[0.04] bg-white/[0.015] p-3 text-[11px] leading-5 text-surface-500 text-center">
                 Backend:{' '}
-                <span className="text-surface-300" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                <span
+                  className="text-surface-300"
+                  style={{ fontFamily: "'JetBrains Mono', monospace" }}
+                >
                   localhost:6868
                 </span>
                 {' · '}
@@ -380,6 +439,7 @@ export function AuthPage() {
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>
