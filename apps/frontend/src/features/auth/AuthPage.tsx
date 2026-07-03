@@ -58,14 +58,7 @@ function TerminalPreview() {
   ].join('\n');
 
   return (
-    <div
-      className="
-        overflow-hidden rounded-xl
-        border border-white/10 bg-white/5 backdrop-blur-md
-        shadow-2xl shadow-black/40
-      "
-    >
-      {/* Window chrome */}
+    <div className="overflow-hidden rounded-xl border border-white/10 bg-white/5 backdrop-blur-md shadow-2xl shadow-black/40">
       <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.06] bg-white/[0.02]">
         <span className="h-2.5 w-2.5 rounded-full bg-red-400/80" />
         <span className="h-2.5 w-2.5 rounded-full bg-amber-400/70" />
@@ -78,7 +71,6 @@ function TerminalPreview() {
         </span>
       </div>
 
-      {/* Code + Verdict */}
       <div className="grid grid-cols-[1fr_160px]">
         <div
           className="h-[156px] overflow-hidden p-4 text-[12px] leading-[1.65] text-slate-300"
@@ -127,14 +119,7 @@ function LiveStats() {
       {STATS.map((s) => (
         <div
           key={s.label}
-          className="
-            rounded-xl
-            border border-white/10 bg-white/5 backdrop-blur-md
-            shadow-2xl shadow-black/40
-            px-4 py-3.5
-            hover:bg-white/[0.07] hover:border-white/15
-            transition-all duration-300
-          "
+          className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-md shadow-2xl shadow-black/40 px-4 py-3.5 hover:bg-white/[0.07] hover:border-white/15 transition-all duration-300"
         >
           <div className="flex items-center gap-1.5 text-surface-500 mb-1.5 text-[10px] uppercase tracking-[0.12em] font-semibold">
             <span className="text-emerald-500/60 text-xs">{s.icon}</span>
@@ -162,14 +147,7 @@ function TrustBadges() {
       {TECH_BADGES.map((b) => (
         <span
           key={b}
-          className="
-            rounded-md
-            border border-white/[0.05] bg-white/[0.02]
-            px-2.5 py-1
-            text-[10px] text-surface-500 font-medium tracking-wide
-            hover:border-white/[0.1] hover:text-surface-300
-            transition-colors duration-300
-          "
+          className="rounded-md border border-white/[0.05] bg-white/[0.02] px-2.5 py-1 text-[10px] text-surface-500 font-medium tracking-wide hover:border-white/[0.1] hover:text-surface-300 transition-colors duration-300"
         >
           {b}
         </span>
@@ -235,212 +213,187 @@ export function AuthPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-navy-900 flex items-center overflow-hidden">
+    <div className="relative min-h-screen w-full flex items-center justify-center p-4 lg:p-8 bg-black/90 overflow-hidden">
       <DotGrid />
 
-      {/* ─── Container ─── */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-8 py-16 sm:py-20">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <div className="relative z-10 w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
 
-          {/* ═══════════════ LEFT: HERO ═══════════════ */}
-          <div className="space-y-8 animate-slide-in-left">
-            {/* Logo */}
-            <div className="stagger-1 animate-fade-in-up">
-              <AppLogo />
+        {/* ═══════════════ LEFT COLUMN: HERO ═══════════════ */}
+        <div className="flex flex-col gap-6 justify-center animate-slide-in-left">
+
+          <div className="stagger-1 animate-fade-in-up">
+            <AppLogo />
+          </div>
+
+          <div className="stagger-2 animate-fade-in-up space-y-5">
+            <div className="inline-flex items-center gap-1.5 rounded-md border border-emerald-500/15 bg-emerald-500/[0.05] px-3 py-1 text-[11px] font-semibold text-emerald-300/80">
+              <ThunderboltFilled className="text-emerald-400/70 text-xs" />
+              Realtime PvP Coding Arena
             </div>
 
-            {/* Hero Copy */}
-            <div className="stagger-2 animate-fade-in-up max-w-[520px] space-y-5">
-              {/* Badge */}
-              <div className="inline-flex items-center gap-1.5 rounded-md border border-emerald-500/15 bg-emerald-500/[0.05] px-3 py-1 text-[11px] font-semibold text-emerald-300/80">
-                <ThunderboltFilled className="text-emerald-400/70 text-xs" />
-                Realtime PvP Coding Arena
-              </div>
+            <h1
+              className="text-[40px] sm:text-[48px] lg:text-[54px] font-bold leading-[1.1] tracking-[-0.025em] text-slate-50"
+              style={{ fontFamily: "'Clash Display', sans-serif" }}
+            >
+              Code.
+              <br />
+              Submit.
+              <br />
+              <span className="text-emerald-300/90">Conquer.</span>
+            </h1>
 
-              <h1
-                className="text-[40px] sm:text-[48px] lg:text-[54px] font-bold leading-[1.1] tracking-[-0.025em] text-slate-50"
+            <p className="text-[14px] leading-relaxed text-slate-300 max-w-[440px]">
+              Vào lobby, nhận bài, chạy test, submit và xem verdict realtime. Nơi mọi coder đều có thể leo rank.
+            </p>
+          </div>
+
+          <div className="stagger-3 animate-fade-in-up">
+            <LiveStats />
+          </div>
+
+          <div className="stagger-4 animate-fade-in-up">
+            <TerminalPreview />
+          </div>
+
+          <div className="stagger-5 animate-fade-in-up">
+            <TrustBadges />
+          </div>
+        </div>
+
+        {/* ═══════════════ RIGHT COLUMN: AUTH FORM ═══════════════ */}
+        <div className="w-full max-w-md mx-auto lg:mr-auto lg:ml-0 animate-scale-in stagger-3">
+          <div className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl shadow-black/50 rounded-2xl p-6 lg:p-8">
+
+            <div className="mb-6">
+              <div className="mb-3 text-xs font-bold tracking-widest text-emerald-400">
+                MEMBER ACCESS
+              </div>
+              <h2
+                className="text-[26px] font-semibold text-slate-100 mb-1.5"
                 style={{ fontFamily: "'Clash Display', sans-serif" }}
               >
-                Code.
-                <br />
-                Submit.
-                <br />
-                <span className="text-emerald-300/90">Conquer.</span>
-              </h1>
-
-              <p className="text-[14px] leading-relaxed text-slate-300 max-w-[440px]">
-                Vào lobby, nhận bài, chạy test, submit và xem verdict realtime. Nơi mọi coder đều có thể leo rank.
+                {title}
+              </h2>
+              <p className="text-[13px] text-surface-400 leading-relaxed">
+                {mode === 'login'
+                  ? 'Tiếp tục phiên luyện tập hoặc vào hàng chờ PvP.'
+                  : 'Tạo hồ sơ để lưu rank, submissions và inventory.'}
               </p>
             </div>
 
-            {/* Live Stats */}
-            <div className="stagger-3 animate-fade-in-up max-w-[480px]">
-              <LiveStats />
-            </div>
-
-            {/* Terminal Preview */}
-            <div className="stagger-4 animate-fade-in-up max-w-[580px]">
-              <TerminalPreview />
-            </div>
-
-            {/* Trust Badges */}
-            <div className="stagger-5 animate-fade-in-up pt-1">
-              <TrustBadges />
-            </div>
-          </div>
-
-          {/* ═══════════════ RIGHT: AUTH FORM ═══════════════ */}
-          <div className="animate-scale-in stagger-3">
-            <div
-              className="
-                rounded-2xl
-                border border-white/10 bg-white/5 backdrop-blur-md
-                shadow-2xl shadow-black/40
-                p-7 sm:p-8
-              "
-            >
-              {/* Header */}
-              <div className="mb-6">
-                <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.22em] text-emerald-400/60">
-                  Member Access
-                </div>
-                <h2
-                  className="text-[26px] font-semibold text-slate-100 mb-1.5"
-                  style={{ fontFamily: "'Clash Display', sans-serif" }}
+            <div className="flex bg-white/[0.04] rounded-lg p-1 mb-6 border border-white/[0.05]">
+              {(['login', 'register'] as AuthMode[]).map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => {
+                    setMode(v);
+                    setError(null);
+                  }}
+                  className={`flex-1 py-2 text-[13px] font-medium rounded-md transition-all duration-200 cursor-pointer
+                    ${mode === v
+                      ? 'bg-emerald-500 text-white shadow-[0_2px_8px_rgba(16,185,129,0.3)]'
+                      : 'text-surface-400 hover:text-surface-200'
+                    }`}
                 >
-                  {title}
-                </h2>
-                <p className="text-[13px] text-surface-400 leading-relaxed">
-                  {mode === 'login'
-                    ? 'Tiếp tục phiên luyện tập hoặc vào hàng chờ PvP.'
-                    : 'Tạo hồ sơ để lưu rank, submissions và inventory.'}
-                </p>
-              </div>
+                  {v === 'login' ? 'Login' : 'Register'}
+                </button>
+              ))}
+            </div>
 
-              {/* Mode Tabs */}
-              <div className="flex bg-white/[0.04] rounded-lg p-1 mb-6 border border-white/[0.05]">
-                {(['login', 'register'] as AuthMode[]).map((v) => (
-                  <button
-                    key={v}
-                    type="button"
-                    onClick={() => {
-                      setMode(v);
-                      setError(null);
-                    }}
-                    className={`flex-1 py-2 text-[13px] font-medium rounded-md transition-all duration-200 cursor-pointer
-                      ${mode === v
-                        ? 'bg-emerald-500 text-white shadow-[0_2px_8px_rgba(16,185,129,0.3)]'
-                        : 'text-surface-400 hover:text-surface-200'
-                      }`}
-                  >
-                    {v === 'login' ? 'Login' : 'Register'}
-                  </button>
-                ))}
-              </div>
+            {error && (
+              <Alert
+                type={error.includes('thành công') ? 'success' : 'error'}
+                message={error}
+                showIcon
+                className="mb-5 animate-fade-in"
+              />
+            )}
 
-              {/* Error / Success */}
-              {error && (
-                <Alert
-                  type={error.includes('thành công') ? 'success' : 'error'}
-                  message={error}
-                  showIcon
-                  className="mb-5 animate-fade-in"
-                />
-              )}
-
-              {/* Form */}
-              <Form
-                className="ocj-auth-form"
-                layout="vertical"
-                onFinish={handleFinish}
-                requiredMark={false}
-                size="large"
-              >
-                {mode === 'register' && (
-                  <Form.Item
-                    label={
-                      <span className="text-surface-400 text-[11px] font-semibold uppercase tracking-wider">
-                        Username
-                      </span>
-                    }
-                    name="username"
-                    rules={[{ required: true, message: 'Nhập tên hiển thị' }]}
-                  >
-                    <Input
-                      placeholder="luffy_gear5"
-                      autoComplete="nickname"
-                      className="!h-[44px] !rounded-lg"
-                    />
-                  </Form.Item>
-                )}
-
+            <Form
+              className="ocj-auth-form"
+              layout="vertical"
+              onFinish={handleFinish}
+              requiredMark={false}
+              size="large"
+            >
+              {mode === 'register' && (
                 <Form.Item
                   label={
                     <span className="text-surface-400 text-[11px] font-semibold uppercase tracking-wider">
-                      Email
+                      Username
                     </span>
                   }
-                  name="email"
-                  rules={[{ required: true, message: 'Nhập email' }]}
+                  name="username"
+                  rules={[{ required: true, message: 'Nhập tên hiển thị' }]}
                 >
                   <Input
-                    placeholder="you@example.com"
-                    autoComplete="email"
+                    placeholder="luffy_gear5"
+                    autoComplete="nickname"
                     className="!h-[44px] !rounded-lg"
                   />
                 </Form.Item>
+              )}
 
-                <Form.Item
-                  label={
-                    <span className="text-surface-400 text-[11px] font-semibold uppercase tracking-wider">
-                      Password
-                    </span>
-                  }
-                  name="password"
-                  rules={[{ required: true, message: 'Nhập mật khẩu' }]}
-                >
-                  <Input.Password
-                    placeholder="••••••••"
-                    autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-                    className="!h-[44px] !rounded-lg"
-                  />
-                </Form.Item>
+              <Form.Item
+                label={
+                  <span className="text-surface-400 text-[11px] font-semibold uppercase tracking-wider">
+                    Email
+                  </span>
+                }
+                name="email"
+                rules={[{ required: true, message: 'Nhập email' }]}
+              >
+                <Input
+                  placeholder="you@example.com"
+                  autoComplete="email"
+                  className="!h-[44px] !rounded-lg"
+                />
+              </Form.Item>
 
-                <Button
-                  htmlType="submit"
-                  type="primary"
-                  size="large"
-                  loading={loading}
-                  block
-                  icon={<ArrowRightOutlined />}
-                  className="
-                    !h-[44px] !rounded-lg !text-[14px] !font-semibold mt-2
-                    !bg-emerald-500 hover:!bg-emerald-400 !border-emerald-500
-                    shadow-[0_4px_14px_rgba(16,185,129,0.25)]
-                    hover:shadow-[0_6px_20px_rgba(16,185,129,0.35)]
-                    transition-all duration-200
-                  "
-                >
-                  {mode === 'login' ? 'Vào đấu trường' : 'Tạo tài khoản'}
-                </Button>
-              </Form>
+              <Form.Item
+                label={
+                  <span className="text-surface-400 text-[11px] font-semibold uppercase tracking-wider">
+                    Password
+                  </span>
+                }
+                name="password"
+                rules={[{ required: true, message: 'Nhập mật khẩu' }]}
+              >
+                <Input.Password
+                  placeholder="••••••••"
+                  autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                  className="!h-[44px] !rounded-lg"
+                />
+              </Form.Item>
 
-              {/* Footer hint */}
-              <div className="mt-5 rounded-lg border border-white/[0.04] bg-white/[0.015] p-3 text-[11px] leading-5 text-surface-500 text-center">
-                Backend:{' '}
-                <span
-                  className="text-surface-300"
-                  style={{ fontFamily: "'JetBrains Mono', monospace" }}
-                >
-                  localhost:6868
-                </span>
-                {' · '}
-                Seed admin để test
-              </div>
+              <Button
+                htmlType="submit"
+                type="primary"
+                size="large"
+                loading={loading}
+                block
+                icon={<ArrowRightOutlined />}
+                className="!h-[44px] !rounded-lg !text-[14px] !font-semibold mt-2 !bg-emerald-500 hover:!bg-emerald-600 !border-emerald-500 shadow-[0_4px_14px_rgba(16,185,129,0.25)] hover:shadow-[0_6px_20px_rgba(16,185,129,0.35)] transition-all duration-200"
+              >
+                {mode === 'login' ? 'Vào đấu trường' : 'Tạo tài khoản'}
+              </Button>
+            </Form>
+
+            <div className="mt-5 rounded-lg border border-white/[0.04] bg-white/[0.015] p-3 text-[11px] leading-5 text-surface-500 text-center">
+              Backend:{' '}
+              <span
+                className="text-surface-300"
+                style={{ fontFamily: "'JetBrains Mono', monospace" }}
+              >
+                localhost:6868
+              </span>
+              {' · '}
+              Seed admin để test
             </div>
           </div>
-
         </div>
+
       </div>
     </div>
   );
