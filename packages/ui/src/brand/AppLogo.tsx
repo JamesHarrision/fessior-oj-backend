@@ -1,17 +1,20 @@
 export function AppLogo(props: { variant?: 'full' | 'mark' }) {
   const variant = props.variant ?? 'full';
   return (
-    <div className="inline-flex items-center gap-2 select-none">
-      <div className="relative grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-fuchsia-500/95 via-violet-500/90 to-cyan-400/80 shadow-[0_10px_30px_rgba(139,92,246,0.35)]">
-        <div className="h-3 w-3 rounded-[6px] bg-slate-950/70 ring-1 ring-white/15" />
+    <div className="inline-flex items-center gap-2.5 select-none">
+      <div className="relative grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-400 shadow-[0_8px_32px_rgba(16,185,129,0.35)]">
+        <div className="h-3.5 w-3.5 rounded-[5px] bg-navy-900/80 ring-1 ring-white/20" />
       </div>
       {variant === 'full' && (
         <div className="flex flex-col leading-none">
-          <div className="text-[13px] font-semibold tracking-tight text-slate-50">QUEU</div>
-          <div className="text-[11px] tracking-wide text-slate-400">ARENA</div>
+          <div className="text-[16px] font-bold tracking-tight text-slate-50" style={{ fontFamily: "'Clash Display', sans-serif" }}>
+            QUEU
+          </div>
+          <div className="text-[11px] font-medium tracking-[0.2em] text-emerald-400/80 uppercase">
+            ARENA
+          </div>
         </div>
       )}
     </div>
   );
 }
-

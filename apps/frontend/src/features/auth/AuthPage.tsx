@@ -1,13 +1,162 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, Button, Form, Input, Segmented, Typography } from 'antd';
-import { ArrowRightOutlined, CheckCircleFilled, ThunderboltFilled } from '@ant-design/icons';
-import { FullPageCenter, AppLogo } from '@ocj/ui';
+import { Alert, Button, Form, Input, Segmented } from 'antd';
+import { ArrowRightOutlined, CheckCircleFilled, ThunderboltFilled, UserCheck, Flame, Trophy } from '@ant-design/icons';
+import { AppLogo } from '@ocj/ui';
 import { validateEmail, validateUsername, checkPasswordStrength } from '@ocj/validators';
 import { parseErrorMessage } from '@ocj/utils';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 type AuthMode = 'login' | 'register';
+
+/* ══════════════════════════════════════════════════════════
+   Dot Grid Background (CSS-only animated canvas)
+   ══════════════════════════════════════════════════════════ */
+
+function DotGrid() {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
+      <div
+        className="absolute inset-0 opacity-[0.06]"
+        style={{
+          backgroundImage: 'radial-gradient(circle, rgba(16,185,129,0.5) 1px, transparent 1px)',
+          backgroundSize: '32px 32px',
+        }}
+      />
+      {/* Animated glow orbs */}
+      <div className="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full bg-emerald-500/5 blur-[120px] animate-pulse-slow" />
+      <div className="absolute -bottom-60 -right-40 w-[700px] h-[700px] rounded-full bg-navy-600/20 blur-[140px]" />
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════
+   Terminal Preview — code snippet with verdict
+   ══════════════════════════════════════════════════════════ */
+
+function TerminalPreview() {
+  return (
+    <div className="relative overflow-hidden rounded-xl border border-white/[0.08] bg-[#060b14] shadow-[0_24px_80px_rgba(0,0,0,0.5)]">
+      {/* Window chrome */}
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.06] bg-white/[0.02]">
+        <span className="h-2.5 w-2.5 rounded-full bg-red-400/80" />
+        <span className="h-2.5 w-2.5 rounded-full bg-amber-400/70" />
+        <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/70" />
+        <span className="ml-3 text-xs text-surface-500" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+          two-sum.cpp
+        </span>
+      </div>
+
+      {/* Code + Verdict */}
+      <div className="grid grid-cols-[1fr_180px]">
+        <pre
+          className="h-[172px] overflow-hidden p-4 text-[12px] leading-[1.7] text-slate-300"
+          style={{ fontFamily: "'JetBrains Mono', monospace" }}
+        >
+          <span className="text-surface-500">{'// O(n) solution\n'}</span>
+          <span className="text-violet-300">{'int'}</span>{' '}
+          <span className="text-amber-300">{'solve'}</span>
+          <span>(</span>
+          <span className="text-violet-300">{'vector'}</span>
+          <span>{'<int>& a, '}</span>
+          <span className="text-violet-300">{'int'}</span>
+          <span>{' target)'}</span>
+          {' {'}
+          {'\n'}  <span className="text-violet-300">{'unordered_map'}</span>
+          <span>{'<int,int> seen;\n'}</span>
+          {'\n'}  <span className="text-cyan-300">{'for'}</span>
+          <span>{' (</span>
+          <span className="text-violet-300">{'int'}</span>
+          <span>{' i=0; i<a.size(); ++i) {'}</span>
+          {'\n'}    <span className="text-violet-300">{'int'}</span>
+          <span>{' need = target - a[i];\n'}</span>
+          <span className="text-surface-500">{'    // ...\n'}</span>
+          <span className="text-cyan-300">{'  return'}</span>
+          <span>{' i;\n'}</span>
+          {'  }\n'}
+          {'}\n'}
+          <span className="terminal-cursor" />
+        </pre>
+
+        {/* Verdict panel */}
+        <div className="border-l border-white/[0.06] bg-white/[0.025] p-4 flex flex-col justify-center">
+          <div className="flex items-center gap-2 mb-4 text-emerald-400">
+            <CheckCircleFilled />
+            <span className="text-sm font-semibold">Accepted</span>
+          </div>
+          <div className="space-y-2.5 text-xs">
+            {[
+              ['Runtime', '42 ms'],
+              ['Memory', '12.8 MB'],
+              ['Tests', '24 / 24'],
+            ].map(([label, val]) => (
+              <div key={label} className="flex justify-between">
+                <span className="text-surface-500">{label}</span>
+                <span className="text-slate-200 font-medium">{val}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════
+   Live Stats Strip
+   ══════════════════════════════════════════════════════════ */
+
+function LiveStats() {
+  const stats = [
+    { icon: <UserCheck />, label: 'Active Coders', value: '1,482' },
+    { icon: <Flame />, label: 'Streak Record', value: '07 days' },
+    { icon: <Trophy />, label: 'Rank', value: '#128' },
+  ];
+
+  return (
+    <div className="grid grid-cols-3 gap-3">
+      {stats.map((s) => (
+        <div
+          key={s.label}
+          className="rounded-xl border border-white/[0.07] bg-white/[0.03] backdrop-blur-sm px-4 py-3.5 hover:bg-white/[0.05] hover:border-emerald-500/20 transition-all duration-300"
+        >
+          <div className="flex items-center gap-2 text-surface-400 mb-1.5 text-[11px] uppercase tracking-wider font-medium">
+            <span className="text-emerald-400/70">{s.icon}</span>
+            {s.label}
+          </div>
+          <div className="text-2xl font-bold text-slate-50" style={{ fontFamily: "'Clash Display', sans-serif" }}>
+            {s.value}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════
+   Trust Badges
+   ══════════════════════════════════════════════════════════ */
+
+function TrustBadges() {
+  const badges = ['Repository API', 'React Query', 'Zustand', 'Ant Design', 'Tailwind CSS', 'Monaco Editor'];
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      {badges.map((b) => (
+        <span
+          key={b}
+          className="rounded-lg border border-white/[0.06] bg-white/[0.025] px-3 py-1.5 text-[11px] text-surface-400 font-medium tracking-wide hover:border-emerald-500/20 hover:text-slate-200 transition-colors duration-300"
+        >
+          {b}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════
+   AuthPage — Main Component
+   ══════════════════════════════════════════════════════════ */
 
 export function AuthPage() {
   const navigate = useNavigate();
@@ -18,14 +167,10 @@ export function AuthPage() {
 
   const isAuthed = Boolean(token && user);
 
-  const title = useMemo(() => {
-    return mode === 'login' ? 'Đăng nhập' : 'Tạo tài khoản';
-  }, [mode]);
+  const title = useMemo(() => (mode === 'login' ? 'Đăng nhập' : 'Tạo tài khoản'), [mode]);
 
   useEffect(() => {
-    if (isAuthed) {
-      navigate('/match', { replace: true });
-    }
+    if (isAuthed) navigate('/match', { replace: true });
   }, [isAuthed, navigate]);
 
   const handleFinish = async (values: { email: string; password: string; username?: string }) => {
@@ -37,7 +182,6 @@ export function AuthPage() {
         navigate('/match', { replace: true });
         return;
       }
-
       const username = values.username?.trim() ?? '';
       if (!validateUsername(username)) {
         setError('Tên hiển thị không hợp lệ (3-30 ký tự, chữ/số/_).');
@@ -52,7 +196,6 @@ export function AuthPage() {
         setError(`Mật khẩu quá yếu: ${strength.feedback.join(' ')}`);
         return;
       }
-
       await register(username, values.email, values.password);
       setMode('login');
       setError('Đăng ký thành công. Hãy đăng nhập.');
@@ -64,107 +207,89 @@ export function AuthPage() {
   };
 
   return (
-    <FullPageCenter>
-      <div className="w-[calc(100%-32px)] max-w-[1120px] sm:w-[calc(100%-64px)]">
-        <div className="grid min-h-[620px] grid-cols-1 overflow-hidden rounded-lg border border-white/10 bg-[#080b14] shadow-[0_32px_120px_rgba(0,0,0,0.48)] lg:grid-cols-[1fr_0.82fr]">
-          <section className="relative flex min-h-[500px] flex-col justify-between border-b border-white/10 bg-[linear-gradient(135deg,#08111f_0%,#050816_48%,#07131a_100%)] p-6 sm:p-8 lg:border-b-0 lg:border-r">
-            <div className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(34,211,238,0.7),rgba(168,85,247,0.6),transparent)]" />
-            <div className="flex items-start justify-between gap-4">
+    <div className="relative min-h-screen bg-navy-900 flex items-center overflow-hidden">
+      <DotGrid />
+
+      {/* ═══ Main Grid: Hero (left) + Form (right) ═══ */}
+      <div className="relative z-10 w-full max-w-[1280px] mx-auto px-6 sm:px-10 lg:px-16 py-12">
+        <div className="grid lg:grid-cols-[1fr_440px] gap-12 lg:gap-20 items-center">
+
+          {/* ═══════════════ LEFT: HERO ═══════════════ */}
+          <div className="space-y-10 animate-slide-in-left">
+            {/* Logo */}
+            <div className="stagger-1 animate-fade-in-up">
               <AppLogo />
-              <div className="hidden rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-right text-xs leading-5 text-slate-400 sm:block">
-                <div className="font-semibold text-slate-100">Live Judge</div>
-                <div>42 ms · 12.8 MB</div>
-              </div>
             </div>
 
-            <div className="relative z-10 mt-8 max-w-[560px]">
-              <div className="mb-5 inline-flex items-center gap-2 rounded-lg border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs font-semibold text-cyan-100">
-                <ThunderboltFilled className="text-cyan-300" />
-                Realtime PvP coding arena
-              </div>
-              <Typography.Title level={1} className="!mb-4 !text-slate-50 !text-[34px] !leading-[1.06] sm:!text-[46px]">
-                Code nhanh. Submit chuẩn. Leo rank thật.
-              </Typography.Title>
-              <Typography.Paragraph className="!mb-0 !max-w-[560px] !text-[15px] !leading-7 !text-slate-300">
-                Vào lobby, nhận bài, chạy test, submit và xem verdict realtime trong cùng một flow. Auth mới giữ vai trò cổng vào cho toàn bộ arena thay vì chỉ là một form đăng nhập.
-              </Typography.Paragraph>
-            </div>
-
-            <div className="relative z-10 mt-8 grid gap-4 xl:grid-cols-[1fr_190px]">
-              <div className="overflow-hidden rounded-lg border border-white/10 bg-[#05070d]/80 shadow-[0_24px_80px_rgba(0,0,0,0.35)]">
-                <div className="flex items-center justify-between border-b border-white/10 px-4 py-2.5">
-                  <div className="flex items-center gap-2">
-                    <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-amber-300" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-emerald-300" />
-                  </div>
-                  <span className="font-mono text-xs text-slate-500">two-sum.cpp</span>
-                </div>
-                <div className="grid gap-0 text-sm md:grid-cols-[1fr_170px]">
-                  <pre className="h-[176px] overflow-hidden p-4 font-mono text-[12px] leading-5 text-slate-300">
-{`int solve(vector<int>& a, int target) {
-  unordered_map<int, int> seen;
-
-  for (int i = 0; i < a.size(); ++i) {
-    int need = target - a[i];
-    if (seen.count(need)) return i;
-    seen[a[i]] = i;
-  }
-}`}
-                  </pre>
-                  <div className="border-t border-white/10 bg-white/[0.03] p-4 md:border-l md:border-t-0">
-                    <div className="mb-3 flex items-center gap-2 text-emerald-300">
-                      <CheckCircleFilled />
-                      <span className="text-sm font-semibold">Accepted</span>
-                    </div>
-                    <div className="space-y-2.5 text-xs text-slate-400">
-                      <div className="flex justify-between"><span>Runtime</span><span className="text-slate-200">42 ms</span></div>
-                      <div className="flex justify-between"><span>Memory</span><span className="text-slate-200">12.8 MB</span></div>
-                      <div className="flex justify-between"><span>Tests</span><span className="text-slate-200">24 / 24</span></div>
-                    </div>
-                  </div>
-                </div>
+            {/* Hero Copy */}
+            <div className="stagger-2 animate-fade-in-up space-y-5 max-w-[560px]">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/[0.07] px-3.5 py-1.5 text-xs font-semibold text-emerald-300">
+                <ThunderboltFilled className="text-emerald-400" />
+                Realtime PvP Coding Arena
               </div>
 
-              <div className="grid grid-cols-3 gap-3 xl:grid-cols-1">
-                {[
-                  ['ELO', '1,482'],
-                  ['Streak', '07'],
-                  ['Rank', '#128'],
-                ].map(([label, value]) => (
-                  <div key={label} className="rounded-lg border border-white/10 bg-white/[0.045] p-3">
-                    <div className="text-xs uppercase tracking-wide text-slate-500">{label}</div>
-                    <div className="mt-1 text-xl font-semibold text-slate-50">{value}</div>
-                  </div>
-                ))}
-              </div>
+              <h1
+                className="text-[42px] sm:text-[52px] lg:text-[60px] font-bold leading-[1.04] tracking-[-0.03em] text-slate-50"
+                style={{ fontFamily: "'Clash Display', sans-serif" }}
+              >
+                Code.
+                <br />
+                Submit.
+                <br />
+                <span className="text-emerald-400">Conquer.</span>
+              </h1>
+
+              <p className="text-[15px] leading-7 text-surface-400 max-w-[460px]">
+                Vào lobby, nhận bài, chạy test, submit và xem verdict realtime trong cùng một flow. Nơi mọi coder đều có thể leo rank.
+              </p>
             </div>
 
-            <div className="relative z-10 mt-5 grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
-              {['Repository API', 'React Query', 'Zustand', 'AntD + Tailwind'].map((item) => (
-                <div key={item} className="rounded-lg border border-white/10 bg-white/[0.035] px-3 py-2 text-slate-300">
-                  {item}
-                </div>
-              ))}
+            {/* Live Stats */}
+            <div className="stagger-3 animate-fade-in-up max-w-[520px]">
+              <LiveStats />
             </div>
-          </section>
 
-          <section className="flex items-center bg-[linear-gradient(180deg,#151515_0%,#101010_100%)] p-6 sm:p-8">
-            <div className="w-full">
+            {/* Terminal Preview */}
+            <div className="stagger-4 animate-fade-in-up max-w-[620px]">
+              <TerminalPreview />
+            </div>
+
+            {/* Trust Badges */}
+            <div className="stagger-5 animate-fade-in-up">
+              <TrustBadges />
+            </div>
+          </div>
+
+          {/* ═══════════════ RIGHT: AUTH FORM ═══════════════ */}
+          <div className="animate-scale-in stagger-3">
+            <div className="glass-card p-8 sm:p-10">
+              {/* Header */}
               <div className="mb-7">
-                <div className="mb-3 text-sm font-semibold uppercase tracking-wide text-violet-300">Member access</div>
-                <Typography.Title level={2} className="!mb-2 !text-[30px] !text-slate-50">
+                <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-400/70">
+                  Member Access
+                </div>
+                <h2
+                  className="text-[28px] font-semibold text-slate-50 mb-2"
+                  style={{ fontFamily: "'Clash Display', sans-serif" }}
+                >
                   {title}
-                </Typography.Title>
-                <Typography.Paragraph className="!mb-0 !text-slate-400">
-                  {mode === 'login' ? 'Tiếp tục phiên luyện tập hoặc vào hàng chờ PvP.' : 'Tạo hồ sơ để lưu rank, submissions và inventory.'}
-                </Typography.Paragraph>
+                </h2>
+                <p className="text-sm text-surface-400 leading-relaxed">
+                  {mode === 'login'
+                    ? 'Tiếp tục phiên luyện tập hoặc vào hàng chờ PvP.'
+                    : 'Tạo hồ sơ để lưu rank, submissions và inventory.'}
+                </p>
               </div>
 
+              {/* Mode Toggle */}
               <Segmented<AuthMode>
                 block
                 value={mode}
-                onChange={(v) => setMode(v)}
+                onChange={(v) => {
+                  setMode(v);
+                  setError(null);
+                }}
                 className="mb-6 w-full"
                 options={[
                   { label: 'Login', value: 'login' },
@@ -172,47 +297,85 @@ export function AuthPage() {
                 ]}
               />
 
-              {error && <Alert type={error.includes('thành công') ? 'success' : 'error'} message={error} showIcon className="mb-4" />}
+              {/* Error / Success */}
+              {error && (
+                <Alert
+                  type={error.includes('thành công') ? 'success' : 'error'}
+                  message={error}
+                  showIcon
+                  className="mb-5 animate-fade-in"
+                />
+              )}
 
-              <Form className="ocj-auth-form" layout="vertical" onFinish={handleFinish} requiredMark={false}>
+              {/* Form */}
+              <Form
+                className="ocj-auth-form"
+                layout="vertical"
+                onFinish={handleFinish}
+                requiredMark={false}
+                size="large"
+              >
                 {mode === 'register' && (
                   <Form.Item
-                    label={<span className="text-slate-300">Tên hiển thị</span>}
+                    label={<span className="text-surface-300 text-xs font-medium uppercase tracking-wider">Username</span>}
                     name="username"
                     rules={[{ required: true, message: 'Nhập tên hiển thị' }]}
                   >
-                    <Input size="large" placeholder="luffy_gear5" autoComplete="nickname" />
+                    <Input
+                      placeholder="luffy_gear5"
+                      autoComplete="nickname"
+                      className="!h-12 !rounded-xl"
+                    />
                   </Form.Item>
                 )}
 
                 <Form.Item
-                  label={<span className="text-slate-300">Email</span>}
+                  label={<span className="text-surface-300 text-xs font-medium uppercase tracking-wider">Email</span>}
                   name="email"
                   rules={[{ required: true, message: 'Nhập email' }]}
                 >
-                  <Input size="large" placeholder="user@example.com" autoComplete="email" />
+                  <Input
+                    placeholder="you@example.com"
+                    autoComplete="email"
+                    className="!h-12 !rounded-xl"
+                  />
                 </Form.Item>
 
                 <Form.Item
-                  label={<span className="text-slate-300">Mật khẩu</span>}
+                  label={<span className="text-surface-300 text-xs font-medium uppercase tracking-wider">Password</span>}
                   name="password"
                   rules={[{ required: true, message: 'Nhập mật khẩu' }]}
                 >
-                  <Input.Password size="large" placeholder="••••••••" autoComplete={mode === 'login' ? 'current-password' : 'new-password'} />
+                  <Input.Password
+                    placeholder="••••••••"
+                    autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                    className="!h-12 !rounded-xl"
+                  />
                 </Form.Item>
 
-                <Button htmlType="submit" type="primary" size="large" loading={loading} block icon={<ArrowRightOutlined />}>
+                <Button
+                  htmlType="submit"
+                  type="primary"
+                  size="large"
+                  loading={loading}
+                  block
+                  icon={<ArrowRightOutlined />}
+                  className="!h-12 !rounded-xl !text-base !font-semibold animate-pulse-glow mt-2"
+                >
                   {mode === 'login' ? 'Vào đấu trường' : 'Tạo tài khoản'}
                 </Button>
               </Form>
 
-              <div className="mt-5 rounded-lg border border-white/10 bg-white/[0.035] p-3 text-xs leading-5 text-slate-400">
-                BE mặc định: <span className="font-mono text-slate-200">http://localhost:6868</span>. Seed admin trước khi test account quản trị.
+              {/* Footer hint */}
+              <div className="mt-6 rounded-lg border border-white/[0.06] bg-white/[0.02] p-3.5 text-[11px] leading-5 text-surface-500 text-center">
+                Backend: <span className="font-medium text-slate-300" style={{ fontFamily: "'JetBrains Mono', monospace" }}>localhost:6868</span>
+                {' · '}
+                Seed admin để test quyền quản trị
               </div>
             </div>
-          </section>
+          </div>
         </div>
       </div>
-    </FullPageCenter>
+    </div>
   );
 }
