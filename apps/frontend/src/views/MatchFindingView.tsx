@@ -5,6 +5,8 @@ import { PlayerCard } from '../components/match/PlayerCard';
 import { FindingCircle } from '../components/match/FindingCircle';
 import { RoomBrowser } from '../components/match/RoomBrowser';
 import { SocialSidebar } from '../components/layout/SocialSidebar';
+import { RecentMatchesWidget } from '../components/match/RecentMatchesWidget';
+import { LeaderboardPreviewWidget } from '../components/match/LeaderboardPreviewWidget';
 
 /* =====================================================
    MatchFindingView — Ink & Vermillion Lobby
@@ -123,6 +125,12 @@ export const MatchFindingView: React.FC<MatchFindingViewProps> = ({ onStartMatch
           </button>
         </div>
       )}
+
+      {/* ── Data row: Recent Matches + Leaderboard ── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full max-w-[1200px] mx-auto">
+        <RecentMatchesWidget />
+        <LeaderboardPreviewWidget />
+      </div>
 
       {/* ── Secondary: Rooms + Social ── */}
       <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-5 w-full max-w-[1200px] mx-auto">
