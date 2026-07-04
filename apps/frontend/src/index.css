@@ -1,13 +1,42 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
 
 @import "tailwindcss";
 
 @source "./**/*.{ts,tsx,html}";
 @source "../../../packages/ui/src/**/*.{ts,tsx}";
 
+/* ============================================
+   INK & VERMILLION — Design Token System
+   ============================================ */
+
 @theme {
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  /* ── Typography ── */
+  --font-display: 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace;
+  --font-body: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* ── Color Palette ── */
+  --color-ink: #0C0C0C;
+  --color-washi: #1A1A1A;
+  --color-charcoal: #2E2E2E;
+  --color-stone: #787878;
+  --color-linen: #E6E0D8;
+  --color-vermilion: #D83A2C;
+
+  /* ── Semantic aliases ── */
+  --color-bg-primary: #0C0C0C;
+  --color-bg-secondary: #1A1A1A;
+  --color-border: #2E2E2E;
+  --color-text-primary: #E6E0D8;
+  --color-text-secondary: #787878;
+  --color-accent: #D83A2C;
+  --color-accent-hover: #B83024;
 }
+
+/* ============================================
+   GLOBAL RESET & BASE
+   ============================================ */
 
 *,
 *::before,
@@ -19,17 +48,289 @@
 
 html,
 body {
-  font-family: var(--font-sans);
-  background-color: #081229;
+  font-family: var(--font-body);
+  background-color: var(--color-ink);
+  color: var(--color-linen);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 /* ============================================
-   🔥 TRỊ BỆNH CỦA ANT DESIGN 🔥
+   SCROLLBAR — Minimal, on-brand
    ============================================ */
 
-/* Ép cái Label của AntD phải full 100% chiều ngang để nút "Forgot?" nhảy sang phải */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-charcoal);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-stone);
+}
+
+/* ============================================
+   SELECTION — Vermilion highlight
+   ============================================ */
+
+::selection {
+  background: rgba(216, 58, 44, 0.3);
+  color: var(--color-linen);
+}
+
+/* ============================================
+   ANIMATIONS — Keyframes
+   ============================================ */
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes digit-flip-down {
+  0% { transform: rotateX(0deg); opacity: 1; }
+  100% { transform: rotateX(90deg); opacity: 0; }
+}
+
+@keyframes digit-flip-up {
+  0% { transform: rotateX(-90deg); opacity: 0; }
+  100% { transform: rotateX(0deg); opacity: 1; }
+}
+
+@keyframes vermilion-flash {
+  0% { box-shadow: inset 0 0 0 0 rgba(216,58,44,0); }
+  40% { box-shadow: inset 0 0 20px 3px rgba(216,58,44,0.15); }
+  100% { box-shadow: inset 0 0 0 0 rgba(216,58,44,0); }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes border-dash-rotate {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -200; }
+}
+
+@keyframes vs-grow {
+  0% { transform: scale(0.3); opacity: 0; }
+  60% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ============================================
+   STAGGER DELAY UTILITIES
+   ============================================ */
+
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.10s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.20s; }
+.stagger-5 { animation-delay: 0.25s; }
+.stagger-6 { animation-delay: 0.30s; }
+.stagger-7 { animation-delay: 0.35s; }
+.stagger-8 { animation-delay: 0.40s; }
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out both;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out both;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.4s ease-out both;
+}
+
+.animate-vermilion-flash {
+  animation: vermilion-flash 0.6s ease-out;
+}
+
+.animate-vs-grow {
+  animation: vs-grow 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ============================================
+   RANK BADGE — CSS Geometry (no images)
+   ============================================ */
+
+.rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 36px;
+  height: 36px;
+  background: var(--color-charcoal);
+  transition: all 0.3s ease;
+}
+
+.rank-badge--bronze {
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  background: #8B6914;
+}
+
+.rank-badge--silver {
+  clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%);
+  background: #A8A9AD;
+}
+
+.rank-badge--gold {
+  clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+  background: #DAA520;
+}
+
+.rank-badge--platinum {
+  clip-path: polygon(50% 0%, 85% 15%, 100% 50%, 85% 85%, 50% 100%, 15% 85%, 0% 50%, 15% 15%);
+  background: #5F9EA0;
+}
+
+.rank-badge--diamond {
+  clip-path: polygon(50% 0%, 80% 20%, 100% 50%, 80% 80%, 50% 100%, 20% 80%, 0% 50%, 20% 20%);
+  background: #7B68EE;
+}
+
+.rank-badge--master {
+  border-radius: 50%;
+  background: linear-gradient(135deg, #D83A2C 0%, #8B0000 100%);
+}
+
+/* ============================================
+   ANT DESIGN OVERRIDES — Minimal neutralization
+   ============================================ */
+
+/* Nuke Ant Design's default coloring on form elements */
+.ant-form-item .ant-form-item-label > label {
+  color: var(--color-stone) !important;
+  font-family: var(--font-body) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+}
+
+.ant-input,
+.ant-input-password {
+  background-color: var(--color-washi) !important;
+  border: 1px solid var(--color-charcoal) !important;
+  color: var(--color-linen) !important;
+  font-family: var(--font-body) !important;
+  border-radius: 4px !important;
+  transition: border-color 0.2s !important;
+}
+
+.ant-input:hover,
+.ant-input-password:hover {
+  border-color: var(--color-stone) !important;
+}
+
+.ant-input:focus,
+.ant-input-password:focus,
+.ant-input-focused {
+  border-color: var(--color-vermilion) !important;
+  box-shadow: none !important;
+}
+
+.ant-input-password .ant-input-suffix {
+  color: var(--color-stone) !important;
+}
+
+.ant-input-affix-wrapper {
+  background-color: var(--color-washi) !important;
+  border: 1px solid var(--color-charcoal) !important;
+  border-radius: 4px !important;
+  padding: 0 !important;
+}
+
+.ant-input-affix-wrapper:hover {
+  border-color: var(--color-stone) !important;
+}
+
+.ant-input-affix-wrapper:focus,
+.ant-input-affix-wrapper-focused {
+  border-color: var(--color-vermilion) !important;
+  box-shadow: none !important;
+}
+
+.ant-input-affix-wrapper .ant-input {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* AntD Spin */
+.ant-spin .ant-spin-dot-item {
+  background-color: var(--color-vermilion) !important;
+}
+
+/* AntD Dropdown */
+.ant-dropdown-menu {
+  background-color: var(--color-washi) !important;
+  border: 1px solid var(--color-charcoal) !important;
+}
+
+.ant-dropdown-menu-item {
+  color: var(--color-linen) !important;
+}
+
+.ant-dropdown-menu-item:hover {
+  background-color: rgba(216,58,44,0.1) !important;
+}
+
+.ant-dropdown-menu-item-divider {
+  background: var(--color-charcoal) !important;
+}
+
+/* AntD Badge */
+.ant-badge .ant-badge-count {
+  background: var(--color-vermilion) !important;
+  font-family: var(--font-display) !important;
+}
+
+/* AntD message/notification (API calls) */
+.ant-message-notice-content {
+  background: var(--color-washi) !important;
+  border: 1px solid var(--color-charcoal) !important;
+  color: var(--color-linen) !important;
+}
+
+/* Auth form fixes */
 .ocj-auth-form .ant-form-item-label {
   width: 100% !important;
   padding-bottom: 6px !important;
@@ -43,18 +344,17 @@ body {
   height: auto !important;
 }
 
-/* Ẩn dấu hai chấm ":" mặc định vô duyên của AntD nếu có */
 .ocj-auth-form .ant-form-item-label>label::after {
   display: none !important;
 }
 
-/* Fix lỗi trình duyệt tự bôi nền màu xanh/vàng khi Autofill tài khoản */
+/* ── Autofill override ── */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 1000px white inset !important;
-  -webkit-text-fill-color: #1e293b !important;
+  -webkit-box-shadow: 0 0 0 1000px var(--color-washi) inset !important;
+  -webkit-text-fill-color: var(--color-linen) !important;
   transition: background-color 9999s ease-in-out 0s;
-  border-radius: 0.75rem !important;
+  border-radius: 4px !important;
 }

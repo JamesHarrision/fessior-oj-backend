@@ -16,6 +16,7 @@ import { SubmissionsView } from '../../views/SubmissionsView';
 import { CustomRoomsView } from '../../views/CustomRoomsView';
 import { AdminDashboard } from '../../views/AdminDashboard';
 import { FriendsView } from '../../views/FriendsView';
+import { TokenProofView } from '../../views/TokenProofView';
 import { useMatchStore } from '../../stores/match.store';
 
 /* =====================================================
@@ -87,6 +88,7 @@ export function AppRouter() {
       <Routes>
         {/* ── Public ── */}
         <Route path="/auth" element={<AuthPage />} />
+        <Route path="/token-proof" element={<TokenProofView />} />
 
         {/* ── Protected App Shell ── */}
         <Route
