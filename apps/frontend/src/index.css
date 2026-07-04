@@ -188,7 +188,10 @@ body {
 }
 
 /* ============================================
-   RANK BADGE — CSS Geometry (no images)
+   RANK BADGE — CSS Geometry (no images, monotone palette)
+   Principle: ALL badges share ONE neutral color (Charcoal).
+   Only the CURRENT USER'S rank gets Vermilion fill.
+   Differentiation is 100% shape-based (clip-path), not color-based.
    ============================================ */
 
 .rank-badge {
@@ -202,34 +205,37 @@ body {
   transition: all 0.3s ease;
 }
 
+/* ── All tiers: same neutral fill, differentiated by SHAPE only ── */
+
 .rank-badge--bronze {
   clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-  background: #8B6914;
 }
 
 .rank-badge--silver {
   clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%);
-  background: #A8A9AD;
 }
 
 .rank-badge--gold {
   clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
-  background: #DAA520;
 }
 
 .rank-badge--platinum {
   clip-path: polygon(50% 0%, 85% 15%, 100% 50%, 85% 85%, 50% 100%, 15% 85%, 0% 50%, 15% 15%);
-  background: #5F9EA0;
 }
 
 .rank-badge--diamond {
   clip-path: polygon(50% 0%, 80% 20%, 100% 50%, 80% 80%, 50% 100%, 20% 80%, 0% 50%, 20% 20%);
-  background: #7B68EE;
 }
 
 .rank-badge--master {
   border-radius: 50%;
-  background: linear-gradient(135deg, #D83A2C 0%, #8B0000 100%);
+}
+
+/* ── Active state: only the CURRENT USER'S rank gets Vermilion ── */
+
+.rank-badge--active {
+  background: var(--color-vermilion);
+  box-shadow: 0 0 0 3px rgba(216, 58, 44, 0.2);
 }
 
 /* ============================================
