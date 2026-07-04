@@ -194,7 +194,7 @@ body {
 
 /* ============================================
    RANK BADGE — CSS Geometry (no images, monotone palette)
-   Principle: ALL badges share ONE neutral color (Charcoal).
+   Principle: ALL badges share ONE neutral color (Stone).
    Only the CURRENT USER'S rank gets Vermilion fill.
    Differentiation is 100% shape-based (clip-path), not color-based.
    ============================================ */
@@ -206,7 +206,8 @@ body {
   position: relative;
   width: 36px;
   height: 36px;
-  background: var(--color-charcoal);
+  /* Stone on Ink: ~4.1:1 — visible at all sizes. Charcoal was ~2.1:1, nearly invisible. */
+  background: var(--color-stone);
   transition: all 0.3s ease;
 }
 
