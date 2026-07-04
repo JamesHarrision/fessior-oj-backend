@@ -1,8 +1,9 @@
 import { BrowserRouter, Navigate, Route, Routes, useNavigate, useParams } from 'react-router-dom';
-import type { IMatch, IProblem } from '@ocj/types';
+import type { IMatch } from '@ocj/types';
 import { ProtectedRoute } from './ProtectedRoute';
 import { AppShellLayout } from '../layouts/AppShellLayout';
 import { AuthPage } from '../../features/auth/AuthPage';
+import { ProblemsPage } from '../../features/problems/ProblemsPage';
 import { MatchFindingView } from '../../views/MatchFindingView';
 import { SoloEditorView } from '../../views/SoloEditorView';
 import { RankingView } from '../../views/RankingView';
@@ -11,7 +12,6 @@ import { ContestView } from '../../views/ContestView';
 import { SettingsView } from '../../views/SettingsView';
 import { AIView } from '../../views/AIView';
 import { ApiTesterView } from '../../views/tester/ApiTesterView';
-import { ProblemsView } from '../../views/ProblemsView';
 import { SubmissionsView } from '../../views/SubmissionsView';
 import { CustomRoomsView } from '../../views/CustomRoomsView';
 import { AdminDashboard } from '../../views/AdminDashboard';
@@ -46,20 +46,6 @@ function EditorRouteWrapper() {
     <SoloEditorView
       activeMatch={activeMatch ?? undefined}
       problemSlug={selectedProblem?.slug ?? null}
-    />
-  );
-}
-
-function ProblemsRouteWrapper() {
-  const nav = useNavigate();
-  const setSelectedProblem = useMatchStore((s) => s.setSelectedProblem);
-
-  return (
-    <ProblemsView
-      onSelectProblem={(slug) => {
-        setSelectedProblem({ slug } as unknown as IProblem);
-        nav('/editor');
-      }}
     />
   );
 }
@@ -117,7 +103,7 @@ export function AppRouter() {
           <Route path="/editor" element={<EditorRouteWrapper />} />
 
           {/* ── Problems ── */}
-          <Route path="/problems" element={<ProblemsRouteWrapper />} />
+          <Route path="/problems" element={<ProblemsPage />} />
 
           {/* ── Competitions ── */}
           <Route path="/contest" element={<ContestView />} />
