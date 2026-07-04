@@ -112,18 +112,31 @@ export const handleSubmissionUpdate = async (data: {
   status: string;
   testCasesPassed: number;
   testCasesTotal: number;
+  matchId?: string;
 }) => {
-  // Find active match where user is either player1 or player2
-  const activeMatch = await prisma.match.findFirst({
-    where: {
-      problem_id: data.problemId,
-      status: MatchStatus.PENDING,
-      OR: [
-        { player1_id: data.userId },
-        { player2_id: data.userId },
-      ],
-    },
-  });
+  // Use direct matchId if provided (submission linked to match).
+  // Falls back to reverse-lookup for legacy submissions without matchId.
+  let activeMatch;
+  if (data.matchId) {
+    activeMatch = await prisma.match.findUnique({
+      where: { id: data.matchId, status: MatchStatus.PENDING },
+    });
+  }
+
+  if (!activeMatch) {
+    // Legacy fallback — reverse-lookup by problem + user (fragile, deprecated).
+    // Exists only for submissions created before matchId was added to the model.
+    activeMatch = await prisma.match.findFirst({
+      where: {
+        problem_id: data.problemId,
+        status: MatchStatus.PENDING,
+        OR: [
+          { player1_id: data.userId },
+          { player2_id: data.userId },
+        ],
+      },
+    });
+  }
 
   if (!activeMatch) return;
 

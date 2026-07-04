@@ -495,6 +495,7 @@ export interface SubmitCodeRequest {
   problemId: string;
   code: string;
   language: LanguageSlug;
+  matchId?: string;
   contestId?: string;
 }
 

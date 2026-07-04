@@ -103,7 +103,7 @@ export const api = {
   // =========================================================
   // Submissions
   // =========================================================
-  submitCode: (data: { problemId: string; code: string; language: string }) =>
+  submitCode: (data: { problemId: string; code: string; language: string; matchId?: string; contestId?: string }) =>
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     wrap<any>(submissionRepository.submit(data)),
   runCode: (data: { problemId?: string; code: string; language: string; testCases?: unknown[] }) =>

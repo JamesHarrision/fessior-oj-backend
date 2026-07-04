@@ -143,6 +143,7 @@ export const SoloEditorView: React.FC<SoloEditorViewProps> = ({ activeMatch, pro
         problemId: problem.id || problem._id || problem.slug,
         code,
         language,
+        matchId: activeMatch?.id,
       });
 
       if (res.success && res.data) {

@@ -103,6 +103,7 @@ export const startSubmissionWorker = () => {
             status: finalStatus,
             testCasesPassed: passedCount,
             testCasesTotal: testCases.length,
+            matchId: submission.matchId ?? undefined,
           })
         );
       } catch (err: any) {
