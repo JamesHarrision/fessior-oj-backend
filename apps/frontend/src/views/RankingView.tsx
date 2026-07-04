@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { api } from '../services/api';
 import { PageHeader, SkeletonBlock, EmptyState } from '@ocj/ui';
 import { Pagination } from 'antd';
-import { Crown } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 /* =====================================================
    RankingView — Full leaderboard page
@@ -32,12 +32,12 @@ const SORT_OPTIONS: { key: SortBy; label: string }[] = [
 ];
 
 export const RankingView: React.FC = () => {
+  const { user } = useAuth();
   const [players, setPlayers] = useState<PlayerRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState<SortBy>('eloRating');
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -55,13 +55,9 @@ export const RankingView: React.FC = () => {
           avatarUrl: e.avatarUrl ?? e.avatar_url ?? undefined,
         }));
 
-        // Sort
+        // Sort locally
         all.sort((a, b) => (b[sortBy] as number) - (a[sortBy] as number));
         all.forEach((p, i) => (p.rank = i + 1));
-
-        // Detect current user
-        const me = all.find((p) => p.userId === currentUserId || (p as any).isCurrentUser);
-        if (me) setCurrentUserId(me.userId);
 
         setPlayers(all);
       }
@@ -70,7 +66,7 @@ export const RankingView: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [sortBy, currentUserId]);
+  }, [sortBy]);
 
   useEffect(() => {
     fetchData();
@@ -78,7 +74,7 @@ export const RankingView: React.FC = () => {
 
   const totalPages = Math.ceil(players.length / PAGE_SIZE);
   const paginated = players.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-  const top3Boundary = Math.min(3, players.length);
+  const currentUserId = user?.id ?? null;
 
   return (
     <div className="flex flex-col gap-6">
@@ -161,69 +157,63 @@ export const RankingView: React.FC = () => {
               const absoluteRank = (page - 1) * PAGE_SIZE + idx + 1;
               const isTop3 = absoluteRank <= 3;
               const isCurrentUser = p.userId === currentUserId;
+              const isThirdRow = absoluteRank === 3;
 
               return (
-                <div
-                  key={p.userId || absoluteRank}
-                  className={`
-                    grid grid-cols-[56px_1fr_100px_90px] items-center px-4 py-3 border-b border-charcoal/40 last:border-b-0 transition-colors
-                    ${isCurrentUser
-                      ? 'border-l-[3px] border-l-vermilion bg-washi/80'
-                      : 'hover:bg-charcoal/20'
-                    }
-                    ${isTop3 && idx === 0 ? 'border-t border-t-charcoal/50' : ''}
-                  `}
-                >
-                  {/* Rank */}
-                  <span
+                <React.Fragment key={p.userId || absoluteRank}>
+                  <div
                     className={`
-                      font-display font-bold tabular-nums
-                      ${isTop3 ? 'text-lg text-linen' : 'text-sm text-stone'}
+                      grid grid-cols-[56px_1fr_100px_90px] items-center px-4 py-3 border-b border-charcoal/40 last:border-b-0 transition-colors
+                      ${isCurrentUser
+                        ? 'border-l-[3px] border-l-vermilion bg-washi/80'
+                        : 'hover:bg-charcoal/20'
+                      }
                     `}
                   >
-                    {isTop3 ? (
-                      <span className="inline-flex items-center gap-1">
-                        {absoluteRank === 1 && <Crown size={16} className="text-amber-400" />}
-                        {absoluteRank}
-                      </span>
-                    ) : (
-                      absoluteRank
-                    )}
-                  </span>
-
-                  {/* Player */}
-                  <div className="flex items-center gap-3 min-w-0">
-                    <img
-                      src={p.avatarUrl
-                        ? p.avatarUrl.startsWith('http') ? p.avatarUrl : `${window.location.origin}${p.avatarUrl}`
-                        : `https://api.dicebear.com/7.x/adventurer/svg?seed=${p.username}`
-                      }
-                      alt=""
-                      className="w-7 h-7 rounded-full border border-charcoal shrink-0 bg-ink/30"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = `https://api.dicebear.com/7.x/adventurer/svg?seed=${p.username}`;
-                      }}
-                    />
-                    <span className="font-body text-sm text-linen truncate">
-                      {p.username}
+                    {/* Rank */}
+                    <span className={`font-display font-bold tabular-nums ${isTop3 ? 'text-lg text-linen' : 'text-sm text-stone'}`}>
+                      {absoluteRank}
                     </span>
-                    {isCurrentUser && (
-                      <span className="shrink-0 font-display text-[9px] font-bold uppercase tracking-wider text-vermilion px-1.5 py-0.5 border border-vermilion/30">
-                        {isTop3 ? `BẠN · TOP ${absoluteRank}` : 'BẠN'}
+
+                    {/* Player */}
+                    <div className="flex items-center gap-3 min-w-0">
+                      <img
+                        src={p.avatarUrl
+                          ? p.avatarUrl.startsWith('http') ? p.avatarUrl : `${window.location.origin}${p.avatarUrl}`
+                          : `https://api.dicebear.com/7.x/adventurer/svg?seed=${p.username}`
+                        }
+                        alt=""
+                        className="w-7 h-7 rounded-full border border-charcoal shrink-0 bg-ink/30"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = `https://api.dicebear.com/7.x/adventurer/svg?seed=${p.username}`;
+                        }}
+                      />
+                      <span className="font-body text-sm text-linen truncate">
+                        {p.username}
                       </span>
-                    )}
+                      {isCurrentUser && (
+                        <span className="shrink-0 font-display text-[9px] font-bold uppercase tracking-wider text-vermilion px-1.5 py-0.5 border border-vermilion/30">
+                          {isTop3 ? `BẠN · TOP ${absoluteRank}` : 'BẠN'}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* ELO */}
+                    <span className="font-display text-sm font-bold text-linen tabular-nums text-right">
+                      {p.eloRating}
+                    </span>
+
+                    {/* Streak */}
+                    <span className="font-display text-sm text-stone tabular-nums text-right">
+                      {p.streakCount > 0 ? p.streakCount : '—'}
+                    </span>
                   </div>
 
-                  {/* ELO */}
-                  <span className="font-display text-sm font-bold text-linen tabular-nums text-right">
-                    {p.eloRating}
-                  </span>
-
-                  {/* Streak */}
-                  <span className="font-display text-sm text-stone tabular-nums text-right">
-                    {p.streakCount}
-                  </span>
-                </div>
+                  {/* Divider after top 3 */}
+                  {isThirdRow && (
+                    <div className="h-px bg-charcoal mx-4" />
+                  )}
+                </React.Fragment>
               );
             })}
           </div>
