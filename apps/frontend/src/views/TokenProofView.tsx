@@ -129,7 +129,7 @@ function Section(props: { number: number; title: string; children: React.ReactNo
 
 export function TokenProofView() {
   return (
-    <div className="min-h-screen bg-ink text-linen font-body">
+    <div className="min-h-screen w-full bg-ink text-linen font-body">
       <div className="max-w-[960px] mx-auto px-8 py-12">
 
         {/* ── HEADER ── */}
