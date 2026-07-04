@@ -11,7 +11,7 @@ export function ContestSolveView() {
   return (
     <div className="flex-1 flex flex-col gap-3 min-h-0">
       <div className="font-body text-sm text-stone p-4">
-        Contest solving placeholder — route: /contest/{contestId}/problem/{problemId}
+        Contest solving placeholder — /contest/{contestId}/problem/{problemId}
       </div>
       <CodeEditorPane
         code={code}
@@ -24,6 +24,10 @@ export function ContestSolveView() {
         code={code}
         language={language}
         onSubmit={() => {}}
+        isSubmitting={false}
+        verdict=""
+        showSubmit={false}
+        showSampleTests={false}
       />
     </div>
   );

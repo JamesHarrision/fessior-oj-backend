@@ -10,14 +10,14 @@ import type { Monaco } from '@monaco-editor/react';
 
 interface CodeEditorPaneProps {
   code: string;
-  onChange: (value: string) => void;
+  onCodeChange: (value: string) => void;
   language: string;
   onLanguageChange: (lang: string) => void;
 }
 
 export const CodeEditorPane: React.FC<CodeEditorPaneProps> = ({
   code,
-  onChange,
+  onCodeChange,
   language,
   onLanguageChange,
 }) => {
@@ -127,7 +127,7 @@ export const CodeEditorPane: React.FC<CodeEditorPaneProps> = ({
           height="100%"
           language={getMonacoLanguage()}
           value={code}
-          onChange={(val) => onChange(val || '')}
+          onChange={(val) => onCodeChange(val || '')}
           theme="vs-dark"
           onMount={handleEditorDidMount}
           options={{

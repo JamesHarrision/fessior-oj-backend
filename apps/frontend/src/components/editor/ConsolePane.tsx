@@ -19,6 +19,8 @@ interface ConsolePaneProps {
   isSubmitting: boolean;
   verdict: string;
   verdictDetails?: any;
+  showSubmit?: boolean;
+  showSampleTests?: boolean;
 }
 
 export const ConsolePane: React.FC<ConsolePaneProps> = ({
@@ -29,6 +31,8 @@ export const ConsolePane: React.FC<ConsolePaneProps> = ({
   isSubmitting,
   verdict,
   verdictDetails,
+  showSubmit = true,
+  showSampleTests = true,
 }) => {
   const [activeTab, setActiveTab] = useState<'cases' | 'result'>('cases');
   const [testMode, setTestMode] = useState<'sample' | 'custom'>('sample');
@@ -116,6 +120,8 @@ export const ConsolePane: React.FC<ConsolePaneProps> = ({
             <Play size={12} />
             <span>{isRunning ? 'Đang chạy...' : 'Chạy thử'}</span>
           </button>
+        {/* Submit — hidden when no problem context (playground/contest) */}
+        {showSubmit && (
           <button
             className="bg-vermilion text-linen font-display text-[11px] font-bold uppercase tracking-wider px-3.5 py-1.5 hover:bg-vermilion-hover transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={onSubmit}
@@ -123,21 +129,36 @@ export const ConsolePane: React.FC<ConsolePaneProps> = ({
           >
             <span>{isSubmitting ? 'Đang nộp...' : 'Nộp bài'}</span>
           </button>
+        )}
         </div>
       </div>
 
       {/* ── Body ── */}
       <div className="flex-1 bg-ink p-4 overflow-y-auto">
         {activeTab === 'cases' ? (
-          <TestCaseSelector
-            testMode={testMode}
-            setTestMode={setTestMode}
-            sampleTestCases={sampleTestCases}
-            activeSampleIdx={activeSampleIdx}
-            setActiveSampleIdx={setActiveSampleIdx}
-            customInput={customInput}
-            setCustomInput={setCustomInput}
-          />
+          showSampleTests ? (
+            <TestCaseSelector
+              testMode={testMode}
+              setTestMode={setTestMode}
+              sampleTestCases={sampleTestCases}
+              activeSampleIdx={activeSampleIdx}
+              setActiveSampleIdx={setActiveSampleIdx}
+              customInput={customInput}
+              setCustomInput={setCustomInput}
+            />
+          ) : (
+            /* ── Playground mode: custom input only, no sample tests ── */
+            <div className="flex flex-col gap-1.5">
+              <span className="font-display text-[10px] font-bold uppercase tracking-[0.1em] text-stone">Dữ liệu đầu vào (stdin)</span>
+              <textarea
+                className="bg-ink border border-charcoal p-3 font-mono text-xs text-linen placeholder-stone w-full h-32 resize-none outline-none focus:border-vermilion transition-colors"
+                value={customInput}
+                onChange={(e) => setCustomInput(e.target.value)}
+                placeholder="Nhập stdin cho chương trình của bạn..."
+                spellCheck="false"
+              />
+            </div>
+          )
         ) : (
           <ExecutionResultPanel
             isRunning={isRunning}

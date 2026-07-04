@@ -19,6 +19,10 @@ export function PlaygroundView() {
         code={code}
         language={language}
         onSubmit={() => {}}
+        isSubmitting={false}
+        verdict=""
+        showSubmit={false}
+        showSampleTests={false}
       />
     </div>
   );
