@@ -109,45 +109,55 @@ export class SubmissionService {
   }
 
   async runCode(data: {
-    problemId: string;
+    problemId?: string;
     code: string;
     language: 'cpp' | 'java' | 'python';
     customInput?: string;
   }) {
-    let problem = null;
-    if (mongoose.Types.ObjectId.isValid(data.problemId)) {
-      problem = await Problem.findById(data.problemId);
-    }
-    if (!problem) {
-      problem = await Problem.findOne({ slug: data.problemId });
-    }
-    if (!problem) {
-      throw new AppError('Problem not found', 404);
-    }
-
-    let testcasesToRun: Array<{ input: string; output: string; isExample: boolean }> = [];
-    if (data.customInput !== undefined && data.customInput !== null) {
-      testcasesToRun = [{ input: data.customInput, output: '', isExample: false }];
-    } else {
-      testcasesToRun = await Testcase.find({ problemId: problem._id, isExample: true });
-      if (testcasesToRun.length === 0) {
-        testcasesToRun = [{ input: '', output: '', isExample: true }];
-      }
-    }
-
     const rapidApiKey = process.env.RAPIDAPI_KEY || '';
     const rapidApiHost = process.env.RAPIDAPI_HOST || 'judge0-ce.p.rapidapi.com';
     const judge0Url = process.env.JUDGE0_URL || `https://${rapidApiHost}`;
     const languageId = LANGUAGE_IDS[data.language as LanguageKey] || 71;
 
+    let testcasesToRun: Array<{ input: string; output: string; isExample: boolean }> = [];
+    let problem: any = null;
+
+    if (data.problemId) {
+      // ── Has problem context: fetch problem + testcases ──
+      if (mongoose.Types.ObjectId.isValid(data.problemId)) {
+        problem = await Problem.findById(data.problemId);
+      }
+      if (!problem) {
+        problem = await Problem.findOne({ slug: data.problemId });
+      }
+      if (!problem) {
+        throw new AppError('Problem not found', 404);
+      }
+
+      if (data.customInput !== undefined && data.customInput !== null) {
+        testcasesToRun = [{ input: data.customInput, output: '', isExample: false }];
+      } else {
+        testcasesToRun = await Testcase.find({ problemId: problem._id, isExample: true });
+        if (testcasesToRun.length === 0) {
+          testcasesToRun = [{ input: '', output: '', isExample: true }];
+        }
+      }
+    } else {
+      // ── No problem context (playground/sandbox): run with custom input or empty ──
+      testcasesToRun = [
+        { input: data.customInput ?? '', output: '', isExample: false },
+      ];
+    }
+
     const results = [];
     for (const tc of testcasesToRun) {
+      const timeLimit = problem?.timeLimit ?? DEFAULT_LIMITS.TIME_LIMIT_MS;
       const result = await executeTestCase(
         data.code,
         languageId,
         tc.input,
         tc.output,
-        problem.timeLimit || DEFAULT_LIMITS.TIME_LIMIT_MS,
+        timeLimit,
         {
           judge0Url,
           rapidApiKey,
