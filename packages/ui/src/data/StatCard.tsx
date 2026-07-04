@@ -1,7 +1,12 @@
 import React from 'react';
 import type { ReactNode } from 'react';
-import { Card } from 'antd';
-import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
+import { ArrowUp, ArrowDown } from 'lucide-react';
+
+/* =====================================================
+   StatCard — Numeric stat with optional trend indicator
+   Ink & Vermillion: mono value Linen, trend vermilion fill/outline
+   API unchanged: { label, value, icon?, trend? }
+   ===================================================== */
 
 interface TrendInfo {
   value: number;
@@ -22,39 +27,37 @@ export const StatCard = React.memo(function StatCard({
   trend,
 }: StatCardProps) {
   return (
-    <Card styles={{ body: { padding: 20 } }}>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-        }}
-      >
-        <div>
-          <div style={{ fontSize: 13, color: '#64748b', marginBottom: 4 }}>
+    <div className="bg-washi border border-charcoal p-5">
+      <div className="flex items-start justify-between">
+        <div className="min-w-0">
+          <div className="font-body text-xs font-semibold uppercase tracking-[0.1em] text-stone mb-2">
             {label}
           </div>
-          <div style={{ fontSize: 28, fontWeight: 600, lineHeight: 1.2 }}>
+          <div className="font-display text-3xl font-bold text-linen tracking-[-0.02em]">
             {value}
           </div>
           {trend && (
-            <div
-              style={{
-                marginTop: 8,
-                fontSize: 13,
-                color: trend.isUp ? '#16a34a' : '#dc2626',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 4,
-              }}
-            >
-              {trend.isUp ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
-              {trend.value}%
+            <div className="flex items-center gap-1 mt-2">
+              {trend.isUp ? (
+                <>
+                  <ArrowUp size={14} className="text-vermilion" />
+                  <span className="font-display text-xs font-bold text-vermilion">
+                    +{trend.value}%
+                  </span>
+                </>
+              ) : (
+                <>
+                  <ArrowDown size={14} className="text-vermilion" />
+                  <span className="font-display text-xs font-bold text-vermilion">
+                    -{trend.value}%
+                  </span>
+                </>
+              )}
             </div>
           )}
         </div>
-        {icon && <div style={{ fontSize: 24, color: '#94a3b8' }}>{icon}</div>}
+        {icon && <div className="text-stone shrink-0 ml-4 mt-1">{icon}</div>}
       </div>
-    </Card>
+    </div>
   );
 });

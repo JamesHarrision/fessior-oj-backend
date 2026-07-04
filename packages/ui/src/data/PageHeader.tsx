@@ -1,8 +1,11 @@
 import React from 'react';
 import type { ReactNode } from 'react';
-import { Typography } from 'antd';
 
-const { Title, Text } = Typography;
+/* =====================================================
+   PageHeader — Page title + subtitle + optional action
+   API unchanged: { title, subtitle?, extra? }
+   Ink & Vermillion: font-display Linen, divider Charcoal
+   ===================================================== */
 
 interface PageHeaderProps {
   title: string;
@@ -16,21 +19,16 @@ export const PageHeader = React.memo(function PageHeader({
   extra,
 }: PageHeaderProps) {
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: 24,
-      }}
-    >
+    <div className="flex items-center justify-between mb-8 border-b border-charcoal pb-5">
       <div>
-        <Title level={2} style={{ margin: 0 }}>
+        <h1 className="font-display text-2xl font-bold text-linen tracking-[-0.01em]">
           {title}
-        </Title>
-        {subtitle && <Text type="secondary">{subtitle}</Text>}
+        </h1>
+        {subtitle && (
+          <p className="font-body text-sm text-stone mt-1">{subtitle}</p>
+        )}
       </div>
-      {extra && <div>{extra}</div>}
+      {extra && <div className="shrink-0">{extra}</div>}
     </div>
   );
 });

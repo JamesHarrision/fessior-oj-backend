@@ -1,5 +1,12 @@
 import React from 'react';
-import { Tag, Tooltip } from 'antd';
+
+/* =====================================================
+   DifficultyBadge — Problem difficulty indicator
+   Monotone palette: NO green/orange/red.
+   All levels use Washi fill + Charcoal border.
+   Differentiation by letter + subtle opacity.
+   API unchanged: { difficulty: 'EASY'|'MEDIUM'|'HARD', size? }
+   ===================================================== */
 
 type Difficulty = 'EASY' | 'MEDIUM' | 'HARD';
 
@@ -8,26 +15,35 @@ interface DifficultyBadgeProps {
   size?: 'small' | 'default';
 }
 
-const DIFFICULTY_CONFIG: Record<Difficulty, { color: string; label: string }> = {
-  EASY: { color: 'green', label: 'Easy' },
-  MEDIUM: { color: 'orange', label: 'Medium' },
-  HARD: { color: 'red', label: 'Hard' },
+const LABELS: Record<Difficulty, string> = {
+  EASY: 'Easy',
+  MEDIUM: 'Medium',
+  HARD: 'Hard',
+};
+
+const LETTERS: Record<Difficulty, string> = {
+  EASY: 'E',
+  MEDIUM: 'M',
+  HARD: 'H',
 };
 
 export const DifficultyBadge = React.memo(function DifficultyBadge({
   difficulty,
   size = 'default',
 }: DifficultyBadgeProps) {
-  const config = DIFFICULTY_CONFIG[difficulty];
+  const isSmall = size === 'small';
+  const letter = LETTERS[difficulty];
 
   return (
-    <Tooltip title={config.label}>
-      <Tag
-        color={config.color}
-        style={size === 'small' ? { fontSize: 12, lineHeight: '18px' } : undefined}
-      >
-        {difficulty[0]}
-      </Tag>
-    </Tooltip>
+    <span
+      title={LABELS[difficulty]}
+      className={`
+        inline-flex items-center justify-center font-display font-bold uppercase
+        bg-washi border border-charcoal text-linen
+        ${isSmall ? 'text-[10px] px-1.5 py-0 leading-none' : 'text-xs px-2.5 py-1'}
+      `}
+    >
+      {letter}
+    </span>
   );
 });

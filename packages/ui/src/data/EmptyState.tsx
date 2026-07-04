@@ -1,9 +1,12 @@
 import React from 'react';
 import type { ReactNode } from 'react';
-import { Typography } from 'antd';
-import { BookOutlined } from '@ant-design/icons';
+import { FileQuestion } from 'lucide-react';
 
-const { Title, Paragraph } = Typography;
+/* =====================================================
+   EmptyState — Empty UI placeholder
+   API unchanged: { icon?, title, description?, action? }
+   Ink & Vermillion: icon Stone, title Linen, desc Stone
+   ===================================================== */
 
 interface EmptyStateProps {
   icon?: ReactNode;
@@ -19,30 +22,19 @@ export const EmptyState = React.memo(function EmptyState({
   action,
 }: EmptyStateProps) {
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '48px 24px',
-      }}
-    >
-      <div style={{ fontSize: 48, color: '#94a3b8', marginBottom: 16 }}>
-        {icon ?? <BookOutlined />}
+    <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+      <div className="mb-4 text-stone">
+        {icon ?? <FileQuestion size={48} strokeWidth={1.5} />}
       </div>
-      <Title level={4} style={{ color: '#94a3b8', textAlign: 'center', margin: 0 }}>
+      <h3 className="font-display text-base font-bold text-linen mb-2">
         {title}
-      </Title>
+      </h3>
       {description && (
-        <Paragraph
-          type="secondary"
-          style={{ textAlign: 'center', maxWidth: 400, marginTop: 8 }}
-        >
+        <p className="font-body text-sm text-stone max-w-md leading-relaxed mb-4">
           {description}
-        </Paragraph>
+        </p>
       )}
-      {action && <div style={{ marginTop: 16 }}>{action}</div>}
+      {action && <div className="mt-2">{action}</div>}
     </div>
   );
 });

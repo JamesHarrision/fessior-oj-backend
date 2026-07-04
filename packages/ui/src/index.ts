@@ -2,6 +2,7 @@ export * from './layout/FullPageCenter';
 export * from './layout/SurfaceCard';
 export * from './layout/ContentCard';
 export * from './feedback/LoadingScreen';
+export * from './feedback/SkeletonBlock';
 export * from './brand/AppLogo';
 export * from './data/DifficultyBadge';
 export * from './data/StatusBadge';

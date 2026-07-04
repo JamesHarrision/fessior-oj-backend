@@ -1,8 +1,11 @@
 import React from 'react';
 import type { ReactNode } from 'react';
-import { Typography } from 'antd';
 
-const { Text } = Typography;
+/* =====================================================
+   SectionHeader — Section divider with uppercase label
+   API unchanged: { title, action? }
+   Ink & Vermillion: font-display uppercase Stone, border Charcoal
+   ===================================================== */
 
 interface SectionHeaderProps {
   title: string;
@@ -14,28 +17,11 @@ export const SectionHeader = React.memo(function SectionHeader({
   action,
 }: SectionHeaderProps) {
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingBottom: 12,
-        marginBottom: 16,
-        borderBottom: '1px solid rgba(148,163,184,0.18)',
-      }}
-    >
-      <Text
-        style={{
-          textTransform: 'uppercase',
-          letterSpacing: '0.05em',
-          fontSize: 12,
-          fontWeight: 600,
-          color: '#64748b',
-        }}
-      >
+    <div className="flex items-center justify-between border-b border-charcoal pb-3 mb-4">
+      <span className="font-display text-xs font-bold uppercase tracking-[0.15em] text-stone">
         {title}
-      </Text>
-      {action && <div>{action}</div>}
+      </span>
+      {action && <div className="shrink-0">{action}</div>}
     </div>
   );
 });
