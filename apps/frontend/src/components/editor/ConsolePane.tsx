@@ -68,12 +68,13 @@ export const ConsolePane: React.FC<ConsolePaneProps> = ({
   }, [verdict, isSubmitting]);
 
   const handleRunCode = async () => {
-    if (!problemId) return;
     setIsRunning(true);
     setRunResults(null);
     setActiveTab('result');
     try {
-      const payload = { problemId, code, language, customInput: testMode === 'custom' ? customInput : undefined };
+      const payload: any = { code, language };
+      if (problemId) payload.problemId = problemId;
+      if (testMode === 'custom' && customInput) payload.customInput = customInput;
       const res = await api.runCode(payload);
       if (res.success && res.data) {
         setRunResults(res.data);
