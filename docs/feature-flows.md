@@ -54,11 +54,16 @@ flowchart LR
 
 Files lien quan:
 
-- `apps/frontend/src/views/ProblemsView.tsx`
-- `apps/frontend/src/views/SoloEditorView.tsx`
+- `apps/frontend/src/views/SoloSolveView.tsx`
+- `apps/frontend/src/views/PvPWorkspaceView.tsx`
+- `apps/frontend/src/views/ContestSolveView.tsx`
+- `apps/frontend/src/views/PlaygroundView.tsx`
+- `apps/frontend/src/features/problems/ProblemsPage.tsx`
 - `apps/frontend/src/components/admin/AdminProblemsTab.tsx`
 - `apps/frontend/src/components/editor/ProblemDescription.tsx`
 - `apps/frontend/src/components/editor/TestCaseSelector.tsx`
+- `apps/frontend/src/components/editor/CodeEditorPane.tsx`
+- `apps/frontend/src/components/editor/ConsolePane.tsx`
 - `apps/main-service/src/routes/problem.route.ts`
 - `apps/main-service/src/controllers/problem.controller.ts`
 - `apps/main-service/src/services/problem.service.ts`
@@ -90,7 +95,10 @@ flowchart LR
 
 Files lien quan:
 
-- `apps/frontend/src/views/SoloEditorView.tsx`
+- `apps/frontend/src/views/SoloSolveView.tsx`
+- `apps/frontend/src/views/PvPWorkspaceView.tsx`
+- `apps/frontend/src/views/ContestSolveView.tsx`
+- `apps/frontend/src/views/PlaygroundView.tsx`
 - `apps/frontend/src/views/SubmissionsView.tsx`
 - `apps/frontend/src/components/editor/CodeEditorPane.tsx`
 - `apps/frontend/src/components/editor/ConsolePane.tsx`

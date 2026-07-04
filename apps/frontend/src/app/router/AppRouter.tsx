@@ -5,7 +5,10 @@ import { AppShellLayout } from '../layouts/AppShellLayout';
 import { AuthPage } from '../../features/auth/AuthPage';
 import { ProblemsPage } from '../../features/problems/ProblemsPage';
 import { MatchFindingView } from '../../views/MatchFindingView';
-import { SoloEditorView } from '../../views/SoloEditorView';
+import { SoloSolveView } from '../../views/SoloSolveView';
+import { PvPWorkspaceView } from '../../views/PvPWorkspaceView';
+import { ContestSolveView } from '../../views/ContestSolveView';
+import { PlaygroundView } from '../../views/PlaygroundView';
 import { RankingView } from '../../views/RankingView';
 import { ShopView } from '../../views/ShopView';
 import { ContestView } from '../../views/ContestView';
@@ -20,7 +23,7 @@ import { TokenProofView } from '../../views/TokenProofView';
 import { useMatchStore } from '../../stores/match.store';
 
 /* =====================================================
-   Route Wrappers — bridge legacy views to Zustand stores
+   Route Wrappers
    ===================================================== */
 
 function MatchRouteWrapper() {
@@ -33,20 +36,8 @@ function MatchRouteWrapper() {
       onStartMatch={(m) => {
         setActiveMatch(m as unknown as IMatch);
         setSelectedProblem(null);
-        nav('/editor');
+        nav(`/match/${(m as any).id ?? (m as any).matchId}`);
       }}
-    />
-  );
-}
-
-function EditorRouteWrapper() {
-  const activeMatch = useMatchStore((s) => s.activeMatch);
-  const selectedProblem = useMatchStore((s) => s.selectedProblem);
-
-  return (
-    <SoloEditorView
-      activeMatch={activeMatch ?? undefined}
-      problemSlug={selectedProblem?.slug ?? null}
     />
   );
 }
@@ -57,9 +48,9 @@ function CustomRoomsRouteWrapper() {
 
   return (
     <CustomRoomsView
-      onStartCustomMatch={(matchId, problemId) => {
-        setActiveMatch({ id: matchId, problem_id: problemId } as unknown as IMatch);
-        nav('/editor');
+      onStartCustomMatch={(matchId, _problemId) => {
+        setActiveMatch({ id: matchId } as unknown as IMatch);
+        nav(`/match/${matchId}`);
       }}
     />
   );
@@ -100,15 +91,18 @@ export function AppRouter() {
         >
           <Route path="/" element={<Navigate to="/match" replace />} />
 
-          {/* ── Match & Editor ── */}
+          {/* ── Match & Solving ── */}
           <Route path="/match" element={<MatchRouteWrapper />} />
-          <Route path="/editor" element={<EditorRouteWrapper />} />
+          <Route path="/match/:matchId" element={<PvPWorkspaceView />} />
+          <Route path="/solve/:problemSlug" element={<SoloSolveView />} />
+          <Route path="/editor" element={<PlaygroundView />} />
 
           {/* ── Problems ── */}
           <Route path="/problems" element={<ProblemsPage />} />
 
           {/* ── Competitions ── */}
           <Route path="/contest" element={<ContestView />} />
+          <Route path="/contest/:contestId/problem/:problemId" element={<ContestSolveView />} />
           <Route path="/ranking" element={<RankingView />} />
           <Route path="/custom-rooms" element={<CustomRoomsRouteWrapper />} />
 

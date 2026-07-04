@@ -144,7 +144,7 @@ export function ProblemsPage() {
   const handleSelect = (slug: string) => {
     const problem = problems.find((p) => p.slug === slug) ?? null;
     setSelectedProblem(problem);
-    navigate('/editor');
+    navigate(`/solve/${slug}`);
   };
 
   return (
