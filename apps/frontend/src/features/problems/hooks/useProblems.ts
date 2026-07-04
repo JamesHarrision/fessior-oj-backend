@@ -4,13 +4,30 @@ import { problemRepository } from '../../../app/api/client';
 import type { IProblem, ITag } from '@ocj/types';
 
 /**
- * HttpClient.request() already extracts .data from ApiResponse.
- * So repository methods return the unwrapped payload directly:
- *   problemRepository.getProblems() → Promise<IProblem[]>
- *   problemRepository.getTags()    → Promise<ITag[]>
+ * Backend API may return data in multiple shapes:
+ *   IProblem[]                    — plain array
+ *   { items: IProblem[], ... }    — paginated wrapper
+ *   { status, data: [...] }       — ApiResponse (if not unwrapped by HttpClient)
  *
- * No additional unwrapping needed here.
+ * This helper normalizes all shapes to IProblem[].
  */
+function ensureArray<T>(raw: unknown): T[] {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw as T[];
+  if (typeof raw === 'object') {
+    const obj = raw as Record<string, unknown>;
+    // Paginated response: { items: [...] }
+    if (Array.isArray(obj.items)) return obj.items as T[];
+    // Nested ApiResponse: { data: [...] }
+    if (Array.isArray(obj.data)) return obj.data as T[];
+    // Nested data.items
+    if (obj.data && typeof obj.data === 'object') {
+      const inner = obj.data as Record<string, unknown>;
+      if (Array.isArray(inner.items)) return inner.items as T[];
+    }
+  }
+  return [];
+}
 
 export function useProblems() {
   const problemsQuery = useQuery({
@@ -26,8 +43,8 @@ export function useProblems() {
   });
 
   return {
-    problems: (problemsQuery.data as IProblem[]) ?? [],
-    tags: (tagsQuery.data as ITag[]) ?? [],
+    problems: ensureArray<IProblem>(problemsQuery.data),
+    tags: ensureArray<ITag>(tagsQuery.data),
     isLoading: problemsQuery.isLoading || tagsQuery.isLoading,
     isError: problemsQuery.isError || tagsQuery.isError,
     error: problemsQuery.error ?? tagsQuery.error,
