@@ -1,5 +1,10 @@
 import React from 'react';
 
+/* =====================================================
+   TestCaseSelector — Ink & Vermillion
+   Props unchanged: 7 props
+   ===================================================== */
+
 interface TestCaseSelectorProps {
   testMode: 'sample' | 'custom';
   setTestMode: (mode: 'sample' | 'custom') => void;
@@ -20,16 +25,19 @@ export const TestCaseSelector: React.FC<TestCaseSelectorProps> = ({
   setCustomInput,
 }) => {
   return (
-    <div className="testcase-tab-content">
-      <div className="test-mode-selector">
+    <div className="flex flex-col gap-3">
+      {/* Mode buttons */}
+      <div className="flex gap-2">
         <button
-          className={`mode-btn ${testMode === 'sample' ? 'active' : ''}`}
+          className={`font-display text-[10px] font-bold uppercase px-3 py-1.5 border cursor-pointer transition-colors ${testMode === 'sample' ? 'border-charcoal bg-charcoal/30 text-linen' : 'border-charcoal/50 text-stone hover:text-linen'
+            }`}
           onClick={() => setTestMode('sample')}
         >
           Testcase mẫu
         </button>
         <button
-          className={`mode-btn ${testMode === 'custom' ? 'active' : ''}`}
+          className={`font-display text-[10px] font-bold uppercase px-3 py-1.5 border cursor-pointer transition-colors ${testMode === 'custom' ? 'border-charcoal bg-charcoal/30 text-linen' : 'border-charcoal/50 text-stone hover:text-linen'
+            }`}
           onClick={() => setTestMode('custom')}
         >
           Tùy biến Input
@@ -38,32 +46,33 @@ export const TestCaseSelector: React.FC<TestCaseSelectorProps> = ({
 
       {testMode === 'sample' ? (
         <>
-          <div className="case-tabs">
+          <div className="flex gap-2 flex-wrap">
             {sampleTestCases.map((_, idx) => (
               <button
                 key={idx}
-                className={`case-tab-btn ${activeSampleIdx === idx ? 'active' : ''}`}
+                className={`font-display text-[10px] font-bold px-2.5 py-1 border cursor-pointer transition-colors ${activeSampleIdx === idx ? 'border-charcoal bg-charcoal/30 text-linen' : 'border-charcoal/50 text-stone hover:text-linen'
+                  }`}
                 onClick={() => setActiveSampleIdx(idx)}
               >
                 Case {idx + 1}
               </button>
             ))}
             {sampleTestCases.length === 0 && (
-              <span className="no-cases-text">Không có testcase mẫu</span>
+              <span className="font-body text-[11px] text-stone">Không có testcase mẫu</span>
             )}
           </div>
 
           {sampleTestCases[activeSampleIdx] && (
-            <div className="case-params">
-              <div className="param-group">
-                <span className="param-label">Input</span>
-                <pre className="param-value-box">
+            <div className="flex flex-col gap-3">
+              <div>
+                <span className="font-display text-[10px] font-bold uppercase tracking-[0.1em] text-stone block mb-1.5">Input</span>
+                <pre className="bg-ink border border-charcoal p-3 font-mono text-xs text-linen whitespace-pre-wrap">
                   {sampleTestCases[activeSampleIdx].input || 'Empty input'}
                 </pre>
               </div>
-              <div className="param-group">
-                <span className="param-label">Expected Output</span>
-                <pre className="param-value-box">
+              <div>
+                <span className="font-display text-[10px] font-bold uppercase tracking-[0.1em] text-stone block mb-1.5">Expected Output</span>
+                <pre className="bg-ink border border-charcoal p-3 font-mono text-xs text-linen whitespace-pre-wrap">
                   {sampleTestCases[activeSampleIdx].output || 'Empty output'}
                 </pre>
               </div>
@@ -71,10 +80,10 @@ export const TestCaseSelector: React.FC<TestCaseSelectorProps> = ({
           )}
         </>
       ) : (
-        <div className="custom-input-wrapper">
-          <span className="param-label">Dữ liệu đầu vào (stdin)</span>
+        <div className="flex flex-col gap-1.5">
+          <span className="font-display text-[10px] font-bold uppercase tracking-[0.1em] text-stone">Dữ liệu đầu vào (stdin)</span>
           <textarea
-            className="custom-input-textarea"
+            className="bg-ink border border-charcoal p-3 font-mono text-xs text-linen placeholder-stone w-full h-32 resize-none outline-none focus:border-vermilion transition-colors"
             value={customInput}
             onChange={(e) => setCustomInput(e.target.value)}
             placeholder="Nhập stdin cho chương trình của bạn..."

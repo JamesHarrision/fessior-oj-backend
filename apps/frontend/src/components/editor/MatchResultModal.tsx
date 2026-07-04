@@ -1,53 +1,94 @@
 import React from 'react';
-import type { IUser } from '@ocj/types';
+import { ArrowUp, ArrowDown } from 'lucide-react';
+
+/* =====================================================
+   MatchResultModal — Ink & Vermillion
+   Win/Loss pattern: fill vs outline (matching ELO Ticker)
+   ===================================================== */
 
 interface MatchResultModalProps {
-  matchResult: any;
-  user: IUser | null;
-  opponent: IUser | null;
+  result: any;
+  currentUserId: string;
   onClose: () => void;
 }
 
 export const MatchResultModal: React.FC<MatchResultModalProps> = ({
-  matchResult,
-  user,
-  opponent,
+  result,
+  currentUserId,
   onClose,
 }) => {
-  const isWinner = matchResult.winnerId === user?.id;
-  const userEloUpdate = matchResult.eloUpdates[user?.id || ''];
-  const opponentEloUpdate = opponent ? matchResult.eloUpdates[opponent.userId || opponent.id || ''] : null;
+  const isWinner = result.winnerId === currentUserId;
+  const userUpdate = result.eloUpdates?.[currentUserId];
+  const opponentId = Object.keys(result.eloUpdates ?? {}).find((k) => k !== currentUserId);
+  const opponentUpdate = opponentId ? result.eloUpdates?.[opponentId] : null;
 
   return (
-    <div className="match-result-overlay">
-      <div className="result-modal glass-card">
-        <h2>{isWinner ? '🏆 CHIẾN THẮNG!' : '💀 THẤT BẠI'}</h2>
-        <p className="result-subtitle">Kết quả trận đấu PvP Arena</p>
+    <div className="fixed inset-0 bg-ink/85 z-50 flex items-center justify-center p-4">
+      <div className="bg-washi border border-charcoal p-10 text-center min-w-[360px] max-w-[420px]">
+        {/* Title */}
+        <h2 className={`font-display text-2xl font-bold uppercase tracking-wider mb-2 ${isWinner ? 'text-vermilion' : 'text-stone'
+          }`}>
+          {isWinner ? 'CHIẾN THẮNG' : 'THẤT BẠI'}
+        </h2>
+        <p className="font-body text-xs text-stone mb-8">Kết quả trận đấu PvP Arena</p>
 
-        <div className="elo-changes">
-          <div className="elo-box">
-            <span className="player-label">{user?.username}</span>
-            <span className="elo-value">
-              {userEloUpdate?.elo || 1000}{' '}
-              <span className="elo-diff plus">
-                (+{userEloUpdate?.change || 0})
-              </span>
+        {/* ELO Changes */}
+        <div className="flex justify-center gap-10 mb-8">
+          {/* User */}
+          <div className="flex flex-col items-center gap-2">
+            <span className="font-body text-xs text-stone uppercase tracking-wider">Bạn</span>
+            <span className="font-display text-3xl font-bold text-linen tabular-nums">
+              {userUpdate?.elo ?? 1000}
             </span>
+            <div className={`flex items-center gap-1 font-display text-xs font-bold ${(userUpdate?.change ?? 0) >= 0 ? 'text-vermilion' : 'text-stone'
+              }`}>
+              {(userUpdate?.change ?? 0) >= 0 ? (
+                <>
+                  <ArrowUp size={12} className="text-vermilion" />
+                  <span>+{userUpdate?.change ?? 0}</span>
+                </>
+              ) : (
+                <>
+                  <ArrowDown size={12} className="text-stone" />
+                  <span>{userUpdate?.change ?? 0}</span>
+                </>
+              )}
+            </div>
           </div>
-          {opponent && (
-            <div className="elo-box">
-              <span className="player-label">{opponent.username}</span>
-              <span className="elo-value">
-                {opponentEloUpdate?.elo || 1000}{' '}
-                <span className="elo-diff minus">
-                  ({opponentEloUpdate?.change || 0})
-                </span>
+
+          {/* Divider */}
+          <div className="w-px bg-charcoal" />
+
+          {/* Opponent */}
+          {opponentUpdate && (
+            <div className="flex flex-col items-center gap-2">
+              <span className="font-body text-xs text-stone uppercase tracking-wider">Đối thủ</span>
+              <span className="font-display text-3xl font-bold text-linen tabular-nums">
+                {opponentUpdate.elo ?? 1000}
               </span>
+              <div className={`flex items-center gap-1 font-display text-xs font-bold ${(opponentUpdate.change ?? 0) >= 0 ? 'text-vermilion' : 'text-stone'
+                }`}>
+                {(opponentUpdate.change ?? 0) >= 0 ? (
+                  <>
+                    <ArrowUp size={12} className="text-vermilion" />
+                    <span>+{opponentUpdate.change ?? 0}</span>
+                  </>
+                ) : (
+                  <>
+                    <ArrowDown size={12} className="text-stone" />
+                    <span>{opponentUpdate.change ?? 0}</span>
+                  </>
+                )}
+              </div>
             </div>
           )}
         </div>
 
-        <button className="close-result-btn" onClick={onClose}>
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="bg-vermilion text-linen font-display text-sm font-bold uppercase tracking-wider px-8 py-3 hover:bg-vermilion-hover transition-colors cursor-pointer"
+        >
           Quay lại sảnh
         </button>
       </div>

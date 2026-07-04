@@ -4,7 +4,12 @@ import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import type { IProblem } from '@ocj/types';
 import { renderMarkdownToHtml } from '@ocj/utils';
-import './ProblemDescription.css';
+import { DifficultyBadge, EmptyState } from '@ocj/ui';
+
+/* =====================================================
+   ProblemDescription — Ink & Vermillion
+   Props unchanged: { problem? }
+   ===================================================== */
 
 interface ProblemProps {
   problem?: IProblem | null;
@@ -24,20 +29,13 @@ export const ProblemDescription: React.FC<ProblemProps> = ({ problem }) => {
     setLoading(true);
     try {
       const res = await api.getComments(problemId);
-      if (res.success && res.data) {
-        setComments(res.data);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+      if (res.success && res.data) setComments(res.data);
+    } catch (err) { console.error(err); }
+    finally { setLoading(false); }
   };
 
   useEffect(() => {
-    if (activeTab === 'discuss') {
-      loadComments();
-    }
+    if (activeTab === 'discuss') loadComments();
   }, [activeTab, problemId]);
 
   const handlePostComment = async (e: React.FormEvent) => {
@@ -45,35 +43,22 @@ export const ProblemDescription: React.FC<ProblemProps> = ({ problem }) => {
     if (!newComment.trim() || !problemId) return;
     try {
       const res = await api.createComment({ targetId: problemId, targetType: 'PROBLEM', content: newComment });
-      if (res.success) {
-        setNewComment('');
-        loadComments();
-      }
-    } catch (err) {
-      console.error(err);
-    }
+      if (res.success) { setNewComment(''); loadComments(); }
+    } catch (err) { console.error(err); }
   };
 
   const handleLike = async (commentId: string) => {
     try {
       const res = await api.toggleLikeComment(commentId);
-      if (res.success) {
-        loadComments();
-      }
-    } catch (err) {
-      console.error(err);
-    }
+      if (res.success) loadComments();
+    } catch (err) { console.error(err); }
   };
 
   const handleDelete = async (commentId: string) => {
     try {
       const res = await api.deleteComment(commentId);
-      if (res.success) {
-        setComments((prev) => prev.filter((c) => c.id !== commentId && c._id !== commentId));
-      }
-    } catch (err) {
-      console.error(err);
-    }
+      if (res.success) setComments((prev) => prev.filter((c) => c.id !== commentId && c._id !== commentId));
+    } catch (err) { console.error(err); }
   };
 
   const title = problem?.title || 'Đang tải...';
@@ -82,97 +67,99 @@ export const ProblemDescription: React.FC<ProblemProps> = ({ problem }) => {
   const tags = problem?.tags || [];
 
   return (
-    <div className="problem-description glass-card">
-      <div className="desc-header-tabs">
+    <div className="flex flex-col h-[480px] bg-washi border border-charcoal overflow-hidden">
+      {/* Tabs */}
+      <div className="flex border-b border-charcoal">
         <button
-          className={`tab-btn ${activeTab === 'desc' ? 'active' : ''}`}
+          className={`flex items-center gap-1.5 font-display text-xs font-semibold px-4 py-2.5 transition-colors cursor-pointer ${activeTab === 'desc' ? 'text-vermilion border-b-[2px] border-b-vermilion' : 'text-stone hover:text-linen border-b-[2px] border-b-transparent'
+            }`}
           onClick={() => setActiveTab('desc')}
         >
-          <BookOpen size={14} /> Chi tiết đề bài
+          <BookOpen size={13} />
+          Chi tiết đề bài
         </button>
         <button
-          className={`tab-btn ${activeTab === 'discuss' ? 'active' : ''}`}
+          className={`flex items-center gap-1.5 font-display text-xs font-semibold px-4 py-2.5 transition-colors cursor-pointer ${activeTab === 'discuss' ? 'text-vermilion border-b-[2px] border-b-vermilion' : 'text-stone hover:text-linen border-b-[2px] border-b-transparent'
+            }`}
           onClick={() => setActiveTab('discuss')}
         >
-          <MessageSquare size={14} /> Thảo luận ({comments.length})
+          <MessageSquare size={13} />
+          Thảo luận ({comments.length})
         </button>
       </div>
 
-      <div className="desc-content">
+      <div className="flex-1 overflow-y-auto p-4">
         {activeTab === 'desc' ? (
           <>
-            <h1 className="problem-title">{title}</h1>
-            <div className="badge-row">
-              <span className={`badge difficulty ${difficulty.toLowerCase()}`}>
-                {difficulty}
-              </span>
+            <h1 className="font-display text-lg font-bold text-linen mb-3">{title}</h1>
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              <DifficultyBadge difficulty={difficulty as any} size="small" />
               {tags.map((tag: any, idx) => (
-                <span key={idx} className="badge tag" style={tag.color ? { borderColor: tag.color, color: tag.color } : undefined}>
+                <span key={idx} className="font-display text-[10px] font-bold uppercase tracking-[0.1em] text-stone border border-charcoal bg-charcoal/20 px-2 py-0.5">
                   {typeof tag === 'object' ? tag.name : tag}
                 </span>
               ))}
             </div>
             <div
-              className="problem-text"
+              className="font-body text-sm text-linen/85 leading-relaxed [&_pre]:bg-ink [&_pre]:border [&_pre]:border-charcoal [&_pre]:p-3 [&_pre]:font-mono [&_pre]:text-xs [&_pre]:text-linen [&_pre]:overflow-x-auto [&_code]:text-vermilion"
               dangerouslySetInnerHTML={{ __html: renderMarkdownToHtml(description) }}
             />
           </>
         ) : (
-          <div className="discussions-container">
-            <form onSubmit={handlePostComment} className="comment-form">
+          <div className="flex flex-col gap-4">
+            {/* Comment form */}
+            <form onSubmit={handlePostComment} className="flex gap-2">
               <input
                 type="text"
                 placeholder="Nhập thảo luận của bạn tại đây..."
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                className="comment-input"
                 required
+                className="flex-1 bg-ink border border-charcoal px-3 py-2 text-sm text-linen placeholder-stone outline-none focus:border-vermilion transition-colors"
               />
-              <button type="submit" className="comment-submit-btn">
+              <button type="submit" className="flex items-center justify-center bg-vermilion text-linen px-3 py-2 hover:bg-vermilion-hover transition-colors cursor-pointer">
                 <Send size={14} />
               </button>
             </form>
 
+            {/* Comments list */}
             {loading ? (
-              <p className="loading-comments">Đang tải thảo luận...</p>
+              <p className="font-body text-xs text-stone text-center py-6 animate-pulse-soft">Đang tải thảo luận...</p>
+            ) : comments.length === 0 ? (
+              <EmptyState
+                icon={<MessageSquare size={32} strokeWidth={1.5} />}
+                title="Chưa có bình luận nào"
+                description="Hãy là người đầu tiên thảo luận về bài toán này."
+              />
             ) : (
-              <div className="comments-list">
-                {comments.length === 0 ? (
-                  <p className="no-comments">Chưa có bình luận nào. Hãy bắt đầu thảo luận!</p>
-                ) : (
-                  comments.map((c) => {
-                    const isOwner = c.userId === user?.id || c.user?.id === user?.id;
-                    const commentUser = c.username || c.user?.username || 'Đấu sĩ';
-                    const hasLiked = c.likes?.includes(user?.id);
-                    return (
-                      <div key={c.id || c._id} className="comment-item">
-                        <div className="comment-meta">
-                          <span className="comment-author">{commentUser}</span>
-                          <span className="comment-date">
-                            {new Date(c.createdAt).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <p className="comment-body">{c.content}</p>
-                        <div className="comment-actions">
-                          <button
-                            onClick={() => handleLike(c.id || c._id)}
-                            className={`like-btn ${hasLiked ? 'liked' : ''}`}
-                          >
-                            <ThumbsUp size={12} /> {c.likes?.length || 0}
-                          </button>
-                          {isOwner && (
-                            <button
-                              onClick={() => handleDelete(c.id || c._id)}
-                              className="delete-comment-btn"
-                            >
-                              <Trash2 size={12} />
-                            </button>
-                          )}
-                        </div>
+              <div className="flex flex-col gap-3 overflow-y-auto max-h-[320px]">
+                {comments.map((c) => {
+                  const isOwner = c.userId === user?.id || c.user?.id === user?.id;
+                  const commentUser = c.username || c.user?.username || 'Đấu sĩ';
+                  const hasLiked = c.likes?.includes(user?.id);
+                  return (
+                    <div key={c.id || c._id} className="bg-ink/30 border border-charcoal/50 p-3">
+                      <div className="flex justify-between items-center mb-1.5">
+                        <span className="font-body text-sm font-semibold text-linen">{commentUser}</span>
+                        <span className="font-body text-[11px] text-stone">
+                          {new Date(c.createdAt).toLocaleDateString('vi-VN')}
+                        </span>
                       </div>
-                    );
-                  })
-                )}
+                      <p className="font-body text-sm text-linen/80 mb-2">{c.content}</p>
+                      <div className="flex items-center gap-3">
+                        <button onClick={() => handleLike(c.id || c._id)} className={`flex items-center gap-1 font-body text-[11px] cursor-pointer transition-colors ${hasLiked ? 'text-vermilion' : 'text-stone hover:text-linen'
+                          }`}>
+                          <ThumbsUp size={11} /> {c.likes?.length || 0}
+                        </button>
+                        {isOwner && (
+                          <button onClick={() => handleDelete(c.id || c._id)} className="font-body text-[11px] text-stone hover:text-vermilion transition-colors cursor-pointer">
+                            <Trash2 size={11} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>

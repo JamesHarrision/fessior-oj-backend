@@ -1,136 +1,96 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Send, ThumbsUp, Trash2, MessageSquare } from 'lucide-react';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
-import { MessageSquare, Heart, Trash2, Send } from 'lucide-react';
-import './ProblemComments.css';
+import { EmptyState } from '@ocj/ui';
+
+/* =====================================================
+   ProblemComments — Ink & Vermillion standalone
+   Props unchanged: { targetId, targetType }
+   ===================================================== */
 
 interface ProblemCommentsProps {
-  problemId: string;
+  targetId: string;
+  targetType: string;
 }
 
-export const ProblemComments: React.FC<ProblemCommentsProps> = ({ problemId }) => {
+export const ProblemComments: React.FC<ProblemCommentsProps> = ({ targetId, targetType }) => {
   const { user } = useAuth();
   const [comments, setComments] = useState<any[]>([]);
   const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const fetchComments = async () => {
-    if (!problemId) return;
-    try {
-      const res = await api.getComments(problemId);
-      if (res.success && res.data) {
-        setComments(res.data);
-      }
-    } catch (err) {
-      console.error('Error fetching comments:', err);
-    }
-  };
-
-  useEffect(() => {
-    fetchComments();
-  }, [problemId]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newComment.trim() || loading) return;
+  const loadComments = async () => {
     setLoading(true);
     try {
-      const res = await api.createComment({ targetId: problemId, targetType: 'PROBLEM', content: newComment });
-      if (res.success) {
-        setNewComment('');
-        fetchComments();
-      }
-    } catch (err: any) {
-      alert(err.message || 'Lỗi gửi bình luận');
-    } finally {
-      setLoading(false);
-    }
+      const res = await api.getComments(targetId);
+      if (res.success && res.data) setComments(res.data);
+    } catch (err) { console.error(err); }
+    finally { setLoading(false); }
   };
 
-  const handleLike = async (commentId: string) => {
+  useEffect(() => { loadComments(); }, [targetId]);
+
+  const handlePost = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
     try {
-      const res = await api.toggleLikeComment(commentId);
-      if (res.success) {
-        // Toggle client-side or refetch
-        fetchComments();
-      }
-    } catch (err) {
-      console.error(err);
-    }
+      const res = await api.createComment({ targetId, targetType, content: newComment });
+      if (res.success) { setNewComment(''); loadComments(); }
+    } catch (err) { console.error(err); }
   };
 
-  const handleDelete = async (commentId: string) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa bình luận này?')) return;
-    try {
-      const res = await api.deleteComment(commentId);
-      if (res.success) {
-        fetchComments();
-      }
-    } catch (err) {
-      console.error(err);
-    }
+  const handleLike = async (id: string) => {
+    try { const res = await api.toggleLikeComment(id); if (res.success) loadComments(); } catch (err) { console.error(err); }
+  };
+  const handleDelete = async (id: string) => {
+    try { const res = await api.deleteComment(id); if (res.success) setComments((p) => p.filter((c) => c.id !== id && c._id !== id)); } catch (err) { console.error(err); }
   };
 
   return (
-    <div className="problem-comments-container glass-card">
-      <div className="comments-header">
-        <MessageSquare size={18} />
-        <h4>Thảo luận ({comments.length})</h4>
-      </div>
-
-      <form onSubmit={handleSubmit} className="comment-form">
+    <div className="flex flex-col gap-4">
+      <form onSubmit={handlePost} className="flex gap-2">
         <input
           type="text"
-          placeholder="Chia sẻ suy nghĩ hoặc gợi ý giải pháp của bạn..."
+          placeholder="Nhập thảo luận..."
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
-          className="glass-input comment-input"
+          required
+          className="flex-1 bg-ink border border-charcoal px-3 py-2 text-sm text-linen placeholder-stone outline-none focus:border-vermilion transition-colors"
         />
-        <button type="submit" disabled={loading || !newComment.trim()} className="btn-send glass-button">
-          <Send size={16} />
+        <button type="submit" className="flex items-center justify-center bg-vermilion text-linen px-3 py-2 hover:bg-vermilion-hover transition-colors cursor-pointer">
+          <Send size={14} />
         </button>
       </form>
 
-      <div className="comments-list">
-        {comments.length === 0 ? (
-          <p className="no-comments">Chưa có bình luận nào. Hãy là người đầu tiên chia sẻ!</p>
-        ) : (
-          comments.map((comment) => {
-            const isOwner = comment.user_id === user?.id || comment.user?.id === user?.id;
-            const hasLiked = comment.likes && comment.likes.some((l: any) => l.user_id === user?.id);
+      {loading ? (
+        <p className="font-body text-xs text-stone text-center py-6 animate-pulse-soft">Đang tải thảo luận...</p>
+      ) : comments.length === 0 ? (
+        <EmptyState icon={<MessageSquare size={28} strokeWidth={1.5} />} title="Chưa có bình luận nào" description="Hãy là người đầu tiên thảo luận." />
+      ) : (
+        <div className="flex flex-col gap-3 max-h-[320px] overflow-y-auto">
+          {comments.map((c) => {
+            const isOwner = c.userId === user?.id || c.user?.id === user?.id;
+            const name = c.username || c.user?.username || 'Đấu sĩ';
+            const liked = c.likes?.includes(user?.id);
             return (
-              <div key={comment.id || comment._id} className="comment-item glass-card">
-                <div className="comment-meta">
-                  <span className="comment-author">{comment.user?.username || 'Người dùng'}</span>
-                  <span className="comment-date">
-                    {new Date(comment.created_at || comment.createdAt).toLocaleDateString('vi-VN')}
-                  </span>
+              <div key={c.id || c._id} className="bg-ink/30 border border-charcoal/50 p-3">
+                <div className="flex justify-between items-center mb-1.5">
+                  <span className="font-body text-sm font-semibold text-linen">{name}</span>
+                  <span className="font-body text-[11px] text-stone">{new Date(c.createdAt).toLocaleDateString('vi-VN')}</span>
                 </div>
-                <p className="comment-text">{comment.content}</p>
-                <div className="comment-actions">
-                  <button 
-                    onClick={() => handleLike(comment.id || comment._id)} 
-                    className={`btn-action-comment ${hasLiked ? 'liked' : ''}`}
-                  >
-                    <Heart size={14} fill={hasLiked ? 'currentColor' : 'none'} />
-                    <span>{comment.likes_count || (comment.likes ? comment.likes.length : 0)}</span>
+                <p className="font-body text-sm text-linen/80 mb-2">{c.content}</p>
+                <div className="flex items-center gap-3">
+                  <button onClick={() => handleLike(c.id || c._id)} className={`flex items-center gap-1 font-body text-[11px] cursor-pointer transition-colors ${liked ? 'text-vermilion' : 'text-stone hover:text-linen'}`}>
+                    <ThumbsUp size={11} /> {c.likes?.length || 0}
                   </button>
-
-                  {isOwner && (
-                    <button 
-                      onClick={() => handleDelete(comment.id || comment._id)} 
-                      className="btn-action-comment btn-delete-comment"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  )}
+                  {isOwner && <button onClick={() => handleDelete(c.id || c._id)} className="font-body text-[11px] text-stone hover:text-vermilion transition-colors cursor-pointer"><Trash2 size={11} /></button>}
                 </div>
               </div>
             );
-          })
-        )}
-      </div>
+          })}
+        </div>
+      )}
     </div>
   );
 };
-export default ProblemComments;

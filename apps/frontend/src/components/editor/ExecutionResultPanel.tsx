@@ -1,6 +1,13 @@
 import React from 'react';
 import { AlertCircle, Clock, Cpu } from 'lucide-react';
 import { formatExecutionTime, formatMemoryKb } from '@ocj/utils';
+import { StatusBadge } from '@ocj/ui';
+import { Spin } from 'antd';
+
+/* =====================================================
+   ExecutionResultPanel — Ink & Vermillion
+   Props unchanged: 7 props
+   ===================================================== */
 
 interface ExecutionResultPanelProps {
   isRunning: boolean;
@@ -22,54 +29,62 @@ export const ExecutionResultPanel: React.FC<ExecutionResultPanelProps> = ({
   verdictDetails,
 }) => {
   return (
-    <div className="console-tab-content">
+    <div className="flex flex-col gap-4">
+      {/* ── Running state ── */}
       {isRunning && (
-        <div className="loading-state">
-          <div className="spinner"></div>
-          <p className="console-loading">Đang biên dịch và thực thi mã nguồn...</p>
+        <div className="flex flex-col items-center justify-center gap-3 py-10">
+          <Spin size="default" />
+          <p className="font-body text-xs text-stone">Đang biên dịch và thực thi mã nguồn...</p>
         </div>
       )}
+
+      {/* ── Submitting state ── */}
       {isSubmitting && (
-        <div className="loading-state">
-          <div className="spinner submissions"></div>
-          <p className="console-loading">Đang chấm điểm trên hệ thống Sandbox...</p>
+        <div className="flex flex-col items-center justify-center gap-3 py-10">
+          <Spin size="default" />
+          <p className="font-body text-xs text-stone">Đang chấm điểm trên hệ thống Sandbox...</p>
         </div>
       )}
 
+      {/* ── Idle: no results yet ── */}
       {!isRunning && !isSubmitting && !runResults && !verdict && (
-        <p className="console-empty">Chưa có kết quả chạy thử. Hãy nhấn nút Chạy thử hoặc Nộp bài.</p>
+        <p className="font-body text-xs text-stone text-center py-10">
+          Chưa có kết quả chạy thử. Hãy nhấn nút Chạy thử hoặc Nộp bài.
+        </p>
       )}
 
-      {/* Run Results (Local Chạy Thử) */}
+      {/* ── Run Results ── */}
       {!isRunning && !isSubmitting && runResults && (
-        <div className="results-container">
+        <div className="flex flex-col gap-3">
           {runResults.some((r) => r.status === 'CE') ? (
-            <div className="error-card CE">
-              <div className="error-header">
-                <AlertCircle size={18} className="error-icon" />
-                <span>Lỗi Biên Dịch (Compilation Error)</span>
+            <div className="border border-vermilion bg-washi p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertCircle size={16} className="text-vermilion" />
+                <span className="font-display text-xs font-bold text-linen">Lỗi Biên Dịch (Compilation Error)</span>
               </div>
-              <pre className="error-details">
+              <pre className="font-mono text-xs text-linen/80 whitespace-pre-wrap">
                 {runResults[0].error || runResults[0].actualOutput || 'No output details provided.'}
               </pre>
             </div>
           ) : runResults.some((r) => r.status === 'RE') ? (
-            <div className="error-card RE">
-              <div className="error-header">
-                <AlertCircle size={18} className="error-icon" />
-                <span>Lỗi Thực Thi (Runtime Error)</span>
+            <div className="border border-vermilion bg-washi p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertCircle size={16} className="text-vermilion" />
+                <span className="font-display text-xs font-bold text-linen">Lỗi Thực Thi (Runtime Error)</span>
               </div>
-              <pre className="error-details">
+              <pre className="font-mono text-xs text-linen/80 whitespace-pre-wrap">
                 {runResults[0].error || 'Chương trình kết thúc với mã lỗi khác 0.'}
               </pre>
             </div>
           ) : (
             <>
-              <div className="case-tabs">
+              {/* Case tabs */}
+              <div className="flex gap-1.5 flex-wrap">
                 {runResults.map((result, idx) => (
                   <button
-                     key={idx}
-                    className={`case-tab-btn ${runActiveCaseIdx === idx ? 'active' : ''} ${result.status}`}
+                    key={idx}
+                    className={`font-display text-[10px] font-bold px-2 py-1 border cursor-pointer transition-colors ${runActiveCaseIdx === idx ? 'border-charcoal bg-charcoal/30 text-linen' : 'border-charcoal/50 text-stone hover:text-linen'
+                      }`}
                     onClick={() => setRunActiveCaseIdx(idx)}
                   >
                     Case {idx + 1} ({result.status})
@@ -77,40 +92,39 @@ export const ExecutionResultPanel: React.FC<ExecutionResultPanelProps> = ({
                 ))}
               </div>
 
+              {/* Active case detail */}
               {runResults[runActiveCaseIdx] && (
-                <div className="case-params">
-                  <div className="verdict-banner-container">
-                    <span className={`verdict-badge ${runResults[runActiveCaseIdx].status}`}>
-                      {runResults[runActiveCaseIdx].status === 'ACCEPTED' ? 'ACCEPTED' : 'WRONG ANSWER'}
-                    </span>
-                    <div className="metrics-group">
-                      <span className="metric-item">
-                        <Clock size={12} />
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center justify-between">
+                    <StatusBadge status={runResults[runActiveCaseIdx].status} />
+                    <div className="flex items-center gap-3">
+                      <span className="flex items-center gap-1 font-body text-[11px] text-stone">
+                        <Clock size={11} />
                         {formatExecutionTime(runResults[runActiveCaseIdx].time)}
                       </span>
-                      <span className="metric-item">
-                        <Cpu size={12} />
+                      <span className="flex items-center gap-1 font-body text-[11px] text-stone">
+                        <Cpu size={11} />
                         {formatMemoryKb(runResults[runActiveCaseIdx].memory)}
                       </span>
                     </div>
                   </div>
 
-                  <div className="param-group">
-                    <span className="param-label">Input</span>
-                    <pre className="param-value-box font-mono">
+                  <div>
+                    <span className="font-display text-[10px] font-bold uppercase tracking-[0.1em] text-stone block mb-1.5">Input</span>
+                    <pre className="bg-ink border border-charcoal p-2.5 font-mono text-xs text-linen whitespace-pre-wrap">
                       {runResults[runActiveCaseIdx].input || 'Empty input'}
                     </pre>
                   </div>
-                  <div className="param-group">
-                    <span className="param-label">Your Output</span>
-                    <pre className="param-value-box font-mono actual">
+                  <div>
+                    <span className="font-display text-[10px] font-bold uppercase tracking-[0.1em] text-stone block mb-1.5">Your Output</span>
+                    <pre className="bg-ink border border-charcoal p-2.5 font-mono text-xs text-linen whitespace-pre-wrap">
                       {runResults[runActiveCaseIdx].actualOutput || 'No output'}
                     </pre>
                   </div>
                   {runResults[runActiveCaseIdx].expectedOutput && (
-                    <div className="param-group">
-                      <span className="param-label">Expected Output</span>
-                      <pre className="param-value-box font-mono expected">
+                    <div>
+                      <span className="font-display text-[10px] font-bold uppercase tracking-[0.1em] text-stone block mb-1.5">Expected Output</span>
+                      <pre className="bg-ink border border-charcoal p-2.5 font-mono text-xs text-linen whitespace-pre-wrap">
                         {runResults[runActiveCaseIdx].expectedOutput}
                       </pre>
                     </div>
@@ -122,28 +136,28 @@ export const ExecutionResultPanel: React.FC<ExecutionResultPanelProps> = ({
         </div>
       )}
 
-      {/* Official Verdict Results (Nộp Bài) */}
+      {/* ── Official Verdict ── */}
       {!isRunning && !isSubmitting && verdict && (
-        <div className="results-container">
-          <div className={`verdict-banner ${verdict}`}>
-            {verdict === 'ACCEPTED' ? '✓ ACCEPTED' : `✗ ${verdict}`}
+        <div className="flex flex-col gap-3">
+          <div className="bg-washi border border-charcoal p-3 text-center">
+            <StatusBadge status={verdict} />
           </div>
 
           {verdictDetails && (
-            <div className="verdict-logs">
-              <p>
-                <strong>Số lượng Testcases đạt:</strong>{' '}
-                <span className="highlight-passed">
+            <div className="flex flex-col gap-3">
+              <p className="font-body text-sm text-linen">
+                <span className="text-stone">Số lượng Testcases đạt: </span>
+                <span className="font-display font-bold text-vermilion">
                   {verdictDetails.testCasesPassed} / {verdictDetails.testCasesTotal}
                 </span>
               </p>
               {verdictDetails.error && (
-                <div className="error-card CE mt-3">
-                  <div className="error-header">
-                    <AlertCircle size={16} />
-                    <span>Chi tiết thông báo lỗi</span>
+                <div className="border border-vermilion bg-washi p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <AlertCircle size={14} className="text-vermilion" />
+                    <span className="font-display text-xs font-bold text-linen">Chi tiết thông báo lỗi</span>
                   </div>
-                  <pre className="error-details">{verdictDetails.error}</pre>
+                  <pre className="font-mono text-xs text-linen/80 whitespace-pre-wrap">{verdictDetails.error}</pre>
                 </div>
               )}
             </div>
