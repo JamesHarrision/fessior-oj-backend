@@ -151,8 +151,9 @@ function TopBar(props: {
   user: ReturnType<typeof useAuth>['user'];
   onLogout: () => void;
   notificationCount?: number;
+  hideSearch?: boolean;
 }) {
-  const { user, onLogout, notificationCount = 0 } = props;
+  const { user, onLogout, notificationCount = 0, hideSearch = false } = props;
 
   const userDropdownItems = [
     { key: 'profile', label: 'Tài khoản', icon: <UserOutlined /> },
@@ -163,15 +164,17 @@ function TopBar(props: {
 
   return (
     <header className="h-16 flex items-center justify-between px-6 bg-washi border-b border-charcoal shrink-0">
-      {/* ── Search ── */}
+      {/* ── Search (hidden on Lobby) ── */}
       <div className="flex-1 max-w-lg">
-        <Input
-          prefix={<SearchOutlined className="text-stone" />}
-          placeholder="Search problems, contests, users..."
-          variant="filled"
-          className="[&_.ant-input]:!bg-ink [&_.ant-input]:!text-linen [&_.ant-input]:!placeholder-stone"
-          size="large"
-        />
+        {!hideSearch && (
+          <Input
+            prefix={<SearchOutlined className="text-stone" />}
+            placeholder="Search problems, contests, users..."
+            variant="filled"
+            className="[&_.ant-input]:!bg-ink [&_.ant-input]:!text-linen [&_.ant-input]:!placeholder-stone"
+            size="large"
+          />
+        )}
       </div>
 
       {/* ── Right Section ── */}
@@ -268,7 +271,7 @@ export function AppShellLayout() {
       {/* ── Main Content Area ── */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* ── Top Bar ── */}
-        <TopBar user={user} onLogout={handleLogout} />
+        <TopBar user={user} onLogout={handleLogout} hideSearch={location.pathname === '/match'} />
 
         {/* ── Content ── */}
         <main className="flex-1 overflow-y-auto bg-ink">

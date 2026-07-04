@@ -74,8 +74,8 @@ export const MatchFindingView: React.FC<MatchFindingViewProps> = ({ onStartMatch
 
   return (
     <div className="flex flex-col gap-10 pb-10">
-      {/* ── Lobby Arena: Host + Circle + Opponent ── */}
-      <div className="flex items-center justify-center gap-8 lg:gap-16 flex-col lg:flex-row">
+      {/* ── Lobby Arena: Host + Circle + Opponent (all same card style, equal height) ── */}
+      <div className="flex items-stretch justify-center gap-6 lg:gap-8 flex-col lg:flex-row">
         {/* Host */}
         <PlayerCard
           name={user?.username || 'Bạn'}
@@ -84,24 +84,12 @@ export const MatchFindingView: React.FC<MatchFindingViewProps> = ({ onStartMatch
           winRate={`Streak: ${user?.streak_count || 0}`}
         />
 
-        {/* Center Circle */}
-        <div className="flex flex-col items-center gap-5">
-          <FindingCircle
-            isSearching={isSearching}
-            onToggleSearch={handleToggleSearch}
-            searchDuration={searchDuration}
-          />
-
-          {/* VS reveal when opponent found */}
-          {matchData && opponent && (
-            <button
-              onClick={() => onStartMatch(matchData)}
-              className="font-display text-xl font-bold uppercase tracking-wide bg-vermilion text-linen px-10 py-3 hover:bg-vermilion-hover transition-colors cursor-pointer animate-vs-grow"
-            >
-              BẮT ĐẦU
-            </button>
-          )}
-        </div>
+        {/* Center Circle — now in matching card wrapper */}
+        <FindingCircle
+          isSearching={isSearching}
+          onToggleSearch={handleToggleSearch}
+          searchDuration={searchDuration}
+        />
 
         {/* Opponent */}
         {opponent ? (
@@ -123,6 +111,18 @@ export const MatchFindingView: React.FC<MatchFindingViewProps> = ({ onStartMatch
           />
         )}
       </div>
+
+      {/* VS reveal when opponent found (outside 3-col, centered) */}
+      {matchData && opponent && (
+        <div className="flex justify-center -mt-4">
+          <button
+            onClick={() => onStartMatch(matchData)}
+            className="font-display text-xl font-bold uppercase tracking-wide bg-vermilion text-linen px-10 py-3 hover:bg-vermilion-hover transition-colors cursor-pointer animate-vs-grow"
+          >
+            BẮT ĐẦU
+          </button>
+        </div>
+      )}
 
       {/* ── Secondary: Rooms + Social ── */}
       <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-5 w-full max-w-[1200px] mx-auto">
