@@ -133,7 +133,7 @@ export const MatchFindingView: React.FC<MatchFindingViewProps> = ({ onStartMatch
       </div>
 
       {/* ── Secondary: Rooms + Social ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-5 w-full max-w-[1200px] mx-auto">
+      <div className="flex justify-between gap-5 w-full max-w-[1200px] mx-auto">
         <RoomBrowser onJoinRoom={handleJoinCustomRoom} />
         <SocialSidebar />
       </div>

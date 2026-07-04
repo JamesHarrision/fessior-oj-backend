@@ -65,7 +65,7 @@ export const RoomBrowser: React.FC<RoomBrowserProps> = ({ onJoinRoom }) => {
   };
 
   return (
-    <div className="bg-washi border border-charcoal p-4 flex flex-col gap-4 min-h-[400px]">
+    <div className="bg-washi border border-charcoal p-4 flex-1 flex-col gap-4 min-h-[400px]">
       {/* ── Header ── */}
       <div className="flex items-center gap-2">
         <Users size={18} className="text-stone" />
