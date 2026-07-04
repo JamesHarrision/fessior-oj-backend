@@ -74,7 +74,12 @@ export const ConsolePane: React.FC<ConsolePaneProps> = ({
     try {
       const payload: any = { code, language };
       if (problemId) payload.problemId = problemId;
-      if (testMode === 'custom' && customInput) payload.customInput = customInput;
+      if (!showSampleTests) {
+        // Playground mode — always send customInput (even if empty string)
+        payload.customInput = customInput;
+      } else if (testMode === 'custom' && customInput) {
+        payload.customInput = customInput;
+      }
       const res = await api.runCode(payload);
       if (res.success && res.data) {
         setRunResults(res.data);
