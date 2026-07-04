@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from '@ocj/api';
-import { problemRepository } from '../../app/api/client';
+import { problemRepository } from '../../../app/api/client';
 import type { IProblem, ITag } from '@ocj/types';
 
 export function useProblems() {
