@@ -96,7 +96,7 @@ function FilterBar(props: {
         onChange={props.onDifficultyChange}
         options={DIFFICULTY_OPTIONS}
         className="!w-full"
-        popupClassName="!rounded-lg"
+        classNames={{ popup: { root: '!rounded-lg' } }}
         size="large"
       />
 
@@ -110,7 +110,7 @@ function FilterBar(props: {
           ...props.tags.map((t) => ({ value: t.slug ?? t.name ?? '', label: t.name })),
         ]}
         className="!w-full"
-        popupClassName="!rounded-lg"
+        classNames={{ popup: { root: '!rounded-lg' } }}
         size="large"
       />
     </div>
