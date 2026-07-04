@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Trophy, RefreshCw, Star, Zap } from 'lucide-react';
+import { RefreshCw, Star, Zap } from 'lucide-react';
 import { api } from '../../services/api';
 import type { IUser } from '@ocj/types';
 
@@ -42,7 +42,7 @@ export const AdminLeaderboardTab: React.FC = () => {
             <p style={{ color: '#64748b' }}>Chưa có dữ liệu xếp hạng.</p>
           ) : (
             leaderboard.map((user, idx) => (
-              <div key={user.id || user._id || idx} className="prob-item-row" style={{ padding: '14px 16px' }}>
+              <div key={user.id || idx} className="prob-item-row" style={{ padding: '14px 16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                   <span style={{
                     fontSize: '1.1rem',
@@ -60,7 +60,7 @@ export const AdminLeaderboardTab: React.FC = () => {
                     </span>
                     <div className="prob-item-meta">
                       <span className="prob-tag-pill" style={{ fontSize: '0.72rem' }}>
-                        ID: {user.id || user._id}
+                        ID: {user.id}
                       </span>
                     </div>
                   </div>
@@ -69,7 +69,7 @@ export const AdminLeaderboardTab: React.FC = () => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Zap size={14} style={{ color: '#f59e0b' }} />
                   <span className="diff-pill diff-easy" style={{ fontSize: '0.88rem', background: 'rgba(245,158,11,0.15)', color: '#f59e0b', padding: '4px 12px', borderRadius: '12px', fontWeight: 700 }}>
-                    {user.elo !== undefined ? user.elo : (user.elo_rating || user.eloRating || 1000)} ELO
+                    {user.elo_rating ?? user.eloRating ?? 1000} ELO
                   </span>
                 </div>
               </div>

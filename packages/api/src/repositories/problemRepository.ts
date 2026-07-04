@@ -1,0 +1,67 @@
+import { API_ROUTES } from '@ocj/constants';
+import type {
+  IProblem,
+  ISubmission,
+  ITag,
+  ProblemListQuery,
+  CreateProblemRequest,
+  UpdateProblemRequest,
+} from '@ocj/types';
+import type { ApiResponse } from '../types';
+import { HttpClient } from '../httpClient';
+
+export class ProblemRepository {
+  private readonly http: HttpClient;
+
+  constructor(http: HttpClient) {
+    this.http = http;
+  }
+
+  getProblems(query?: ProblemListQuery): Promise<ApiResponse<IProblem[]>> {
+    const params = query ? this.buildQueryString(query) : '';
+    const path = params ? `${API_ROUTES.PROBLEMS}?${params}` : API_ROUTES.PROBLEMS;
+    return this.http.request('GET', path);
+  }
+
+  getProblem(slug: string): Promise<ApiResponse<IProblem>> {
+    return this.http.request('GET', `${API_ROUTES.PROBLEMS}/${slug}`);
+  }
+
+  createProblem(data: CreateProblemRequest): Promise<ApiResponse<IProblem>> {
+    return this.http.request('POST', API_ROUTES.PROBLEMS, { body: data });
+  }
+
+  updateProblem(id: string, data: UpdateProblemRequest): Promise<ApiResponse<IProblem>> {
+    return this.http.request('PUT', `${API_ROUTES.PROBLEMS}/${id}`, { body: data });
+  }
+
+  deleteProblem(id: string): Promise<ApiResponse<void>> {
+    return this.http.request('DELETE', `${API_ROUTES.PROBLEMS}/${id}`);
+  }
+
+  getTags(): Promise<ApiResponse<ITag[]>> {
+    return this.http.request('GET', `${API_ROUTES.PROBLEMS}/tags`);
+  }
+
+  getTestcases(problemId: string): Promise<ApiResponse<ISubmission[]>> {
+    return this.http.request('GET', `${API_ROUTES.PROBLEMS}/${problemId}/testcases`);
+  }
+
+  createTestcase(problemId: string, data: Record<string, unknown>): Promise<ApiResponse<ISubmission>> {
+    return this.http.request('POST', `${API_ROUTES.PROBLEMS}/${problemId}/testcases`, { body: data });
+  }
+
+  deleteTestcase(problemId: string, testcaseId: string): Promise<ApiResponse<void>> {
+    return this.http.request('DELETE', `${API_ROUTES.PROBLEMS}/${problemId}/testcases/${testcaseId}`);
+  }
+
+  private buildQueryString(query: Record<string, unknown>): string {
+    const parts: string[] = [];
+    for (const [key, value] of Object.entries(query)) {
+      if (value !== undefined && value !== null && value !== '') {
+        parts.push(`${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`);
+      }
+    }
+    return parts.join('&');
+  }
+}

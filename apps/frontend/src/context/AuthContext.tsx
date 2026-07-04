@@ -1,20 +1,11 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { api } from '../services/api';
+import type { IUser } from '@ocj/types';
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { authRepository } from '../app/api/client';
+import { useAuthStore } from '../features/auth/auth.store';
 import { socketService } from '../services/socket';
 
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  elo_rating: number;
-  streak_count: number;
-  max_streak: number;
-  avatar_url?: string;
-  role: 'USER' | 'ADMIN';
-}
-
 interface AuthContextType {
-  user: User | null;
+  user: IUser | null;
   token: string | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
@@ -26,84 +17,142 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
+  const hasBootstrappedLegacySession = useRef(false);
 
-  const fetchProfile = async () => {
-    try {
-      const response = await api.getMe();
-      if (response.success && response.data) {
-        setUser(response.data);
-      }
-    } catch (err) {
-      console.error('Failed to fetch user profile:', err);
-      // Clean up token if invalid
-      localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
-      setToken(null);
-      setUser(null);
-      socketService.disconnect();
-    } finally {
-      setLoading(false);
-    }
-  };
+  const accessToken = useAuthStore((s) => s.accessToken);
+  const refreshToken = useAuthStore((s) => s.refreshToken);
+  const user = useAuthStore((s) => s.user);
+  const setTokens = useAuthStore((s) => s.setTokens);
+  const setSession = useAuthStore((s) => s.setSession);
+  const setUser = useAuthStore((s) => s.setUser);
+  const clear = useAuthStore((s) => s.clear);
+
+  const clearSession = React.useCallback(() => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+    clear();
+    socketService.disconnect();
+  }, [clear]);
 
   useEffect(() => {
-    if (token) {
-      socketService.connect(token);
-      fetchProfile();
+    if (accessToken) {
+      socketService.connect(accessToken);
+      return;
+    }
+    socketService.disconnect();
+  }, [accessToken]);
+
+  useEffect(() => {
+    if (hasBootstrappedLegacySession.current) {
+      return;
+    }
+
+    hasBootstrappedLegacySession.current = true;
+    const legacyToken = localStorage.getItem('token');
+    const legacyRefreshToken = localStorage.getItem('refreshToken');
+    if (!accessToken && legacyToken && legacyRefreshToken) {
+      setTokens({ accessToken: legacyToken, refreshToken: legacyRefreshToken });
+    }
+  }, [accessToken, setTokens]);
+
+  useEffect(() => {
+    if (accessToken) {
+      localStorage.setItem('token', accessToken);
     } else {
-      socketService.disconnect();
-      setLoading(false);
-    }
-  }, [token]);
-
-  const login = async (email: string, password: string) => {
-    const res = await api.login({ email, password });
-    if (res.success && res.data) {
-      localStorage.setItem('token', res.data.accessToken);
-      localStorage.setItem('refreshToken', res.data.refreshToken);
-      setToken(res.data.accessToken);
-      setUser(res.data.user);
-    }
-  };
-
-  const register = async (username: string, email: string, password: string) => {
-    const res = await api.register({ username, email, password });
-    if (res.success && res.data) {
-      if (res.data.accessToken) {
-        localStorage.setItem('token', res.data.accessToken);
-        localStorage.setItem('refreshToken', res.data.refreshToken);
-        setToken(res.data.accessToken);
-        setUser(res.data.user);
-      }
-    }
-  };
-
-  const logout = async () => {
-    try {
-      const refreshToken = localStorage.getItem('refreshToken');
-      await api.logout({ refreshToken });
-    } catch (err) {
-      console.error('Logout request error:', err);
-    } finally {
       localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
-      setToken(null);
-      setUser(null);
-      socketService.disconnect();
     }
-  };
 
-  const refreshProfile = async () => {
-    await fetchProfile();
-  };
+    if (refreshToken) {
+      localStorage.setItem('refreshToken', refreshToken);
+    } else {
+      localStorage.removeItem('refreshToken');
+    }
+  }, [accessToken, refreshToken]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const run = async () => {
+      if (!accessToken) {
+        setLoading(false);
+        return;
+      }
+
+      if (user) {
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const me = await authRepository.me();
+        if (!cancelled) {
+          setUser(me);
+        }
+      } catch {
+        if (!cancelled) {
+          clearSession();
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void run();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [accessToken, clearSession, setUser, user]);
+
+  const login = React.useCallback(async (email: string, password: string) => {
+    const res = await authRepository.login({ email, password });
+    setSession({ accessToken: res.accessToken, refreshToken: res.refreshToken, user: res.user });
+  }, [setSession]);
+
+  const register = React.useCallback(async (username: string, email: string, password: string) => {
+    const res = await authRepository.register({ username, email, password });
+    if (res.accessToken && res.refreshToken && res.user) {
+      setSession({ accessToken: res.accessToken, refreshToken: res.refreshToken, user: res.user });
+    }
+  }, [setSession]);
+
+  const logout = React.useCallback(async () => {
+    try {
+      await authRepository.logout({ refreshToken });
+    } catch {
+      void 0;
+    } finally {
+      clearSession();
+    }
+  }, [clearSession, refreshToken]);
+
+  const refreshProfile = React.useCallback(async () => {
+    try {
+      const me = await authRepository.me();
+      setUser(me);
+    } catch {
+      clearSession();
+    }
+  }, [clearSession, setUser]);
+
+  const value = useMemo<AuthContextType>(() => {
+    return {
+      user,
+      token: accessToken,
+      loading,
+      login,
+      register,
+      logout,
+      refreshProfile,
+    };
+  }, [accessToken, loading, login, logout, refreshProfile, register, user]);
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout, refreshProfile }}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
   );
 };
 

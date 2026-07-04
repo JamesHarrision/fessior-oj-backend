@@ -14,6 +14,8 @@ export class SubmissionService {
       problemId: string;
       code: string;
       language: 'cpp' | 'java' | 'python';
+      matchId?: string;
+      contestId?: string;
     }
   ) {
     // 1. Find problem by Mongo ObjectId or slug
@@ -38,6 +40,8 @@ export class SubmissionService {
       status: 'PENDING',
       testCasesPassed: 0,
       testCasesTotal: 0,
+      matchId: data.matchId ?? null,
+      contestId: data.contestId ?? null,
     });
     await submission.save();
 

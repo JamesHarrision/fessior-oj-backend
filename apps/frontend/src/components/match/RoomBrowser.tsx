@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../../services/api';
 import { Plus, Users, LogIn } from 'lucide-react';
-import './RoomBrowser.css';
+import { DifficultyBadge } from '@ocj/ui';
 
 interface RoomBrowserProps {
   onJoinRoom: (roomData: any) => void;
@@ -65,61 +65,81 @@ export const RoomBrowser: React.FC<RoomBrowserProps> = ({ onJoinRoom }) => {
   };
 
   return (
-    <div className="room-browser glass-card">
-      <div className="browser-header">
-        <Users size={20} className="glow-icon-blue" />
-        <h3>Phòng đấu tùy chọn</h3>
+    <div className="bg-washi border border-charcoal p-4 flex-1 flex-col gap-4 min-h-[400px]">
+      {/* ── Header ── */}
+      <div className="flex items-center gap-2">
+        <Users size={18} className="text-stone" />
+        <h3 className="font-display text-base font-bold text-linen">Phòng đấu tùy chọn</h3>
       </div>
 
-      <div className="browser-controls">
-        <form onSubmit={handleJoinByCode} className="join-form">
+      {/* ── Controls ── */}
+      <div className="flex flex-col gap-3">
+        {/* Join by code */}
+        <form onSubmit={handleJoinByCode} className="flex gap-2">
           <input
             type="text"
             placeholder="Nhập mã phòng..."
             value={roomCodeInput}
             onChange={(e) => setRoomCodeInput(e.target.value)}
-            className="room-input"
+            className="flex-1 bg-ink border border-charcoal px-3 py-2 text-sm text-linen placeholder-stone outline-none focus:border-vermilion transition-colors"
           />
-          <button type="submit" className="join-btn" disabled={loading}>
-            <LogIn size={16} /> Tham gia
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex items-center gap-1.5 px-4 py-2 bg-vermilion text-linen font-display text-xs font-bold uppercase tracking-wider hover:bg-vermilion-hover disabled:opacity-60 transition-colors cursor-pointer"
+          >
+            <LogIn size={14} />
+            Tham gia
           </button>
         </form>
 
-        <div className="create-section">
+        {/* Create room */}
+        <div className="flex gap-2">
           <select
             value={createDifficulty}
             onChange={(e) => setCreateDifficulty(e.target.value)}
-            className="difficulty-select"
+            className="bg-ink border border-charcoal px-3 py-2 text-sm text-linen outline-none cursor-pointer focus:border-vermilion transition-colors"
           >
             <option value="EASY">Dễ</option>
             <option value="MEDIUM">Trung bình</option>
             <option value="HARD">Khó</option>
           </select>
-          <button onClick={handleCreateRoom} className="create-room-btn" disabled={loading}>
-            <Plus size={16} /> Tạo phòng
+          <button
+            onClick={handleCreateRoom}
+            disabled={loading}
+            className="flex items-center gap-1.5 px-4 py-2 border border-charcoal text-linen font-display text-xs font-bold uppercase tracking-wider hover:border-stone disabled:opacity-60 transition-colors cursor-pointer"
+          >
+            <Plus size={14} />
+            Tạo phòng
           </button>
         </div>
       </div>
 
-      {message && <p className="browser-msg">{message}</p>}
+      {message && (
+        <p className="font-body text-xs text-vermilion">{message}</p>
+      )}
 
-      <div className="rooms-grid">
+      {/* ── Room grid ── */}
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-3 overflow-y-auto max-h-[240px]">
         {rooms.length === 0 ? (
-          <p className="no-rooms">Hiện không có phòng đấu nào đang chờ.</p>
+          <p className="col-span-full text-xs text-stone text-center py-10">
+            Hiện không có phòng đấu nào đang chờ.
+          </p>
         ) : (
           rooms.map((room) => (
-            <div key={room.id} className="room-card">
-              <div className="room-meta">
-                <span className="room-code">{room.code}</span>
-                <span className={`difficulty-badge ${room.difficulty.toLowerCase()}`}>
-                  {room.difficulty}
-                </span>
+            <div key={room.id} className="bg-ink/30 border border-charcoal p-4 flex flex-col gap-3 hover:border-stone transition-colors">
+              <div className="flex justify-between items-center">
+                <span className="font-display text-sm font-bold text-linen">{room.code}</span>
+                <DifficultyBadge difficulty={room.difficulty} size="small" />
               </div>
-              <div className="room-players">
+              <div className="flex flex-col gap-1 font-body text-[11px] text-stone">
                 <span>Chủ phòng: {room.hostName}</span>
                 <span>{room.playersCount}/2 người chơi</span>
               </div>
-              <button onClick={() => onJoinRoom(room)} className="enter-room-btn">
+              <button
+                onClick={() => onJoinRoom(room)}
+                className="w-full py-2 border border-charcoal text-linen font-display text-[10px] font-bold uppercase tracking-wider hover:border-vermilion transition-colors cursor-pointer"
+              >
                 Vào phòng
               </button>
             </div>

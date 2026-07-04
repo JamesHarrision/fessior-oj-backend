@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, Compass, HelpCircle } from 'lucide-react';
+import { Sparkles, Compass } from 'lucide-react';
 import { api } from '../../services/api';
 
 export const AdminAiTab: React.FC = () => {
@@ -126,3 +126,5 @@ export const AdminAiTab: React.FC = () => {
     </div>
   );
 };
+
+

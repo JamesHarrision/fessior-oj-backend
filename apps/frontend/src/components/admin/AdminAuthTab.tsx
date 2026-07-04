@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Shield, Key, User, Trash2 } from 'lucide-react';
+import { Shield, Key, Trash2 } from 'lucide-react';
 import { api } from '../../services/api';
 
 export const AdminAuthTab: React.FC = () => {
@@ -167,3 +167,4 @@ export const AdminAuthTab: React.FC = () => {
     </div>
   );
 };
+

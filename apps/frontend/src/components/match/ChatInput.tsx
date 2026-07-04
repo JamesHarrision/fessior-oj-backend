@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { Send } from 'lucide-react';
-import './ChatInput.css';
+
+/* =====================================================
+   ChatInput — Ink & Vermillion
+   Props unchanged: { onSendMessage }
+   ===================================================== */
 
 interface ChatInputProps {
   onSendMessage: (msg: string) => void;
@@ -17,22 +21,26 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
   };
 
   return (
-    <div className="chat-input-section">
-      <form onSubmit={handleSubmit} className="chat-form">
-        <div className="chat-input-wrapper">
+    <div className="flex flex-col items-center w-full max-w-[480px] mx-auto gap-3">
+      <form onSubmit={handleSubmit} className="w-full">
+        <div className="flex items-center bg-washi border border-charcoal py-1.5 pl-4 pr-1.5 focus-within:border-vermilion transition-colors">
           <input
             type="text"
-            className="chat-field"
+            className="flex-1 bg-transparent border-none outline-none font-body text-sm text-linen placeholder-stone"
             placeholder="Bạn muốn tìm hiểu về gì?"
             value={value}
             onChange={(e) => setValue(e.target.value)}
           />
-          <button type="submit" className="send-btn" aria-label="Send">
-            <Send size={18} />
+          <button
+            type="submit"
+            aria-label="Send"
+            className="w-9 h-9 flex items-center justify-center bg-vermilion text-linen hover:bg-vermilion-hover transition-colors cursor-pointer shrink-0"
+          >
+            <Send size={16} />
           </button>
         </div>
       </form>
-      <p className="chat-hint">
+      <p className="font-body text-[11px] text-stone text-center">
         Mẹo: Hãy chuẩn bị tinh thần thép trước khi bước vào trận đấu.
       </p>
     </div>

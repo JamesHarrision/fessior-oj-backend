@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Bell, Plus, Trash2, Eye } from 'lucide-react';
+import { Bell, Plus, Trash2 } from 'lucide-react';
 import { api } from '../../services/api';
 
 export const AdminNotificationsTab: React.FC = () => {
@@ -188,3 +188,5 @@ export const AdminNotificationsTab: React.FC = () => {
     </div>
   );
 };
+
+

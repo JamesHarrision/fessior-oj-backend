@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ShieldAlert, Plus, Users, Trash2, Key } from 'lucide-react';
+import { Plus, Users, Trash2, Key } from 'lucide-react';
 import { api } from '../../services/api';
 import type { ICustomRoom, IProblem } from '@ocj/types';
 
@@ -63,7 +63,7 @@ export const AdminRoomsTab: React.FC = () => {
     try {
       const res = await api.deleteRoom(roomId);
       if (res.success) {
-        setRooms(prev => prev.filter(r => r.id !== roomId && r._id !== roomId));
+        setRooms(prev => prev.filter(r => r.id !== roomId));
         alert('Đã đóng phòng thi đấu.');
       }
     } catch (err: any) {
@@ -122,18 +122,18 @@ export const AdminRoomsTab: React.FC = () => {
             <p style={{ color: '#64748b' }}>Hiện tại không có phòng PvP nào đang chờ hoặc đang thi đấu.</p>
           ) : (
             rooms.map((r, idx) => {
-              const roomId = r.id || r._id;
+              const roomId = r.id;
               return (
                 <div key={roomId || idx} className="prob-item-row">
                   <div className="prob-item-details">
                     <span className="prob-item-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <Key size={14} style={{ color: '#60a5fa' }} />
-                      Mã Phòng: {r.roomCode || r.code}
+                      Mã Phòng: {r.room_code}
                     </span>
                     <div className="prob-item-meta">
                       <span className="prob-tag-pill" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.7rem' }}>
                         <Users size={10} />
-                        {r.players?.length || 0} người chơi
+                        {r.opponent_id ? '2' : '1'} người chơi
                       </span>
                       <span className="prob-tag-pill" style={{ fontSize: '0.7rem' }}>
                         Trạng thái: {r.status || 'WAITING'}
