@@ -250,12 +250,21 @@ model CustomRoom {
 }
 
 // 2. Contests
+enum ContestStatus {
+  UPCOMING
+  REGISTRATION
+  ONGOING
+  ENDED
+  RESULTS
+}
+
 model Contest {
   id           String               @id @default(uuid()) @db.VarChar(36)
   title        String               @db.VarChar(255)
   description  String?              @db.Text
   start_time   DateTime
   end_time     DateTime
+  status       ContestStatus        @default(UPCOMING)
   created_at   DateTime             @default(now())
   updated_at   DateTime             @updatedAt
 

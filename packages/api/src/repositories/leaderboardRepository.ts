@@ -16,7 +16,7 @@ export class LeaderboardRepository {
     return this.http.request('GET', path);
   }
 
-  private buildQueryString(query: Record<string, unknown>): string {
+  private buildQueryString(query: any): string {
     const parts: string[] = [];
     for (const [key, value] of Object.entries(query)) {
       if (value !== undefined && value !== null && value !== '') {

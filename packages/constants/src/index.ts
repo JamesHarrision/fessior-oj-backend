@@ -45,6 +45,8 @@ export const SOCKET_EVENTS = {
   CONFIG_UPDATED: 'config-updated',
   ROOM_DELETED: 'room-deleted',
   NOTIFICATION: 'notification',
+  PLAYER_JOINED: 'player-joined',
+  PLAYER_KICKED: 'player-kicked',
 } as const;
 
 // Các kênh Redis Pub/Sub

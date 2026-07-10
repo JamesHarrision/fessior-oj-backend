@@ -33,7 +33,7 @@ export class SubmissionRepository {
     return this.http.request('GET', `${API_ROUTES.SUBMISSIONS}/${id}`);
   }
 
-  private buildQueryString(query: Record<string, unknown>): string {
+  private buildQueryString(query: any): string {
     const parts: string[] = [];
     for (const [key, value] of Object.entries(query)) {
       if (value !== undefined && value !== null && value !== '') {
