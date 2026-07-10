@@ -7,7 +7,6 @@ import { ActiveRoomsTable } from '../components/rooms/ActiveRoomsTable';
 import { RoomLobbyPanel } from '../components/rooms/RoomLobbyPanel';
 import type { ICustomRoom } from '@ocj/types';
 import { validateRoomCode } from '@ocj/validators';
-import './CustomRoomsView.css';
 
 interface CustomRoomsViewProps {
   onStartCustomMatch: (matchId: string, problemId: string) => void;
@@ -131,45 +130,65 @@ export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomM
   }
 
   return (
-    <div className="rooms-view-container">
-      <div className="rooms-header glass-card">
-        <div className="title-row">
-          <Shield className="header-icon" size={24} />
-          <h2>Đấu Trường Tùy Chỉnh (Custom Arena)</h2>
+    <div className="flex flex-col gap-6 max-w-[1200px] mx-auto w-full p-4 lg:p-8">
+      {/* Header */}
+      <div className="bg-washi border border-charcoal p-6 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="flex items-center gap-4">
+          <div className="bg-ink p-3 border border-charcoal">
+            <Shield size={32} className="text-vermilion" />
+          </div>
+          <div>
+            <h2 className="font-display text-2xl font-bold text-linen uppercase tracking-wider">Đấu Trường Tùy Chỉnh</h2>
+            <p className="font-body text-sm text-stone mt-1">Tạo phòng chơi riêng tư để so tài thuật toán trực tiếp cùng bạn bè</p>
+          </div>
         </div>
-        <p className="subtitle">Tạo phòng chơi riêng tư để so tài thuật toán trực tiếp cùng bạn bè.</p>
       </div>
 
-      <div className="room-actions-grid">
-        <div className="action-card glass-card">
-          <h3>Tạo phòng đấu mới</h3>
-          <div className="form-group">
-            <label>Độ khó bài tập:</label>
-            <select value={difficulty} onChange={(e: any) => setDifficulty(e.target.value)} className="glass-select">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Create Room */}
+        <div className="bg-ink border border-charcoal p-6 flex flex-col gap-4">
+          <h3 className="font-display text-sm font-bold text-linen uppercase tracking-wider">Tạo phòng đấu mới</h3>
+          <div className="flex flex-col gap-2">
+            <label className="font-display text-[10px] font-bold text-stone uppercase tracking-[0.1em]">Độ khó bài tập</label>
+            <select 
+              value={difficulty} 
+              onChange={(e: any) => setDifficulty(e.target.value)}
+              className="bg-washi border border-charcoal text-linen p-3 font-body text-sm outline-none focus:border-vermilion transition-colors appearance-none cursor-pointer"
+            >
               <option value="EASY">Dễ (Easy)</option>
               <option value="MEDIUM">Trung bình (Medium)</option>
               <option value="HARD">Khó (Hard)</option>
             </select>
           </div>
-          <button onClick={handleCreateRoom} disabled={loading} className="btn-action glass-button">
-            <Plus size={18} /> {loading ? 'Đang tạo...' : 'Tạo phòng'}
+          <button 
+            onClick={handleCreateRoom} 
+            disabled={loading}
+            className="mt-2 bg-vermilion text-linen font-display text-[11px] font-bold uppercase tracking-wider px-4 py-3 hover:bg-vermilion-hover transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+          >
+            <Plus size={16} /> {loading ? 'Đang tạo...' : 'Tạo phòng'}
           </button>
         </div>
 
-        <div className="action-card glass-card">
-          <h3>Tham gia bằng mã phòng</h3>
-          <div className="form-group">
-            <label>Nhập mã phòng 6 ký tự:</label>
+        {/* Join Room */}
+        <div className="bg-ink border border-charcoal p-6 flex flex-col gap-4">
+          <h3 className="font-display text-sm font-bold text-linen uppercase tracking-wider">Tham gia bằng mã</h3>
+          <div className="flex flex-col gap-2">
+            <label className="font-display text-[10px] font-bold text-stone uppercase tracking-[0.1em]">Mã phòng (6 ký tự)</label>
             <input
               type="text"
-              placeholder="Ví dụ: AB12CD"
+              placeholder="VD: AB12CD"
               value={roomCodeInput}
               onChange={(e) => setRoomCodeInput(e.target.value.toUpperCase())}
-              className="glass-input"
+              className="bg-washi border border-charcoal text-linen p-3 font-mono text-sm outline-none focus:border-vermilion transition-colors uppercase placeholder:text-stone/50"
+              maxLength={6}
             />
           </div>
-          <button onClick={() => handleJoinRoom()} disabled={loading || !roomCodeInput} className="btn-action glass-button">
-            Tham gia <ArrowRight size={18} />
+          <button 
+            onClick={() => handleJoinRoom()} 
+            disabled={loading || !roomCodeInput}
+            className="mt-2 border border-charcoal text-linen font-display text-[11px] font-bold uppercase tracking-wider px-4 py-3 hover:border-stone hover:bg-washi transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+          >
+            Tham gia <ArrowRight size={16} />
           </button>
         </div>
       </div>
