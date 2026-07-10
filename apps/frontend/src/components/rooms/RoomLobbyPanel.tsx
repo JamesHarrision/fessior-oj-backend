@@ -1,5 +1,5 @@
 import React from 'react';
-import { LogOut, Play } from 'lucide-react';
+import { LogOut, Play, Users, Trophy } from 'lucide-react';
 import type { ICustomRoom, IUser } from '@ocj/types';
 
 interface RoomLobbyPanelProps {
@@ -16,9 +16,12 @@ export const RoomLobbyPanel: React.FC<RoomLobbyPanelProps> = ({
   onStartMatch,
 }) => {
   const isCreator = activeRoom.creator_id === user?.id;
+  const participants = activeRoom.participants || [];
+  const maxParticipants = activeRoom.max_participants || 10;
+  const canStart = isCreator && participants.length >= 2;
 
   return (
-    <div className="flex flex-col gap-6 max-w-[900px] mx-auto w-full p-4 lg:p-8">
+    <div className="flex flex-col gap-6 max-w-[1200px] mx-auto w-full p-4 lg:p-8">
       {/* Header */}
       <div className="bg-washi border border-charcoal p-6 flex justify-between items-center">
         <div>
@@ -33,53 +36,83 @@ export const RoomLobbyPanel: React.FC<RoomLobbyPanelProps> = ({
         </button>
       </div>
 
-      {/* Players */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
-        <div className="md:col-span-2 bg-ink border border-charcoal p-6 text-center h-full flex flex-col justify-center gap-2">
-          <span className="font-display text-[10px] font-bold text-vermilion uppercase tracking-[0.1em] border border-vermilion/30 px-2 py-1 mx-auto bg-vermilion/10">Chủ phòng</span>
-          <h4 className="font-body text-xl font-bold text-linen mt-2">{activeRoom.creator?.username || user?.username}</h4>
-          <span className="font-mono text-sm text-stone">ELO: {activeRoom.creator?.elo_rating || user?.elo_rating}</span>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Col: Players Grid */}
+        <div className="lg:col-span-2 flex flex-col gap-4">
+          <div className="flex justify-between items-center bg-ink border border-charcoal px-4 py-3">
+            <h4 className="font-display text-xs font-bold text-linen uppercase tracking-wider flex items-center gap-2">
+              <Users size={16} className="text-vermilion" /> 
+              Người chơi ({participants.length}/{maxParticipants})
+            </h4>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {participants.map(p => {
+              const pUser = p.user;
+              const isRoomCreator = activeRoom.creator_id === p.user_id;
+              const isMe = user?.id === p.user_id;
+              return (
+                <div key={p.id} className={`bg-ink border p-4 text-center flex flex-col items-center justify-center gap-2 relative ${isMe ? 'border-vermilion' : 'border-charcoal'}`}>
+                  {isRoomCreator && (
+                    <span className="absolute top-2 left-2 font-display text-[8px] font-bold text-vermilion uppercase tracking-widest border border-vermilion/30 px-1.5 py-0.5 bg-vermilion/10">
+                      Chủ phòng
+                    </span>
+                  )}
+                  <h4 className="font-body text-lg font-bold text-linen mt-4 truncate w-full px-2">
+                    {pUser?.username} {isMe && <span className="text-stone font-normal text-sm">(Bạn)</span>}
+                  </h4>
+                  <span className="font-mono text-xs text-stone">ELO: {pUser?.elo_rating}</span>
+                </div>
+              );
+            })}
+            
+            {/* Empty Slots */}
+            {Array.from({ length: maxParticipants - participants.length }).map((_, i) => (
+              <div key={`empty-${i}`} className="bg-ink/50 border border-charcoal border-dashed p-4 flex flex-col items-center justify-center opacity-50 min-h-[120px]">
+                <div className="w-6 h-6 rounded-full border-2 border-charcoal border-t-stone animate-spin mb-2"></div>
+                <span className="font-body text-xs text-stone">Đang chờ...</span>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="md:col-span-1 flex justify-center py-4">
-          <span className="font-display text-4xl font-bold text-stone italic opacity-30">VS</span>
-        </div>
-
-        <div className="md:col-span-2 bg-ink border border-charcoal p-6 text-center h-full flex flex-col justify-center gap-2 relative overflow-hidden">
-          {activeRoom.opponent_id ? (
-            <>
-              <span className="font-display text-[10px] font-bold text-green-500 uppercase tracking-[0.1em] border border-green-500/30 px-2 py-1 mx-auto bg-green-500/10">Đối thủ</span>
-              <h4 className="font-body text-xl font-bold text-linen mt-2">{activeRoom.opponent?.username || 'Đang tải...'}</h4>
-              <span className="font-mono text-sm text-stone">ELO: {activeRoom.opponent?.elo_rating}</span>
-            </>
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full gap-3 opacity-70">
-              <div className="w-8 h-8 rounded-full border-2 border-charcoal border-t-stone animate-spin"></div>
-              <p className="font-body text-sm text-stone">Đang chờ đối thủ...</p>
+        {/* Right Col: Rules & Config */}
+        <div className="flex flex-col gap-6">
+          <div className="bg-ink border border-charcoal p-6 flex flex-col gap-4">
+            <h4 className="font-display text-xs font-bold text-vermilion uppercase tracking-wider flex items-center gap-2">
+              <Trophy size={16} /> Thể thức: Winner takes all
+            </h4>
+            <div className="font-body text-sm text-stone space-y-2 leading-relaxed">
+              <p>1. Người nộp bài đúng (AC) đầu tiên sẽ chiến thắng chung cuộc.</p>
+              <p>2. Toàn bộ người chơi còn lại sẽ bị tính thua và bị trừ <strong className="text-linen">20 ELO</strong> mỗi người.</p>
+              <p>3. Người thắng cuộc sẽ được cộng <strong className="text-green-400">tổng số ELO bị trừ của TẤT CẢ những người thua</strong>.</p>
+              <p className="italic text-xs opacity-70 mt-4 border-t border-charcoal pt-4">VD: Phòng 5 người, 1 thắng 4 thua. 4 người thua bị trừ 20 ELO. Người thắng được cộng 80 ELO.</p>
             </div>
-          )}
-        </div>
-      </div>
+          </div>
 
-      {/* Config */}
-      <div className="bg-ink border border-charcoal p-6 flex flex-col md:flex-row justify-between items-center gap-4">
-        <div className="flex flex-col gap-2">
-          <h4 className="font-display text-xs font-bold text-stone uppercase tracking-wider">Cấu hình trận đấu</h4>
-          <p className="font-body text-sm text-linen">
-            <span className="text-stone">Độ khó:</span> <span className="font-bold">{activeRoom.difficulty || 'Mọi độ khó'}</span>
-          </p>
-          <p className="font-body text-sm text-linen">
-            <span className="text-stone">Thời gian giới hạn:</span> {activeRoom.time_limit || 2000} ms
-          </p>
+          <div className="bg-washi border border-charcoal p-6 flex flex-col gap-4">
+            <h4 className="font-display text-xs font-bold text-stone uppercase tracking-wider">Cấu hình trận</h4>
+            <p className="font-body text-sm text-linen">
+              <span className="text-stone">Độ khó:</span> <span className="font-bold">{activeRoom.difficulty || 'Mọi độ khó'}</span>
+            </p>
+            <p className="font-body text-sm text-linen">
+              <span className="text-stone">Thời gian giới hạn:</span> {activeRoom.time_limit || 2000} ms
+            </p>
+
+            {isCreator ? (
+              <button
+                onClick={() => onStartMatch(activeRoom.room_code)}
+                disabled={!canStart}
+                className="mt-4 bg-vermilion text-linen font-display text-[13px] font-bold uppercase tracking-wider px-8 py-4 hover:bg-vermilion-hover transition-colors flex justify-center items-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Play size={20} /> Bắt đầu Match
+              </button>
+            ) : (
+              <div className="mt-4 border border-charcoal bg-ink text-stone font-display text-[11px] font-bold uppercase tracking-wider px-4 py-3 text-center">
+                Đang chờ chủ phòng bắt đầu...
+              </div>
+            )}
+          </div>
         </div>
-        {isCreator && activeRoom.opponent_id && (
-          <button
-            onClick={() => onStartMatch(activeRoom.room_code)}
-            className="bg-vermilion text-linen font-display text-[13px] font-bold uppercase tracking-wider px-8 py-4 hover:bg-vermilion-hover transition-colors flex items-center gap-2 shadow-lg"
-          >
-            <Play size={20} /> Bắt đầu Duel!
-          </button>
-        )}
       </div>
     </div>
   );

@@ -192,25 +192,45 @@ export interface ISubmission {
   createdAt?: string | Date;
 }
 
+export interface ICustomRoomParticipant {
+  id: string;
+  room_id: string;
+  user_id: string;
+  is_ready: boolean;
+  joined_at: string | Date;
+  user?: IUser;
+}
+
 export interface ICustomRoom {
   id: string;
   room_code: string;
   creator_id: string;
-  opponent_id?: string | null;
   status: 'WAITING' | 'PLAYING' | 'FINISHED';
   difficulty?: ProblemDifficulty | 'EASY' | 'MEDIUM' | 'HARD' | null;
   time_limit?: number;
   memory_limit?: number;
+  max_participants?: number;
   creator?: IUser;
-  opponent?: IUser | null;
+  participants?: ICustomRoomParticipant[];
   match_id?: string | null;
   problem_id?: string | null;
 }
 
+export interface IMatchParticipant {
+  id: string;
+  match_id: string;
+  user_id: string;
+  status: 'CODING' | 'SUBMITTED_WA' | 'ACCEPTED';
+  score_change: number;
+  is_winner: boolean;
+  joined_at: string | Date;
+  user?: IUser;
+}
+
 export interface IMatch {
   id: string;
-  player1_id: string;
-  player2_id: string;
+  player1_id?: string | null;
+  player2_id?: string | null;
   problem_id: string;
   status: 'PENDING' | 'PLAYING' | 'FINISHED';
   winner_id?: string | null;
@@ -218,6 +238,7 @@ export interface IMatch {
   ended_at?: string | Date | null;
   player1?: IUser;
   player2?: IUser;
+  participants?: IMatchParticipant[];
   problem?: IProblem;
 }
 
@@ -538,6 +559,7 @@ export interface CreateRoomRequest {
   difficulty?: ProblemDifficulty;
   timeLimit?: number;
   memoryLimit?: number;
+  maxParticipants?: number;
 }
 
 export interface JoinRoomRequest {

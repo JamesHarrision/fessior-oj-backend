@@ -18,6 +18,7 @@ export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomM
   const [activeRoom, setActiveRoom] = useState<ICustomRoom | null>(null);
   const [roomCodeInput, setRoomCodeInput] = useState('');
   const [difficulty, setDifficulty] = useState<'EASY' | 'MEDIUM' | 'HARD'>('EASY');
+  const [maxParticipants, setMaxParticipants] = useState<number>(2);
   const [loading, setLoading] = useState(false);
 
   const fetchActiveRooms = () => {
@@ -69,7 +70,7 @@ export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomM
   const handleCreateRoom = async () => {
     setLoading(true);
     try {
-      const res = await api.createRoom({ difficulty });
+      const res = await api.createRoom({ difficulty, maxParticipants });
       if (res.success && res.data) {
         setActiveRoom(res.data);
       }
@@ -89,7 +90,7 @@ export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomM
     }
     setLoading(true);
     try {
-      const res = await api.joinRoom({ room_code: targetCode });
+      const res = await api.joinRoom({ roomCode: targetCode });
       if (res.success && res.data) {
         setActiveRoom(res.data.room);
         if (res.data.matchId) {
@@ -148,17 +149,31 @@ export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomM
         {/* Create Room */}
         <div className="bg-ink border border-charcoal p-6 flex flex-col gap-4">
           <h3 className="font-display text-sm font-bold text-linen uppercase tracking-wider">Tạo phòng đấu mới</h3>
-          <div className="flex flex-col gap-2">
-            <label className="font-display text-[10px] font-bold text-stone uppercase tracking-[0.1em]">Độ khó bài tập</label>
-            <select 
-              value={difficulty} 
-              onChange={(e: any) => setDifficulty(e.target.value)}
-              className="bg-washi border border-charcoal text-linen p-3 font-body text-sm outline-none focus:border-vermilion transition-colors appearance-none cursor-pointer"
-            >
-              <option value="EASY">Dễ (Easy)</option>
-              <option value="MEDIUM">Trung bình (Medium)</option>
-              <option value="HARD">Khó (Hard)</option>
-            </select>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-2">
+              <label className="font-display text-[10px] font-bold text-stone uppercase tracking-[0.1em]">Độ khó bài tập</label>
+              <select 
+                value={difficulty} 
+                onChange={(e: any) => setDifficulty(e.target.value)}
+                className="bg-washi border border-charcoal text-linen p-3 font-body text-sm outline-none focus:border-vermilion transition-colors appearance-none cursor-pointer"
+              >
+                <option value="EASY">Dễ (Easy)</option>
+                <option value="MEDIUM">Trung bình (Medium)</option>
+                <option value="HARD">Khó (Hard)</option>
+              </select>
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="font-display text-[10px] font-bold text-stone uppercase tracking-[0.1em]">Số người (Tối đa)</label>
+              <select 
+                value={maxParticipants} 
+                onChange={(e: any) => setMaxParticipants(parseInt(e.target.value))}
+                className="bg-washi border border-charcoal text-linen p-3 font-body text-sm outline-none focus:border-vermilion transition-colors appearance-none cursor-pointer"
+              >
+                {[2, 3, 4, 5, 6, 8, 10].map(n => (
+                  <option key={n} value={n}>{n} người</option>
+                ))}
+              </select>
+            </div>
           </div>
           <button 
             onClick={handleCreateRoom} 

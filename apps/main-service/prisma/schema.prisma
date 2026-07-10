@@ -36,8 +36,9 @@ model User {
   elo_histories    EloHistory[]
   user_activities  UserActivity[]
   
-  custom_rooms_created CustomRoom[] @relation("Creator")
-  custom_rooms_joined  CustomRoom[] @relation("Opponent")
+  custom_rooms_created       CustomRoom[]            @relation("Creator")
+  custom_room_participations CustomRoomParticipant[]
+  match_participations       MatchParticipant[]
 
   @@map("users")
 }
@@ -142,8 +143,8 @@ model PasswordResetToken {
 
 model Match {
   id             String            @id @default(uuid()) @db.VarChar(36)
-  player1_id     String            @db.VarChar(36)
-  player2_id     String            @db.VarChar(36)
+  player1_id     String?           @db.VarChar(36) // Keep optional for backward compatibility
+  player2_id     String?           @db.VarChar(36) // Keep optional for backward compatibility
   problem_id     String            @db.VarChar(24)
   winner_id      String?           @db.VarChar(36)
   status         MatchStatus       @default(PENDING)
@@ -152,10 +153,27 @@ model Match {
   created_at     DateTime          @default(now())
   updated_at     DateTime          @updatedAt
 
-  player1      User @relation("Player1", fields: [player1_id], references: [id], onDelete: Cascade)
-  player2      User @relation("Player2", fields: [player2_id], references: [id], onDelete: Cascade)
+  player1      User? @relation("Player1", fields: [player1_id], references: [id], onDelete: Cascade)
+  player2      User? @relation("Player2", fields: [player2_id], references: [id], onDelete: Cascade)
+  participants MatchParticipant[]
 
   @@map("matches")
+}
+
+model MatchParticipant {
+  id           String            @id @default(uuid()) @db.VarChar(36)
+  match_id     String            @db.VarChar(36)
+  user_id      String            @db.VarChar(36)
+  status       PlayerMatchStatus @default(CODING)
+  score_change Int               @default(0)
+  is_winner    Boolean           @default(false)
+  joined_at    DateTime          @default(now())
+
+  match Match @relation(fields: [match_id], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([match_id, user_id])
+  @@map("match_participants")
 }
 
 enum MatchStatus {
@@ -230,23 +248,37 @@ enum CustomRoomStatus {
 }
 
 model CustomRoom {
-  id           String           @id @default(uuid()) @db.VarChar(36)
-  room_code    String           @unique @db.VarChar(20)
-  creator_id   String           @db.VarChar(36)
-  opponent_id  String?          @db.VarChar(36)
-  problem_id   String?          @db.VarChar(24)
-  difficulty   Difficulty?
-  time_limit   Int?             @default(2000)
-  memory_limit Int?             @default(256)
-  status       CustomRoomStatus @default(WAITING)
-  match_id     String?          @db.VarChar(36)
-  created_at   DateTime         @default(now())
-  updated_at   DateTime         @updatedAt
+  id               String           @id @default(uuid()) @db.VarChar(36)
+  room_code        String           @unique @db.VarChar(20)
+  creator_id       String           @db.VarChar(36)
+  problem_id       String?          @db.VarChar(24)
+  difficulty       Difficulty?
+  time_limit       Int?             @default(2000)
+  memory_limit     Int?             @default(256)
+  status           CustomRoomStatus @default(WAITING)
+  max_participants Int              @default(10)
+  match_id         String?          @db.VarChar(36)
+  created_at       DateTime         @default(now())
+  updated_at       DateTime         @updatedAt
 
-  creator      User             @relation("Creator", fields: [creator_id], references: [id], onDelete: Cascade)
-  opponent     User?            @relation("Opponent", fields: [opponent_id], references: [id], onDelete: Cascade)
+  creator      User                    @relation("Creator", fields: [creator_id], references: [id], onDelete: Cascade)
+  participants CustomRoomParticipant[]
 
   @@map("custom_rooms")
+}
+
+model CustomRoomParticipant {
+  id         String   @id @default(uuid()) @db.VarChar(36)
+  room_id    String   @db.VarChar(36)
+  user_id    String   @db.VarChar(36)
+  is_ready   Boolean  @default(false)
+  joined_at  DateTime @default(now())
+
+  room CustomRoom @relation(fields: [room_id], references: [id], onDelete: Cascade)
+  user User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([room_id, user_id])
+  @@map("custom_room_participants")
 }
 
 // 2. Contests

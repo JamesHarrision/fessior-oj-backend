@@ -9,6 +9,7 @@ export class RoomRepository {
     difficulty?: Difficulty;
     timeLimit?: number;
     memoryLimit?: number;
+    maxParticipants?: number;
   }) {
     return prisma.customRoom.create({
       data: {
@@ -18,12 +19,24 @@ export class RoomRepository {
         difficulty: data.difficulty,
         time_limit: data.timeLimit,
         memory_limit: data.memoryLimit,
+        max_participants: data.maxParticipants || 10,
         status: CustomRoomStatus.WAITING,
+        participants: {
+          create: {
+            user_id: data.creatorId,
+            is_ready: true, // Creator is automatically ready
+          }
+        }
       },
       include: {
         creator: {
           select: { id: true, username: true, elo_rating: true, avatar_url: true },
         },
+        participants: {
+          include: {
+            user: { select: { id: true, username: true, elo_rating: true, avatar_url: true } }
+          }
+        }
       },
     });
   }
@@ -35,9 +48,11 @@ export class RoomRepository {
         creator: {
           select: { id: true, username: true, elo_rating: true, avatar_url: true },
         },
-        opponent: {
-          select: { id: true, username: true, elo_rating: true, avatar_url: true },
-        },
+        participants: {
+          include: {
+            user: { select: { id: true, username: true, elo_rating: true, avatar_url: true } }
+          }
+        }
       },
     });
   }
@@ -49,43 +64,63 @@ export class RoomRepository {
         creator: {
           select: { id: true, username: true, elo_rating: true, avatar_url: true },
         },
-        opponent: {
-          select: { id: true, username: true, elo_rating: true, avatar_url: true },
-        },
+        participants: {
+          include: {
+            user: { select: { id: true, username: true, elo_rating: true, avatar_url: true } }
+          }
+        }
       },
     });
   }
 
   async findActiveRooms() {
-    return prisma.customRoom.findMany({
+    const rooms = await prisma.customRoom.findMany({
       where: {
         status: CustomRoomStatus.WAITING,
-        opponent_id: null,
       },
       include: {
         creator: {
           select: { id: true, username: true, elo_rating: true, avatar_url: true },
         },
+        participants: {
+          include: {
+            user: { select: { id: true, username: true, elo_rating: true, avatar_url: true } }
+          }
+        },
+        _count: {
+          select: { participants: true }
+        }
       },
       orderBy: { created_at: 'desc' },
     });
+
+    // Filter out rooms that are already full
+    return rooms.filter(r => r._count.participants < r.max_participants);
   }
 
-  async join(id: string, opponentId: string) {
-    return prisma.customRoom.update({
-      where: { id },
+  async join(id: string, userId: string) {
+    await prisma.customRoomParticipant.create({
       data: {
-        opponent_id: opponentId,
-      },
-      include: {
-        creator: {
-          select: { id: true, username: true, elo_rating: true, avatar_url: true },
-        },
-        opponent: {
-          select: { id: true, username: true, elo_rating: true, avatar_url: true },
-        },
-      },
+        room_id: id,
+        user_id: userId,
+        is_ready: false,
+      }
     });
+
+    return this.findById(id);
+  }
+
+  async leave(roomId: string, userId: string) {
+    await prisma.customRoomParticipant.delete({
+      where: {
+        room_id_user_id: {
+          room_id: roomId,
+          user_id: userId,
+        }
+      }
+    });
+
+    // If no participants left, maybe delete room? Handled in service.
   }
 
   async updateStatus(id: string, status: CustomRoomStatus, matchId?: string) {
@@ -98,66 +133,10 @@ export class RoomRepository {
     });
   }
 
-  async updateConfig(
-    id: string,
-    data: {
-      problemId?: string;
-      difficulty?: Difficulty;
-      timeLimit?: number;
-      memoryLimit?: number;
-    }
-  ) {
-    return prisma.customRoom.update({
-      where: { id },
-      data: {
-        problem_id: data.problemId,
-        difficulty: data.difficulty,
-        time_limit: data.timeLimit,
-        memory_limit: data.memoryLimit,
-      },
-      include: {
-        creator: {
-          select: { id: true, username: true, elo_rating: true, avatar_url: true },
-        },
-        opponent: {
-          select: { id: true, username: true, elo_rating: true, avatar_url: true },
-        },
-      },
-    });
-  }
-
   async delete(id: string) {
     return prisma.customRoom.delete({
       where: { id },
     });
-  }
-
-  async leave(id: string, userId: string) {
-    const room = await this.findById(id);
-    if (!room) return null;
-
-    if (room.creator_id === userId) {
-      // Nếu chủ phòng rời đi, hủy luôn phòng
-      return this.delete(id);
-    } else if (room.opponent_id === userId) {
-      // Nếu đối thủ rời đi, xóa opponent_id để phòng tiếp tục WAITING
-      return prisma.customRoom.update({
-        where: { id },
-        data: {
-          opponent_id: null,
-          status: CustomRoomStatus.WAITING,
-        },
-        include: {
-          creator: {
-            select: { id: true, username: true, elo_rating: true, avatar_url: true },
-          },
-          opponent: {
-            select: { id: true, username: true, elo_rating: true, avatar_url: true },
-          },
-        },
-      });
-    }
-    return room;
   }
 }
 

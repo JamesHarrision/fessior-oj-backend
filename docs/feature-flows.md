@@ -156,9 +156,9 @@ Files lien quan:
 - `packages/constants/src/index.ts`
 - `packages/utils/src/index.ts`
 
-## 5. Custom Rooms
+## 5. Custom Rooms (Multiplayer Arena)
 
-User tao phong custom, chon config/problem/difficulty, moi hoac cho opponent tham gia. Socket room `custom-room:{roomCode}` dung de sync room state.
+User tạo phòng custom, chọn số lượng người (2-10), config/problem/difficulty, mời hoặc chờ opponent tham gia. Socket room `custom-room:{roomCode}` dùng để sync room state.
 
 ```mermaid
 flowchart LR
@@ -167,7 +167,7 @@ flowchart LR
   Validator --> Controller[room.controller]
   Controller --> Service[room.service]
   Service --> Repo[room.repository]
-  Repo --> MySQL[(custom_rooms / matches)]
+  Repo --> MySQL[(custom_rooms / custom_room_participants / match_participants)]
   Service --> Mongo[(Problem)]
   FE <-->|join-custom-room| Socket[Socket.io]
   Socket --> Room["custom-room:{roomCode}"]
@@ -175,8 +175,11 @@ flowchart LR
 
 **Flow chi tiết:**
 - User (Host) tạo phòng custom -> vào Waiting Room chờ.
-- Opponent nhập code -> Join phòng -> Bắn socket `match-started` cho cả 2.
-- Sau khi 1 người nộp bài đúng (AC), logic `endMatch` ở Backend sẽ tính ELO và đồng thời tự động cập nhật `status = FINISHED` cho CustomRoom.
+- Các Opponent nhập code -> Join phòng.
+- Host nhấn "Bắt đầu" khi có >= 2 người -> Backend gom toàn bộ thành `MatchParticipant` -> Bắn socket `match-started` cho cả phòng.
+- Thể thức Winner Takes All: Sau khi 1 người nộp bài đúng (AC) đầu tiên, logic `endMatch` ở Backend sẽ tính ELO.
+- Toàn bộ người thua bị phạt (vd: -20 ELO). Người thắng được cộng dồn (Tổng ELO phạt).
+- Trận đấu kết thúc -> cập nhật `status = FINISHED` cho CustomRoom và Match.
 
 Files lien quan:
 

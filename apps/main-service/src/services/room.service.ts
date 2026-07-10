@@ -1,5 +1,5 @@
 import { roomRepository } from '../repositories/room.repository';
-import { CustomRoomStatus, Difficulty, MatchStatus } from '@prisma/client';
+import { CustomRoomStatus, Difficulty, MatchStatus, PlayerMatchStatus } from '@prisma/client';
 import { Problem } from '../models/problem.model';
 import { prisma } from '../config/prisma';
 import { io } from '../sockets/socket';
@@ -13,9 +13,9 @@ export class RoomService {
       difficulty?: Difficulty;
       timeLimit?: number;
       memoryLimit?: number;
+      maxParticipants?: number;
     }
   ) {
-    // 1. Generate unique room code (6 characters)
     let roomCode = '';
     let isUnique = false;
     while (!isUnique) {
@@ -26,7 +26,6 @@ export class RoomService {
       }
     }
 
-    // 2. Validate problem if specified
     if (data.problemId) {
       const problem = await Problem.findById(data.problemId);
       if (!problem) {
@@ -41,6 +40,7 @@ export class RoomService {
       difficulty: data.difficulty,
       timeLimit: data.timeLimit,
       memoryLimit: data.memoryLimit,
+      maxParticipants: data.maxParticipants || 10,
     });
   }
 
@@ -56,34 +56,36 @@ export class RoomService {
     return room;
   }
 
-  async joinRoom(roomCode: string, opponentId: string) {
+  async joinRoom(roomCode: string, userId: string) {
     const room = await roomRepository.findByCode(roomCode);
     if (!room) {
       throw new Error('Room not found');
     }
 
-    if (room.status !== CustomRoomStatus.WAITING || room.opponent_id) {
+    if (room.status !== CustomRoomStatus.WAITING) {
       throw new Error('Room is not available');
     }
 
-    if (room.creator_id === opponentId) {
-      throw new Error('You cannot join your own room');
+    if (room.participants.length >= room.max_participants) {
+      throw new Error('Room is full');
     }
 
-    // 1. Update room with opponentId
-    const updatedRoom = await roomRepository.join(room.id, opponentId);
+    const alreadyJoined = room.participants.some(p => p.user_id === userId);
+    if (alreadyJoined) {
+      throw new Error('You have already joined this room');
+    }
 
-    // Notify host that player joined
+    const updatedRoom = await roomRepository.join(room.id, userId);
+
     const roomSocketName = `custom-room:${room.room_code}`;
-    // Emit socket event
-    io?.to(roomSocketName).emit(SOCKET_EVENTS.PLAYER_JOINED, { userId: opponentId });
+    io?.to(roomSocketName).emit(SOCKET_EVENTS.PLAYER_JOINED, { userId });
 
     return {
       room: updatedRoom,
     };
   }
 
-  async kickPlayer(roomId: string, creatorId: string, opponentId: string) {
+  async kickPlayer(roomId: string, creatorId: string, targetUserId: string) {
     const room = await roomRepository.findById(roomId);
     if (!room) {
       throw new Error('Room not found');
@@ -93,7 +95,8 @@ export class RoomService {
       throw new Error('Only the creator can kick players');
     }
 
-    if (room.opponent_id !== opponentId) {
+    const isInRoom = room.participants.some(p => p.user_id === targetUserId);
+    if (!isInRoom) {
       throw new Error('Player is not in the room');
     }
 
@@ -101,12 +104,12 @@ export class RoomService {
       throw new Error('Cannot kick from an active or finished room');
     }
 
-    const result = await roomRepository.leave(roomId, opponentId);
+    await roomRepository.leave(roomId, targetUserId);
     
     const roomSocketName = `custom-room:${room.room_code}`;
-    io?.to(roomSocketName).emit(SOCKET_EVENTS.PLAYER_KICKED, { userId: opponentId });
+    io?.to(roomSocketName).emit(SOCKET_EVENTS.PLAYER_KICKED, { userId: targetUserId });
 
-    return result;
+    return { success: true };
   }
 
   async startRoomMatch(roomId: string, creatorId: string) {
@@ -123,21 +126,18 @@ export class RoomService {
       throw new Error('Room is not in waiting state');
     }
 
-    if (!room.opponent_id) {
-      throw new Error('Need an opponent to start the match');
+    if (room.participants.length < 2) {
+      throw new Error('Need at least 2 players to start the match');
     }
 
-    // Select problem for the match
     let problemId = room.problem_id;
     if (!problemId) {
-      // If no specific problem selected, find one by difficulty or random
       const query: any = {};
       if (room.difficulty) {
         query.difficulty = room.difficulty;
       }
       const count = await Problem.countDocuments(query);
       if (count === 0) {
-        // Fallback to any problem
         const fallbackCount = await Problem.countDocuments();
         if (fallbackCount === 0) {
           throw new Error('No problems available for match');
@@ -156,20 +156,24 @@ export class RoomService {
       throw new Error('Failed to select a problem for the match');
     }
 
-    // Create a running Match in MySQL
     const match = await prisma.match.create({
       data: {
-        player1_id: room.creator_id,
-        player2_id: room.opponent_id,
         problem_id: problemId,
         status: MatchStatus.PENDING,
+        participants: {
+          create: room.participants.map(p => ({
+            user_id: p.user_id,
+            status: PlayerMatchStatus.CODING,
+            score_change: 0,
+            is_winner: false,
+          }))
+        }
       },
+      include: { participants: true }
     });
 
-    // Update Room status to PLAYING and set match_id
     const updatedRoom = await roomRepository.updateStatus(room.id, CustomRoomStatus.PLAYING, match.id);
 
-    // Emit socket events to both players
     const roomSocketName = `custom-room:${room.room_code}`;
     io?.to(roomSocketName).emit(SOCKET_EVENTS.MATCH_STARTED, {
       matchId: match.id,
@@ -193,71 +197,55 @@ export class RoomService {
       throw new Error('Cannot leave a room that has already started or finished');
     }
 
-    const result = await roomRepository.leave(roomId, userId);
-
-    // Notify other players via socket
-    const roomSocketName = `custom-room:${room.room_code}`;
-    io?.to(roomSocketName).emit(SOCKET_EVENTS.PLAYER_LEFT, { userId });
-
-    return result;
+    if (room.creator_id === userId) {
+      // If creator leaves, delete the room
+      await roomRepository.delete(roomId);
+      const roomSocketName = `custom-room:${room.room_code}`;
+      io?.to(roomSocketName).emit(SOCKET_EVENTS.ROOM_DELETED, { roomId });
+      return { deleted: true };
+    } else {
+      await roomRepository.leave(roomId, userId);
+      const roomSocketName = `custom-room:${room.room_code}`;
+      io?.to(roomSocketName).emit(SOCKET_EVENTS.PLAYER_LEFT, { userId });
+      return { deleted: false };
+    }
   }
 
-  async updateRoomConfig(
-    roomId: string,
-    creatorId: string,
-    data: {
-      problemId?: string;
-      difficulty?: Difficulty;
-      timeLimit?: number;
-      memoryLimit?: number;
-    }
-  ) {
+  async updateRoomConfig(roomId: string, creatorId: string, data: Partial<{ difficulty: Difficulty, timeLimit: number, memoryLimit: number }>) {
     const room = await roomRepository.findById(roomId);
     if (!room) {
       throw new Error('Room not found');
     }
-
     if (room.creator_id !== creatorId) {
-      throw new Error('Only the creator can update room config');
+      throw new Error('Only the creator can update the room configuration');
     }
 
-    if (room.status !== CustomRoomStatus.WAITING) {
-      throw new Error('Cannot update config of an active or finished room');
-    }
-
-    if (data.problemId) {
-      const problem = await Problem.findById(data.problemId);
-      if (!problem) {
-        throw new Error('Problem not found');
+    const updatedRoom = await prisma.customRoom.update({
+      where: { id: roomId },
+      data: {
+        difficulty: data.difficulty,
+        time_limit: data.timeLimit,
+        memory_limit: data.memoryLimit,
+      },
+      include: {
+        creator: { select: { id: true, username: true, elo_rating: true, avatar_url: true } },
+        participants: { include: { user: { select: { id: true, username: true, elo_rating: true, avatar_url: true } } } }
       }
-    }
+    });
 
-    const updated = await roomRepository.updateConfig(roomId, data);
-
-    // Notify room of configuration change
-    const roomSocketName = `custom-room:${room.room_code}`;
-    io?.to(roomSocketName).emit(SOCKET_EVENTS.CONFIG_UPDATED, updated);
-
-    return updated;
+    const roomSocketName = `custom-room:${updatedRoom.room_code}`;
+    io?.to(roomSocketName).emit(SOCKET_EVENTS.CONFIG_UPDATED, { room: updatedRoom });
+    return updatedRoom;
   }
 
   async deleteRoom(roomId: string, creatorId: string) {
     const room = await roomRepository.findById(roomId);
-    if (!room) {
-      throw new Error('Room not found');
-    }
-
-    if (room.creator_id !== creatorId) {
-      throw new Error('Only the creator can delete the room');
-    }
+    if (!room) throw new Error('Room not found');
+    if (room.creator_id !== creatorId) throw new Error('Only the creator can delete the room');
 
     await roomRepository.delete(roomId);
-
-    // Notify room of deletion
     const roomSocketName = `custom-room:${room.room_code}`;
-    io?.to(roomSocketName).emit(SOCKET_EVENTS.ROOM_DELETED);
-
-    return { success: true };
+    io?.to(roomSocketName).emit(SOCKET_EVENTS.ROOM_DELETED, { roomId });
   }
 }
 
