@@ -212,6 +212,12 @@ export const endMatch = async (matchId: string, winnerId: string) => {
       },
     });
 
+    // If this match belongs to a custom room, update its status
+    await tx.customRoom.updateMany({
+      where: { match_id: matchId },
+      data: { status: 'FINISHED' } // Assuming CustomRoomStatus.FINISHED
+    });
+
     // Broadcast results
     io?.to(`match:${matchId}`).emit(SOCKET_EVENTS.MATCH_ENDED, {
       winnerId,

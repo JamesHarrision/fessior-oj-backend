@@ -73,7 +73,61 @@ export class RoomService {
     // 1. Update room with opponentId
     const updatedRoom = await roomRepository.join(room.id, opponentId);
 
-    // 2. Select problem for the match
+    // Notify host that player joined
+    const roomSocketName = `custom-room:${room.room_code}`;
+    // Emit socket event
+    io?.to(roomSocketName).emit(SOCKET_EVENTS.PLAYER_JOINED, { userId: opponentId });
+
+    return {
+      room: updatedRoom,
+    };
+  }
+
+  async kickPlayer(roomId: string, creatorId: string, opponentId: string) {
+    const room = await roomRepository.findById(roomId);
+    if (!room) {
+      throw new Error('Room not found');
+    }
+
+    if (room.creator_id !== creatorId) {
+      throw new Error('Only the creator can kick players');
+    }
+
+    if (room.opponent_id !== opponentId) {
+      throw new Error('Player is not in the room');
+    }
+
+    if (room.status !== CustomRoomStatus.WAITING) {
+      throw new Error('Cannot kick from an active or finished room');
+    }
+
+    const result = await roomRepository.leave(roomId, opponentId);
+    
+    const roomSocketName = `custom-room:${room.room_code}`;
+    io?.to(roomSocketName).emit(SOCKET_EVENTS.PLAYER_KICKED, { userId: opponentId });
+
+    return result;
+  }
+
+  async startRoomMatch(roomId: string, creatorId: string) {
+    const room = await roomRepository.findById(roomId);
+    if (!room) {
+      throw new Error('Room not found');
+    }
+
+    if (room.creator_id !== creatorId) {
+      throw new Error('Only the creator can start the match');
+    }
+
+    if (room.status !== CustomRoomStatus.WAITING) {
+      throw new Error('Room is not in waiting state');
+    }
+
+    if (!room.opponent_id) {
+      throw new Error('Need an opponent to start the match');
+    }
+
+    // Select problem for the match
     let problemId = room.problem_id;
     if (!problemId) {
       // If no specific problem selected, find one by difficulty or random
@@ -102,20 +156,20 @@ export class RoomService {
       throw new Error('Failed to select a problem for the match');
     }
 
-    // 3. Create a running Match in MySQL
+    // Create a running Match in MySQL
     const match = await prisma.match.create({
       data: {
         player1_id: room.creator_id,
-        player2_id: opponentId,
+        player2_id: room.opponent_id,
         problem_id: problemId,
         status: MatchStatus.PENDING,
       },
     });
 
-    // 4. Update Room status to PLAYING and set match_id
-    await roomRepository.updateStatus(room.id, CustomRoomStatus.PLAYING, match.id);
+    // Update Room status to PLAYING and set match_id
+    const updatedRoom = await roomRepository.updateStatus(room.id, CustomRoomStatus.PLAYING, match.id);
 
-    // 5. Emit socket events to both players if they are connected
+    // Emit socket events to both players
     const roomSocketName = `custom-room:${room.room_code}`;
     io?.to(roomSocketName).emit(SOCKET_EVENTS.MATCH_STARTED, {
       matchId: match.id,
@@ -124,11 +178,7 @@ export class RoomService {
     });
 
     return {
-      room: {
-        ...updatedRoom,
-        status: CustomRoomStatus.PLAYING,
-        match_id: match.id,
-      },
+      room: updatedRoom,
       matchId: match.id,
     };
   }

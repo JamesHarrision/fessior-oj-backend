@@ -90,7 +90,7 @@ export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomM
     }
     setLoading(true);
     try {
-      const res = await api.joinRoom({ roomCode: targetCode });
+      const res = await api.joinRoom({ room_code: targetCode });
       if (res.success && res.data) {
         setActiveRoom(res.data.room);
         if (res.data.matchId) {
@@ -110,7 +110,7 @@ export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomM
       if (activeRoom.creator_id === user?.id) {
         await api.deleteRoom(activeRoom.id);
       } else {
-        await api.leaveRoom({ roomId: activeRoom.id });
+        await api.leaveRoom(activeRoom.id);
       }
       setActiveRoom(null);
       fetchActiveRooms();

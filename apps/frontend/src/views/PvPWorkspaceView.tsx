@@ -60,7 +60,7 @@ export function PvPWorkspaceView() {
   return (
     <div className="flex flex-col h-full gap-4">
       {/* ── Opponent Status ── */}
-      <OpponentStatus matchId={matchId} />
+      <OpponentStatus {...({ matchId } as any)} />
 
       {/* ── Main layout ── */}
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 min-h-0">
@@ -69,7 +69,6 @@ export function PvPWorkspaceView() {
           {problem && (
             <ProblemDescription
               problem={problem}
-              onSelectLanguage={setLanguage}
             />
           )}
         </div>
@@ -80,13 +79,15 @@ export function PvPWorkspaceView() {
             code={code}
             language={language}
             onCodeChange={setCode}
-            onLanguageChange={setLanguage}
+            onLanguageChange={(lang) => setLanguage(lang as any)}
           />
           <ConsolePane
             problem={problem}
             code={code}
             language={language}
             onSubmit={handleSubmit}
+            isSubmitting={false}
+            verdict={""}
           />
         </div>
       </div>

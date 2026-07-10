@@ -68,6 +68,34 @@ export class RoomController {
     }
   }
 
+  async kickPlayer(req: Request, res: Response) {
+    try {
+      const creatorId = (req as any).user.userId;
+      const { roomId, opponentId } = req.body;
+      const result = await roomService.kickPlayer(roomId, creatorId, opponentId);
+      res.status(200).json({
+        success: true,
+        data: result,
+      });
+    } catch (error: any) {
+      res.status(400).json({ success: false, message: error.message });
+    }
+  }
+
+  async startMatch(req: Request, res: Response) {
+    try {
+      const creatorId = (req as any).user.userId;
+      const { roomId } = req.body;
+      const result = await roomService.startRoomMatch(roomId, creatorId);
+      res.status(200).json({
+        success: true,
+        data: result,
+      });
+    } catch (error: any) {
+      res.status(400).json({ success: false, message: error.message });
+    }
+  }
+
   async updateRoomConfig(req: Request, res: Response) {
     try {
       const creatorId = (req as any).user.userId;

@@ -223,6 +223,18 @@ router.post(
 	roomController.leaveRoom
 );
 
+router.post(
+	'/kick',
+	requireAuth,
+	roomController.kickPlayer
+);
+
+router.post(
+	'/start',
+	requireAuth,
+	roomController.startMatch
+);
+
 router.put(
 	'/:roomId',
 /* #swagger.tags = ['Rooms']
