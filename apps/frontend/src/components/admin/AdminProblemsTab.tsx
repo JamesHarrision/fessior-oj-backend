@@ -189,7 +189,7 @@ export const AdminProblemsTab: React.FC<AdminProblemsTabProps> = ({
     setTcError('');
     setTcSuccess('');
     try {
-      const res = await api.deleteTestcase(tcId);
+      const res = await api.deleteTestcase(editingProblem?.id || editingProblem?._id, tcId);
       if (res.success) {
         setTestcases(prev => prev.filter(t => t.id !== tcId && t._id !== tcId));
         setTcSuccess('Đã xóa testcase thành công.');

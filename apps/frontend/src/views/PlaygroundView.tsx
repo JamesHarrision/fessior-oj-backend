@@ -12,7 +12,7 @@ export function PlaygroundView() {
         code={code}
         language={language}
         onCodeChange={setCode}
-        onLanguageChange={setLanguage}
+        onLanguageChange={(lang) => setLanguage(lang as any)}
       />
       <ConsolePane
         problem={null}

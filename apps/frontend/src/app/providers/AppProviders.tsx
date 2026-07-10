@@ -210,7 +210,7 @@ export function AppProviders(props: { children: ReactNode }) {
             controlItemBgHover: 'rgba(216,58,44,0.1)',
           },
           Tooltip: {
-            colorBgDefault: '#1A1A1A',
+            // colorBgDefault: '#1A1A1A',
             colorTextLightSolid: '#E6E0D8',
           },
           Notification: {
@@ -250,7 +250,7 @@ export function AppProviders(props: { children: ReactNode }) {
             hoverBorderColor: '#787878',
             cellActiveWithRangeBg: 'rgba(216,58,44,0.1)',
             cellHoverWithRangeBg: 'rgba(216,58,44,0.05)',
-            cellRangeEdgeTodayHoverBorderColor: '#D83A2C',
+            // cellRangeEdgeTodayHoverBorderColor: '#D83A2C',
           },
           Pagination: {
             itemActiveBg: '#D83A2C',

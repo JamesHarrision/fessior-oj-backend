@@ -45,9 +45,7 @@ async function rawGet<T>(path: string) {
 async function rawPost<T>(path: string, body?: unknown) {
   return wrap<T>(httpClient.request('POST', path, { body }));
 }
-async function rawPut<T>(path: string, body?: unknown) {
-  return wrap<T>(httpClient.request('PUT', path, { body }));
-}
+
 async function rawDelete(path: string) {
   return wrap<void>(httpClient.request('DELETE', path));
 }
@@ -103,10 +101,10 @@ export const api = {
   // =========================================================
   // Submissions
   // =========================================================
-  submitCode: (data: { problemId: string; code: string; language: string; matchId?: string; contestId?: string }) =>
+  submitCode: (data: any) =>
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     wrap<any>(submissionRepository.submit(data)),
-  runCode: (data: { problemId?: string; code: string; language: string; testCases?: unknown[] }) =>
+  runCode: (data: any) =>
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     wrap<any>(submissionRepository.run(data)),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -172,8 +170,10 @@ export const api = {
   createRoom: (data: Record<string, unknown>) =>
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     wrap<any>(roomRepository.createRoom(data as never)),
+  kickPlayer: (roomId: string, opponentId: string) => rawPost<any>(`/rooms/${roomId}/kick`, { opponentId }),
+  startMatch: (roomId: string) => rawPost<any>(`/rooms/${roomId}/start`, {}),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  joinRoom: (data: { room_code: string }) => wrap<any>(roomRepository.joinRoom(data)),
+  joinRoom: (data: { room_code: string }) => wrap<any>(roomRepository.joinRoom({ roomCode: data.room_code } as any)),
   leaveRoom: (roomCode: string) => wrap(roomRepository.leaveRoom(roomCode)),
   deleteRoom: (roomCode: string) => wrap(roomRepository.deleteRoom(roomCode)),
 

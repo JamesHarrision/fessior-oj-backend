@@ -31,7 +31,7 @@ export const AdminCommentsTab: React.FC = () => {
     if (!probId) return;
     setLoading(true);
     try {
-      const res = await api.getComments(probId);
+      const res = await api.getComments(probId, 'PROBLEM');
       if (res.success) {
         setComments(res.data?.items || res.data || []);
       }

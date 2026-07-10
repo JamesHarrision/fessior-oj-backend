@@ -1,9 +1,10 @@
-import { type ReactNode, useCallback } from 'react';
+import { type ReactNode, useCallback, useEffect, useState } from 'react';
 import { Avatar, Dropdown, Input, Badge } from 'antd';
 import { BellOutlined, SearchOutlined, UserOutlined, SettingOutlined, LogoutOutlined } from '@ant-design/icons';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { AppLogo } from '@ocj/ui';
 import { useAuth } from '../../context/AuthContext';
+import { api } from '../../services/api';
 import { Role } from '@ocj/types';
 import { Swords, BookOpen, Trophy, Crown, Beaker, LayoutDashboard, ShoppingBag, Bot, Settings, UsersRound, Code2, ScrollText } from 'lucide-react';
 
@@ -236,6 +237,29 @@ export function AppShellLayout() {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Poll notifications every 30s
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchNotifications = async () => {
+      try {
+        const res = await api.getNotifications();
+        if (res.success && res.data) {
+          const unread = res.data.filter((n: any) => !n.is_read).length;
+          setUnreadCount(unread);
+        }
+      } catch (err) {
+        console.error('Failed to fetch notifications', err);
+      }
+    };
+
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 30000);
+
+    return () => clearInterval(interval);
+  }, [user]);
 
   const selectedKey = ((): string => {
     const pathname = location.pathname;
@@ -271,7 +295,7 @@ export function AppShellLayout() {
       {/* ── Main Content Area ── */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* ── Top Bar ── */}
-        <TopBar user={user} onLogout={handleLogout} hideSearch={location.pathname === '/match'} />
+        <TopBar user={user} onLogout={handleLogout} notificationCount={unreadCount} hideSearch={location.pathname === '/match'} />
 
         {/* ── Content ── */}
         <main className="flex-1 overflow-y-auto bg-ink">

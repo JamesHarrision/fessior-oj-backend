@@ -8,7 +8,7 @@ export const AccountSettings: React.FC = () => {
   const { user, logout, refreshProfile } = useAuth();
   
   // Change Password State
-  const [oldPassword, setOldPassword] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passError, setPassError] = useState('');
@@ -61,7 +61,7 @@ export const AccountSettings: React.FC = () => {
     setPassError('');
     setPassSuccess('');
 
-    if (!oldPassword || !newPassword || !confirmPassword) {
+    if (!currentPassword || !newPassword || !confirmPassword) {
       setPassError('Vui lòng điền đầy đủ tất cả các trường.');
       return;
     }
@@ -78,10 +78,10 @@ export const AccountSettings: React.FC = () => {
 
     setPassLoading(true);
     try {
-      const res = await api.changePassword({ oldPassword, newPassword });
+      const res = await api.changePassword({ currentPassword, newPassword });
       if (res.success) {
         setPassSuccess('Đổi mật khẩu thành công! Tất cả các phiên khác đã được đăng xuất.');
-        setOldPassword('');
+        setCurrentPassword('');
         setNewPassword('');
         setConfirmPassword('');
         // Refresh sessions list
@@ -224,8 +224,8 @@ export const AccountSettings: React.FC = () => {
               <input
                 type="password"
                 placeholder="Nhập mật khẩu hiện tại"
-                value={oldPassword}
-                onChange={(e) => setOldPassword(e.target.value)}
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
                 className="settings-field-input"
                 required
               />

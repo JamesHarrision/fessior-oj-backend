@@ -67,7 +67,7 @@ export const AdminNotificationsTab: React.FC = () => {
     const unreadIds = notifications.filter(n => !n.isRead && !n.read).map(n => n.id || n._id);
     if (unreadIds.length === 0) return;
     try {
-      const res = await api.markNotificationsAsRead(unreadIds);
+      const res = await api.markNotificationsAsRead();
       if (res.success) {
         fetchNotifications();
       }

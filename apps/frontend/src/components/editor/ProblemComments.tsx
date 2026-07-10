@@ -23,7 +23,7 @@ export const ProblemComments: React.FC<ProblemCommentsProps> = ({ targetId, targ
   const loadComments = async () => {
     setLoading(true);
     try {
-      const res = await api.getComments(targetId);
+      const res = await api.getComments(targetId, 'PROBLEM');
       if (res.success && res.data) setComments(res.data);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }

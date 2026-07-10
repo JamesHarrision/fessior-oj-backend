@@ -48,7 +48,7 @@ export function SoloSolveView() {
     <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 min-h-0">
       {/* Left: Problem Description */}
       <div className="overflow-y-auto">
-        <ProblemDescription problem={problem} onSelectLanguage={setLanguage} />
+        <ProblemDescription problem={problem} />
       </div>
 
       {/* Right: Editor + Console */}
@@ -57,13 +57,15 @@ export function SoloSolveView() {
           code={code}
           language={language}
           onCodeChange={setCode}
-          onLanguageChange={setLanguage}
+          onLanguageChange={(lang) => setLanguage(lang as any)}
         />
         <ConsolePane
           problem={problem}
           code={code}
           language={language}
           onSubmit={handleSubmit}
+          isSubmitting={false}
+          verdict={""}
         />
       </div>
     </div>

@@ -19,7 +19,7 @@ export const AdminAiTab: React.FC = () => {
     setRoadmapLoading(true);
     setRoadmapResult(null);
     try {
-      const res = await api.getAIRoadmap({ skillLevel, focusArea });
+      const res = await api.getAIRoadmap( /* { skillLevel, focusArea } */ );
       if (res.success) {
         setRoadmapResult(res.data);
       }

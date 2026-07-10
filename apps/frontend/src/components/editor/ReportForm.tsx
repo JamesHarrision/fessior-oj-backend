@@ -19,7 +19,7 @@ const REPORT_TYPES = [
   { key: 'OTHERS', label: 'Khác' },
 ];
 
-export const ReportForm: React.FC<ReportFormProps> = ({ targetId, targetType, onClose }) => {
+export const ReportForm: React.FC<ReportFormProps> = ({ onClose }) => {
   const [type, setType] = useState('BUG');
   const [content, setContent] = useState('');
   const [submitted, setSubmitted] = useState(false);

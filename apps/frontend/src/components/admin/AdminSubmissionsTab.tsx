@@ -67,7 +67,7 @@ export const AdminSubmissionsTab: React.FC = () => {
         problemId: selectedProblemId,
         language: testLanguage,
         code: testCode,
-        customInput: customInput || undefined
+        // customInput: customInput || undefined
       });
       if (res.success) {
         setRunResult(res.data);

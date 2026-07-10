@@ -20,7 +20,7 @@ export const SubmissionsView: React.FC = () => {
       if (res.success && res.data) {
         const list = Array.isArray(res.data) ? res.data : (res.data.items || []);
         // Sort by newest first
-        const sorted = list.sort((a, b) => 
+        const sorted = list.sort((a: any, b: any) => 
           new Date(b.createdAt || b.created_at).getTime() - new Date(a.createdAt || a.created_at).getTime()
         );
         setSubmissions(sorted);

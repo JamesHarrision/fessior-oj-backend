@@ -28,7 +28,7 @@ export const ProblemDescription: React.FC<ProblemProps> = ({ problem }) => {
     if (!problemId) return;
     setLoading(true);
     try {
-      const res = await api.getComments(problemId);
+      const res = await api.getComments(problemId, 'PROBLEM');
       if (res.success && res.data) setComments(res.data);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
