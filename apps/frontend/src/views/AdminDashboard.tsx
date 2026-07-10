@@ -33,7 +33,6 @@ import { AdminNotificationsTab } from '../components/admin/AdminNotificationsTab
 import { AdminReportsTab } from '../components/admin/AdminReportsTab';
 
 import type { IProblem, IContest, IReport, ProblemDifficulty } from '@ocj/types';
-import './AdminDashboard.css';
 
 interface AdminDashboardProps {
   currentSubView: string;
@@ -82,9 +81,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentSubView, 
 
   if (user?.role !== 'ADMIN') {
     return (
-      <div className="admin-denied glass-card">
-        <h3>Quyền truy cập bị từ chối</h3>
-        <p>Bạn không có quyền quản trị để truy cập trang này.</p>
+      <div className="flex flex-col items-center justify-center p-20 bg-ink border border-charcoal">
+        <h3 className="font-display text-2xl font-bold text-vermilion uppercase tracking-wider mb-2">Quyền truy cập bị từ chối</h3>
+        <p className="font-body text-stone">Bạn không có quyền quản trị để truy cập trang này.</p>
       </div>
     );
   }
@@ -152,7 +151,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentSubView, 
 
   const handleUpdateReport = async (reportId: string, status: 'RESOLVED' | 'REJECTED') => {
     try {
-      await api.updateReportStatus(reportId, { status });
+      await api.updateReportStatus(reportId, status);
       loadData();
     } catch (err) {
       console.error(err);
@@ -176,16 +175,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentSubView, 
   ];
 
   return (
-    <div className="admin-dashboard-container">
-      <div className="admin-header glass-card">
-        <Settings className="admin-gear-icon" size={24} />
-        <h2>Bảng Quản Trị Hệ Thống (Admin Panel)</h2>
+    <div className="flex flex-col gap-6 w-full max-w-[1400px] mx-auto h-[calc(100vh-100px)]">
+      {/* Header */}
+      <div className="bg-washi border border-charcoal p-4 lg:p-6 flex items-center gap-4 shrink-0">
+        <div className="bg-ink p-3 border border-charcoal">
+          <Settings size={28} className="text-vermilion animate-[spin_10s_linear_infinite]" />
+        </div>
+        <div>
+          <h2 className="font-display text-xl lg:text-2xl font-bold text-linen uppercase tracking-wider">Bảng Quản Trị Hệ Thống (Admin Panel)</h2>
+        </div>
       </div>
 
-      <div className="admin-layout-wrapper">
-        {/* Admin Navigation Sidebar */}
-        <div className="admin-sidebar-nav glass-card">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
+      {/* Layout Wrapper */}
+      <div className="flex flex-col lg:flex-row gap-6 flex-1 min-h-0 overflow-hidden">
+        {/* Sidebar Nav */}
+        <div className="w-full lg:w-[280px] bg-washi border border-charcoal flex flex-col shrink-0 overflow-y-auto">
+          <div className="flex flex-col p-2 gap-1 flex-1">
             {tabsList.map((tab) => {
               const TabIcon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -193,7 +198,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentSubView, 
                 <button
                   key={tab.id}
                   onClick={() => onViewChange(`admin/${tab.id}`)}
-                  className={`admin-nav-item-btn ${isActive ? 'active' : ''}`}
+                  className={`flex items-center gap-3 px-4 py-3 font-display text-xs font-bold uppercase tracking-wider transition-colors border-l-[3px] ${
+                    isActive
+                      ? 'border-l-vermilion bg-ink text-vermilion'
+                      : 'border-l-transparent text-stone hover:bg-ink/50 hover:text-linen'
+                  }`}
                 >
                   <TabIcon size={16} />
                   <span>{tab.label}</span>
@@ -202,26 +211,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentSubView, 
             })}
           </div>
 
-          <button
-            onClick={() => onViewChange('match')}
-            className="admin-nav-item-btn exit-admin-btn"
-            style={{
-              marginTop: '16px',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              background: 'rgba(239, 68, 68, 0.05)',
-              color: '#f87171',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px'
-            }}
-          >
-            <X size={16} />
-            <span>Thoát Admin</span>
-          </button>
+          <div className="p-4 border-t border-charcoal">
+            <button
+              onClick={() => onViewChange('match')}
+              className="w-full flex items-center justify-center gap-2 font-display text-xs font-bold uppercase tracking-wider px-4 py-3 border border-vermilion/50 text-vermilion hover:bg-vermilion hover:text-linen transition-colors"
+            >
+              <X size={16} />
+              <span>Thoát Admin</span>
+            </button>
+          </div>
         </div>
 
-        {/* Admin Tab Content Panel */}
-        <div className="admin-content-pane">
+        {/* Content Pane */}
+        <div className="flex-1 bg-washi border border-charcoal p-6 overflow-y-auto relative min-h-[400px]">
           {activeTab === 'auth' && <AdminAuthTab />}
           
           {activeTab === 'problems' && (
