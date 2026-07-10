@@ -39,7 +39,7 @@ export const AIView: React.FC = () => {
     if (!focusArea.trim()) return;
     setRoadmapLoading(true);
     try {
-      const res = await api.getAIRoadmap({ skillLevel, focusArea });
+      const res = await api.getAIRoadmap();
       if (res.success && res.data) {
         setRoadmap(res.data);
       }

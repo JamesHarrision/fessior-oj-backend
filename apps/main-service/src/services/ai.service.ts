@@ -57,8 +57,11 @@ export class AIService {
   private genAI: GoogleGenerativeAI | null = null;
 
   constructor() {
-    if (GEMINI_API_KEY) {
-      this.genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (apiKey) {
+      this.genAI = new GoogleGenerativeAI(apiKey);
+    } else {
+      this.genAI = null; // [MOCK MODE] if no API key
     }
   }
 
