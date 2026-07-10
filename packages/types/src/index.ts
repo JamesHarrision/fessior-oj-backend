@@ -214,6 +214,7 @@ export interface ICustomRoom {
   participants?: ICustomRoomParticipant[];
   match_id?: string | null;
   problem_id?: string | null;
+  _count?: { participants: number };
 }
 
 export interface IMatchParticipant {

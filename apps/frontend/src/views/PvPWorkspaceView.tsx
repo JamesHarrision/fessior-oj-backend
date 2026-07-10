@@ -30,7 +30,7 @@ export function PvPWorkspaceView() {
     if (!matchId) return;
 
     // Fetch match details just in case we are entering from Custom Room (which only passes matchId)
-    api.getMatch(matchId).then(res => {
+    api.getMatchDetails(matchId).then(res => {
       if (res.success && res.data) {
         const matchData = res.data;
         setActiveMatch(matchData);
@@ -45,8 +45,8 @@ export function PvPWorkspaceView() {
         }
         
         // Fetch problem if not present
-        if (!problem) {
-          api.getProblemById(matchData.problem_id).then(pres => {
+        if (!problem && matchData.problem_id) {
+          api.getProblemDetail(matchData.problem_id).then(pres => {
              if (pres.success && pres.data) {
                 setProblem(pres.data);
                 setCode(pres.data.starterCodes?.[language] ?? '');
