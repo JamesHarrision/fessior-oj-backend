@@ -186,3 +186,18 @@ POST /api/v1/submissions/run
 ```
 
 Muc dich: chay code nhanh, khong tao persistent submission theo route description.
+
+### Luồng xử lý Testcase trong Ad-Hoc Run
+
+- **Lấy Testcase mẫu**: Frontend khi gọi API lấy danh sách testcase mẫu sẽ truyền cờ `?example=true` để chỉ lấy các testcase public (`isExample: true`). Backend sẽ bỏ qua các testcase ẩn.
+- **Chạy Testcase mẫu**: Backend (hàm `runCode`) tự động lọc `Testcase.find({ isExample: true })` và chạy toàn bộ các testcase mẫu. Trả về `ACCEPTED` hoặc `WA` dựa trên so sánh output.
+- **Chạy Tùy biến Input (Custom Input)**: Nếu request gửi kèm `customInput`, Backend sẽ không so sánh `expectedOutput`. Miễn là tiến trình không gặp lỗi (CE, RE, TLE), kết quả sẽ được đánh dấu là `ACCEPTED` (để Frontend có thể hiển thị `actualOutput` thay vì báo `WA`).
+
+## Cơ chế Executor (Judge0 / Local Fallback)
+
+Giao tiếp với hệ thống sandbox thông qua `packages/executor`.
+1. Gọi API `Judge0` để thực thi mã nguồn.
+2. Nếu Judge0 báo lỗi Cgroup Sandbox (Error 13 hoặc lỗi `/bin/sh`), hệ thống sẽ chuyển sang cơ chế **Local Execution Fallback** (Thực thi ngầm cục bộ).
+   - Tự động chạy lệnh `docker exec -i` vào container `judge0-*server`.
+   - Lưu ý: Node.js phải luôn đóng luồng `child.stdin.end()` sau khi gửi Input để tránh việc tiến trình `docker exec` bị treo vĩnh viễn chờ luồng đầu vào.
+   - Nếu `docker exec` thất bại, hệ thống sẽ thực thi mã trực tiếp trên Host (yêu cầu máy Host phải cài đặt sẵn `g++`, `python`).

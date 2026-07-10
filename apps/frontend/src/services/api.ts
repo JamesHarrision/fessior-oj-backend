@@ -93,7 +93,7 @@ export const api = {
 
   // Testcase management
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getTestcases: (problemId: string) => wrap<any>(problemRepository.getTestcases(problemId)),
+  getTestcases: (problemId: string, isExample?: boolean) => wrap<any>(problemRepository.getTestcases(problemId, isExample)),
   addTestcase: (problemId: string, data: Record<string, unknown>) =>
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     wrap<any>(problemRepository.createTestcase(problemId, data)),

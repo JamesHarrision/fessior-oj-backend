@@ -25,20 +25,20 @@ function ProblemCard(props: { problem: IProblem; onSelect: (slug: string) => voi
 
   return (
     <div
-      className="!bg-white !rounded-2xl !border !border-surface-200 !shadow-[0_1px_3px_rgba(0,0,0,0.06)] !p-6
-                 hover:!shadow-[0_8px_24px_rgba(0,0,0,0.1)] hover:!border-emerald-500/30 hover:-translate-y-1
+      className="!bg-washi !rounded-2xl !border !border-charcoal !p-6
+                 hover:!border-vermilion/50 hover:-translate-y-1
                  transition-all duration-300 cursor-pointer !flex !flex-col !justify-between !min-h-[200px]"
       onClick={() => onSelect(problem.slug)}
     >
       <div>
         <div className="!flex !items-center !justify-between !mb-3">
           <DifficultyBadge difficulty={difficulty} />
-          <span className="!text-[11px] !font-semibold !text-surface-400 !uppercase !tracking-wider">
+          <span className="!text-[11px] !font-semibold !text-stone !uppercase !tracking-wider">
             {problem.timeLimit ?? 2000}ms · {problem.memoryLimit ?? 256}MB
           </span>
         </div>
 
-        <h3 className="!text-[15px] !font-semibold !text-navy-850 !mb-2 !leading-snug"
+        <h3 className="!text-[15px] !font-semibold !text-linen !mb-2 !leading-snug"
             style={{ fontFamily: "'Clash Display', sans-serif" }}>
           {problem.title}
         </h3>
@@ -51,7 +51,7 @@ function ProblemCard(props: { problem: IProblem; onSelect: (slug: string) => voi
               </Tag>
             ))}
             {tags.length > 3 && (
-              <span className="!text-[10px] !text-surface-400 !self-center">+{tags.length - 3}</span>
+              <span className="!text-[10px] !text-stone !self-center">+{tags.length - 3}</span>
             )}
           </div>
         )}
@@ -59,7 +59,7 @@ function ProblemCard(props: { problem: IProblem; onSelect: (slug: string) => voi
 
       <button
         className="!w-full !flex !items-center !justify-center !gap-2 !py-2.5 !rounded-lg
-                   !bg-emerald-500 hover:!bg-emerald-600 !text-white !text-[13px] !font-semibold
+                   !bg-vermilion hover:!bg-vermilion-hover !text-linen !text-[13px] !font-semibold
                    !border-none !cursor-pointer transition-colors duration-200"
       >
         Solve Now <ArrowRightOutlined className="!text-xs" />
@@ -80,15 +80,15 @@ function FilterBar(props: {
   tags: ITag[];
 }) {
   return (
-    <div className="!bg-white !rounded-2xl !border !border-surface-200 !shadow-[0_1px_3px_rgba(0,0,0,0.06)] !p-4
+    <div className="!bg-washi !rounded-2xl !border !border-charcoal !p-4
                     !grid !grid-cols-1 sm:!grid-cols-[2fr_1fr_1fr] !gap-3">
       <Input
-        prefix={<SearchOutlined className="!text-surface-400" />}
+        prefix={<SearchOutlined className="!text-stone" />}
         placeholder="Search problems..."
         value={props.search}
         onChange={(e) => props.onSearchChange(e.target.value)}
         allowClear
-        className="!h-[42px] !rounded-lg !bg-surface-50 !border-surface-200 hover:!border-emerald-500"
+        className="!h-[42px] !rounded-lg !bg-ink !border-charcoal hover:!border-vermilion"
       />
 
       <Select
@@ -169,7 +169,7 @@ export function ProblemsPage() {
           <Spin size="large" />
         </div>
       ) : isError ? (
-        <div className="!bg-white !rounded-2xl !border !border-surface-200 !p-12">
+        <div className="!bg-washi !rounded-2xl !border !border-charcoal !p-12">
           <EmptyState
             icon={<BookOutlined style={{ fontSize: 48, color: '#94A3B8' }} />}
             title="Failed to load problems"
@@ -177,7 +177,7 @@ export function ProblemsPage() {
           />
         </div>
       ) : filtered.length === 0 ? (
-        <div className="!bg-white !rounded-2xl !border !border-surface-200 !p-12">
+        <div className="!bg-washi !rounded-2xl !border !border-charcoal !p-12">
           <EmptyState
             icon={<BookOutlined style={{ fontSize: 48, color: '#94A3B8' }} />}
             title="No problems found"

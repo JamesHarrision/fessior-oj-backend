@@ -43,8 +43,9 @@ export class ProblemRepository {
     return this.http.request('GET', `${API_ROUTES.PROBLEMS}/tags`);
   }
 
-  getTestcases(problemId: string): Promise<ApiResponse<ISubmission[]>> {
-    return this.http.request('GET', `${API_ROUTES.PROBLEMS}/${problemId}/testcases`);
+  getTestcases(problemId: string, isExample?: boolean): Promise<ApiResponse<ISubmission[]>> {
+    const query = isExample !== undefined ? `?example=${isExample}` : '';
+    return this.http.request('GET', `${API_ROUTES.PROBLEMS}/${problemId}/testcases${query}`);
   }
 
   createTestcase(problemId: string, data: Record<string, unknown>): Promise<ApiResponse<ISubmission>> {

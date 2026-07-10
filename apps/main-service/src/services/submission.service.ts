@@ -164,8 +164,14 @@ export class SubmissionService {
           rapidApiHost,
         }
       );
+      let finalStatus = result.status;
+      // For custom input, we don't have expected output to compare, so any successful run without crashes is "ACCEPTED".
+      if (data.customInput !== undefined && !['CE', 'RE', 'TLE'].includes(finalStatus)) {
+        finalStatus = 'ACCEPTED';
+      }
+
       results.push({
-        status: result.status,
+        status: finalStatus,
         input: tc.input,
         expectedOutput: tc.output,
         actualOutput: result.actualOutput,

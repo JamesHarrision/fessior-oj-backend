@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { api } from '../services/api';
-import { Clock, Eye, Sparkles } from 'lucide-react';
-import './SubmissionsView.css';
+import { Eye, Sparkles } from 'lucide-react';
+import { PageHeader, StatusBadge } from '@ocj/ui';
+import { Spin, Pagination } from 'antd';
 
 export const SubmissionsView: React.FC = () => {
   const [submissions, setSubmissions] = useState<any[]>([]);
@@ -10,15 +11,28 @@ export const SubmissionsView: React.FC = () => {
   const [aiFeedback, setAiFeedback] = useState<string | null>(null);
   const [loadingAi, setLoadingAi] = useState(false);
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+
   useEffect(() => {
     api.getSubmissions().then(res => {
       if (res.success && res.data) {
         const list = Array.isArray(res.data) ? res.data : (res.data.items || []);
-        setSubmissions(list);
+        // Sort by newest first
+        const sorted = list.sort((a, b) => 
+          new Date(b.createdAt || b.created_at).getTime() - new Date(a.createdAt || a.created_at).getTime()
+        );
+        setSubmissions(sorted);
       }
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
+
+  const paginatedSubmissions = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    return submissions.slice(startIndex, startIndex + pageSize);
+  }, [submissions, currentPage]);
 
   const handleViewDetail = async (sub: any) => {
     setSelectedSub(sub);
@@ -52,97 +66,151 @@ export const SubmissionsView: React.FC = () => {
   };
 
   return (
-    <div className="submissions-view-container">
-      <div className="submissions-header glass-card">
-        <div className="title-row">
-          <Clock className="header-icon" size={24} />
-          <h2>Lịch Sử Nộp Bài</h2>
-        </div>
-        <p className="subtitle">Xem lại danh sách và trạng thái các bài nộp của bạn trong quá khứ.</p>
-      </div>
+    <div className="!space-y-6">
+      <PageHeader
+        title="Submission History"
+        subtitle="Review your past submissions and track your progress over time."
+      />
 
       {loading ? (
-        <div className="loading-spinner-container">
-          <div className="loading-spinner"></div>
+        <div className="!flex !justify-center !py-20">
+          <Spin size="large" />
         </div>
       ) : (
-        <div className="submissions-table-container glass-card">
-          <table className="submissions-table">
-            <thead>
-              <tr>
-                <th>Mã nộp</th>
-                <th>Bài tập</th>
-                <th>Ngôn ngữ</th>
-                <th>Kết quả</th>
-                <th>Thời gian chạy</th>
-                <th>Ngày nộp</th>
-                <th>Chi tiết</th>
-              </tr>
-            </thead>
-            <tbody>
-              {submissions.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="empty-cell">Không tìm thấy lượt nộp bài nào.</td>
+        <div className="!bg-washi !rounded-2xl !border !border-charcoal !overflow-hidden">
+          <div className="!overflow-x-auto">
+            <table className="!w-full !text-left !border-collapse">
+              <thead>
+                <tr className="!border-b !border-charcoal !bg-ink/50">
+                  <th className="!py-4 !px-6 !text-[11px] !font-bold !text-stone !uppercase !tracking-wider">ID</th>
+                  <th className="!py-4 !px-6 !text-[11px] !font-bold !text-stone !uppercase !tracking-wider">Problem</th>
+                  <th className="!py-4 !px-6 !text-[11px] !font-bold !text-stone !uppercase !tracking-wider">Language</th>
+                  <th className="!py-4 !px-6 !text-[11px] !font-bold !text-stone !uppercase !tracking-wider">Result</th>
+                  <th className="!py-4 !px-6 !text-[11px] !font-bold !text-stone !uppercase !tracking-wider">Time</th>
+                  <th className="!py-4 !px-6 !text-[11px] !font-bold !text-stone !uppercase !tracking-wider">Date</th>
+                  <th className="!py-4 !px-6 !text-[11px] !font-bold !text-stone !uppercase !tracking-wider !text-center">Action</th>
                 </tr>
-              ) : (
-                submissions.map(sub => (
-                  <tr key={sub.id || sub._id}>
-                    <td className="code-font">{String(sub.id || sub._id).slice(-6)}</td>
-                    <td className="bold">{sub.problemId?.title || sub.problem?.title || sub.problemId}</td>
-                    <td className="code-font">{sub.language}</td>
-                    <td>
-                      <span className={`verdict-badge status-${sub.status.toLowerCase()}`}>
-                        {sub.status}
-                      </span>
-                    </td>
-                    <td>{sub.executionTime ? `${sub.executionTime}ms` : 'N/A'}</td>
-                    <td>{new Date(sub.createdAt || sub.created_at).toLocaleString()}</td>
-                    <td>
-                      <button onClick={() => handleViewDetail(sub)} className="btn-icon glass-button">
-                        <Eye size={14} />
-                      </button>
+              </thead>
+              <tbody className="!divide-y !divide-charcoal">
+                {paginatedSubmissions.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="!py-12 !text-center !text-stone">
+                      No submissions found.
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  paginatedSubmissions.map(sub => (
+                    <tr key={sub.id || sub._id} className="hover:!bg-ink/30 !transition-colors !duration-200">
+                      <td className="!py-4 !px-6 !text-[13px] !font-mono !text-stone">
+                        {String(sub.id || sub._id).slice(-6)}
+                      </td>
+                      <td className="!py-4 !px-6 !text-[14px] !font-semibold !text-linen">
+                        {sub.problemId?.title || sub.problem?.title || sub.problemId}
+                      </td>
+                      <td className="!py-4 !px-6 !text-[13px] !font-mono !text-stone">
+                        {sub.language}
+                      </td>
+                      <td className="!py-4 !px-6">
+                        <StatusBadge status={sub.status} />
+                      </td>
+                      <td className="!py-4 !px-6 !text-[13px] !text-stone">
+                        {sub.executionTime ? `${sub.executionTime}ms` : 'N/A'}
+                      </td>
+                      <td className="!py-4 !px-6 !text-[13px] !text-stone">
+                        {new Date(sub.createdAt || sub.created_at).toLocaleString()}
+                      </td>
+                      <td className="!py-4 !px-6 !text-center">
+                        <button
+                          onClick={() => handleViewDetail(sub)}
+                          className="!inline-flex !items-center !justify-center !w-8 !h-8 !rounded-lg !bg-charcoal hover:!bg-stone/20 !text-linen !transition-colors !border !border-transparent hover:!border-stone/30"
+                          title="View Details"
+                        >
+                          <Eye size={14} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+          
+          {submissions.length > 0 && (
+            <div className="!px-6 !py-4 !border-t !border-charcoal !flex !justify-end">
+              <Pagination
+                current={currentPage}
+                total={submissions.length}
+                pageSize={pageSize}
+                onChange={setCurrentPage}
+                showSizeChanger={false}
+              />
+            </div>
+          )}
         </div>
       )}
 
       {selectedSub && (
-        <div className="submission-detail-overlay">
-          <div className="submission-modal glass-card">
-            <div className="modal-header">
-              <h3>Chi Tiết Lượt Nộp: #{String(selectedSub.id || selectedSub._id).slice(-6)}</h3>
-              <button onClick={() => setSelectedSub(null)} className="close-btn">&times;</button>
+        <div className="!fixed !inset-0 !z-50 !flex !items-center !justify-center !bg-ink/80 !backdrop-blur-sm !p-4">
+          <div className="!bg-washi !rounded-2xl !border !border-charcoal !w-full !max-w-3xl !shadow-2xl !max-h-[90vh] !flex !flex-col animate-fade-in-up">
+            <div className="!px-6 !py-5 !border-b !border-charcoal !flex !items-center !justify-between !bg-ink/30 !rounded-t-2xl">
+              <h3 className="!text-lg !font-semibold !text-linen !font-display">
+                Submission #{String(selectedSub.id || selectedSub._id).slice(-6)}
+              </h3>
+              <button
+                onClick={() => setSelectedSub(null)}
+                className="!text-stone hover:!text-linen !transition-colors !p-1"
+              >
+                &times;
+              </button>
             </div>
             
-            <div className="modal-content">
-              <div className="meta-grid">
-                <div><strong>Đề bài:</strong> {selectedSub.problemId?.title || selectedSub.problem?.title || selectedSub.problemId}</div>
-                <div><strong>Kết quả:</strong> <span className={`verdict-badge status-${selectedSub.status.toLowerCase()}`}>{selectedSub.status}</span></div>
-                <div><strong>Ngôn ngữ:</strong> {selectedSub.language}</div>
-                <div><strong>Độ khó:</strong> {selectedSub.problemId?.difficulty || selectedSub.problem?.difficulty || 'N/A'}</div>
+            <div className="!p-6 !overflow-y-auto !flex-1 !space-y-6">
+              <div className="!grid !grid-cols-2 sm:!grid-cols-4 !gap-4 !p-4 !bg-ink !rounded-xl !border !border-charcoal">
+                <div>
+                  <div className="!text-[11px] !text-stone !uppercase !font-bold !mb-1">Problem</div>
+                  <div className="!text-sm !text-linen !font-semibold">
+                    {selectedSub.problemId?.title || selectedSub.problem?.title || selectedSub.problemId}
+                  </div>
+                </div>
+                <div>
+                  <div className="!text-[11px] !text-stone !uppercase !font-bold !mb-1">Result</div>
+                  <div><StatusBadge status={selectedSub.status} /></div>
+                </div>
+                <div>
+                  <div className="!text-[11px] !text-stone !uppercase !font-bold !mb-1">Language</div>
+                  <div className="!text-sm !text-linen !font-mono">{selectedSub.language}</div>
+                </div>
+                <div>
+                  <div className="!text-[11px] !text-stone !uppercase !font-bold !mb-1">Difficulty</div>
+                  <div className="!text-sm !text-stone">
+                    {selectedSub.problemId?.difficulty || selectedSub.problem?.difficulty || 'N/A'}
+                  </div>
+                </div>
               </div>
 
-              <h4>Mã nguồn đã nộp:</h4>
-              <pre className="code-block code-font"><code>{selectedSub.code}</code></pre>
+              <div>
+                <h4 className="!text-sm !font-bold !text-stone !mb-3 !uppercase !tracking-wider">Source Code</h4>
+                <pre className="!bg-ink !p-4 !rounded-xl !border !border-charcoal !text-sm !text-linen !font-mono !overflow-x-auto">
+                  <code>{selectedSub.code}</code>
+                </pre>
+              </div>
 
-              <div className="ai-feedback-section">
+              <div className="!pt-4 !border-t !border-charcoal">
                 <button
                   disabled={loadingAi}
                   onClick={handleRequestAiFeedback}
-                  className="btn-ai-feedback glass-button"
+                  className="!flex !items-center !justify-center !gap-2 !w-full !py-3 !rounded-xl !bg-charcoal hover:!bg-stone/20 !text-linen !font-semibold !transition-all disabled:!opacity-50 disabled:!cursor-not-allowed !border !border-charcoal"
                 >
-                  <Sparkles size={16} />
-                  {loadingAi ? 'AI đang phân tích...' : 'Nhận xét code bằng AI (Mock Interview)'}
+                  <Sparkles size={16} className={loadingAi ? "!animate-pulse" : ""} />
+                  {loadingAi ? 'AI is analyzing...' : 'Get AI Feedback (Mock Interview)'}
                 </button>
 
                 {aiFeedback && (
-                  <div className="ai-feedback-box glass-card">
-                    <h5><Sparkles size={14} className="ai-icon" /> AI Feedback:</h5>
-                    <p className="ai-feedback-text">{aiFeedback}</p>
+                  <div className="!mt-4 !p-5 !bg-ink !rounded-xl !border !border-vermilion/30 !animate-fade-in-up">
+                    <h5 className="!flex !items-center !gap-2 !text-vermilion !font-bold !mb-3">
+                      <Sparkles size={14} /> AI Feedback
+                    </h5>
+                    <p className="!text-sm !text-linen !leading-relaxed !whitespace-pre-wrap">{aiFeedback}</p>
                   </div>
                 )}
               </div>
@@ -153,4 +221,5 @@ export const SubmissionsView: React.FC = () => {
     </div>
   );
 };
+
 export default SubmissionsView;
