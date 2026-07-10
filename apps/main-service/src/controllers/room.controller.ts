@@ -7,7 +7,8 @@ export class RoomController {
       const creatorId = (req as any).user.userId;
       const room = await roomService.createRoom(creatorId, req.body);
       res.status(201).json({
-        success: true,
+        status: 'Success',
+        message: 'Room created successfully',
         data: room,
       });
     } catch (error: any) {
@@ -19,7 +20,8 @@ export class RoomController {
     try {
       const rooms = await roomService.getActiveRooms();
       res.status(200).json({
-        success: true,
+        status: 'Success',
+        message: 'Active rooms fetched successfully',
         data: rooms,
       });
     } catch (error: any) {
@@ -32,7 +34,8 @@ export class RoomController {
       const roomId = req.params.roomId as string;
       const room = await roomService.getRoomDetails(roomId);
       res.status(200).json({
-        success: true,
+        status: 'Success',
+        message: 'Room details fetched successfully',
         data: room,
       });
     } catch (error: any) {
@@ -46,7 +49,8 @@ export class RoomController {
       const { roomCode } = req.body;
       const result = await roomService.joinRoom(roomCode, opponentId);
       res.status(200).json({
-        success: true,
+        status: 'Success',
+        message: 'Success',
         data: result,
       });
     } catch (error: any) {
@@ -60,7 +64,8 @@ export class RoomController {
       const { roomId } = req.body;
       const result = await roomService.leaveRoom(roomId, userId);
       res.status(200).json({
-        success: true,
+        status: 'Success',
+        message: 'Success',
         data: result,
       });
     } catch (error: any) {
@@ -74,7 +79,8 @@ export class RoomController {
       const { roomId, opponentId } = req.body;
       const result = await roomService.kickPlayer(roomId, creatorId, opponentId);
       res.status(200).json({
-        success: true,
+        status: 'Success',
+        message: 'Success',
         data: result,
       });
     } catch (error: any) {
@@ -88,7 +94,8 @@ export class RoomController {
       const { roomId } = req.body;
       const result = await roomService.startRoomMatch(roomId, creatorId);
       res.status(200).json({
-        success: true,
+        status: 'Success',
+        message: 'Success',
         data: result,
       });
     } catch (error: any) {
@@ -102,7 +109,8 @@ export class RoomController {
       const roomId = req.params.roomId as string;
       const updated = await roomService.updateRoomConfig(roomId, creatorId, req.body);
       res.status(200).json({
-        success: true,
+        status: 'Success',
+        message: 'Room updated successfully',
         data: updated,
       });
     } catch (error: any) {
@@ -116,7 +124,7 @@ export class RoomController {
       const roomId = req.params.roomId as string;
       await roomService.deleteRoom(roomId, creatorId);
       res.status(200).json({
-        success: true,
+        status: 'Success',
         message: 'Room deleted successfully',
       });
     } catch (error: any) {
