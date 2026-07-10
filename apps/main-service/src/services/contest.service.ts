@@ -179,10 +179,9 @@ export class ContestService {
       select: { id: true, username: true, elo_rating: true, avatar_url: true },
     });
 
-    // 2. Fetch all accepted submissions for this contest
+    // 2. Fetch all submissions for this contest to calculate penalty and scores
     const submissions = await Submission.find({
       contestId,
-      status: 'ACCEPTED',
     }).sort({ createdAt: 1 }); // Sort chronologically to get earliest solves
 
     // 3. Map contest problems points
@@ -197,17 +196,26 @@ export class ContestService {
       
       // Keep track of first accepted submission per problem to sum points and compute penalty/time
       const solvedProblems = new Set<string>();
+      const wrongAttempts = new Map<string, number>();
       let totalPoints = 0;
       let totalTime = 0; // sum of milliseconds from contest start to submission time
 
       userSubs.forEach((sub) => {
         const pIdStr = sub.problemId.toString();
-        if (!solvedProblems.has(pIdStr) && problemPointsMap[pIdStr] !== undefined) {
+        if (solvedProblems.has(pIdStr) || problemPointsMap[pIdStr] === undefined) {
+          return; // Already solved or invalid problem
+        }
+
+        if (sub.status === 'ACCEPTED') {
           solvedProblems.add(pIdStr);
           totalPoints += problemPointsMap[pIdStr];
           
           const timeSpent = Math.max(0, sub.createdAt.getTime() - new Date(contest.start_time).getTime());
-          totalTime += timeSpent;
+          const penaltyMs = (wrongAttempts.get(pIdStr) || 0) * 20 * 60 * 1000; // 20 mins per WA
+          totalTime += (timeSpent + penaltyMs);
+        } else {
+          // It's a WA/TLE/etc before AC
+          wrongAttempts.set(pIdStr, (wrongAttempts.get(pIdStr) || 0) + 1);
         }
       });
 
