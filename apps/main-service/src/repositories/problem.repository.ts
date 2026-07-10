@@ -96,7 +96,12 @@ export class ProblemRepository {
   }
 
   async getProblemBySlug(slug: string) {
-    const problem = await Problem.findOne({ slug });
+    let query: any = { slug };
+    // Mongoose ObjectId is 24 hex characters
+    if (/^[0-9a-fA-F]{24}$/.test(slug)) {
+      query = { $or: [{ slug }, { _id: slug }] };
+    }
+    const problem = await Problem.findOne(query);
     if (!problem) return null;
 
     // Fetch tags from SQL

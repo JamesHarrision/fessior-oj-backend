@@ -240,6 +240,84 @@ export class ContestService {
 
     return standings;
   }
+
+  async endContest(contestId: string) {
+    const contest = await contestRepository.findById(contestId);
+    if (!contest) throw new Error('Contest not found');
+
+    const standings = await this.getLeaderboard(contestId);
+    const N = standings.length;
+
+    if (N > 0) {
+      await prisma.$transaction(async (tx) => {
+        // Find or create badges
+        const top1Badge = await tx.badge.upsert({
+          where: { slug: 'contest-top-1' },
+          update: {},
+          create: { name: 'Top 1 Contest', slug: 'contest-top-1', type: 'ACHIEVEMENT', description: 'Đạt hạng 1 trong một Contest' }
+        });
+        const top2Badge = await tx.badge.upsert({
+          where: { slug: 'contest-top-2' },
+          update: {},
+          create: { name: 'Top 2 Contest', slug: 'contest-top-2', type: 'ACHIEVEMENT', description: 'Đạt hạng 2 trong một Contest' }
+        });
+        const top3Badge = await tx.badge.upsert({
+          where: { slug: 'contest-top-3' },
+          update: {},
+          create: { name: 'Top 3 Contest', slug: 'contest-top-3', type: 'ACHIEVEMENT', description: 'Đạt hạng 3 trong một Contest' }
+        });
+        const participantBadge = await tx.badge.upsert({
+          where: { slug: 'contest-participant' },
+          update: {},
+          create: { name: 'Contest Participant', slug: 'contest-participant', type: 'CONTEST', description: 'Tham gia thi đấu Contest' }
+        });
+
+        for (let i = 0; i < N; i++) {
+          const userEntry = standings[i];
+          const rank = i; 
+          let eloChange = Math.round(((N - 1) / 2 - rank) * 10);
+          let oldElo = userEntry.elo;
+          let newElo = oldElo + eloChange;
+          
+          await tx.eloHistory.create({
+            data: {
+              user: { connect: { id: userEntry.userId } },
+              old_elo: oldElo,
+              new_elo: newElo,
+              change: eloChange,
+              reason: 'CONTEST',
+            },
+          });
+          
+          await tx.user.update({
+            where: { id: userEntry.userId },
+            data: { elo_rating: { increment: eloChange } }
+          });
+
+          const awardBadge = async (badgeId: string) => {
+            const existing = await tx.userBadge.findUnique({
+              where: { user_id_badge_id: { user_id: userEntry.userId, badge_id: badgeId } }
+            });
+            if (!existing) {
+              await tx.userBadge.create({ data: { user_id: userEntry.userId, badge_id: badgeId } });
+            }
+          };
+
+          await awardBadge(participantBadge.id);
+          if (rank === 0) await awardBadge(top1Badge.id);
+          if (rank === 1) await awardBadge(top2Badge.id);
+          if (rank === 2) await awardBadge(top3Badge.id);
+        }
+      });
+    }
+
+    await prisma.contest.update({
+      where: { id: contestId },
+      data: { status: 'RESULTS' }
+    });
+
+    return { success: true, message: 'Contest ended successfully' };
+  }
 }
 
 export const contestService = new ContestService();

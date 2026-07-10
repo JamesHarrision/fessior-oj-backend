@@ -113,6 +113,16 @@ export const initSocket = (socketIoServer: Server) => {
       console.log(`Socket ${socket.id} left custom-room: ${data.roomCode}`);
     });
 
+    socket.on(SOCKET_EVENTS.JOIN_CONTEST, (data: { contestId: string }) => {
+      socket.join(`contest:${data.contestId}`);
+      console.log(`Socket ${socket.id} joined contest: ${data.contestId}`);
+    });
+
+    socket.on(SOCKET_EVENTS.LEAVE_CONTEST, (data: { contestId: string }) => {
+      socket.leave(`contest:${data.contestId}`);
+      console.log(`Socket ${socket.id} left contest: ${data.contestId}`);
+    });
+
     socket.on(SOCKET_EVENTS.DISCONNECT, () => {
       console.log(`Socket disconnected: ${socket.id}`);
       removeUserFromQueue(socket.data.user.userId);

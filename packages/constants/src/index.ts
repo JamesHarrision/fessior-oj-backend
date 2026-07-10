@@ -47,6 +47,9 @@ export const SOCKET_EVENTS = {
   NOTIFICATION: 'notification',
   PLAYER_JOINED: 'player-joined',
   PLAYER_KICKED: 'player-kicked',
+  JOIN_CONTEST: 'join-contest',
+  LEAVE_CONTEST: 'leave-contest',
+  CONTEST_LEADERBOARD_UPDATE: 'contest-leaderboard-update',
 } as const;
 
 // Các kênh Redis Pub/Sub

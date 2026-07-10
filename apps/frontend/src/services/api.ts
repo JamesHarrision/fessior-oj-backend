@@ -161,6 +161,12 @@ export const api = {
   unregisterContest: (id: string) => wrap(contestRepository.unregister(id)),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getContestLeaderboard: (id: string) => wrap<any>(contestRepository.getScoreboard(id)),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  endContest: (id: string) => wrap<any>(contestRepository.endContest(id)),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getContestProblems: (id: string) => wrap<any>(contestRepository.getContestProblems(id)),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getContestSubmissions: (id: string) => wrap<any>(contestRepository.getContestSubmissions(id)),
 
   // =========================================================
   // Rooms

@@ -243,14 +243,33 @@ export interface IMatch {
   problem?: IProblem;
 }
 
+export interface IContestRegistration {
+  contest_id: string;
+  user_id: string;
+  registered_at: string | Date;
+  user?: IUser;
+}
+
+export interface IContestProblem {
+  contest_id: string;
+  mongo_problem_id: string;
+  points: number;
+  order: number;
+  problem?: IProblem;
+}
+
 export interface IContest {
   id: string;
   title: string;
   description?: string | null;
   start_time: string | Date;
   end_time: string | Date;
-  problems?: any[];
-  registrations?: any[];
+  status: ContestStatus | 'UPCOMING' | 'REGISTRATION' | 'ONGOING' | 'ENDED' | 'RESULTS';
+  created_at?: string | Date;
+  updated_at?: string | Date;
+  problems?: IContestProblem[];
+  registrations?: IContestRegistration[];
+  _count?: { registrations: number };
 }
 
 export interface IReport {
