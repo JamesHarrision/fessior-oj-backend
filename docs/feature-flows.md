@@ -173,6 +173,11 @@ flowchart LR
   Socket --> Room["custom-room:{roomCode}"]
 ```
 
+**Flow chi tiết:**
+- User (Host) tạo phòng custom -> vào Waiting Room chờ.
+- Opponent nhập code -> Join phòng -> Bắn socket `match-started` cho cả 2.
+- Sau khi 1 người nộp bài đúng (AC), logic `endMatch` ở Backend sẽ tính ELO và đồng thời tự động cập nhật `status = FINISHED` cho CustomRoom.
+
 Files lien quan:
 
 - `apps/frontend/src/views/CustomRoomsView.tsx`
@@ -190,7 +195,8 @@ Files lien quan:
 
 ## 6. Contest
 
-Admin tao contest va gan problems. User dang ky, submit bai co `contestId`, xem scoreboard.
+Admin tao contest va gan problems. User dang ky, submit bai co `contestId`. 
+**Scoreboard (Bảng xếp hạng):** Hệ thống tạo *Static Scoreboard* sau khi (hoặc trong khi) Contest diễn ra bằng cách query lại toàn bộ submissions. Logic tính điểm (`score`) cộng gộp các bài giải đúng và phạt thời gian (`timePenalty` = 20 phút cho mỗi lần nộp sai WA). API này có thể gọi bằng Polling (Frontend gọi 15s/lần) để mô phỏng Realtime mà không làm chết Server.
 
 ```mermaid
 flowchart LR
@@ -270,7 +276,8 @@ Files lien quan:
 
 ## 9. Shop And Inventory
 
-Admin quan ly item shop. User xem shop, mua item bang code coins va equip item trong inventory.
+Admin quan ly item shop. User xem shop, mua item bang code coins va equip item trong inventory. 
+**Frontend UI:** Giao diện ShopView đã được chuyển hoàn toàn sang Tailwind CSS để tăng tính nhất quán và hiển thị mượt mà.
 
 ```mermaid
 flowchart LR
@@ -295,7 +302,8 @@ Files lien quan:
 
 ## 10. Notification
 
-Notification luu trong MySQL va co the emit realtime qua Socket.io user room.
+Notification luu trong MySQL va co the emit realtime qua Socket.io user room hoac Frontend chu dong Polling.
+**Polling:** Ở AppShellLayout, Frontend sẽ tự động gọi API lấy danh sách Notification mỗi 30 giây để cập nhật số đếm chưa đọc (`unreadCount`).
 
 ```mermaid
 flowchart LR
@@ -347,7 +355,7 @@ Files lien quan:
 
 ## 12. AI Roadmap And Feedback
 
-AI module dung Google Gemini de tao roadmap hoc DSA va feedback submission/mock interview.
+AI module dung Google Gemini de tao roadmap hoc DSA va feedback submission/mock interview. (API Key của Gemini được cấu hình bảo mật thông qua `.env` server side).
 
 ```mermaid
 flowchart LR
