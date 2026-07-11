@@ -250,6 +250,7 @@ export class RoomService {
       data: {
         difficulty: updates.difficulty,
         max_participants: updates.maxParticipants,
+        match_id: updates.matchId,
       },
       include: {
         creator: {

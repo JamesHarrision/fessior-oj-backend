@@ -12,7 +12,7 @@ export class RoomController {
         data: room,
       });
     } catch (error: any) {
-      res.status(400).json({ success: false, message: error.message });
+      res.status(400).json({ status: 'Error', message: error.message });
     }
   }
 
@@ -26,7 +26,7 @@ export class RoomController {
         data: room,
       });
     } catch (error: any) {
-      res.status(400).json({ success: false, message: error.message });
+      res.status(400).json({ status: 'Error', message: error.message });
     }
   }
 
@@ -39,7 +39,7 @@ export class RoomController {
         data: rooms,
       });
     } catch (error: any) {
-      res.status(400).json({ success: false, message: error.message });
+      res.status(400).json({ status: 'Error', message: error.message });
     }
   }
 
@@ -53,7 +53,7 @@ export class RoomController {
         data: room,
       });
     } catch (error: any) {
-      res.status(404).json({ success: false, message: error.message });
+      res.status(404).json({ status: 'Error', message: error.message });
     }
   }
 
@@ -68,7 +68,7 @@ export class RoomController {
         data: result,
       });
     } catch (error: any) {
-      res.status(400).json({ success: false, message: error.message });
+      res.status(400).json({ status: 'Error', message: error.message });
     }
   }
 
@@ -83,7 +83,7 @@ export class RoomController {
         data: result,
       });
     } catch (error: any) {
-      res.status(400).json({ success: false, message: error.message });
+      res.status(400).json({ status: 'Error', message: error.message });
     }
   }
 
@@ -98,7 +98,7 @@ export class RoomController {
         data: result,
       });
     } catch (error: any) {
-      res.status(400).json({ success: false, message: error.message });
+      res.status(400).json({ status: 'Error', message: error.message });
     }
   }
 
@@ -113,7 +113,7 @@ export class RoomController {
         data: result,
       });
     } catch (error: any) {
-      res.status(400).json({ success: false, message: error.message });
+      res.status(400).json({ status: 'Error', message: error.message });
     }
   }
 
@@ -128,7 +128,7 @@ export class RoomController {
         data: updated,
       });
     } catch (error: any) {
-      res.status(400).json({ success: false, message: error.message });
+      res.status(400).json({ status: 'Error', message: error.message });
     }
   }
 
@@ -142,7 +142,7 @@ export class RoomController {
         message: 'Room deleted successfully',
       });
     } catch (error: any) {
-      res.status(400).json({ success: false, message: error.message });
+      res.status(400).json({ status: 'Error', message: error.message });
     }
   }
 }

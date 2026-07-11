@@ -28,10 +28,16 @@ export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomM
   };
 
   useEffect(() => {
-    // 1. Fetch current user room to handle F5
+    // Restore active room if page refreshes
     api.getCurrentRoom().then(res => {
       if (res.success && res.data) {
-        setActiveRoom(res.data);
+        const room = res.data;
+        if (room.status === 'PLAYING' && room.match_id) {
+          socketService.leaveCustomRoom(room.room_code);
+          onStartCustomMatch(room.match_id, room.problem_id || '');
+        } else {
+          setActiveRoom(room);
+        }
       }
     }).catch(() => {});
 
