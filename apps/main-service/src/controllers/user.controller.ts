@@ -324,6 +324,51 @@ export const getUserTagStatsByUsername = async (req: Request, res: Response, nex
   }
 };
 
+export const getUserEloHistoryByUsername = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { username } = req.params;
+    
+    if (!username || typeof username !== 'string') {
+      res.status(400).json({ status: 'Error', message: 'Invalid username' });
+      return;
+    }
+    
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    
+    const result = await userService.getUserEloHistoryByUsername(username, page, limit);
+    
+    res.status(200).json({
+      status: 'Success',
+      message: 'User ELO history retrieved successfully',
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUserStreakByUsername = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { username } = req.params;
+    
+    if (!username || typeof username !== 'string') {
+      res.status(400).json({ status: 'Error', message: 'Invalid username' });
+      return;
+    }
+    
+    const result = await userService.getUserStreakByUsername(username);
+    
+    res.status(200).json({
+      status: 'Success',
+      message: 'User streak retrieved successfully',
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const adminUpdateUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;

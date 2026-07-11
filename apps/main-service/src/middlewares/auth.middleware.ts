@@ -49,3 +49,26 @@ export const requireAdmin = (req: Request, res: Response, next: NextFunction) =>
   }
   next();
 };
+
+export const optionalAuth = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      const decoded = verifyAccessToken(token);
+
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.userId },
+        select: { is_banned: true },
+      });
+
+      if (user && !user.is_banned) {
+        req.user = decoded;
+      }
+    }
+  } catch (error) {
+    // Ignore error for optional auth
+  } finally {
+    next();
+  }
+};
