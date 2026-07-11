@@ -9,11 +9,12 @@ export class MatchHistoryController {
       const limit = parseInt(req.query.limit as string) || 10;
       const data = await matchHistoryService.getHistory(userId, page, limit);
       res.status(200).json({
-        success: true,
+        status: 'Success',
+        message: 'Success',
         data,
       });
     } catch (error: any) {
-      res.status(400).json({ success: false, message: error.message });
+      res.status(400).json({ status: 'Error', message: error.message });
     }
   }
 
@@ -22,11 +23,12 @@ export class MatchHistoryController {
       const matchId = req.params.matchId as string;
       const match = await matchHistoryService.getMatchDetails(matchId);
       res.status(200).json({
-        success: true,
+        status: 'Success',
+        message: 'Success',
         data: match,
       });
     } catch (error: any) {
-      res.status(404).json({ success: false, message: error.message });
+      res.status(404).json({ status: 'Error', message: error.message });
     }
   }
 
@@ -35,11 +37,11 @@ export class MatchHistoryController {
       const matchId = req.params.matchId as string;
       await matchHistoryService.deleteMatch(matchId);
       res.status(200).json({
-        success: true,
+        status: 'Success',
         message: 'Match deleted successfully',
       });
     } catch (error: any) {
-      res.status(400).json({ success: false, message: error.message });
+      res.status(400).json({ status: 'Error', message: error.message });
     }
   }
 }

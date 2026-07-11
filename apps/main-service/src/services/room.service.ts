@@ -168,12 +168,12 @@ export class RoomService {
           throw new Error('No problems available for match');
         }
         const randomIndex = Math.floor(Math.random() * fallbackCount);
-        const randomProblem = await Problem.findOne().skip(randomIndex);
-        problemId = randomProblem?._id.toString() as string;
+        const randomProblemList = await Problem.find().skip(randomIndex).limit(1);
+        problemId = randomProblemList[0]?._id.toString() as string;
       } else {
         const randomIndex = Math.floor(Math.random() * count);
-        const problem = await Problem.findOne(query).skip(randomIndex);
-        problemId = problem?._id.toString() as string;
+        const problemList = await Problem.find(query).skip(randomIndex).limit(1);
+        problemId = problemList[0]?._id.toString() as string;
       }
     }
 
