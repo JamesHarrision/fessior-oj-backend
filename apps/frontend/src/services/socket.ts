@@ -121,14 +121,24 @@ export const socketService = {
     socket?.on(SOCKET_EVENTS.MATCH_STARTED, callback);
   },
 
+  onPlayerJoined: (callback: (data: { userId: string }) => void) => {
+    socket?.off('PLAYER_JOINED');
+    socket?.on('PLAYER_JOINED', callback);
+  },
+
   onPlayerLeft: (callback: (data: { userId: string }) => void) => {
-    socket?.off(SOCKET_EVENTS.PLAYER_LEFT);
-    socket?.on(SOCKET_EVENTS.PLAYER_LEFT, callback);
+    socket?.off('PLAYER_LEFT');
+    socket?.on('PLAYER_LEFT', callback);
+  },
+
+  onPlayerKicked: (callback: (data: { userId: string }) => void) => {
+    socket?.off('PLAYER_KICKED');
+    socket?.on('PLAYER_KICKED', callback);
   },
 
   onConfigUpdated: (callback: (data: any) => void) => {
-    socket?.off(SOCKET_EVENTS.CONFIG_UPDATED);
-    socket?.on(SOCKET_EVENTS.CONFIG_UPDATED, callback);
+    socket?.off('ROOM_CONFIG_UPDATED');
+    socket?.on('ROOM_CONFIG_UPDATED', callback);
   },
 
   onRoomDeleted: (callback: () => void) => {

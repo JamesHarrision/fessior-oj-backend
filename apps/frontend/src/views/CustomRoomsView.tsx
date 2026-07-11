@@ -65,11 +65,31 @@ export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomM
       setActiveRoom(updatedRoom);
     });
 
+    const refreshActiveRoom = () => {
+      api.getCurrentRoom().then(res => {
+        if (res.success && res.data) {
+          setActiveRoom(res.data);
+        } else {
+          setActiveRoom(null);
+        }
+      }).catch(() => {});
+    };
+
+    socketService.onPlayerJoined(() => {
+      refreshActiveRoom();
+    });
+
     socketService.onPlayerLeft(() => {
-      setActiveRoom((prev: any) => {
-        if (!prev) return null;
-        return { ...prev, opponent_id: null, opponent: null };
-      });
+      refreshActiveRoom();
+    });
+
+    socketService.onPlayerKicked((data) => {
+      if (user && data.userId === user.id) {
+        alert('Bạn đã bị chủ phòng kích khỏi phòng.');
+        setActiveRoom(null);
+      } else {
+        refreshActiveRoom();
+      }
     });
 
     socketService.onRoomDeleted(() => {
