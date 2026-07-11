@@ -123,6 +123,16 @@ export const initSocket = (socketIoServer: Server) => {
       console.log(`Socket ${socket.id} left custom-room: ${data.roomCode}`);
     });
 
+    socket.on('join-match', (data: { matchId: string }) => {
+      socket.join(`match:${data.matchId}`);
+      console.log(`Socket ${socket.id} joined match: ${data.matchId}`);
+    });
+
+    socket.on('leave-match', (data: { matchId: string }) => {
+      socket.leave(`match:${data.matchId}`);
+      console.log(`Socket ${socket.id} left match: ${data.matchId}`);
+    });
+
     socket.on(SOCKET_EVENTS.JOIN_CONTEST, (data: { contestId: string }) => {
       socket.join(`contest:${data.contestId}`);
       console.log(`Socket ${socket.id} joined contest: ${data.contestId}`);

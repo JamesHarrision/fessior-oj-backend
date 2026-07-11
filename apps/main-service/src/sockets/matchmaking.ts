@@ -254,6 +254,7 @@ export const endMatch = async (matchId: string, winnerId: string) => {
     });
 
     io?.to(`match:${matchId}`).emit(SOCKET_EVENTS.MATCH_ENDED, {
+      matchId,
       winnerId,
       eloUpdates
     });
