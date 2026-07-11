@@ -168,12 +168,8 @@ function TopBar(props: {
       {/* ── Search (hidden on Lobby) ── */}
       <div className="flex-1 max-w-lg">
         {!hideSearch && (
-          <Input
-            prefix={<SearchOutlined className="text-stone" />}
-            placeholder="Search problems, contests, users..."
-            variant="filled"
+          <div
             className="[&_.ant-input]:!bg-ink [&_.ant-input]:!text-linen [&_.ant-input]:!placeholder-stone"
-            size="large"
           />
         )}
       </div>
@@ -189,19 +185,38 @@ function TopBar(props: {
         </div>
 
         {/* Notifications */}
-        <button
-          type="button"
-          className="relative p-2 text-stone hover:text-linen transition-colors cursor-pointer"
-          title="Notifications"
+        <Dropdown 
+          menu={{ 
+            items: [
+              {
+                key: 'header',
+                label: <div className="font-display font-bold text-linen px-2 py-1 border-b border-charcoal">Thông báo</div>,
+                disabled: true,
+              },
+              {
+                key: 'empty',
+                label: <div className="text-stone text-xs text-center py-4">Chưa có thông báo mới</div>,
+                disabled: true,
+              }
+            ] 
+          }} 
+          trigger={['click']} 
+          placement="bottomRight"
         >
-          {notificationCount > 0 ? (
-            <Badge count={notificationCount} size="small" offset={[-2, 2]}>
+          <button
+            type="button"
+            className="relative p-2 text-stone hover:text-linen transition-colors cursor-pointer"
+            title="Notifications"
+          >
+            {notificationCount > 0 ? (
+              <Badge count={notificationCount} size="small" offset={[-2, 2]}>
+                <BellOutlined className="text-lg" />
+              </Badge>
+            ) : (
               <BellOutlined className="text-lg" />
-            </Badge>
-          ) : (
-            <BellOutlined className="text-lg" />
-          )}
-        </button>
+            )}
+          </button>
+        </Dropdown>
 
         {/* User Dropdown */}
         <Dropdown menu={{ items: userDropdownItems }} trigger={['click']} placement="bottomRight">

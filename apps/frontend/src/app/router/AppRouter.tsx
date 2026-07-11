@@ -20,6 +20,7 @@ import { CustomRoomsView } from '../../views/CustomRoomsView';
 import { AdminDashboard } from '../../views/AdminDashboard';
 import { FriendsView } from '../../views/FriendsView';
 import { TokenProofView } from '../../views/TokenProofView';
+import { ProfileView } from '../../views/ProfileView';
 import { useMatchStore } from '../../stores/match.store';
 
 /* =====================================================
@@ -109,6 +110,7 @@ export function AppRouter() {
           {/* ── Community ── */}
           <Route path="/submissions" element={<SubmissionsView />} />
           <Route path="/friends" element={<FriendsView />} />
+          <Route path="/profile/:username" element={<ProfileView />} />
 
           {/* ── Tools ── */}
           <Route path="/shop" element={<ShopView />} />

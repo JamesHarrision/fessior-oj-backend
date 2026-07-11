@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import { socketService } from '../services/socket';
 import { useAuth } from '../context/AuthContext';
-import { Shield, Plus, ArrowRight } from 'lucide-react';
+import { Shield, Plus, ArrowRight, Search } from 'lucide-react';
 import { ActiveRoomsTable } from '../components/rooms/ActiveRoomsTable';
 import { RoomLobbyPanel } from '../components/rooms/RoomLobbyPanel';
 import type { ICustomRoom } from '@ocj/types';
 import { validateRoomCode } from '@ocj/validators';
+import { Pagination } from '@ocj/ui';
 
 interface CustomRoomsViewProps {
   onStartCustomMatch: (matchId: string, problemId: string) => void;
@@ -17,9 +18,15 @@ export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomM
   const [rooms, setRooms] = useState<ICustomRoom[]>([]);
   const [activeRoom, setActiveRoom] = useState<ICustomRoom | null>(null);
   const [roomCodeInput, setRoomCodeInput] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterDifficulty, setFilterDifficulty] = useState<string>('');
+  
   const [difficulty, setDifficulty] = useState<'EASY' | 'MEDIUM' | 'HARD'>('EASY');
   const [maxParticipants, setMaxParticipants] = useState<number>(2);
   const [loading, setLoading] = useState(false);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
 
   const fetchActiveRooms = () => {
     api.getActiveRooms().then(res => {
@@ -173,6 +180,23 @@ export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomM
     }
   };
 
+  const filteredRooms = React.useMemo(() => {
+    return rooms.filter(r => {
+      const matchSearch = !searchQuery || r.room_code.includes(searchQuery.toUpperCase());
+      const matchDiff = !filterDifficulty || r.difficulty === filterDifficulty;
+      return matchSearch && matchDiff;
+    });
+  }, [rooms, searchQuery, filterDifficulty]);
+
+  React.useMemo(() => {
+    setCurrentPage(1);
+  }, [searchQuery, filterDifficulty]);
+
+  const currentRooms = React.useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    return filteredRooms.slice(startIndex, startIndex + pageSize);
+  }, [filteredRooms, currentPage]);
+
   if (activeRoom) {
     return (
       <RoomLobbyPanel
@@ -199,70 +223,94 @@ export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomM
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Create Room */}
-        <div className="bg-ink border border-charcoal p-6 flex flex-col gap-4">
-          <h3 className="font-display text-sm font-bold text-linen uppercase tracking-wider">Tạo phòng đấu mới</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-col gap-2">
-              <label className="font-display text-[10px] font-bold text-stone uppercase tracking-[0.1em]">Độ khó bài tập</label>
-              <select 
-                value={difficulty} 
-                onChange={(e: any) => setDifficulty(e.target.value)}
-                className="bg-washi border border-charcoal text-linen p-3 font-body text-sm outline-none focus:border-vermilion transition-colors appearance-none cursor-pointer"
-              >
-                <option value="EASY">Dễ (Easy)</option>
-                <option value="MEDIUM">Trung bình (Medium)</option>
-                <option value="HARD">Khó (Hard)</option>
-              </select>
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="font-display text-[10px] font-bold text-stone uppercase tracking-[0.1em]">Số người (Tối đa)</label>
-              <select 
-                value={maxParticipants} 
-                onChange={(e: any) => setMaxParticipants(parseInt(e.target.value))}
-                className="bg-washi border border-charcoal text-linen p-3 font-body text-sm outline-none focus:border-vermilion transition-colors appearance-none cursor-pointer"
-              >
-                {[2, 3, 4, 5, 6, 8, 10].map(n => (
-                  <option key={n} value={n}>{n} người</option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <button 
-            onClick={handleCreateRoom} 
-            disabled={loading}
-            className="mt-2 bg-vermilion text-linen font-display text-[11px] font-bold uppercase tracking-wider px-4 py-3 hover:bg-vermilion-hover transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-          >
-            <Plus size={16} /> {loading ? 'Đang tạo...' : 'Tạo phòng'}
-          </button>
-        </div>
-
-        {/* Join Room */}
-        <div className="bg-ink border border-charcoal p-6 flex flex-col gap-4">
-          <h3 className="font-display text-sm font-bold text-linen uppercase tracking-wider">Tham gia bằng mã</h3>
-          <div className="flex flex-col gap-2">
-            <label className="font-display text-[10px] font-bold text-stone uppercase tracking-[0.1em]">Mã phòng (6 ký tự)</label>
+      <div className="flex flex-col gap-4">
+        {/* Top bar: Join Room */}
+        <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-stone" size={18} />
             <input
               type="text"
-              placeholder="VD: AB12CD"
+              placeholder="Nhập mã phòng để tham gia hoặc tìm kiếm..."
               value={roomCodeInput}
-              onChange={(e) => setRoomCodeInput(e.target.value.toUpperCase())}
-              className="bg-washi border border-charcoal text-linen p-3 font-mono text-sm outline-none focus:border-vermilion transition-colors uppercase placeholder:text-stone/50"
+              onChange={(e) => {
+                const val = e.target.value.toUpperCase();
+                setRoomCodeInput(val);
+                setSearchQuery(val);
+              }}
+              className="w-full bg-ink border border-charcoal text-linen py-3 pl-10 pr-4 font-mono text-sm outline-none focus:border-vermilion transition-colors placeholder:text-stone/50 placeholder:font-body"
               maxLength={6}
             />
           </div>
           <button 
             onClick={() => handleJoinRoom()} 
             disabled={loading || !roomCodeInput}
-            className="mt-2 border border-charcoal text-linen font-display text-[11px] font-bold uppercase tracking-wider px-4 py-3 hover:border-stone hover:bg-washi transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+            className="shrink-0 bg-vermilion text-linen font-display text-[12px] font-bold uppercase tracking-wider px-6 py-3 hover:bg-vermilion-hover transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
           >
             Tham gia <ArrowRight size={16} />
           </button>
         </div>
+
+        {/* Toolbar: Filters & Create Room */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-ink border border-charcoal p-4">
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <span className="font-display text-[11px] font-bold text-stone uppercase tracking-wider shrink-0">Lọc:</span>
+            <select 
+              value={filterDifficulty} 
+              onChange={(e) => setFilterDifficulty(e.target.value)}
+              className="bg-washi border border-charcoal text-linen px-3 py-2 font-body text-sm outline-none focus:border-vermilion transition-colors appearance-none cursor-pointer w-full sm:w-auto min-w-[120px]"
+            >
+              <option value="">Tất cả độ khó</option>
+              <option value="EASY">Dễ (Easy)</option>
+              <option value="MEDIUM">Trung bình (Medium)</option>
+              <option value="HARD">Khó (Hard)</option>
+            </select>
+          </div>
+
+          <div className="flex items-center gap-3 w-full sm:w-auto border-t border-charcoal pt-4 sm:border-t-0 sm:pt-0 sm:border-l sm:pl-4">
+             <span className="font-display text-[11px] font-bold text-stone uppercase tracking-wider shrink-0 hidden sm:block">Tạo phòng:</span>
+             <select 
+              value={difficulty} 
+              onChange={(e: any) => setDifficulty(e.target.value)}
+              className="bg-washi border border-charcoal text-linen px-3 py-2 font-body text-sm outline-none focus:border-vermilion transition-colors appearance-none cursor-pointer flex-1 sm:flex-none"
+            >
+              <option value="EASY">Dễ</option>
+              <option value="MEDIUM">TB</option>
+              <option value="HARD">Khó</option>
+            </select>
+            <select 
+              value={maxParticipants} 
+              onChange={(e: any) => setMaxParticipants(parseInt(e.target.value))}
+              className="bg-washi border border-charcoal text-linen px-3 py-2 font-body text-sm outline-none focus:border-vermilion transition-colors appearance-none cursor-pointer flex-1 sm:flex-none"
+            >
+              {[2, 3, 4, 5, 6, 8, 10].map(n => (
+                <option key={n} value={n}>{n} users</option>
+              ))}
+            </select>
+            <button 
+              onClick={handleCreateRoom} 
+              disabled={loading}
+              className="bg-washi border border-charcoal text-linen font-display text-[11px] font-bold uppercase tracking-wider px-4 py-2 hover:border-vermilion hover:text-vermilion transition-colors flex items-center justify-center gap-2 disabled:opacity-50 shrink-0"
+            >
+              <Plus size={14} /> Tạo mới
+            </button>
+          </div>
+        </div>
       </div>
 
-      <ActiveRoomsTable rooms={rooms} onJoinRoom={handleJoinRoom} />
+      <div className="flex flex-col gap-4">
+        <ActiveRoomsTable rooms={currentRooms} onJoinRoom={handleJoinRoom} />
+        
+        {filteredRooms.length > 0 && (
+          <div className="flex justify-end mt-2">
+             <Pagination 
+                currentPage={currentPage}
+                totalItems={filteredRooms.length}
+                pageSize={pageSize}
+                onPageChange={setCurrentPage}
+             />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

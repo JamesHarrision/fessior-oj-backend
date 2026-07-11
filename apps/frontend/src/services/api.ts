@@ -67,6 +67,13 @@ export const api = {
   revokeAllSessions: () => rawDelete('/auth/sessions'),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   updateProfile: (data: Record<string, unknown>) => wrap<any>(userRepository.updateProfile(data)),
+  
+  // Public Profile
+  getUserProfile: (username: string) => rawGet<any>(`/users/profile/${username}`),
+  getUserProfileSubmissions: (username: string) => rawGet<any>(`/users/profile/${username}/submissions`),
+  getUserProfileTagStats: (username: string) => rawGet<any>(`/users/profile/${username}/tag-stats`),
+  getUserProfileEloHistory: (username: string) => rawGet<any>(`/users/profile/${username}/elo-history`),
+  getUserProfileStreak: (username: string) => rawGet<any>(`/users/profile/${username}/streak`),
 
   // =========================================================
   // Problems
@@ -134,6 +141,7 @@ export const api = {
   // =========================================================
   // Friends & Social
   // =========================================================
+  inviteFriend: (friendId: string) => rawPost<any>('/api/v1/friends/invite', { friendId }),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getFriends: () => wrap<any>(friendRepository.getFriends()),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -215,9 +223,11 @@ export const api = {
   // AI
   // =========================================================
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getAIRoadmap: () => wrap<any>(aiRepository.getRoadmap()),
+  getAIRoadmap: (data: any) => wrap<any>(aiRepository.getRoadmap(data)),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getAIFeedback: (submissionId: string) => wrap<any>(aiRepository.getFeedback(submissionId)),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getAIHistory: () => wrap<any[]>(aiRepository.getHistory()),
 
   // =========================================================
   // Notifications

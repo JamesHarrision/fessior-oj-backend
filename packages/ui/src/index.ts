@@ -10,3 +10,4 @@ export * from './data/EmptyState';
 export * from './data/PageHeader';
 export * from './data/StatCard';
 export * from './data/SectionHeader';
+export * from './data/Pagination';

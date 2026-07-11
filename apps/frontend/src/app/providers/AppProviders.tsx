@@ -2,6 +2,8 @@ import type { ReactNode } from 'react';
 import { ConfigProvider } from 'antd';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '../../context/AuthContext';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -265,7 +267,10 @@ export function AppProviders(props: { children: ReactNode }) {
       }}
     >
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>{props.children}</AuthProvider>
+        <AuthProvider>
+          {props.children}
+          <ToastContainer position="bottom-right" />
+        </AuthProvider>
       </QueryClientProvider>
     </ConfigProvider>
   );
