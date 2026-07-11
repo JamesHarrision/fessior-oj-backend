@@ -178,8 +178,8 @@ export const api = {
   createRoom: (data: Record<string, unknown>) =>
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     wrap<any>(roomRepository.createRoom(data as never)),
-  kickPlayer: (roomId: string, opponentId: string) => rawPost<any>(`/rooms/${roomId}/kick`, { opponentId }),
-  startMatch: (roomId: string) => rawPost<any>(`/rooms/${roomId}/start`, {}),
+  kickPlayer: (roomId: string, opponentId: string) => rawPost<any>(`/rooms/kick`, { roomId, opponentId }),
+  startMatch: (roomId: string) => rawPost<any>(`/rooms/start`, { roomId }),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   joinRoom: (data: { room_code: string }) => wrap<any>(roomRepository.joinRoom({ roomCode: data.room_code } as any)),
   leaveRoom: (roomCode: string) => wrap(roomRepository.leaveRoom(roomCode)),

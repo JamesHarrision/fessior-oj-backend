@@ -118,6 +118,20 @@ export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomM
     }
   };
 
+  const handleStartMatch = async () => {
+    if (!activeRoom) return;
+    setLoading(true);
+    try {
+      await api.startMatch(activeRoom.id);
+      // We don't need to do anything here because the socket event MATCH_STARTED 
+      // will be broadcasted and caught in the useEffect, which will then trigger onStartCustomMatch.
+    } catch (err: any) {
+      alert(err.message || 'Lỗi bắt đầu trận đấu');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleLeaveRoom = async () => {
     if (!activeRoom) return;
     try {
@@ -127,7 +141,7 @@ export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomM
         await api.leaveRoom(activeRoom.id);
       }
       setActiveRoom(null);
-      fetchActiveRooms();
+      // Note: socket ACTIVE_ROOMS_UPDATE will auto update the rooms list
     } catch (err: any) {
       console.error(err);
     }
@@ -139,7 +153,7 @@ export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomM
         activeRoom={activeRoom}
         user={user}
         onLeaveRoom={handleLeaveRoom}
-        onStartMatch={handleJoinRoom}
+        onStartMatch={handleStartMatch}
       />
     );
   }
