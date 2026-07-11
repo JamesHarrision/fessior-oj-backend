@@ -60,21 +60,15 @@ export function PvPWorkspaceView() {
       }
     });
 
-    socketService.onSubmissionUpdate((data: any) => {
-      if (data.matchId === matchId) {
-        // Update participant state
-        setParticipants(prev => prev.map(p => {
-           if (p.user_id === data.userId) {
-             return {
-               ...p,
-               score_change: data.score_change !== undefined ? data.score_change : p.score_change,
-               status: data.new_status || p.status,
-               is_winner: data.is_winner !== undefined ? data.is_winner : p.is_winner
-             };
-           }
-           return p;
-        }));
-      }
+    // Realtime Submission updates from ANY rival (N-player)
+    socketService.onRivalSubmission((data: any) => {
+      setParticipants(prev => prev.map(p => {
+        if (p.user_id === data.userId) {
+          const newStatus = data.status === 'ACCEPTED' ? 'ACCEPTED' : 'SUBMITTED_WA';
+          return { ...p, status: newStatus };
+        }
+        return p;
+      }));
     });
 
     return () => {
