@@ -33,7 +33,7 @@ export const ExecutionResultPanel: React.FC<ExecutionResultPanelProps> = ({
       {/* ── Running state ── */}
       {isRunning && (
         <div className="flex flex-col items-center justify-center gap-3 py-10">
-          <Spin size="default" />
+          <Spin size="medium" />
           <p className="font-body text-xs text-stone">Đang biên dịch và thực thi mã nguồn...</p>
         </div>
       )}
@@ -41,7 +41,7 @@ export const ExecutionResultPanel: React.FC<ExecutionResultPanelProps> = ({
       {/* ── Submitting state ── */}
       {isSubmitting && (
         <div className="flex flex-col items-center justify-center gap-3 py-10">
-          <Spin size="default" />
+          <Spin size="medium" />
           <p className="font-body text-xs text-stone">Đang chấm điểm trên hệ thống Sandbox...</p>
         </div>
       )}

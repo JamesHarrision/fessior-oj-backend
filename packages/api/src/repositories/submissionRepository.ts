@@ -16,7 +16,7 @@ export class SubmissionRepository {
   }
 
   submit(data: SubmitCodeRequest): Promise<ApiResponse<ISubmission>> {
-    return this.http.request('POST', `${API_ROUTES.SUBMISSIONS}/submit`, { body: data });
+    return this.http.request('POST', `${API_ROUTES.SUBMISSIONS}`, { body: data });
   }
 
   run(data: RunCodeRequest): Promise<ApiResponse<ISubmission>> {
