@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { message } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 import { socketService } from '../services/socket';
 import { api } from '../services/api';
@@ -26,10 +26,13 @@ export function PvPWorkspaceView() {
   // N-player state
   const [participants, setParticipants] = useState<IMatchParticipant[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [verdict, setVerdict] = useState<string>('');
 
   // ── Load match + problem ──
   useEffect(() => {
     if (!matchId) return;
+
+    socketService.joinMatch(matchId);
 
     // Fetch match details just in case we are entering from Custom Room (which only passes matchId)
     api.getMatchDetails(matchId).then(res => {
@@ -55,6 +58,7 @@ export function PvPWorkspaceView() {
 
     socketService.onMatchEnded((data: any) => {
       if (data.matchId === matchId) {
+        setIsSubmitting(false);
         setMatchResult(data);
         setShowResult(true);
         
@@ -84,10 +88,18 @@ export function PvPWorkspaceView() {
         }
         return p;
       }));
+
+      if (data.userId === user?.id) {
+        setIsSubmitting(false);
+        setVerdict(data.status);
+        if (data.status !== 'ACCEPTED') {
+          toast.error(`Chưa chính xác (${data.status}). Thử lại nhé!`, { theme: 'dark' });
+        }
+      }
     });
 
     return () => {
-      // socket.off happens in socketService if needed, or component unmounts
+      socketService.leaveMatch(matchId);
     };
   }, [matchId]); // Removed problem dependency to avoid infinite loops
 
@@ -108,13 +120,12 @@ export function PvPWorkspaceView() {
       });
 
       if (res.success) {
-        message.success('Đã nộp bài thành công! Đang chờ chấm điểm...');
+        toast.success('Đã nộp bài thành công! Đang chờ chấm điểm...', { theme: 'dark' });
       } else {
-        message.error(res.message || 'Lỗi khi nộp bài');
+        toast.error(res.message || 'Lỗi khi nộp bài', { theme: 'dark' });
       }
     } catch (err: any) {
-      message.error(err.message || 'Lỗi hệ thống khi nộp bài');
-    } finally {
+      toast.error(err.message || 'Lỗi hệ thống khi nộp bài', { theme: 'dark' });
       setIsSubmitting(false);
     }
   };
@@ -152,7 +163,7 @@ export function PvPWorkspaceView() {
               onRun={handleRunCode}
               onSubmit={handleSubmit}
               isSubmitting={isSubmitting}
-              verdict={""}
+              verdict={verdict}
             />
           </div>
         </div>
