@@ -69,7 +69,7 @@ export const MatchResultModal: React.FC<MatchResultModalProps> = ({
                   const op = result.eloUpdates[opId];
                   return (
                     <div key={opId} className="flex justify-between items-center bg-ink border border-charcoal px-3 py-2">
-                      <span className="font-body text-xs text-linen">User {opId.substring(0, 4)}</span>
+                      <span className="font-body text-xs text-linen">{op.username || `User ${opId.substring(0, 4)}`}</span>
                       {renderEloChange(op.change)}
                     </div>
                   );

@@ -186,7 +186,7 @@ export const endMatch = async (matchId: string, winnerId: string) => {
             data: { elo_rating: newElo, streak_count: newStreak, max_streak: maxStreak }
           });
           
-          eloUpdates[p.user_id] = { elo: newElo, change, streak: newStreak };
+          eloUpdates[p.user_id] = { elo: newElo, change, streak: newStreak, username: user.username };
         }
 
         // Update participant

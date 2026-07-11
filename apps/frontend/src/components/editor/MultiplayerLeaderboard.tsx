@@ -32,14 +32,21 @@ export const MultiplayerLeaderboard: React.FC<MultiplayerLeaderboardProps> = ({ 
                 alt={p.user?.username}
                 className={`w-10 h-10 rounded-full border-2 ${isAC ? 'border-green-500' : isWA ? 'border-red-500' : 'border-charcoal'}`}
               />
-              <div className="flex flex-col">
+              <div className="flex flex-col flex-1">
                 <span className={`font-body text-sm font-bold truncate max-w-[120px] ${isMe ? 'text-vermilion' : 'text-linen'}`}>
                   {p.user?.username} {isMe && '(Bạn)'}
                 </span>
-                <div className="flex items-center gap-1 mt-1">
-                  {isAC && <><CheckCircle2 size={12} className="text-green-500" /><span className="text-[10px] text-green-500 uppercase tracking-wider">Hoàn thành</span></>}
-                  {isWA && <><XCircle size={12} className="text-red-500" /><span className="text-[10px] text-red-500 uppercase tracking-wider">Sai KQ</span></>}
-                  {isCoding && <><Code2 size={12} className="text-stone animate-pulse" /><span className="text-[10px] text-stone uppercase tracking-wider">Đang code...</span></>}
+                <div className="flex items-center justify-between mt-1">
+                  <div className="flex items-center gap-1">
+                    {isAC && <><CheckCircle2 size={12} className="text-green-500" /><span className="text-[10px] text-green-500 uppercase tracking-wider">Hoàn thành</span></>}
+                    {isWA && <><XCircle size={12} className="text-red-500" /><span className="text-[10px] text-red-500 uppercase tracking-wider">Sai KQ</span></>}
+                    {isCoding && <><Code2 size={12} className="text-stone animate-pulse" /><span className="text-[10px] text-stone uppercase tracking-wider">Đang code...</span></>}
+                  </div>
+                  {p.score_change !== undefined && (
+                    <span className={`text-[10px] font-bold uppercase tracking-wider ml-2 ${p.score_change > 0 ? 'text-vermilion' : 'text-stone'}`}>
+                      {p.score_change > 0 ? '+' : ''}{p.score_change} ELO
+                    </span>
+                  )}
                 </div>
               </div>
             </div>

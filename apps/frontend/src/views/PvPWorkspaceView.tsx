@@ -57,6 +57,21 @@ export function PvPWorkspaceView() {
       if (data.matchId === matchId) {
         setMatchResult(data);
         setShowResult(true);
+        
+        // Update score_change for leaderboard
+        if (data.eloUpdates) {
+          setParticipants(prev => prev.map(p => {
+            const update = data.eloUpdates[p.user_id];
+            if (update) {
+              return { 
+                ...p, 
+                score_change: update.change,
+                is_winner: data.winnerId === p.user_id 
+              };
+            }
+            return p;
+          }));
+        }
       }
     });
 
