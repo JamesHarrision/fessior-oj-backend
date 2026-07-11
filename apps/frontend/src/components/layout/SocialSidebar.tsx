@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../../services/api';
-import { UserCheck, UserPlus, Users, Trash2, X } from 'lucide-react';
+import { UserCheck, UserPlus, Users, Trash2, X, Swords } from 'lucide-react';
 
 export const SocialSidebar: React.FC = () => {
   const [friends, setFriends] = useState<any[]>([]);
@@ -142,6 +142,17 @@ export const SocialSidebar: React.FC = () => {
                     </div>
                   </div>
                   <div className={`w-2 h-2 rounded-full shrink-0 ${friend.online ? 'bg-vermilion' : 'bg-charcoal'}`} />
+                  <button
+                    onClick={() => {
+                      if (window.confirm(`Gửi lời mời thách đấu đến ${friend.username}?`)) {
+                        api.inviteFriend(friend.id).then(() => alert('Đã gửi lời mời thách đấu!')).catch(err => alert('Có lỗi xảy ra: ' + err.message));
+                      }
+                    }}
+                    className="p-1 text-stone hover:text-green-500 transition-colors cursor-pointer"
+                    title="Thách đấu"
+                  >
+                    <Swords size={14} />
+                  </button>
                   <button
                     onClick={() => handleRemove(friend.id)}
                     className="p-1 text-stone hover:text-vermilion transition-colors cursor-pointer"

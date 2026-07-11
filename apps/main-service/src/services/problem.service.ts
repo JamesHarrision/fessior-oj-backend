@@ -102,6 +102,7 @@ export class ProblemService {
     tagSlug?: string;
     page?: number;
     limit?: number;
+    userId?: string;
   }) {
     const page = filters.page || 1;
     const limit = filters.limit || 10;
@@ -110,6 +111,7 @@ export class ProblemService {
       tagSlug: filters.tagSlug,
       page,
       limit,
+      userId: filters.userId,
     });
   }
 
