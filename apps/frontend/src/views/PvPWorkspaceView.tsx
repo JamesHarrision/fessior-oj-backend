@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { message } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { socketService } from '../services/socket';
@@ -24,6 +25,7 @@ export function PvPWorkspaceView() {
   
   // N-player state
   const [participants, setParticipants] = useState<IMatchParticipant[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // ── Load match + problem ──
   useEffect(() => {
@@ -36,67 +38,76 @@ export function PvPWorkspaceView() {
         setActiveMatch(matchData);
         if (matchData.participants) {
           setParticipants(matchData.participants);
-        } else if (matchData.player1_id && matchData.player2_id) {
-          // Convert 1v1 to participants array for unified UI
-          setParticipants([
-            { user_id: matchData.player1_id, status: matchData.player1_status, user: matchData.player1 } as any,
-            { user_id: matchData.player2_id, status: matchData.player2_status, user: matchData.player2 } as any,
-          ]);
         }
         
         // Fetch problem if not present
         if (!problem && matchData.problem_id) {
           api.getProblemDetail(matchData.problem_id).then(pres => {
              if (pres.success && pres.data) {
-                setProblem(pres.data);
-                setCode(pres.data.starterCodes?.[language] ?? '');
+               setProblem(pres.data);
+               setCode(pres.data.starterCodes?.[0]?.code || '');
+               setLanguage(pres.data.starterCodes?.[0]?.language || 'cpp');
              }
           });
         }
       }
-    }).catch(console.error);
-
-    // Realtime Events
-    socketService.onMatchFound((data: any) => {
-      setActiveMatch({ ...data, id: data.matchId } as unknown as IMatch);
-      setProblem(data.problem);
-      setCode(data.problem?.starterCodes?.[language] ?? '');
-      if (data.player1 && data.player2) {
-        setParticipants([
-          { user_id: data.player1.userId, user: data.player1, status: 'CODING' } as any,
-          { user_id: data.player2.userId, user: data.player2, status: 'CODING' } as any
-        ]);
-      }
     });
 
     socketService.onMatchEnded((data: any) => {
-      setMatchResult(data);
-      setShowResult(true);
+      if (data.matchId === matchId) {
+        setMatchResult(data);
+        setShowResult(true);
+      }
     });
 
-    // Realtime Submission updates from ANY rival (N-player)
-    socketService.onRivalSubmission((data: any) => {
-      setParticipants(prev => prev.map(p => {
-        if (p.user_id === data.userId) {
-          return { ...p, status: data.status === 'ACCEPTED' ? 'ACCEPTED' : 'SUBMITTED_WA' };
-        }
-        return p;
-      }));
+    socketService.onSubmissionUpdate((data: any) => {
+      if (data.matchId === matchId) {
+        // Update participant state
+        setParticipants(prev => prev.map(p => {
+           if (p.user_id === data.userId) {
+             return {
+               ...p,
+               score_change: data.score_change !== undefined ? data.score_change : p.score_change,
+               status: data.new_status || p.status,
+               is_winner: data.is_winner !== undefined ? data.is_winner : p.is_winner
+             };
+           }
+           return p;
+        }));
+      }
     });
 
     return () => {
-      socketService.leaveQueue();
+      // socket.off happens in socketService if needed, or component unmounts
     };
-  }, [matchId, language]);
+  }, [matchId]); // Removed problem dependency to avoid infinite loops
+
+  const handleRunCode = async () => {
+    // Basic run functionality if needed
+  };
 
   const handleSubmit = async () => {
     if (!problem || !activeMatch?.id) return;
-    await api.submitCode({
-      problemId: problem.id || problem._id || problem.slug,
-      code,
-      language,
-      matchId: activeMatch.id,
-    });
+    
+    setIsSubmitting(true);
+    try {
+      const res = await api.submitCode({
+        problemId: problem.id || problem._id || problem.slug,
+        code,
+        language,
+        matchId: activeMatch.id,
+      });
+
+      if (res.success) {
+        message.success('Đã nộp bài thành công! Đang chờ chấm điểm...');
+      } else {
+        message.error(res.message || 'Lỗi khi nộp bài');
+      }
+    } catch (err: any) {
+      message.error(err.message || 'Lỗi hệ thống khi nộp bài');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCloseResult = () => {
@@ -111,33 +122,30 @@ export function PvPWorkspaceView() {
       {/* ── Multiplayer Leaderboard ── */}
       <MultiplayerLeaderboard participants={participants} currentUserId={user?.id || ''} />
 
-      {/* ── Main layout ── */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-0">
-        {/* Left: Problem Description */}
-        <div className="overflow-y-auto border border-charcoal bg-ink p-4">
-          {problem ? (
-            <ProblemDescription problem={problem} />
-          ) : (
-             <div className="flex items-center justify-center h-full text-stone">Đang tải đề bài...</div>
-          )}
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 min-h-0">
+        {/* Left Side: Problem Statement */}
+        <div className="bg-washi border border-charcoal flex flex-col min-h-0 shadow-lg">
+          <ProblemDescription problem={problem} />
         </div>
 
-        {/* Right: Editor + Console */}
-        <div className="flex flex-col gap-4 min-h-0">
-          <CodeEditorPane
-            code={code}
-            language={language}
-            onCodeChange={setCode}
-            onLanguageChange={(lang) => setLanguage(lang as any)}
-          />
-          <ConsolePane
-            problem={problem}
-            code={code}
-            language={language}
-            onSubmit={handleSubmit}
-            isSubmitting={false}
-            verdict={""}
-          />
+        {/* Right Side: Code Editor & Console */}
+        <div className="flex flex-col gap-4 lg:gap-6 min-h-0">
+          <div className="flex-1 bg-ink border border-charcoal shadow-lg min-h-0">
+            <CodeEditorPane
+              code={code}
+              onCodeChange={setCode}
+              language={language}
+              onLanguageChange={setLanguage as any}
+            />
+          </div>
+          <div className="h-[280px] bg-washi border border-charcoal shadow-lg shrink-0">
+            <ConsolePane
+              onRun={handleRunCode}
+              onSubmit={handleSubmit}
+              isSubmitting={isSubmitting}
+              verdict={""}
+            />
+          </div>
         </div>
       </div>
 
