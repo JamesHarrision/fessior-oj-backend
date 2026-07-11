@@ -9,11 +9,15 @@ export class AiRepository {
     this.http = http;
   }
 
-  getRoadmap(): Promise<ApiResponse<Record<string, unknown>>> {
-    return this.http.request('GET', `${API_ROUTES.AI}/roadmap`);
+  getRoadmap(data: any): Promise<ApiResponse<Record<string, unknown>>> {
+    return this.http.request('POST', `${API_ROUTES.AI}/roadmap`, data);
   }
 
   getFeedback(submissionId: string): Promise<ApiResponse<string>> {
-    return this.http.request('GET', `${API_ROUTES.AI}/feedback/${submissionId}`);
+    return this.http.request('POST', `${API_ROUTES.AI}/feedback/${submissionId}`);
+  }
+
+  getHistory(): Promise<ApiResponse<any[]>> {
+    return this.http.request('GET', `${API_ROUTES.AI}/history`);
   }
 }
