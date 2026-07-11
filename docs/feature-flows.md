@@ -176,7 +176,8 @@ flowchart LR
 **Flow chi tiết:**
 - User (Host) tạo phòng custom -> vào Waiting Room chờ.
 - Các Opponent nhập code -> Join phòng.
-- Host nhấn "Bắt đầu" khi có >= 2 người -> Backend gom toàn bộ thành `MatchParticipant` -> Bắn socket `match-started` cho cả phòng.
+- Host nhấn "Bắt đầu" khi có >= 2 người -> Backend gom toàn bộ thành `MatchParticipant` -> Bắn socket `MATCH_STARTED` cho cả phòng.
+- Khi user join, leave hoặc bi kick, Socket sẽ bắn `PLAYER_JOINED`, `PLAYER_LEFT`, `PLAYER_KICKED` để Frontend fetch lại Room Info thay vì f5.
 - Thể thức Winner Takes All: Sau khi 1 người nộp bài đúng (AC) đầu tiên, logic `endMatch` ở Backend sẽ tính ELO.
 - Toàn bộ người thua bị phạt (vd: -20 ELO). Người thắng được cộng dồn (Tổng ELO phạt).
 - Trận đấu kết thúc -> cập nhật `status = FINISHED` cho CustomRoom và Match.

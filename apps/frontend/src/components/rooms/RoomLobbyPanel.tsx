@@ -1,5 +1,6 @@
 import React from 'react';
 import { LogOut, Play, Users, Trophy } from 'lucide-react';
+import { DifficultyBadge } from '@ocj/ui';
 import type { ICustomRoom, IUser } from '@ocj/types';
 
 interface RoomLobbyPanelProps {
@@ -90,13 +91,16 @@ export const RoomLobbyPanel: React.FC<RoomLobbyPanelProps> = ({
           </div>
 
           <div className="bg-washi border border-charcoal p-6 flex flex-col gap-4">
-            <h4 className="font-display text-xs font-bold text-stone uppercase tracking-wider">Cấu hình trận</h4>
-            <p className="font-body text-sm text-linen">
-              <span className="text-stone">Độ khó:</span> <span className="font-bold">{activeRoom.difficulty || 'Mọi độ khó'}</span>
-            </p>
-            <p className="font-body text-sm text-linen">
+            <div className="flex flex-col gap-2">
+              <h4 className="font-display text-xs font-bold text-stone uppercase tracking-wider">Cấu hình trận</h4>
+              <p className="font-body text-sm text-linen flex items-center gap-2">
+                <span className="text-stone">Độ khó:</span> 
+                <DifficultyBadge difficulty={(activeRoom.difficulty as any) || 'EASY'} />
+              </p>
+              <p className="font-body text-sm text-linen">
               <span className="text-stone">Thời gian giới hạn:</span> {activeRoom.time_limit || 2000} ms
             </p>
+            </div>
 
             {isCreator ? (
               <button

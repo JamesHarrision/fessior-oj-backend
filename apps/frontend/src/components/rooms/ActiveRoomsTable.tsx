@@ -1,5 +1,6 @@
 import React from 'react';
 import { Users } from 'lucide-react';
+import { DifficultyBadge } from '@ocj/ui';
 import type { ICustomRoom } from '@ocj/types';
 
 interface ActiveRoomsTableProps {
@@ -38,16 +39,11 @@ export const ActiveRoomsTable: React.FC<ActiveRoomsTableProps> = ({ rooms, onJoi
                   <td className="p-4 font-mono text-xs font-bold text-linen whitespace-nowrap">{r.room_code}</td>
                   <td className="p-4 font-body text-sm text-linen whitespace-nowrap">{r.creator?.username}</td>
                   <td className="p-4 whitespace-nowrap">
-                    <span className={`inline-block px-2.5 py-1 text-[10px] font-display font-bold uppercase tracking-wider border ${
-                      r.difficulty === 'EASY' ? 'border-green-500/30 text-green-500 bg-green-500/10' :
-                      r.difficulty === 'MEDIUM' ? 'border-yellow-500/30 text-yellow-500 bg-yellow-500/10' :
-                      r.difficulty === 'HARD' ? 'border-vermilion/30 text-vermilion bg-vermilion/10' :
-                      'border-stone/30 text-stone bg-stone/10'
-                    }`}>
-                      {r.difficulty || 'ANY'}
-                    </span>
+                    <DifficultyBadge difficulty={(r.difficulty as any) || 'EASY'} />
                   </td>
-                  <td className="p-4 font-mono text-xs text-stone whitespace-nowrap text-center">1 / 2</td>
+                  <td className="p-4 font-mono text-xs text-stone whitespace-nowrap text-center">
+                    {r.participants?.length || 1} / {r.max_participants || 10}
+                  </td>
                   <td className="p-4 whitespace-nowrap text-right">
                     <button 
                       onClick={() => onJoinRoom(r.room_code)} 
