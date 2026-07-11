@@ -28,9 +28,25 @@ export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomM
   };
 
   useEffect(() => {
+    // 1. Fetch current user room to handle F5
+    api.getCurrentRoom().then(res => {
+      if (res.success && res.data) {
+        setActiveRoom(res.data);
+      }
+    }).catch(() => {});
+
+    // 2. Fetch initial active rooms list
     fetchActiveRooms();
-    const interval = setInterval(fetchActiveRooms, 10000);
-    return () => clearInterval(interval);
+
+    // 3. Listen to active rooms updates via socket
+    socketService.joinLobby();
+    socketService.onActiveRoomsUpdate((updatedRooms) => {
+      setRooms(updatedRooms);
+    });
+
+    return () => {
+      socketService.leaveLobby();
+    };
   }, []);
 
   // Setup room sockets
@@ -48,13 +64,11 @@ export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomM
         if (!prev) return null;
         return { ...prev, opponent_id: null, opponent: null };
       });
-      fetchActiveRooms();
     });
 
     socketService.onRoomDeleted(() => {
       alert('Chủ phòng đã giải tán phòng.');
       setActiveRoom(null);
-      fetchActiveRooms();
     });
 
     socketService.onMatchStarted(({ matchId, problemId }) => {

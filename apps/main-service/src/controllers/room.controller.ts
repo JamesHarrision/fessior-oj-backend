@@ -16,6 +16,20 @@ export class RoomController {
     }
   }
 
+  async getCurrentRoom(req: Request, res: Response) {
+    try {
+      const userId = (req as any).user.userId;
+      const room = await roomService.getCurrentRoom(userId);
+      res.status(200).json({
+        status: 'Success',
+        message: 'Current room fetched successfully',
+        data: room,
+      });
+    } catch (error: any) {
+      res.status(400).json({ success: false, message: error.message });
+    }
+  }
+
   async getActiveRooms(req: Request, res: Response) {
     try {
       const rooms = await roomService.getActiveRooms();

@@ -6,6 +6,16 @@ import { io } from '../sockets/socket';
 import { SOCKET_EVENTS } from '@ocj/constants';
 
 export class RoomService {
+  private async broadcastActiveRooms() {
+    const activeRooms = await roomRepository.findActiveRooms();
+    io?.to('lobby').emit(SOCKET_EVENTS.ACTIVE_ROOMS_UPDATE, activeRooms);
+  }
+
+  async getCurrentRoom(userId: string) {
+    const room = await roomRepository.findCurrentActiveRoom(userId);
+    return room;
+  }
+
   async createRoom(
     creatorId: string,
     data: {
@@ -16,6 +26,11 @@ export class RoomService {
       maxParticipants?: number;
     }
   ) {
+    const currentRoom = await roomRepository.findCurrentActiveRoom(creatorId);
+    if (currentRoom) {
+      throw new Error('You are already in an active room. Leave it before creating a new one.');
+    }
+
     let roomCode = '';
     let isUnique = false;
     while (!isUnique) {
@@ -33,7 +48,7 @@ export class RoomService {
       }
     }
 
-    return roomRepository.create({
+    const newRoom = await roomRepository.create({
       roomCode,
       creatorId,
       problemId: data.problemId,
@@ -42,6 +57,9 @@ export class RoomService {
       memoryLimit: data.memoryLimit,
       maxParticipants: data.maxParticipants || 10,
     });
+
+    this.broadcastActiveRooms();
+    return newRoom;
   }
 
   async getActiveRooms() {
@@ -66,19 +84,25 @@ export class RoomService {
       throw new Error('Room is not available');
     }
 
+    const alreadyJoined = room.participants.some(p => p.user_id === userId);
+    if (alreadyJoined) {
+      return { room };
+    }
+
     if (room.participants.length >= room.max_participants) {
       throw new Error('Room is full');
     }
 
-    const alreadyJoined = room.participants.some(p => p.user_id === userId);
-    if (alreadyJoined) {
-      throw new Error('You have already joined this room');
+    const currentRoom = await roomRepository.findCurrentActiveRoom(userId);
+    if (currentRoom && currentRoom.id !== room.id) {
+      throw new Error('You are already in another active room. Leave it before joining this one.');
     }
 
     const updatedRoom = await roomRepository.join(room.id, userId);
 
     const roomSocketName = `custom-room:${room.room_code}`;
     io?.to(roomSocketName).emit(SOCKET_EVENTS.PLAYER_JOINED, { userId });
+    this.broadcastActiveRooms();
 
     return {
       room: updatedRoom,
@@ -108,6 +132,7 @@ export class RoomService {
     
     const roomSocketName = `custom-room:${room.room_code}`;
     io?.to(roomSocketName).emit(SOCKET_EVENTS.PLAYER_KICKED, { userId: targetUserId });
+    this.broadcastActiveRooms();
 
     return { success: true };
   }
@@ -180,6 +205,8 @@ export class RoomService {
       roomId: room.id,
       problemId,
     });
+    
+    this.broadcastActiveRooms();
 
     return {
       room: updatedRoom,
@@ -198,55 +225,62 @@ export class RoomService {
     }
 
     if (room.creator_id === userId) {
-      // If creator leaves, delete the room
       await roomRepository.delete(roomId);
       const roomSocketName = `custom-room:${room.room_code}`;
-      io?.to(roomSocketName).emit(SOCKET_EVENTS.ROOM_DELETED, { roomId });
-      return { deleted: true };
+      io?.to(roomSocketName).emit('ROOM_DELETED');
     } else {
       await roomRepository.leave(roomId, userId);
+      const updatedRoom = await roomRepository.findById(roomId);
       const roomSocketName = `custom-room:${room.room_code}`;
-      io?.to(roomSocketName).emit(SOCKET_EVENTS.PLAYER_LEFT, { userId });
-      return { deleted: false };
+      io?.to(roomSocketName).emit('ROOM_CONFIG_UPDATED', updatedRoom);
+      io?.to(roomSocketName).emit('PLAYER_LEFT', { userId });
     }
+    
+    this.broadcastActiveRooms();
+    return { success: true };
   }
 
-  async updateRoomConfig(roomId: string, creatorId: string, data: Partial<{ difficulty: Difficulty, timeLimit: number, memoryLimit: number }>) {
+  async updateRoomConfig(roomId: string, creatorId: string, updates: any) {
     const room = await roomRepository.findById(roomId);
-    if (!room) {
-      throw new Error('Room not found');
-    }
-    if (room.creator_id !== creatorId) {
-      throw new Error('Only the creator can update the room configuration');
-    }
+    if (!room) throw new Error('Room not found');
+    if (room.creator_id !== creatorId) throw new Error('Permission denied');
 
-    const updatedRoom = await prisma.customRoom.update({
+    const updated = await prisma.customRoom.update({
       where: { id: roomId },
       data: {
-        difficulty: data.difficulty,
-        time_limit: data.timeLimit,
-        memory_limit: data.memoryLimit,
+        difficulty: updates.difficulty,
+        max_participants: updates.maxParticipants,
       },
       include: {
-        creator: { select: { id: true, username: true, elo_rating: true, avatar_url: true } },
-        participants: { include: { user: { select: { id: true, username: true, elo_rating: true, avatar_url: true } } } }
-      }
+        creator: {
+          select: { id: true, username: true, elo_rating: true, avatar_url: true },
+        },
+        participants: {
+          include: {
+            user: { select: { id: true, username: true, elo_rating: true, avatar_url: true } }
+          }
+        }
+      },
     });
 
-    const roomSocketName = `custom-room:${updatedRoom.room_code}`;
-    io?.to(roomSocketName).emit(SOCKET_EVENTS.CONFIG_UPDATED, { room: updatedRoom });
-    return updatedRoom;
+    const roomSocketName = `custom-room:${room.room_code}`;
+    io?.to(roomSocketName).emit('ROOM_CONFIG_UPDATED', updated);
+    this.broadcastActiveRooms();
+
+    return updated;
   }
 
   async deleteRoom(roomId: string, creatorId: string) {
     const room = await roomRepository.findById(roomId);
     if (!room) throw new Error('Room not found');
-    if (room.creator_id !== creatorId) throw new Error('Only the creator can delete the room');
+    if (room.creator_id !== creatorId) throw new Error('Permission denied');
 
     await roomRepository.delete(roomId);
     const roomSocketName = `custom-room:${room.room_code}`;
-    io?.to(roomSocketName).emit(SOCKET_EVENTS.ROOM_DELETED, { roomId });
+    io?.to(roomSocketName).emit('ROOM_DELETED');
+    this.broadcastActiveRooms();
   }
+
 }
 
 export const roomService = new RoomService();

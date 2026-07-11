@@ -46,6 +46,15 @@ export const socketService = {
     socket?.emit(SOCKET_EVENTS.FORFEIT_MATCH, { matchId });
   },
 
+  // Lobby Emitters
+  joinLobby: () => {
+    socket?.emit('join-lobby');
+  },
+
+  leaveLobby: () => {
+    socket?.emit('leave-lobby');
+  },
+
   // Custom Room Emitters
   joinCustomRoom: (roomCode: string) => {
     socket?.emit(SOCKET_EVENTS.JOIN_CUSTOM_ROOM, { roomCode });
@@ -56,6 +65,11 @@ export const socketService = {
   },
 
   // Listeners
+  onActiveRoomsUpdate: (callback: (rooms: any[]) => void) => {
+    socket?.off(SOCKET_EVENTS.ACTIVE_ROOMS_UPDATE);
+    socket?.on(SOCKET_EVENTS.ACTIVE_ROOMS_UPDATE, callback);
+  },
+
   onQueueStatus: (callback: (data: { status: 'QUEUED' | 'IDLE' | 'MATCHED'; elo?: number; message?: string }) => void) => {
     socket?.off(SOCKET_EVENTS.QUEUE_STATUS);
     socket?.on(SOCKET_EVENTS.QUEUE_STATUS, callback);

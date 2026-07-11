@@ -98,6 +98,27 @@ export class RoomRepository {
     return rooms.filter(r => r._count.participants < r.max_participants);
   }
 
+  async findCurrentActiveRoom(userId: string) {
+    return prisma.customRoom.findFirst({
+      where: {
+        status: { in: [CustomRoomStatus.WAITING, CustomRoomStatus.PLAYING] },
+        participants: {
+          some: { user_id: userId }
+        }
+      },
+      include: {
+        creator: {
+          select: { id: true, username: true, elo_rating: true, avatar_url: true },
+        },
+        participants: {
+          include: {
+            user: { select: { id: true, username: true, elo_rating: true, avatar_url: true } }
+          }
+        }
+      },
+    });
+  }
+
   async join(id: string, userId: string) {
     await prisma.customRoomParticipant.create({
       data: {

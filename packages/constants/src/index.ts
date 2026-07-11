@@ -50,6 +50,7 @@ export const SOCKET_EVENTS = {
   JOIN_CONTEST: 'join-contest',
   LEAVE_CONTEST: 'leave-contest',
   CONTEST_LEADERBOARD_UPDATE: 'contest-leaderboard-update',
+  ACTIVE_ROOMS_UPDATE: 'active-rooms-update',
 } as const;
 
 // Các kênh Redis Pub/Sub

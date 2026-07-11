@@ -103,6 +103,16 @@ export const initSocket = (socketIoServer: Server) => {
     });
 
     // Custom Room Subscriptions
+    socket.on('join-lobby', () => {
+      socket.join('lobby');
+      console.log(`Socket ${socket.id} joined lobby`);
+    });
+
+    socket.on('leave-lobby', () => {
+      socket.leave('lobby');
+      console.log(`Socket ${socket.id} left lobby`);
+    });
+
     socket.on(SOCKET_EVENTS.JOIN_CUSTOM_ROOM, (data: { roomCode: string }) => {
       socket.join(`custom-room:${data.roomCode}`);
       console.log(`Socket ${socket.id} joined custom-room: ${data.roomCode}`);

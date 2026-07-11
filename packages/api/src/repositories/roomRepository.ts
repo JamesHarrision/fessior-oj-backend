@@ -14,6 +14,10 @@ export class RoomRepository {
     return this.http.request('GET', `${API_ROUTES.ROOMS}/active`);
   }
 
+  getCurrentRoom(): Promise<ApiResponse<ICustomRoom>> {
+    return this.http.request('GET', `${API_ROUTES.ROOMS}/current`);
+  }
+
   createRoom(data: CreateRoomRequest): Promise<ApiResponse<ICustomRoom>> {
     return this.http.request('POST', `${API_ROUTES.ROOMS}/create`, { body: data });
   }

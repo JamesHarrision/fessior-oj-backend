@@ -173,6 +173,8 @@ export const api = {
   // =========================================================
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getActiveRooms: () => wrap<any>(roomRepository.getActiveRooms()),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getCurrentRoom: () => wrap<any>(roomRepository.getCurrentRoom()),
   createRoom: (data: Record<string, unknown>) =>
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     wrap<any>(roomRepository.createRoom(data as never)),
