@@ -8,37 +8,38 @@ datasource db {
 }
 
 model User {
-  id            String   @id @default(uuid()) @db.VarChar(36)
-  bio          String?  @db.VarChar(500)
-  full_name    String?  @db.VarChar(100)
-  username      String   @unique @db.VarChar(50)
-  email         String   @unique @db.VarChar(255)
-  password_hash String?  @db.VarChar(255)
-  avatar_url    String?  @db.VarChar(500)
-  role          Role     @default(USER)
-  elo_rating    Int      @default(1200)
-  streak_count  Int      @default(0)
-  max_streak    Int      @default(0)
+  id               String    @id @default(uuid()) @db.VarChar(36)
+  bio              String?   @db.VarChar(500)
+  full_name        String?   @db.VarChar(100)
+  username         String    @unique @db.VarChar(50)
+  email            String    @unique @db.VarChar(255)
+  password_hash    String?   @db.VarChar(255)
+  avatar_url       String?   @db.VarChar(500)
+  role             Role      @default(USER)
+  elo_rating       Int       @default(1200)
+  streak_count     Int       @default(0)
+  max_streak       Int       @default(0)
   last_active_date DateTime? @db.Date
-  code_coins    Int      @default(0)
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
-  is_banned      Boolean   @default(false)
-  banned_at      DateTime?
-  banned_reason  String?   @db.VarChar(255)
-  
-  refresh_tokens RefreshToken[]
+  code_coins       Int       @default(0)
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @updatedAt
+  is_banned        Boolean   @default(false)
+  banned_at        DateTime?
+  banned_reason    String?   @db.VarChar(255)
+
+  refresh_tokens        RefreshToken[]
   password_reset_tokens PasswordResetToken[]
-  matches_as_p1  Match[]    @relation("Player1")
-  matches_as_p2  Match[]    @relation("Player2")
-  tag_stats      UserTagStat[]
-  user_badges      UserBadge[]
-  elo_histories    EloHistory[]
-  user_activities  UserActivity[]
-  
+  matches_as_p1         Match[]              @relation("Player1")
+  matches_as_p2         Match[]              @relation("Player2")
+  tag_stats             UserTagStat[]
+  user_badges           UserBadge[]
+  elo_histories         EloHistory[]
+  user_activities       UserActivity[]
+
   custom_rooms_created       CustomRoom[]            @relation("Creator")
   custom_room_participations CustomRoomParticipant[]
   match_participations       MatchParticipant[]
+  AiHistory                  AiHistory[]
 
   @@map("users")
 }
@@ -65,10 +66,10 @@ model Badge {
 }
 
 model UserBadge {
-  id         String   @id @default(cuid()) @db.VarChar(36)
-  user_id    String   @db.VarChar(36)
-  badge_id   String   @db.VarChar(36)
-  earned_at  DateTime @default(now())
+  id        String   @id @default(cuid()) @db.VarChar(36)
+  user_id   String   @db.VarChar(36)
+  badge_id  String   @db.VarChar(36)
+  earned_at DateTime @default(now())
 
   user  User  @relation(fields: [user_id], references: [id], onDelete: Cascade)
   badge Badge @relation(fields: [badge_id], references: [id], onDelete: Cascade)
@@ -83,7 +84,7 @@ model EloHistory {
   old_elo    Int
   new_elo    Int
   change     Int
-  reason     String   @db.VarChar(50)  // MATCH_WIN, MATCH_LOSS, CONTEST, ADMIN
+  reason     String   @db.VarChar(50) // MATCH_WIN, MATCH_LOSS, CONTEST, ADMIN
   match_id   String?  @db.VarChar(36)
   created_at DateTime @default(now())
 
@@ -95,11 +96,11 @@ model EloHistory {
 }
 
 model UserActivity {
-  id                   String   @id @default(cuid()) @db.VarChar(36)
-  user_id              String   @db.VarChar(36)
-  activity_date        DateTime @db.Date
-  submissions_count    Int      @default(0)
-  problems_solved_count Int     @default(0)
+  id                    String   @id @default(cuid()) @db.VarChar(36)
+  user_id               String   @db.VarChar(36)
+  activity_date         DateTime @db.Date
+  submissions_count     Int      @default(0)
+  problems_solved_count Int      @default(0)
 
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
@@ -115,16 +116,16 @@ enum Role {
 }
 
 model RefreshToken {
-  id         String   @id @default(uuid()) @db.VarChar(36)
-  token      String   @unique @db.VarChar(500)
-  user_id    String   @db.VarChar(36)
-  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  expires_at DateTime
-  user_agent   String?  @db.VarChar(500)    
-  ip_address   String?  @db.VarChar(45)      
-  last_used_at DateTime?                    
-  is_revoked   Boolean  @default(false)
-  created_at DateTime @default(now())
+  id           String    @id @default(uuid()) @db.VarChar(36)
+  token        String    @unique @db.VarChar(500)
+  user_id      String    @db.VarChar(36)
+  user         User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  expires_at   DateTime
+  user_agent   String?   @db.VarChar(500)
+  ip_address   String?   @db.VarChar(45)
+  last_used_at DateTime?
+  is_revoked   Boolean   @default(false)
+  created_at   DateTime  @default(now())
 
   @@map("refresh_tokens")
 }
@@ -153,8 +154,8 @@ model Match {
   created_at     DateTime          @default(now())
   updated_at     DateTime          @updatedAt
 
-  player1      User? @relation("Player1", fields: [player1_id], references: [id], onDelete: Cascade)
-  player2      User? @relation("Player2", fields: [player2_id], references: [id], onDelete: Cascade)
+  player1      User?              @relation("Player1", fields: [player1_id], references: [id], onDelete: Cascade)
+  player2      User?              @relation("Player2", fields: [player2_id], references: [id], onDelete: Cascade)
   participants MatchParticipant[]
 
   @@map("matches")
@@ -213,11 +214,11 @@ model UserTagStat {
 }
 
 model ProblemIndex {
-  mongo_problem_id String          @id @db.VarChar(24)
-  title            String          @db.VarChar(255)
-  slug             String          @unique @db.VarChar(255)
+  mongo_problem_id String            @id @db.VarChar(24)
+  title            String            @db.VarChar(255)
+  slug             String            @unique @db.VarChar(255)
   difficulty       Difficulty
-  created_at       DateTime        @default(now())
+  created_at       DateTime          @default(now())
   tags             ProblemIndexTag[]
 
   @@map("problem_index")
@@ -268,11 +269,11 @@ model CustomRoom {
 }
 
 model CustomRoomParticipant {
-  id         String   @id @default(uuid()) @db.VarChar(36)
-  room_id    String   @db.VarChar(36)
-  user_id    String   @db.VarChar(36)
-  is_ready   Boolean  @default(false)
-  joined_at  DateTime @default(now())
+  id        String   @id @default(uuid()) @db.VarChar(36)
+  room_id   String   @db.VarChar(36)
+  user_id   String   @db.VarChar(36)
+  is_ready  Boolean  @default(false)
+  joined_at DateTime @default(now())
 
   room CustomRoom @relation(fields: [room_id], references: [id], onDelete: Cascade)
   user User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
@@ -291,16 +292,16 @@ enum ContestStatus {
 }
 
 model Contest {
-  id           String               @id @default(uuid()) @db.VarChar(36)
-  title        String               @db.VarChar(255)
-  description  String?              @db.Text
-  start_time   DateTime
-  end_time     DateTime
-  status       ContestStatus        @default(UPCOMING)
-  created_at   DateTime             @default(now())
-  updated_at   DateTime             @updatedAt
+  id          String        @id @default(uuid()) @db.VarChar(36)
+  title       String        @db.VarChar(255)
+  description String?       @db.Text
+  start_time  DateTime
+  end_time    DateTime
+  status      ContestStatus @default(UPCOMING)
+  created_at  DateTime      @default(now())
+  updated_at  DateTime      @updatedAt
 
-  problems     ContestProblem[]
+  problems      ContestProblem[]
   registrations ContestRegistration[]
 
   @@map("contests")
@@ -312,7 +313,7 @@ model ContestProblem {
   points           Int    @default(100)
   order            Int    @default(0)
 
-  contest      Contest @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  contest Contest @relation(fields: [contest_id], references: [id], onDelete: Cascade)
 
   @@id([contest_id, mongo_problem_id])
   @@map("contest_problems")
@@ -323,7 +324,7 @@ model ContestRegistration {
   user_id       String   @db.VarChar(36)
   registered_at DateTime @default(now())
 
-  contest      Contest @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  contest Contest @relation(fields: [contest_id], references: [id], onDelete: Cascade)
 
   @@id([contest_id, user_id])
   @@map("contest_registrations")
@@ -333,16 +334,16 @@ model ContestRegistration {
 model Comment {
   id          String   @id @default(uuid()) @db.VarChar(36)
   target_id   String   @db.VarChar(36)
-  target_type String   @db.VarChar(20) @default("PROBLEM")
+  target_type String   @default("PROBLEM") @db.VarChar(20)
   user_id     String   @db.VarChar(36)
   content     String   @db.Text
   parent_id   String?  @db.VarChar(36)
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 
-  parent      Comment? @relation("Replies", fields: [parent_id], references: [id], onDelete: Cascade)
-  replies     Comment[] @relation("Replies")
-  likes       CommentLike[]
+  parent  Comment?      @relation("Replies", fields: [parent_id], references: [id], onDelete: Cascade)
+  replies Comment[]     @relation("Replies")
+  likes   CommentLike[]
 
   @@map("comments")
 }
@@ -352,7 +353,7 @@ model CommentLike {
   user_id    String   @db.VarChar(36)
   created_at DateTime @default(now())
 
-  comment    Comment  @relation(fields: [comment_id], references: [id], onDelete: Cascade)
+  comment Comment @relation(fields: [comment_id], references: [id], onDelete: Cascade)
 
   @@id([comment_id, user_id])
   @@map("comment_likes")
@@ -408,7 +409,7 @@ model InventoryItem {
   is_equipped Boolean  @default(false)
   acquired_at DateTime @default(now())
 
-  item        ShopItem @relation(fields: [item_id], references: [id], onDelete: Cascade)
+  item ShopItem @relation(fields: [item_id], references: [id], onDelete: Cascade)
 
   @@unique([user_id, item_id])
   @@map("inventory_items")
@@ -447,4 +448,20 @@ model Report {
   updated_at       DateTime     @updatedAt
 
   @@map("reports")
+}
+
+// 8. AI History
+model AiHistory {
+  id         String   @id @default(uuid()) @db.VarChar(36)
+  user_id    String   @db.VarChar(36)
+  type       String   @db.VarChar(50) // ROADMAP, INTERVIEW
+  input      String   @db.Text
+  output     String   @db.Text
+  created_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([created_at])
+  @@map("ai_histories")
 }
