@@ -32,6 +32,8 @@ Events duoc khai bao trong `packages/constants/src/index.ts`.
 | `forfeit-match` | client -> server | Dau hang/roi match. |
 | `join-custom-room` | client -> server | Join socket room custom. |
 | `leave-custom-room` | client -> server | Roi socket room custom. |
+| `join-match` | client -> server | Vao room cua tran dau Custom Arena. |
+| `leave-match` | client -> server | Roi room cua tran dau Custom Arena. |
 | `queue-status` | server -> client | Trang thai queue cua user. |
 | `match-found` | server -> client | Da tim thay tran 1v1. |
 | `rival-submission` | server -> client | Doi thu vua co submission update. |

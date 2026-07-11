@@ -276,6 +276,17 @@ erDiagram
     datetime created_at
     datetime updated_at
   }
+
+  AI_HISTORY {
+    string id PK
+    string user_id FK
+    string type
+    string input
+    string output
+    datetime created_at
+  }
+
+  USER ||--o{ AI_HISTORY : has
 ```
 
 ## Nhom bang
