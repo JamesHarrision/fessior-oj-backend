@@ -33,6 +33,11 @@ export class MatchHistoryRepository {
           player2: {
             select: { id: true, username: true, elo_rating: true, avatar_url: true },
           },
+          participants: {
+            include: {
+              user: { select: { id: true, username: true, elo_rating: true, avatar_url: true } }
+            }
+          }
         },
       }),
     ]);

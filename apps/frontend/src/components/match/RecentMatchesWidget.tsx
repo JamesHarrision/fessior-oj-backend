@@ -30,7 +30,6 @@ export const RecentMatchesWidget: React.FC = () => {
           const rows: MatchRow[] = items.map((m: any) => {
             const isWinner = user ? m.winner_id === user.id : m.winner_id === m.player1_id;
             
-            // In 1v1 we assume it's opponent. In multi it might be different, but default is "Đối thủ"
             let opponentName = m.opponent_name;
             if (!opponentName && user) {
                if (m.player1?.id === user.id) opponentName = m.player2?.username;
@@ -38,11 +37,20 @@ export const RecentMatchesWidget: React.FC = () => {
             }
             opponentName = opponentName ?? 'Đối thủ';
 
+            let realEloChange = m.elo_change;
+            if (realEloChange === undefined && m.participants && m.participants.length > 0) {
+               const myParticipant = m.participants.find((p: any) => p.user_id === user?.id || p.user?.id === user?.id);
+               if (myParticipant) {
+                  realEloChange = myParticipant.score_change;
+               }
+            }
+            realEloChange = realEloChange ?? (isWinner ? 25 : -15);
+
             return {
               id: m.id,
               opponent: opponentName,
               result: isWinner ? 'win' : 'loss',
-              eloChange: m.elo_change ?? (isWinner ? 25 : -15),
+              eloChange: realEloChange,
               when: m.ended_at ? formatRelativeTime(new Date(m.ended_at)) : 'Vừa xong',
             };
           });

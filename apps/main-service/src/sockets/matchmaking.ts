@@ -231,6 +231,22 @@ export const endMatch = async (matchId: string, winnerId: string) => {
           winner_id: winnerId,
           player1_status: winnerId === player1Id ? PlayerMatchStatus.ACCEPTED : PlayerMatchStatus.SUBMITTED_WA,
           player2_status: winnerId === player2Id ? PlayerMatchStatus.ACCEPTED : PlayerMatchStatus.SUBMITTED_WA,
+          participants: {
+            create: [
+              {
+                user_id: player1Id,
+                status: winnerId === player1Id ? PlayerMatchStatus.ACCEPTED : PlayerMatchStatus.SUBMITTED_WA,
+                score_change: winnerId === player1Id ? winnerChange : loserChange,
+                is_winner: winnerId === player1Id,
+              },
+              {
+                user_id: player2Id,
+                status: winnerId === player2Id ? PlayerMatchStatus.ACCEPTED : PlayerMatchStatus.SUBMITTED_WA,
+                score_change: winnerId === player2Id ? winnerChange : loserChange,
+                is_winner: winnerId === player2Id,
+              }
+            ]
+          }
         },
       });
 
