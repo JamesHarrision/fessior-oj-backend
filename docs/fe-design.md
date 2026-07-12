@@ -346,8 +346,7 @@ Không dùng `Segmented` của Ant Design trên dark theme — thay bằng custo
 │  • Lobby      │  └────────────────────────────┘   │
 │  • Editor     │                                   │
 │  • Problems   │  ┌─ Content Grid ─────────────┐   │
-│  • Contests   │  │ [Section ...]               │   │
-│  • Rankings   │  │ [Cards / Table / Form]      │   │
+│  • Rankings   │  │ [Section ...]               │   │
 │               │  └────────────────────────────┘   │
 │  COMMUNITY    │                                   │
 │  • Rooms      │                                   │
@@ -361,6 +360,11 @@ Không dùng `Segmented` của Ant Design trên dark theme — thay bằng custo
 ├───────────────┤                                   │
 │  [User Avatar]│                                   │
 └──────────────────────────────────────────────────┘
+
+## 8.1 Layout Pattern: Admin Panel
+
+Giao diện Admin được tách biệt hoàn toàn khỏi AppShellLayout của người dùng, sử dụng toàn màn hình (`h-screen w-full`).
+Sidebar của Admin liệt kê các tab quản trị (Problems, Users, API Tester, v.v.). Trang `/admin/*` này chỉ dành cho người dùng có role `ADMIN`.
 ```
 
 ---
