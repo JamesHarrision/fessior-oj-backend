@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Sparkles, BookOpen, Compass, Clock, ChevronRight } from 'lucide-react';
+import { Sparkles, BookOpen, Compass, Clock, ChevronRight, Send, User } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { api } from '../services/api';
 import { PageHeader, EmptyState, SkeletonBlock } from '@ocj/ui';
 
@@ -19,7 +20,10 @@ export const AIView: React.FC = () => {
   // Review States
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [selectedSubId, setSelectedSubId] = useState('');
-  const [feedback, setFeedback] = useState('');
+  const [chatHistory, setChatHistory] = useState<any[]>([]);
+  const [activeHistoryId, setActiveHistoryId] = useState('');
+  const [chatLoading, setChatLoading] = useState(false);
+  const [chatInput, setChatInput] = useState('');
   const [feedbackLoading, setFeedbackLoading] = useState(false);
 
   useEffect(() => {
@@ -76,20 +80,50 @@ export const AIView: React.FC = () => {
   const handleGetFeedback = async (id: string) => {
     setSelectedSubId(id);
     setFeedbackLoading(true);
-    setFeedback('');
+    setChatHistory([]);
+    setActiveHistoryId('');
     try {
       const res = await api.getAIFeedback(id);
       if (res.success && res.data) {
-        setFeedback(res.data.feedback);
+        if (res.data.chatHistory) {
+          setChatHistory(res.data.chatHistory);
+        } else {
+          setChatHistory([{ role: 'model', text: res.data.feedback }]);
+        }
+        if (res.data.historyId) {
+          setActiveHistoryId(res.data.historyId);
+        }
         // Refresh history
         const histRes = await api.getAIHistory();
         if (histRes.success && histRes.data) setHistory(histRes.data);
       }
     } catch (err) {
       console.error(err);
-      setFeedback('Lỗi: Không thể tải nhận xét từ AI.');
+      setChatHistory([{ role: 'model', text: 'Lỗi: Không thể tải nhận xét từ AI.' }]);
     } finally {
       setFeedbackLoading(false);
+    }
+  };
+
+  const handleSendChat = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!chatInput.trim() || !activeHistoryId) return;
+    
+    const message = chatInput.trim();
+    setChatInput('');
+    setChatHistory(prev => [...prev, { role: 'user', text: message }]);
+    setChatLoading(true);
+    
+    try {
+      const res = await api.sendAIChatMessage(activeHistoryId, message);
+      if (res.success && res.data && res.data.chatHistory) {
+        setChatHistory(res.data.chatHistory);
+      }
+    } catch (err) {
+      console.error(err);
+      setChatHistory(prev => [...prev, { role: 'model', text: 'Lỗi khi gửi tin nhắn.' }]);
+    } finally {
+      setChatLoading(false);
     }
   };
 
@@ -101,7 +135,12 @@ export const AIView: React.FC = () => {
       } catch {}
     } else if (item.type === 'INTERVIEW') {
       setActiveTab('review');
-      setFeedback(item.output);
+      setActiveHistoryId(item.id);
+      try {
+        setChatHistory(JSON.parse(item.output));
+      } catch {
+        setChatHistory([{ role: 'model', text: item.output }]);
+      }
     }
   };
 
@@ -238,9 +277,9 @@ export const AIView: React.FC = () => {
                                 <span className="font-display text-[10px] font-bold text-stone uppercase tracking-wider block mb-2">Bài tập đề xuất</span>
                                 <div className="flex flex-wrap gap-2">
                                   {node.recommendedProblems.map((slug: string) => (
-                                    <span key={slug} className="font-mono text-xs text-linen bg-ink px-2 py-1 border border-charcoal">
+                                    <Link key={slug} to={`/solve/${slug}`} className="font-mono text-xs text-linen bg-ink px-2 py-1 border border-charcoal hover:border-vermilion hover:text-vermilion transition-colors cursor-pointer">
                                       {slug}
-                                    </span>
+                                    </Link>
                                   ))}
                                 </div>
                               </div>
@@ -279,21 +318,66 @@ export const AIView: React.FC = () => {
                   )}
                 </div>
 
-                <div className="w-full lg:w-2/3 bg-washi border border-charcoal p-5 min-h-[400px]">
+                <div className="w-full lg:w-2/3 bg-washi border border-charcoal flex flex-col min-h-[500px]">
                   {feedbackLoading ? (
-                    <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-4 p-5">
                       <SkeletonBlock lines={1} />
                       <SkeletonBlock lines={4} />
                       <SkeletonBlock lines={3} />
                     </div>
-                  ) : feedback ? (
-                    <div className="font-body text-sm text-linen whitespace-pre-wrap leading-relaxed">
-                      {feedback}
-                    </div>
+                  ) : chatHistory.length > 0 ? (
+                    <>
+                      <div className="flex-1 p-5 overflow-y-auto flex flex-col gap-4">
+                        {chatHistory.map((msg, idx) => (
+                          <div key={idx} className={`flex gap-3 max-w-[85%] ${msg.role === 'user' ? 'self-end flex-row-reverse' : 'self-start'}`}>
+                            <div className={`w-8 h-8 rounded-full shrink-0 flex items-center justify-center ${msg.role === 'user' ? 'bg-charcoal text-linen' : 'bg-vermilion text-linen'}`}>
+                              {msg.role === 'user' ? <User size={14} /> : <Sparkles size={14} />}
+                            </div>
+                            <div className={`p-4 font-body text-sm leading-relaxed whitespace-pre-wrap ${msg.role === 'user' ? 'bg-charcoal text-linen' : 'bg-ink border border-charcoal text-linen'}`}>
+                              {msg.text}
+                            </div>
+                          </div>
+                        ))}
+                        {chatLoading && (
+                          <div className="flex gap-3 max-w-[85%] self-start">
+                             <div className="w-8 h-8 rounded-full shrink-0 flex items-center justify-center bg-vermilion text-linen">
+                              <Sparkles size={14} />
+                            </div>
+                            <div className="p-4 bg-ink border border-charcoal flex gap-1 items-center">
+                              <span className="w-2 h-2 bg-stone rounded-full animate-bounce"></span>
+                              <span className="w-2 h-2 bg-stone rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></span>
+                              <span className="w-2 h-2 bg-stone rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {activeHistoryId && (
+                        <div className="p-4 border-t border-charcoal bg-ink">
+                          <form onSubmit={handleSendChat} className="flex gap-2">
+                            <input 
+                              type="text" 
+                              value={chatInput}
+                              onChange={(e) => setChatInput(e.target.value)}
+                              placeholder="Hỏi thêm Mentor về cách tối ưu hoặc một ngôn ngữ khác..."
+                              className="flex-1 bg-washi border border-charcoal text-linen p-3 font-body text-sm outline-none focus:border-vermilion transition-colors"
+                              disabled={chatLoading}
+                            />
+                            <button 
+                              type="submit"
+                              disabled={chatLoading || !chatInput.trim()}
+                              className="bg-vermilion text-linen px-4 hover:bg-vermilion-hover transition-colors flex items-center justify-center disabled:opacity-50"
+                            >
+                              <Send size={18} />
+                            </button>
+                          </form>
+                        </div>
+                      )}
+                    </>
                   ) : (
-                    <EmptyState 
-                      message="Chọn một bài nộp để AI phân tích và đưa ra nhận xét chi tiết"
-                    />
+                    <div className="p-5">
+                      <EmptyState message="Chọn một bài nộp để AI phân tích và đưa ra nhận xét chi tiết" />
+                    </div>
                   )}
                 </div>
               </div>
