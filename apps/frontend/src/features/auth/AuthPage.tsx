@@ -5,15 +5,44 @@ import {
   UserOutlined,
   LockOutlined,
   ArrowRightOutlined,
-  GoogleOutlined,
-  GithubOutlined
 } from '@ant-design/icons';
 import { validateEmail, validateUsername, checkPasswordStrength } from '@ocj/validators';
 import { parseErrorMessage } from '@ocj/utils';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 
 type AuthMode = 'login' | 'register';
+
+// Hard, brutalist animation variants
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2
+    }
+  }
+};
+
+const sharpReveal = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { type: 'tween', ease: 'circOut', duration: 0.4 }
+  }
+};
+
+const badgeFlash = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { type: 'tween', ease: 'easeOut', duration: 0.3 }
+  }
+};
 
 export function AuthPage() {
   const navigate = useNavigate();
@@ -25,7 +54,7 @@ export function AuthPage() {
   const isAuthed = Boolean(token && user);
 
   useEffect(() => {
-    if (isAuthed) navigate('/match', { replace: true });
+    if (isAuthed) navigate('/home', { replace: true });
   }, [isAuthed, navigate]);
 
   const handleFinish = async (values: {
@@ -38,7 +67,7 @@ export function AuthPage() {
     try {
       if (mode === 'login') {
         await login(values.email, values.password);
-        navigate('/match', { replace: true });
+        navigate('/home', { replace: true });
         return;
       }
       const username = values.username?.trim() ?? '';
@@ -66,118 +95,183 @@ export function AuthPage() {
   };
 
   return (
-    <div className="!min-h-screen flex flex-col justify-between !bg-gradient-to-br from-[#1a3668] via-[#0d2146] to-[#081229] font-sans">
-
+    <div className="min-h-screen w-full flex flex-col justify-between bg-ink text-linen font-body overflow-hidden">
+      
       {/* ─── Main Content ─── */}
-      <div className="flex-1 flex items-center !p-6 lg:!p-12 w-full">
-        {/* ÉP CỨNG WIDTH 1200PX VÀ MARGIN AUTO Ở ĐÂY */}
-        <div className="!w-full !max-w-[1200px] !mx-auto grid grid-cols-1 lg:grid-cols-2 !gap-12 lg:!gap-24 items-center">
+      <div className="flex-1 flex items-center p-6 lg:p-12 w-full">
+        <div className="w-full max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
 
           {/* ── LEFT: Typography & Stats ── */}
-          <div className="flex flex-col text-white">
-            <div className="inline-flex items-center !gap-2 !px-4 !py-2 !rounded-full !border !border-blue-500/40 !bg-blue-500/10 w-max !mb-8">
-              <CodeOutlined className="text-blue-300 text-sm" />
-              <span className="text-[11px] font-semibold text-blue-200 uppercase tracking-widest leading-none mt-0.5">
-                Algorithm Engine V2.4
+          <motion.div 
+            variants={staggerContainer} 
+            initial="hidden" 
+            animate="visible"
+            className="flex flex-col"
+          >
+            <motion.div variants={badgeFlash} className="inline-flex items-center gap-2 px-3 py-1.5 border border-charcoal bg-washi w-max mb-10 rounded">
+              <CodeOutlined className="text-vermilion text-xs" />
+              <span className="font-display text-[11px] font-bold text-stone uppercase tracking-widest leading-none mt-0.5">
+                ALGORITHM ENGINE V2.4
               </span>
-            </div>
+            </motion.div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.15] tracking-tight !mb-6">
-              Join the Community. <br />
-              <span className="text-blue-200">Unleash the Algorithm.</span>
-            </h1>
+            <motion.h1 variants={sharpReveal} className="font-display text-4xl sm:text-5xl lg:text-[64px] font-bold leading-[1.1] tracking-tight mb-8">
+              QUEU ARENA.<br />
+              <span className="text-vermilion">MATCHMAKING.</span>
+            </motion.h1>
 
-            <p className="text-[15px] text-blue-100/70 !max-w-md leading-relaxed !mb-12">
-              Queu Arena is the professional-grade home for precision coding. Scale your skills, compete in global rankings, and master the world's most complex problems.
-            </p>
+            <motion.p variants={sharpReveal} className="font-body text-[18px] leading-[1.6] text-linen max-w-md mb-12">
+              The professional-grade home for precision coding. Scale your skills, compete in global rankings, and master the world's most complex problems.
+            </motion.p>
 
             {/* Stats Row */}
-            <div className="grid grid-cols-3 !gap-4 !max-w-xl">
+            <motion.div variants={staggerContainer} className="grid grid-cols-3 gap-4 max-w-[480px]">
               {[
-                { value: '50k+', label: 'Active Engineers' },
-                { value: '1200+', label: 'Daily Challenges' },
-                { value: 'Top 1%', label: 'Elite Rankings' },
+                { value: '50k+', label: 'ACTIVE ENGINEERS' },
+                { value: '1200+', label: 'DAILY CHALLENGES' },
+                { value: 'Top 1%', label: 'ELITE RANKINGS' },
               ].map((stat, idx) => (
-                <div key={idx} className="!border !border-white/5 !bg-white/[0.03] !p-5 !rounded-2xl flex flex-col justify-center">
-                  <div className="text-2xl font-bold text-white !mb-1">{stat.value}</div>
-                  <div className="text-[10px] font-semibold text-blue-200/60 uppercase tracking-wide">
+                <motion.div 
+                  key={idx} 
+                  variants={sharpReveal}
+                  whileHover={{ scale: 1.05, borderColor: '#D83A2C', transition: { duration: 0.1 } }}
+                  className="bg-washi border border-charcoal p-5 flex flex-col justify-center rounded cursor-default"
+                >
+                  <div className="font-display text-2xl font-bold text-linen mb-2">{stat.value}</div>
+                  <div className="font-display text-[11px] font-bold text-stone uppercase tracking-wider">
                     {stat.label}
                   </div>
-                </div>
+                </motion.div>
               ))}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* ── RIGHT: Form Card ── */}
-          <div className="w-full !max-w-[460px] mx-auto lg:!ml-auto lg:!mr-0">
-            <div className="!bg-[#e4ebf5] !rounded-[24px] !p-8 sm:!p-10 !shadow-2xl shadow-black/40 text-slate-800">
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ type: 'tween', ease: 'circOut', duration: 0.5, delay: 0.3 }}
+            className="w-full max-w-[440px] mx-auto lg:ml-auto lg:mr-0"
+          >
+            <div className="bg-washi border border-charcoal p-8 lg:p-10 rounded">
+              
+              <div className="font-display text-[11px] font-bold tracking-widest text-vermilion mb-6 uppercase flex items-center gap-2">
+                <motion.div 
+                  animate={{ opacity: [1, 0, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+                  className="w-2 h-2 bg-vermilion rounded-full"
+                />
+                MEMBER ACCESS
+              </div>
 
               {/* Toggle Login/Register */}
-              <div className="!bg-slate-200/80 !rounded-xl !p-1.5 flex !mb-8 items-center w-full">
+              <div className="flex bg-ink border border-charcoal rounded p-1 mb-8 relative">
+                {/* Active Slider Indicator */}
+                <motion.div 
+                  layout
+                  className="absolute top-1 bottom-1 bg-charcoal rounded z-0"
+                  initial={false}
+                  animate={{
+                    left: mode === 'login' ? '4px' : 'calc(50% + 2px)',
+                    width: 'calc(50% - 6px)'
+                  }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                />
                 <button
                   onClick={() => { setMode('login'); setError(null); }}
-                  className={`flex-1 !py-2.5 text-sm font-semibold !rounded-lg transition-all flex justify-center items-center ${mode === 'login'
-                      ? '!bg-white text-slate-900 !shadow-sm'
-                      : 'text-slate-500 hover:text-slate-700'
-                    }`}
+                  className={`relative z-10 flex-1 py-2 font-display text-[13px] font-bold rounded flex justify-center items-center transition-colors ${
+                    mode === 'login' ? 'text-linen' : 'text-stone hover:text-linen'
+                  }`}
                 >
-                  Login
+                  LOGIN
                 </button>
                 <button
                   onClick={() => { setMode('register'); setError(null); }}
-                  className={`flex-1 !py-2.5 text-sm font-semibold !rounded-lg transition-all flex justify-center items-center ${mode === 'register'
-                      ? '!bg-white text-slate-900 !shadow-sm'
-                      : 'text-slate-500 hover:text-slate-700'
-                    }`}
+                  className={`relative z-10 flex-1 py-2 font-display text-[13px] font-bold rounded flex justify-center items-center transition-colors ${
+                    mode === 'register' ? 'text-linen' : 'text-stone hover:text-linen'
+                  }`}
                 >
-                  Register
+                  REGISTER
                 </button>
               </div>
 
-              <div className="!mb-8">
-                <h2 className="text-2xl font-bold text-slate-900 !mb-1.5">
-                  {mode === 'login' ? 'Welcome Back' : 'Create Account'}
-                </h2>
-                <p className="text-sm text-slate-500">
+              <div className="mb-8">
+                <motion.h2 
+                  key={mode}
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="font-display text-2xl font-bold text-linen mb-2 uppercase"
+                >
+                  {mode === 'login' ? 'WELCOME BACK' : 'CREATE ACCOUNT'}
+                </motion.h2>
+                <motion.p 
+                  key={`p-${mode}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="font-body text-[14px] text-stone"
+                >
                   {mode === 'login'
                     ? 'Enter your credentials to access the arena.'
                     : 'Register an account to start your journey.'}
-                </p>
+                </motion.p>
               </div>
 
-              {error && (
-                <div className={`text-[13px] !px-4 !py-3 !rounded-lg !mb-6 ${error.includes('thành công') ? '!bg-green-100 text-green-700' : '!bg-red-100 text-red-600'}`}>
-                  {error}
-                </div>
-              )}
-
-              <Form layout="vertical" onFinish={handleFinish} requiredMark={false} className="ocj-auth-form">
-
-                {mode === 'register' && (
-                  <Form.Item
-                    name="username"
-                    label={<span className="text-[12px] font-semibold text-slate-600">Username</span>}
-                    rules={[{ required: true, message: 'Required' }]}
-                    className="!mb-5"
+              <AnimatePresence mode="wait">
+                {error && (
+                  <motion.div 
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="overflow-hidden mb-6"
                   >
-                    <Input
-                      prefix={<UserOutlined className="text-slate-400 !mr-2" />}
-                      placeholder="Choose a username"
-                      className="!bg-white !border-transparent hover:!border-blue-400 focus:!border-blue-500 !text-slate-800 !px-4 !py-3.5 !rounded-xl !shadow-sm transition-colors text-sm"
-                    />
-                  </Form.Item>
+                    <div className={`text-[13px] font-body px-4 py-3 rounded border ${
+                      error.includes('thành công') 
+                        ? 'bg-green-500/10 border-green-500/30 text-green-500' 
+                        : 'bg-vermilion/10 border-vermilion/30 text-vermilion'
+                    }`}>
+                      {error}
+                    </div>
+                  </motion.div>
                 )}
+              </AnimatePresence>
+
+              <Form layout="vertical" onFinish={handleFinish} requiredMark={false} className="flex flex-col gap-5 ocj-auth-form">
+
+                <AnimatePresence mode="popLayout">
+                  {mode === 'register' && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ type: 'tween', ease: 'easeInOut', duration: 0.2 }}
+                      className="overflow-hidden"
+                    >
+                      <Form.Item
+                        name="username"
+                        label={<span className="font-display block text-[11px] font-bold text-stone uppercase tracking-wider">Username</span>}
+                        rules={[{ required: true, message: 'Required' }]}
+                        className="!mb-0 mt-1"
+                      >
+                        <Input
+                          prefix={<UserOutlined className="text-stone mr-2" />}
+                          placeholder="Choose a username"
+                          className="w-full h-[44px] bg-ink border border-charcoal rounded px-4 py-3 font-body text-[14px] text-linen focus:outline-none focus:border-vermilion hover:border-stone transition-colors placeholder:text-stone"
+                        />
+                      </Form.Item>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
                 <Form.Item
                   name="email"
-                  label={<span className="text-[12px] font-semibold text-slate-600">Identifier</span>}
+                  label={<span className="font-display block text-[11px] font-bold text-stone uppercase tracking-wider">Identifier</span>}
                   rules={[{ required: true, message: 'Required' }]}
-                  className="!mb-5"
+                  className="!mb-0"
                 >
                   <Input
-                    prefix={<UserOutlined className="text-slate-400 !mr-2" />}
-                    placeholder="Username or Email"
-                    className="!bg-white !border-transparent hover:!border-blue-400 focus:!border-blue-500 !text-slate-800 !px-4 !py-3.5 !rounded-xl !shadow-sm transition-colors text-sm"
+                    prefix={<UserOutlined className="text-stone mr-2" />}
+                    placeholder="admin@example.com"
+                    className="w-full h-[44px] bg-ink border border-charcoal rounded px-4 py-3 font-body text-[14px] text-linen focus:outline-none focus:border-vermilion hover:border-stone transition-colors placeholder:text-stone"
                   />
                 </Form.Item>
 
@@ -185,70 +279,84 @@ export function AuthPage() {
                   name="password"
                   label={
                     <div className="flex justify-between items-center w-full">
-                      <span className="text-[12px] font-semibold text-slate-600">Security Key</span>
-                      {mode === 'login' && <a href="#" className="text-[12px] font-semibold text-blue-600 hover:text-blue-700">Forgot?</a>}
+                      <span className="font-display block text-[11px] font-bold text-stone uppercase tracking-wider">Security Key</span>
+                      {mode === 'login' && <a href="#" className="font-display text-[11px] font-bold text-stone hover:text-vermilion transition-colors uppercase tracking-wider">Forgot?</a>}
                     </div>
                   }
                   rules={[{ required: true, message: 'Required' }]}
-                  className="!mb-6"
+                  className="!mb-2"
                 >
                   <Input.Password
-                    prefix={<LockOutlined className="text-slate-400 !mr-2" />}
+                    prefix={<LockOutlined className="text-stone mr-2" />}
                     placeholder="••••••••"
-                    className="!bg-white !border-transparent hover:!border-blue-400 focus:!border-blue-500 !text-slate-800 !px-4 !py-3.5 !rounded-xl !shadow-sm transition-colors text-sm [&_.ant-input-suffix]:text-slate-400"
+                    className="w-full h-[44px] bg-ink border border-charcoal rounded px-4 py-3 font-body text-[14px] text-linen focus:outline-none focus:border-vermilion hover:border-stone transition-colors placeholder:text-stone [&_.ant-input-suffix]:text-stone"
                   />
                 </Form.Item>
 
-                <Form.Item className="!mt-2 !mb-0">
-                  <button
+                <Form.Item className="!mt-4 !mb-0">
+                  <motion.button
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.98 }}
                     type="submit"
                     disabled={loading}
-                    className="w-full !bg-[#0d59e8] hover:!bg-[#0a46b5] text-white font-medium text-[15px] !py-3.5 !rounded-xl !shadow-md transition-all flex justify-center items-center !gap-2 disabled:opacity-70"
+                    className="w-full h-[44px] bg-vermilion hover:bg-vermilion-hover text-linen font-display font-bold text-[14px] uppercase tracking-wider rounded transition-colors flex justify-center items-center gap-2 disabled:opacity-50"
                   >
-                    {mode === 'login' ? 'Initiate Access' : 'Create Account'}
+                    {mode === 'login' ? 'INITIATE ACCESS' : 'CREATE ACCOUNT'}
                     {!loading && <ArrowRightOutlined className="text-sm" />}
-                  </button>
+                  </motion.button>
                 </Form.Item>
               </Form>
 
-              <div className="flex items-center !gap-4 !my-8">
-                <div className="flex-1 !h-px !bg-slate-300/60"></div>
-                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                  Secure Gateways
+              <div className="flex items-center gap-4 mt-8 mb-6">
+                <div className="flex-1 h-[1px] bg-charcoal"></div>
+                <div className="font-display text-[11px] font-bold text-stone uppercase tracking-widest">
+                  SECURE GATEWAYS
                 </div>
-                <div className="flex-1 !h-px !bg-slate-300/60"></div>
+                <div className="flex-1 h-[1px] bg-charcoal"></div>
               </div>
 
-              <div className="grid grid-cols-2 !gap-4 w-full">
-                <button type="button" className="flex items-center justify-center !gap-2 !bg-white hover:!bg-slate-50 border border-transparent text-slate-700 font-medium !py-3 !rounded-xl !shadow-sm transition-all text-sm w-full">
-                  <GoogleOutlined className="text-lg text-slate-700" />
+              <div className="grid grid-cols-2 gap-3 w-full">
+                <motion.button 
+                  whileHover={{ scale: 1.02, backgroundColor: '#2E2E2E' }}
+                  whileTap={{ scale: 0.98 }}
+                  type="button" 
+                  className="flex items-center justify-center gap-2 bg-ink border border-charcoal text-linen font-display font-bold py-2.5 rounded text-[13px] uppercase tracking-wider w-full"
+                >
                   Google
-                </button>
-                <button type="button" className="flex items-center justify-center !gap-2 !bg-white hover:!bg-slate-50 border border-transparent text-slate-700 font-medium !py-3 !rounded-xl !shadow-sm transition-all text-sm w-full">
-                  <GithubOutlined className="text-lg text-slate-700" />
+                </motion.button>
+                <motion.button 
+                  whileHover={{ scale: 1.02, backgroundColor: '#2E2E2E' }}
+                  whileTap={{ scale: 0.98 }}
+                  type="button" 
+                  className="flex items-center justify-center gap-2 bg-ink border border-charcoal text-linen font-display font-bold py-2.5 rounded text-[13px] uppercase tracking-wider w-full"
+                >
                   GitHub
-                </button>
+                </motion.button>
               </div>
 
-              <p className="text-[11px] text-slate-500 text-center !mt-8 !px-4 leading-relaxed">
-                By continuing, you agree to the Queu Arena <a href="#" className="font-semibold text-slate-700 underline hover:text-blue-600">Protocol & Terms</a>.
+              <p className="font-body text-[12px] text-stone text-center mt-8 px-2">
+                By continuing, you agree to the Queu Arena <a href="#" className="font-bold text-linen underline hover:text-vermilion transition-colors">Protocol & Terms</a>.
               </p>
 
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
 
       {/* ─── Footer ─── */}
-      {/* ÉP CỨNG WIDTH 1200PX VÀ MARGIN AUTO Ở FOOTER ĐỂ CÙNG TRỤC DỌC VỚI CONTENT */}
-      <footer className="!w-full !max-w-[1200px] !mx-auto !px-6 lg:!px-12 !py-6 flex flex-col sm:flex-row justify-between items-center text-[12px] text-blue-200/50">
+      <motion.footer 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.6, duration: 0.5 }}
+        className="w-full max-w-[1200px] mx-auto px-6 lg:px-12 py-6 flex flex-col sm:flex-row justify-between items-center font-body text-[12px] text-stone"
+      >
         <p>© 2024 Queu Arena. Professional Grade Online Judge.</p>
-        <div className="flex !gap-6 !mt-4 sm:!mt-0">
-          <a href="#" className="hover:text-blue-200 transition-colors">Documentation</a>
-          <a href="#" className="hover:text-blue-200 transition-colors">API Status</a>
-          <a href="#" className="hover:text-blue-200 transition-colors">Privacy</a>
+        <div className="flex gap-6 mt-4 sm:mt-0 font-medium">
+          <a href="#" className="hover:text-linen transition-colors">Documentation</a>
+          <a href="#" className="hover:text-linen transition-colors">API Status</a>
+          <a href="#" className="hover:text-linen transition-colors">Privacy</a>
         </div>
-      </footer>
+      </motion.footer>
 
     </div>
   );

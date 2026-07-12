@@ -257,20 +257,23 @@ Files lien quan:
 ## 8. Social Friendship And Online State
 
 Friend request/accept/block/list chay qua REST. Online state duoc Socket.io ghi vao Redis set `online_users`.
+Newsfeed cho phep user xem hoat dong cua ban be (nhu hoan thanh bai tap, len rank) va thong bao tu server.
 
 ```mermaid
 flowchart LR
-  FE[SocialSidebar / Friends UI] --> API[Friend routes]
+  FE[SocialSidebar / Friends UI / Home Dashboard] --> API[Friend routes]
   API --> Validator[friendship.validator]
   Validator --> Controller[friendship.controller]
   Controller --> Service[friendship.service]
   Service --> Repo[friendship.repository]
-  Repo --> MySQL[(friendships / blocks / users)]
+  Repo --> MySQL[(friendships / blocks / users / newsfeed)]
   Socket[Socket connect/disconnect] --> Redis[(online_users)]
 ```
 
 Files lien quan:
 
+- `apps/frontend/src/views/HomeView.tsx`
+- `apps/frontend/src/views/FriendsView.tsx`
 - `apps/frontend/src/components/layout/SocialSidebar.tsx`
 - `apps/main-service/src/routes/friendship.route.ts`
 - `apps/main-service/src/controllers/friendship.controller.ts`
