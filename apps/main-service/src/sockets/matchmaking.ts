@@ -61,6 +61,12 @@ export const startMatch = async (p1: QueuePlayer, p2: QueuePlayer) => {
         player2_id: p2.userId,
         problem_id: problem._id.toString(),
         status: MatchStatus.PENDING,
+        participants: {
+          create: [
+            { user_id: p1.userId, status: PlayerMatchStatus.CODING, score_change: 0, is_winner: false },
+            { user_id: p2.userId, status: PlayerMatchStatus.CODING, score_change: 0, is_winner: false }
+          ]
+        }
       },
     });
 
@@ -159,7 +165,7 @@ export const endMatch = async (matchId: string, winnerId: string) => {
     
     if (!match || match.status === MatchStatus.FINISHED) return;
 
-    const isArenaMatch = match.participants && match.participants.length > 0;
+    const isArenaMatch = !match.player1_id && !match.player2_id;
     let eloUpdates: Record<string, any> = {};
 
     if (isArenaMatch) {
@@ -231,23 +237,25 @@ export const endMatch = async (matchId: string, winnerId: string) => {
           winner_id: winnerId,
           player1_status: winnerId === player1Id ? PlayerMatchStatus.ACCEPTED : PlayerMatchStatus.SUBMITTED_WA,
           player2_status: winnerId === player2Id ? PlayerMatchStatus.ACCEPTED : PlayerMatchStatus.SUBMITTED_WA,
-          participants: {
-            create: [
-              {
-                user_id: player1Id,
-                status: winnerId === player1Id ? PlayerMatchStatus.ACCEPTED : PlayerMatchStatus.SUBMITTED_WA,
-                score_change: winnerId === player1Id ? winnerChange : loserChange,
-                is_winner: winnerId === player1Id,
-              },
-              {
-                user_id: player2Id,
-                status: winnerId === player2Id ? PlayerMatchStatus.ACCEPTED : PlayerMatchStatus.SUBMITTED_WA,
-                score_change: winnerId === player2Id ? winnerChange : loserChange,
-                is_winner: winnerId === player2Id,
-              }
-            ]
-          }
         },
+      });
+      
+      // Update participants for 1v1
+      await tx.matchParticipant.update({
+        where: { match_id_user_id: { match_id: matchId, user_id: player1Id } },
+        data: {
+           status: winnerId === player1Id ? PlayerMatchStatus.ACCEPTED : PlayerMatchStatus.SUBMITTED_WA,
+           score_change: winnerId === player1Id ? winnerChange : loserChange,
+           is_winner: winnerId === player1Id,
+        }
+      });
+      await tx.matchParticipant.update({
+        where: { match_id_user_id: { match_id: matchId, user_id: player2Id } },
+        data: {
+           status: winnerId === player2Id ? PlayerMatchStatus.ACCEPTED : PlayerMatchStatus.SUBMITTED_WA,
+           score_change: winnerId === player2Id ? winnerChange : loserChange,
+           is_winner: winnerId === player2Id,
+        }
       });
 
       await tx.user.update({
@@ -284,7 +292,8 @@ export const handleForfeit = async (matchId: string, forfeitingUserId: string) =
   });
   if (!match || match.status === MatchStatus.FINISHED) return;
 
-  if (match.participants && match.participants.length > 0) {
+  const isArenaMatch = !match.player1_id && !match.player2_id;
+  if (isArenaMatch) {
     // If it's a multiplayer arena, a forfeit from one player shouldn't end the match for everyone.
     // They just leave or get -20 immediately. But wait, if they forfeit, who is the winner?
     // We cannot easily determine a winner if someone forfeits early.
