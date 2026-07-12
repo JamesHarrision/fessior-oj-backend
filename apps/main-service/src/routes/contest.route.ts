@@ -35,6 +35,50 @@ router.get(
 );
 
 router.get(
+	'/registered',
+/* #swagger.tags = ['Contests']
+   #swagger.summary = 'Get registered contests of the authenticated user'
+   #swagger.description = 'Returns list of contests that the authenticated user has registered for.'
+   #swagger.security = [{ "bearerAuth": [] }]
+   #swagger.responses[200] = { 
+     description: 'Registered contests list',
+     content: { 
+       'application/json': { 
+         schema: { 
+           type: 'object', 
+           properties: { 
+             status: { type: 'string' }, 
+             message: { type: 'string' }, 
+             data: { 
+               type: 'array', 
+               items: { 
+                 type: 'object', 
+                 properties: { 
+                   id: { type: 'string' }, 
+                   title: { type: 'string' }, 
+                   description: { type: 'string' }, 
+                   start_time: { type: 'string', format: 'date-time' }, 
+                   end_time: { type: 'string', format: 'date-time' }, 
+                   status: { type: 'string' } 
+                 } 
+               } 
+             } 
+           } 
+         }, 
+         example: { 
+           status: 'Success', 
+           message: 'Registered contests fetched', 
+           data: [ { id: 'contest_1', title: 'June Challenge', start_time: '2026-06-20T10:00:00Z', end_time: '2026-06-20T13:00:00Z', status: 'UPCOMING' } ] 
+         } 
+       } 
+     }
+   }
+*/
+	requireAuth,
+	contestController.getRegisteredContests
+);
+
+router.get(
 	'/:contestId',
 /* #swagger.tags = ['Contests']
    #swagger.summary = 'Get contest details'
@@ -61,7 +105,20 @@ router.get(
                  startAt: { type: 'string', format: 'date-time' }, 
                  endAt: { type: 'string', format: 'date-time' }, 
                  durationMinutes: { type: 'integer' }, 
-                 status: { type: 'string' } 
+                 status: { type: 'string' },
+                 registeredUsers: {
+                   type: 'array',
+                   items: {
+                     type: 'object',
+                     properties: {
+                       id: { type: 'string' },
+                       username: { type: 'string' },
+                       fullName: { type: 'string' },
+                       avatarUrl: { type: 'string' },
+                       eloRating: { type: 'integer' }
+                     }
+                   }
+                 }
                } 
              } 
            } 
@@ -76,7 +133,16 @@ router.get(
              startAt: '2026-06-20T10:00:00Z', 
              endAt: '2026-06-20T13:00:00Z', 
              durationMinutes: 180, 
-             status: 'UPCOMING' 
+             status: 'UPCOMING',
+             registeredUsers: [
+               {
+                 id: 'user_1',
+                 username: 'normal_user',
+                 fullName: 'Normal User',
+                 avatarUrl: 'https://avatar.url',
+                 eloRating: 1200
+               }
+             ]
            } 
          } 
        } 

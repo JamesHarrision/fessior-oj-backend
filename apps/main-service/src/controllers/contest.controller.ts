@@ -145,6 +145,19 @@ export class ContestController {
       res.status(400).json({ success: false, message: error.message });
     }
   }
+
+  async getRegisteredContests(req: Request, res: Response) {
+    try {
+      const userId = req.user.userId;
+      const contests = await contestService.getRegisteredContests(userId);
+      res.status(200).json({
+        success: true,
+        data: contests,
+      });
+    } catch (error: any) {
+      res.status(400).json({ success: false, message: error.message });
+    }
+  }
 }
 
 export const contestController = new ContestController();

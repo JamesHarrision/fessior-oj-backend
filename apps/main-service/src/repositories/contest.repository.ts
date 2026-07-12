@@ -157,6 +157,18 @@ export class ContestRepository {
     });
     return !!reg;
   }
+
+  async findRegisteredContests(userId: string) {
+    return prisma.contestRegistration.findMany({
+      where: { user_id: userId },
+      include: {
+        contest: true,
+      },
+      orderBy: {
+        registered_at: 'desc',
+      },
+    });
+  }
 }
 
 export const contestRepository = new ContestRepository();
