@@ -192,25 +192,46 @@ export interface ISubmission {
   createdAt?: string | Date;
 }
 
+export interface ICustomRoomParticipant {
+  id: string;
+  room_id: string;
+  user_id: string;
+  is_ready: boolean;
+  joined_at: string | Date;
+  user?: IUser;
+}
+
 export interface ICustomRoom {
   id: string;
   room_code: string;
   creator_id: string;
-  opponent_id?: string | null;
   status: 'WAITING' | 'PLAYING' | 'FINISHED';
   difficulty?: ProblemDifficulty | 'EASY' | 'MEDIUM' | 'HARD' | null;
   time_limit?: number;
   memory_limit?: number;
+  max_participants?: number;
   creator?: IUser;
-  opponent?: IUser | null;
+  participants?: ICustomRoomParticipant[];
   match_id?: string | null;
   problem_id?: string | null;
+  _count?: { participants: number };
+}
+
+export interface IMatchParticipant {
+  id: string;
+  match_id: string;
+  user_id: string;
+  status: 'CODING' | 'SUBMITTED_WA' | 'ACCEPTED';
+  score_change: number;
+  is_winner: boolean;
+  joined_at: string | Date;
+  user?: IUser;
 }
 
 export interface IMatch {
   id: string;
-  player1_id: string;
-  player2_id: string;
+  player1_id?: string | null;
+  player2_id?: string | null;
   problem_id: string;
   status: 'PENDING' | 'PLAYING' | 'FINISHED';
   winner_id?: string | null;
@@ -218,6 +239,22 @@ export interface IMatch {
   ended_at?: string | Date | null;
   player1?: IUser;
   player2?: IUser;
+  participants?: IMatchParticipant[];
+  problem?: IProblem;
+}
+
+export interface IContestRegistration {
+  contest_id: string;
+  user_id: string;
+  registered_at: string | Date;
+  user?: IUser;
+}
+
+export interface IContestProblem {
+  contest_id: string;
+  mongo_problem_id: string;
+  points: number;
+  order: number;
   problem?: IProblem;
 }
 
@@ -227,8 +264,12 @@ export interface IContest {
   description?: string | null;
   start_time: string | Date;
   end_time: string | Date;
-  problems?: any[];
-  registrations?: any[];
+  status: ContestStatus | 'UPCOMING' | 'REGISTRATION' | 'ONGOING' | 'ENDED' | 'RESULTS';
+  created_at?: string | Date;
+  updated_at?: string | Date;
+  problems?: IContestProblem[];
+  registrations?: IContestRegistration[];
+  _count?: { registrations: number };
 }
 
 export interface IReport {
@@ -538,6 +579,7 @@ export interface CreateRoomRequest {
   difficulty?: ProblemDifficulty;
   timeLimit?: number;
   memoryLimit?: number;
+  maxParticipants?: number;
 }
 
 export interface JoinRoomRequest {

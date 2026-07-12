@@ -40,16 +40,19 @@ export const executeInDocker = async (
   const fileName = language === 'java' ? 'Main.java' : `solution.${fileExt}`;
   const containerFilePath = `${containerDir}/${fileName}`;
 
-  const execInContainer = (command: string, inputData?: string): Promise<{ stdout: string; stderr: string; error: any }> => {
+  const execInContainer = (command: string, inputData?: string, timeoutMs?: number): Promise<{ stdout: string; stderr: string; error: any }> => {
     return new Promise((resolve) => {
-      const child = exec(command, (error: any, stdout: string | Buffer, stderr: string | Buffer) => {
+      const execOptions = timeoutMs ? { timeout: timeoutMs } : {};
+      const child = exec(command, execOptions, (error: any, stdout: string | Buffer, stderr: string | Buffer) => {
         resolve({ stdout: stdout.toString(), stderr: stderr.toString(), error });
       });
-      if (inputData !== undefined && child.stdin) {
+      if (child.stdin) {
         child.stdin.on('error', (err) => {
           // Suppress write errors
         });
-        child.stdin.write(inputData);
+        if (inputData !== undefined) {
+          child.stdin.write(inputData);
+        }
         child.stdin.end();
       }
     });
@@ -96,7 +99,8 @@ export const executeInDocker = async (
     }
 
     const startTime = Date.now();
-    const runRes = await execInContainer(runCommand, stdin);
+    // Use timeLimitMs + 500 for the Node.js exec timeout so we can detect TLE
+    const runRes = await execInContainer(runCommand, stdin, timeLimitMs + 500);
     const elapsed = Date.now() - startTime;
 
     execInContainer(`docker exec -i ${containerName} rm -rf ${containerDir}`).catch(() => {});

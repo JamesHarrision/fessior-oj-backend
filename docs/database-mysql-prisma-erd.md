@@ -8,8 +8,6 @@ MySQL duoc quan ly bang Prisma tai `apps/main-service/prisma/schema.prisma`. Dat
 erDiagram
   USER ||--o{ REFRESH_TOKEN : owns
   USER ||--o{ PASSWORD_RESET_TOKEN : owns
-  USER ||--o{ MATCH : player1
-  USER ||--o{ MATCH : player2
   USER ||--o{ USER_TAG_STAT : has
   USER ||--o{ USER_BADGE : earns
   USER ||--o{ ELO_HISTORY : has
@@ -110,16 +108,25 @@ erDiagram
 
   MATCH {
     string id PK
-    string player1_id FK
-    string player2_id FK
     string problem_id
     string winner_id
     MatchStatus status
-    PlayerMatchStatus player1_status
-    PlayerMatchStatus player2_status
     datetime created_at
     datetime updated_at
   }
+
+  MATCH_PARTICIPANT {
+    string id PK
+    string match_id FK
+    string user_id FK
+    PlayerMatchStatus status
+    int score_change
+    boolean is_winner
+    datetime joined_at
+  }
+
+  MATCH ||--o{ MATCH_PARTICIPANT : has
+  USER ||--o{ MATCH_PARTICIPANT : plays_as
 
   TAG {
     string id PK
@@ -151,16 +158,27 @@ erDiagram
     string id PK
     string room_code UK
     string creator_id FK
-    string opponent_id FK
     string problem_id
     Difficulty difficulty
     int time_limit
     int memory_limit
+    int max_participants
     CustomRoomStatus status
     string match_id
     datetime created_at
     datetime updated_at
   }
+
+  CUSTOM_ROOM_PARTICIPANT {
+    string id PK
+    string room_id FK
+    string user_id FK
+    PlayerRoomStatus status
+    datetime joined_at
+  }
+
+  CUSTOM_ROOM ||--o{ CUSTOM_ROOM_PARTICIPANT : has
+  USER ||--o{ CUSTOM_ROOM_PARTICIPANT : joins_as
 
   CONTEST {
     string id PK
@@ -258,6 +276,17 @@ erDiagram
     datetime created_at
     datetime updated_at
   }
+
+  AI_HISTORY {
+    string id PK
+    string user_id FK
+    string type
+    string input
+    string output
+    datetime created_at
+  }
+
+  USER ||--o{ AI_HISTORY : has
 ```
 
 ## Nhom bang
@@ -283,8 +312,8 @@ erDiagram
 
 ### Match & Room
 
-- `matches`: tran 1v1, player1/player2, problem Mongo id, winner, status.
-- `custom_rooms`: phong custom, creator/opponent, problem Mongo id, status.
+- `matches`: tran 1v1 va N-player (Arena), problem Mongo id, winner, status. Quan he 1-N voi `match_participants`.
+- `custom_rooms`: phong custom N-player, creator, problem Mongo id, status. Quan he 1-N voi `custom_room_participants`.
 
 ### Contest
 

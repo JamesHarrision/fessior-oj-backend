@@ -133,7 +133,7 @@ export const AdminRoomsTab: React.FC = () => {
                     <div className="prob-item-meta">
                       <span className="prob-tag-pill" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.7rem' }}>
                         <Users size={10} />
-                        {r.opponent_id ? '2' : '1'} người chơi
+                        {r._count?.participants || 1} người chơi
                       </span>
                       <span className="prob-tag-pill" style={{ fontSize: '0.7rem' }}>
                         Trạng thái: {r.status || 'WAITING'}

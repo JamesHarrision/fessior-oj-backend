@@ -1136,4 +1136,20 @@ router.post('/:id/unban', requireAuth, requireAdmin, (req, res, next) => {
   userController.unbanUser(req, res, next);
 });
 
+router.get('/profile/:username/elo-history', (req, res, next) => {
+  /* #swagger.tags = ['User']
+     #swagger.summary = 'Get public user elo history by username'
+     #swagger.description = 'Returns paginated elo history for a specific user.'
+  */
+  userController.getUserEloHistoryByUsername(req, res, next);
+});
+
+router.get('/profile/:username/streak', (req, res, next) => {
+  /* #swagger.tags = ['User']
+     #swagger.summary = 'Get public user streak by username'
+     #swagger.description = 'Returns streak count and heatmap for a specific user.'
+  */
+  userController.getUserStreakByUsername(req, res, next);
+});
+
 export default router;

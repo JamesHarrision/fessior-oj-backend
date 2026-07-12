@@ -10,7 +10,7 @@ interface LeftTabPanelProps {
 
 export const LeftTabPanel: React.FC<LeftTabPanelProps> = ({ problem }) => {
   const [leftTab, setLeftTab] = useState<'desc' | 'comments' | 'report'>('desc');
-  const problemId = problem?.id || problem?._id || '';
+  // 
 
   return (
     <div className="left-column">
@@ -38,9 +38,9 @@ export const LeftTabPanel: React.FC<LeftTabPanelProps> = ({ problem }) => {
         {leftTab === 'desc' ? (
           <ProblemDescription problem={problem} />
         ) : leftTab === 'comments' ? (
-          <ProblemComments problemId={problemId} />
+          <ProblemComments targetId={problem?.id || ""} targetType="PROBLEM" />
         ) : (
-          <ReportForm problemId={problemId} />
+          <ReportForm targetId={problem?.id || ""} targetType="PROBLEM" onClose={() => setLeftTab("desc")} />
         )}
       </div>
     </div>

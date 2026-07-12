@@ -1,6 +1,7 @@
 import { prisma } from '../config/prisma';
 import { Problem, IProblem } from '../models/problem.model';
 import { Testcase, ITestcase } from '../models/testcase.model';
+import { Submission } from '../models/submission.model';
 import { Difficulty } from '@prisma/client';
 
 export class ProblemRepository {
@@ -96,7 +97,12 @@ export class ProblemRepository {
   }
 
   async getProblemBySlug(slug: string) {
-    const problem = await Problem.findOne({ slug });
+    let query: any = { slug };
+    // Mongoose ObjectId is 24 hex characters
+    if (/^[0-9a-fA-F]{24}$/.test(slug)) {
+      query = { $or: [{ slug }, { _id: slug }] };
+    }
+    const problem = await Problem.findOne(query);
     if (!problem) return null;
 
     // Fetch tags from SQL
@@ -123,8 +129,9 @@ export class ProblemRepository {
     tagSlug?: string;
     page: number;
     limit: number;
+    userId?: string;
   }) {
-    const { difficulty, tagSlug, page, limit } = filters;
+    const { difficulty, tagSlug, page, limit, userId } = filters;
     const skip = (page - 1) * limit;
 
     const whereClause: any = {};
@@ -158,14 +165,57 @@ export class ProblemRepository {
       }),
     ]);
 
-    const formattedItems = items.map((item) => ({
-      id: item.mongo_problem_id,
-      title: item.title,
-      slug: item.slug,
-      difficulty: item.difficulty,
-      created_at: item.created_at,
-      tags: item.tags.map((t) => t.tag),
-    }));
+    const problemIds = items.map(item => item.mongo_problem_id);
+
+    // Aggregate submissions for acceptance rate
+    const submissionStats = await Submission.aggregate([
+      { $match: { problemId: { $in: problemIds.map(id => new (require('mongoose')).Types.ObjectId(id)) } } },
+      { $group: {
+          _id: "$problemId",
+          totalSubmissions: { $sum: 1 },
+          acceptedSubmissions: {
+            $sum: { $cond: [{ $eq: ["$status", "ACCEPTED"] }, 1, 0] }
+          }
+      }}
+    ]);
+
+    const statsMap = new Map();
+    submissionStats.forEach(stat => {
+      const accRate = stat.totalSubmissions > 0 
+        ? Math.round((stat.acceptedSubmissions / stat.totalSubmissions) * 100) 
+        : 0;
+      statsMap.set(stat._id.toString(), {
+        acceptanceRate: accRate,
+        totalSubmissions: stat.totalSubmissions
+      });
+    });
+
+    // Check if current user has solved these problems
+    let userSolvedSet = new Set<string>();
+    if (userId) {
+      const userSolved = await Submission.find({
+        userId,
+        problemId: { $in: problemIds },
+        status: "ACCEPTED"
+      }).select('problemId');
+      
+      userSolved.forEach(sub => userSolvedSet.add(sub.problemId.toString()));
+    }
+
+    const formattedItems = items.map((item) => {
+      const stats = statsMap.get(item.mongo_problem_id) || { acceptanceRate: 0, totalSubmissions: 0 };
+      return {
+        id: item.mongo_problem_id,
+        title: item.title,
+        slug: item.slug,
+        difficulty: item.difficulty,
+        created_at: item.created_at,
+        tags: item.tags.map((t) => t.tag),
+        acceptanceRate: stats.acceptanceRate,
+        totalSubmissions: stats.totalSubmissions,
+        isSolved: userSolvedSet.has(item.mongo_problem_id)
+      };
+    });
 
     return {
       total,

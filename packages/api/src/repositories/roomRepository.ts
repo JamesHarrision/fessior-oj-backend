@@ -14,16 +14,20 @@ export class RoomRepository {
     return this.http.request('GET', `${API_ROUTES.ROOMS}/active`);
   }
 
+  getCurrentRoom(): Promise<ApiResponse<ICustomRoom>> {
+    return this.http.request('GET', `${API_ROUTES.ROOMS}/current`);
+  }
+
   createRoom(data: CreateRoomRequest): Promise<ApiResponse<ICustomRoom>> {
-    return this.http.request('POST', API_ROUTES.ROOMS, { body: data });
+    return this.http.request('POST', `${API_ROUTES.ROOMS}/create`, { body: data });
   }
 
   joinRoom(data: JoinRoomRequest): Promise<ApiResponse<ICustomRoom>> {
     return this.http.request('POST', `${API_ROUTES.ROOMS}/join`, { body: data });
   }
 
-  leaveRoom(roomCode: string): Promise<ApiResponse<void>> {
-    return this.http.request('POST', `${API_ROUTES.ROOMS}/${roomCode}/leave`);
+  leaveRoom(roomId: string): Promise<ApiResponse<void>> {
+    return this.http.request('POST', `${API_ROUTES.ROOMS}/leave`, { body: { roomId } });
   }
 
   deleteRoom(roomCode: string): Promise<ApiResponse<void>> {

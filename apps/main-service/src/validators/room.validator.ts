@@ -6,6 +6,7 @@ export const createRoomSchema = z.object({
   difficulty: z.enum(['EASY', 'MEDIUM', 'HARD']).optional(),
   timeLimit: z.number().int().min(100).max(10000).optional(),
   memoryLimit: z.number().int().min(16).max(1024).optional(),
+  maxParticipants: z.number().int().min(2).max(10).optional(),
 });
 
 export const joinRoomSchema = z.object({

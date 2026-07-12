@@ -12,7 +12,7 @@ export class MatchRepository {
 
   getMatches(query?: Record<string, unknown>): Promise<ApiResponse<IMatch[]>> {
     const params = query ? this.buildQueryString(query) : '';
-    const path = params ? `${API_ROUTES.MATCHES}?${params}` : API_ROUTES.MATCHES;
+    const path = params ? `${API_ROUTES.MATCHES}/history?${params}` : `${API_ROUTES.MATCHES}/history`;
     return this.http.request('GET', path);
   }
 

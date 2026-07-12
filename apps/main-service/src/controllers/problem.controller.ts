@@ -56,6 +56,7 @@ export class ProblemController {
 
   async listProblems(req: Request, res: Response, next: NextFunction) {
     try {
+      const userId = req.user?.userId;
       const difficulty = req.query.difficulty as Difficulty | undefined;
       const tagSlug = req.query.tag as string | undefined;
       const page = req.query.page ? parseInt(req.query.page as string, 10) : undefined;
@@ -66,6 +67,7 @@ export class ProblemController {
         tagSlug,
         page,
         limit,
+        userId,
       });
 
       res.status(200).json({

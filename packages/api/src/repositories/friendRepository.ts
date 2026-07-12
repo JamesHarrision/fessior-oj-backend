@@ -11,7 +11,7 @@ export class FriendRepository {
   }
 
   getFriends(): Promise<ApiResponse<IFriendship[]>> {
-    return this.http.request('GET', `${API_ROUTES.FRIENDS}/list`);
+    return this.http.request('GET', `${API_ROUTES.FRIENDS}`);
   }
 
   getFriendRequests(): Promise<ApiResponse<IFriendship[]>> {

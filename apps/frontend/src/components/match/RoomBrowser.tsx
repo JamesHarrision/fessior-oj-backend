@@ -53,7 +53,7 @@ export const RoomBrowser: React.FC<RoomBrowserProps> = ({ onJoinRoom }) => {
     setLoading(true);
     setMessage('');
     try {
-      const res = await api.joinRoom({ roomCode: roomCodeInput });
+      const res = await api.joinRoom({ room_code: roomCodeInput });
       if (res.success && res.data) {
         onJoinRoom(res.data);
       }

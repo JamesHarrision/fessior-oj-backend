@@ -135,6 +135,16 @@ export class ContestController {
       res.status(400).json({ success: false, message: error.message });
     }
   }
+
+  async endContest(req: Request, res: Response) {
+    try {
+      const contestId = req.params.contestId as string;
+      const result = await contestService.endContest(contestId);
+      res.status(200).json(result);
+    } catch (error: any) {
+      res.status(400).json({ success: false, message: error.message });
+    }
+  }
 }
 
 export const contestController = new ContestController();

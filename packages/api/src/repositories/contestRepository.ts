@@ -49,6 +49,18 @@ export class ContestRepository {
     return this.http.request('GET', `${API_ROUTES.CONTESTS}/${id}/scoreboard`);
   }
 
+  endContest(id: string): Promise<ApiResponse<any>> {
+    return this.http.request('POST', `${API_ROUTES.CONTESTS}/${id}/end`);
+  }
+
+  getContestProblems(id: string): Promise<ApiResponse<any[]>> {
+    return this.http.request('GET', `${API_ROUTES.CONTESTS}/${id}/problems`);
+  }
+
+  getContestSubmissions(id: string): Promise<ApiResponse<any[]>> {
+    return this.http.request('GET', `${API_ROUTES.CONTESTS}/${id}/submissions`);
+  }
+
   private buildQueryString(query: Record<string, unknown>): string {
     const parts: string[] = [];
     for (const [key, value] of Object.entries(query)) {

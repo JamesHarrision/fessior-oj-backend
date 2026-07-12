@@ -103,6 +103,16 @@ export const initSocket = (socketIoServer: Server) => {
     });
 
     // Custom Room Subscriptions
+    socket.on('join-lobby', () => {
+      socket.join('lobby');
+      console.log(`Socket ${socket.id} joined lobby`);
+    });
+
+    socket.on('leave-lobby', () => {
+      socket.leave('lobby');
+      console.log(`Socket ${socket.id} left lobby`);
+    });
+
     socket.on(SOCKET_EVENTS.JOIN_CUSTOM_ROOM, (data: { roomCode: string }) => {
       socket.join(`custom-room:${data.roomCode}`);
       console.log(`Socket ${socket.id} joined custom-room: ${data.roomCode}`);
@@ -111,6 +121,26 @@ export const initSocket = (socketIoServer: Server) => {
     socket.on(SOCKET_EVENTS.LEAVE_CUSTOM_ROOM, (data: { roomCode: string }) => {
       socket.leave(`custom-room:${data.roomCode}`);
       console.log(`Socket ${socket.id} left custom-room: ${data.roomCode}`);
+    });
+
+    socket.on('join-match', (data: { matchId: string }) => {
+      socket.join(`match:${data.matchId}`);
+      console.log(`Socket ${socket.id} joined match: ${data.matchId}`);
+    });
+
+    socket.on('leave-match', (data: { matchId: string }) => {
+      socket.leave(`match:${data.matchId}`);
+      console.log(`Socket ${socket.id} left match: ${data.matchId}`);
+    });
+
+    socket.on(SOCKET_EVENTS.JOIN_CONTEST, (data: { contestId: string }) => {
+      socket.join(`contest:${data.contestId}`);
+      console.log(`Socket ${socket.id} joined contest: ${data.contestId}`);
+    });
+
+    socket.on(SOCKET_EVENTS.LEAVE_CONTEST, (data: { contestId: string }) => {
+      socket.leave(`contest:${data.contestId}`);
+      console.log(`Socket ${socket.id} left contest: ${data.contestId}`);
     });
 
     socket.on(SOCKET_EVENTS.DISCONNECT, () => {

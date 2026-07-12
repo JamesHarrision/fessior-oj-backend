@@ -45,9 +45,7 @@ async function rawGet<T>(path: string) {
 async function rawPost<T>(path: string, body?: unknown) {
   return wrap<T>(httpClient.request('POST', path, { body }));
 }
-async function rawPut<T>(path: string, body?: unknown) {
-  return wrap<T>(httpClient.request('PUT', path, { body }));
-}
+
 async function rawDelete(path: string) {
   return wrap<void>(httpClient.request('DELETE', path));
 }
@@ -69,6 +67,13 @@ export const api = {
   revokeAllSessions: () => rawDelete('/auth/sessions'),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   updateProfile: (data: Record<string, unknown>) => wrap<any>(userRepository.updateProfile(data)),
+  
+  // Public Profile
+  getUserProfile: (username: string) => rawGet<any>(`/users/profile/${username}`),
+  getUserProfileSubmissions: (username: string) => rawGet<any>(`/users/profile/${username}/submissions`),
+  getUserProfileTagStats: (username: string) => rawGet<any>(`/users/profile/${username}/tag-stats`),
+  getUserProfileEloHistory: (username: string) => rawGet<any>(`/users/profile/${username}/elo-history`),
+  getUserProfileStreak: (username: string) => rawGet<any>(`/users/profile/${username}/streak`),
 
   // =========================================================
   // Problems
@@ -93,7 +98,7 @@ export const api = {
 
   // Testcase management
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getTestcases: (problemId: string) => wrap<any>(problemRepository.getTestcases(problemId)),
+  getTestcases: (problemId: string, isExample?: boolean) => wrap<any>(problemRepository.getTestcases(problemId, isExample)),
   addTestcase: (problemId: string, data: Record<string, unknown>) =>
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     wrap<any>(problemRepository.createTestcase(problemId, data)),
@@ -103,10 +108,10 @@ export const api = {
   // =========================================================
   // Submissions
   // =========================================================
-  submitCode: (data: { problemId: string; code: string; language: string; matchId?: string; contestId?: string }) =>
+  submitCode: (data: any) =>
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     wrap<any>(submissionRepository.submit(data)),
-  runCode: (data: { problemId?: string; code: string; language: string; testCases?: unknown[] }) =>
+  runCode: (data: any) =>
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     wrap<any>(submissionRepository.run(data)),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -136,6 +141,7 @@ export const api = {
   // =========================================================
   // Friends & Social
   // =========================================================
+  inviteFriend: (friendId: string) => rawPost<any>('/api/v1/friends/invite', { friendId }),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getFriends: () => wrap<any>(friendRepository.getFriends()),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -163,17 +169,27 @@ export const api = {
   unregisterContest: (id: string) => wrap(contestRepository.unregister(id)),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getContestLeaderboard: (id: string) => wrap<any>(contestRepository.getScoreboard(id)),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  endContest: (id: string) => wrap<any>(contestRepository.endContest(id)),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getContestProblems: (id: string) => wrap<any>(contestRepository.getContestProblems(id)),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getContestSubmissions: (id: string) => wrap<any>(contestRepository.getContestSubmissions(id)),
 
   // =========================================================
   // Rooms
   // =========================================================
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getActiveRooms: () => wrap<any>(roomRepository.getActiveRooms()),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getCurrentRoom: () => wrap<any>(roomRepository.getCurrentRoom()),
   createRoom: (data: Record<string, unknown>) =>
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     wrap<any>(roomRepository.createRoom(data as never)),
+  kickPlayer: (roomId: string, opponentId: string) => rawPost<any>(`/rooms/kick`, { roomId, opponentId }),
+  startMatch: (roomId: string) => rawPost<any>(`/rooms/start`, { roomId }),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  joinRoom: (data: { room_code: string }) => wrap<any>(roomRepository.joinRoom(data)),
+  joinRoom: (data: { room_code: string }) => wrap<any>(roomRepository.joinRoom({ roomCode: data.room_code } as any)),
   leaveRoom: (roomCode: string) => wrap(roomRepository.leaveRoom(roomCode)),
   deleteRoom: (roomCode: string) => wrap(roomRepository.deleteRoom(roomCode)),
 
@@ -207,9 +223,11 @@ export const api = {
   // AI
   // =========================================================
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getAIRoadmap: () => wrap<any>(aiRepository.getRoadmap()),
+  getAIRoadmap: (data: any) => wrap<any>(aiRepository.getRoadmap(data)),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getAIFeedback: (submissionId: string) => wrap<any>(aiRepository.getFeedback(submissionId)),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getAIHistory: () => wrap<any[]>(aiRepository.getHistory()),
 
   // =========================================================
   // Notifications

@@ -249,6 +249,17 @@ router.put(
 	contestController.updateContest
 );
 
+router.post(
+	'/:contestId/end',
+/* #swagger.tags = ['Contests']
+   #swagger.summary = 'End contest and calculate ELO (admin)'
+   #swagger.security = [{ "bearerAuth": [] }]
+*/
+	requireAuth,
+	requireAdmin,
+	contestController.endContest
+);
+
 router.delete(
 	'/:contestId',
 /* #swagger.tags = ['Contests']

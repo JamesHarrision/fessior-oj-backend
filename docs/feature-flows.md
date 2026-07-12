@@ -54,11 +54,16 @@ flowchart LR
 
 Files lien quan:
 
-- `apps/frontend/src/views/ProblemsView.tsx`
-- `apps/frontend/src/views/SoloEditorView.tsx`
+- `apps/frontend/src/views/SoloSolveView.tsx`
+- `apps/frontend/src/views/PvPWorkspaceView.tsx`
+- `apps/frontend/src/views/ContestSolveView.tsx`
+- `apps/frontend/src/views/PlaygroundView.tsx`
+- `apps/frontend/src/features/problems/ProblemsPage.tsx`
 - `apps/frontend/src/components/admin/AdminProblemsTab.tsx`
 - `apps/frontend/src/components/editor/ProblemDescription.tsx`
 - `apps/frontend/src/components/editor/TestCaseSelector.tsx`
+- `apps/frontend/src/components/editor/CodeEditorPane.tsx`
+- `apps/frontend/src/components/editor/ConsolePane.tsx`
 - `apps/main-service/src/routes/problem.route.ts`
 - `apps/main-service/src/controllers/problem.controller.ts`
 - `apps/main-service/src/services/problem.service.ts`
@@ -90,7 +95,10 @@ flowchart LR
 
 Files lien quan:
 
-- `apps/frontend/src/views/SoloEditorView.tsx`
+- `apps/frontend/src/views/SoloSolveView.tsx`
+- `apps/frontend/src/views/PvPWorkspaceView.tsx`
+- `apps/frontend/src/views/ContestSolveView.tsx`
+- `apps/frontend/src/views/PlaygroundView.tsx`
 - `apps/frontend/src/views/SubmissionsView.tsx`
 - `apps/frontend/src/components/editor/CodeEditorPane.tsx`
 - `apps/frontend/src/components/editor/ConsolePane.tsx`
@@ -148,9 +156,9 @@ Files lien quan:
 - `packages/constants/src/index.ts`
 - `packages/utils/src/index.ts`
 
-## 5. Custom Rooms
+## 5. Custom Rooms (Multiplayer Arena)
 
-User tao phong custom, chon config/problem/difficulty, moi hoac cho opponent tham gia. Socket room `custom-room:{roomCode}` dung de sync room state.
+User tạo phòng custom, chọn số lượng người (2-10), config/problem/difficulty, mời hoặc chờ opponent tham gia. Socket room `custom-room:{roomCode}` dùng để sync room state.
 
 ```mermaid
 flowchart LR
@@ -159,11 +167,22 @@ flowchart LR
   Validator --> Controller[room.controller]
   Controller --> Service[room.service]
   Service --> Repo[room.repository]
-  Repo --> MySQL[(custom_rooms / matches)]
+  Repo --> MySQL[(custom_rooms / custom_room_participants / match_participants)]
   Service --> Mongo[(Problem)]
   FE <-->|join-custom-room| Socket[Socket.io]
   Socket --> Room["custom-room:{roomCode}"]
 ```
+
+**Flow chi tiết:**
+- User (Host) tạo phòng custom -> vào Waiting Room chờ.
+- Các Opponent nhập code -> Join phòng.
+- Host nhấn "Bắt đầu" khi có >= 2 người -> Backend gom toàn bộ thành `MatchParticipant` -> Bắn socket `MATCH_STARTED` cho cả phòng.
+- Khi user join, leave hoặc bi kick, Socket sẽ bắn `PLAYER_JOINED`, `PLAYER_LEFT`, `PLAYER_KICKED` để Frontend fetch lại Room Info thay vì f5.
+- Khi trận đấu bắt đầu, Frontend gửi `join-match` để vào room socket dành riêng cho match.
+- Mỗi khi có người nộp bài, Socket bắn `RIVAL_SUBMISSION`.
+- Thể thức Winner Takes All: Sau khi 1 người nộp bài đúng (AC) đầu tiên, logic `endMatch` ở Backend sẽ tính ELO và bắn `MATCH_ENDED` với kết quả ngay lập tức (không cần F5 trang).
+- Toàn bộ người thua bị phạt (vd: -20 ELO). Người thắng được cộng dồn (Tổng ELO phạt).
+- Trận đấu kết thúc -> cập nhật `status = FINISHED` cho CustomRoom và Match.
 
 Files lien quan:
 
@@ -182,7 +201,8 @@ Files lien quan:
 
 ## 6. Contest
 
-Admin tao contest va gan problems. User dang ky, submit bai co `contestId`, xem scoreboard.
+Admin tao contest va gan problems. User dang ky, submit bai co `contestId`. 
+**Scoreboard (Bảng xếp hạng):** Hệ thống tạo *Static Scoreboard* sau khi (hoặc trong khi) Contest diễn ra bằng cách query lại toàn bộ submissions. Logic tính điểm (`score`) cộng gộp các bài giải đúng và phạt thời gian (`timePenalty` = 20 phút cho mỗi lần nộp sai WA). API này có thể gọi bằng Polling (Frontend gọi 15s/lần) để mô phỏng Realtime mà không làm chết Server.
 
 ```mermaid
 flowchart LR
@@ -262,7 +282,8 @@ Files lien quan:
 
 ## 9. Shop And Inventory
 
-Admin quan ly item shop. User xem shop, mua item bang code coins va equip item trong inventory.
+Admin quan ly item shop. User xem shop, mua item bang code coins va equip item trong inventory. 
+**Frontend UI:** Giao diện ShopView đã được chuyển hoàn toàn sang Tailwind CSS để tăng tính nhất quán và hiển thị mượt mà.
 
 ```mermaid
 flowchart LR
@@ -287,7 +308,8 @@ Files lien quan:
 
 ## 10. Notification
 
-Notification luu trong MySQL va co the emit realtime qua Socket.io user room.
+Notification luu trong MySQL va co the emit realtime qua Socket.io user room hoac Frontend chu dong Polling.
+**Polling:** Ở AppShellLayout, Frontend sẽ tự động gọi API lấy danh sách Notification mỗi 30 giây để cập nhật số đếm chưa đọc (`unreadCount`).
 
 ```mermaid
 flowchart LR
@@ -339,7 +361,7 @@ Files lien quan:
 
 ## 12. AI Roadmap And Feedback
 
-AI module dung Google Gemini de tao roadmap hoc DSA va feedback submission/mock interview.
+AI module dung Google Gemini de tao roadmap hoc DSA va mock interview (phỏng vấn). Lich su AI (roadmap, interview) se duoc luu lai trong MySQL bang `AiHistory`. (API Key của Gemini được cấu hình bảo mật thông qua `.env` server side).
 
 ```mermaid
 flowchart LR
@@ -349,6 +371,7 @@ flowchart LR
   Controller --> Service[ai.service]
   Service --> Gemini[Google Gemini]
   Service --> Mongo[(Submission)]
+  Service --> MySQL[(ai_histories)]
 ```
 
 Files lien quan:

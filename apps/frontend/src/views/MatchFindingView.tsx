@@ -7,6 +7,8 @@ import { RoomBrowser } from '../components/match/RoomBrowser';
 import { SocialSidebar } from '../components/layout/SocialSidebar';
 import { RecentMatchesWidget } from '../components/match/RecentMatchesWidget';
 import { LeaderboardPreviewWidget } from '../components/match/LeaderboardPreviewWidget';
+import { ContestBannerWidget } from '../components/match/ContestBannerWidget';
+import { WaitingRoom } from '../components/match/WaitingRoom';
 
 /* =====================================================
    MatchFindingView — Ink & Vermillion Lobby
@@ -22,6 +24,7 @@ export const MatchFindingView: React.FC<MatchFindingViewProps> = ({ onStartMatch
   const [searchDuration, setSearchDuration] = useState(0);
   const [opponent, setOpponent] = useState<any>(null);
   const [matchData, setMatchData] = useState<any>(null);
+  const [customRoom, setCustomRoom] = useState<any>(null);
 
   useEffect(() => {
     let interval: any;
@@ -71,7 +74,7 @@ export const MatchFindingView: React.FC<MatchFindingViewProps> = ({ onStartMatch
   };
 
   const handleJoinCustomRoom = (room: any) => {
-    console.log('Joined Custom Room:', room);
+    setCustomRoom(room);
   };
 
   return (
@@ -126,6 +129,11 @@ export const MatchFindingView: React.FC<MatchFindingViewProps> = ({ onStartMatch
         </div>
       )}
 
+      {/* ── Banner: Contest ── */}
+      <div className="w-full max-w-[1200px] mx-auto">
+        <ContestBannerWidget />
+      </div>
+
       {/* ── Data row: Recent Matches + Leaderboard ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 w-full max-w-[1200px] mx-auto">
         <RecentMatchesWidget />
@@ -137,6 +145,13 @@ export const MatchFindingView: React.FC<MatchFindingViewProps> = ({ onStartMatch
         <RoomBrowser onJoinRoom={handleJoinCustomRoom} />
         <SocialSidebar />
       </div>
+
+      {customRoom && (
+        <WaitingRoom 
+          room={customRoom} 
+          onClose={() => setCustomRoom(null)} 
+        />
+      )}
     </div>
   );
 };

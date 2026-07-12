@@ -117,4 +117,13 @@ router.post('/feedback/:submissionId', (req, res, next) => {
   aiController.generateMockInterviewFeedback(req, res, next);
 });
 
+router.get('/history', (req, res, next) => {
+  /* #swagger.tags = ['AI Features']
+     #swagger.summary = 'Get AI conversation history'
+     #swagger.description = 'Return a list of previous AI roadmap and interview feedbacks.'
+     #swagger.security = [{ "bearerAuth": [] }]
+  */
+  aiController.getHistory(req, res, next);
+});
+
 export default router;

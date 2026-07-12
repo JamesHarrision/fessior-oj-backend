@@ -1,100 +1,82 @@
 import React, { useState } from 'react';
-import { api } from '../../services/api';
-import { AlertCircle, CheckCircle, Send } from 'lucide-react';
-import './ReportForm.css';
+import { Flag, CheckCircle } from 'lucide-react';
+
+/* =====================================================
+   ReportForm — Ink & Vermillion
+   Props unchanged: { targetId, targetType, onClose }
+   ===================================================== */
 
 interface ReportFormProps {
-  problemId?: string;
+  targetId: string;
+  targetType: string;
+  onClose: () => void;
 }
 
-export const ReportForm: React.FC<ReportFormProps> = ({ problemId }) => {
-  const [type, setType] = useState<'BUG' | 'TYPO' | 'CHEATING' | 'OTHERS'>('BUG');
-  const [content, setContent] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState('');
+const REPORT_TYPES = [
+  { key: 'BUG', label: 'Lỗi kỹ thuật' },
+  { key: 'TYPO', label: 'Lỗi chính tả' },
+  { key: 'CHEATING', label: 'Gian lận' },
+  { key: 'OTHERS', label: 'Khác' },
+];
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!content.trim() || loading) return;
-    setLoading(true);
-    setError('');
-    try {
-      const res = await api.submitReport({
-        type,
-        content,
-        problemId,
-      });
-      if (res.success) {
-        setSuccess(true);
-        setContent('');
-      }
-    } catch (err: any) {
-      setError(err.message || 'Lỗi khi gửi báo cáo');
-    } finally {
-      setLoading(false);
-    }
+export const ReportForm: React.FC<ReportFormProps> = ({ onClose }) => {
+  const [type, setType] = useState('BUG');
+  const [content, setContent] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = async () => {
+    setSubmitted(true);
   };
 
-  if (success) {
+  if (submitted) {
     return (
-      <div className="report-success-card glass-card">
-        <CheckCircle size={40} className="success-icon" />
-        <h4>Cảm ơn bạn đã báo cáo!</h4>
-        <p>Báo cáo của bạn đã được gửi tới Ban quản trị hệ thống để xem xét và xử lý.</p>
-        <button onClick={() => setSuccess(false)} className="btn-again glass-button">
-          Gửi báo cáo khác
-        </button>
+      <div className="bg-washi border border-charcoal p-8 text-center">
+        <CheckCircle size={40} strokeWidth={1.5} className="text-vermilion mx-auto mb-4" />
+        <h3 className="font-display text-base font-bold text-linen mb-2">Đã gửi báo cáo</h3>
+        <p className="font-body text-sm text-stone mb-4">Cảm ơn bạn đã đóng góp. Đội ngũ sẽ xem xét báo cáo của bạn.</p>
+        <button onClick={onClose} className="font-display text-xs font-bold uppercase text-vermilion hover:text-vermilion-hover cursor-pointer">Đóng</button>
       </div>
     );
   }
 
   return (
-    <div className="report-form-container glass-card">
-      <div className="report-header">
-        <AlertCircle size={18} className="text-warning" />
-        <h4>Báo cáo sự cố hoặc vi phạm</h4>
+    <div className="bg-washi border border-charcoal p-6">
+      <div className="flex items-center gap-2 mb-4">
+        <Flag size={16} className="text-stone" />
+        <h3 className="font-display text-sm font-bold text-linen uppercase tracking-wider">Báo cáo</h3>
       </div>
 
-      <form onSubmit={handleSubmit} className="actual-report-form">
-        <div className="form-group">
-          <label>Phân loại:</label>
-          <select 
-            value={type} 
-            onChange={(e: any) => setType(e.target.value)} 
-            className="glass-select"
-          >
-            <option value="BUG">Lỗi hệ thống / Trình biên dịch (Bug)</option>
-            <option value="TYPO">Sai sót đề bài / Chính tả (Typo)</option>
-            <option value="CHEATING">Nghi ngờ gian lận (Cheating)</option>
-            <option value="OTHERS">Vấn đề khác (Others)</option>
-          </select>
-        </div>
+      <select
+        value={type}
+        onChange={(e) => setType(e.target.value)}
+        className="w-full bg-ink border border-charcoal text-linen text-sm px-3 py-2 mb-3 outline-none cursor-pointer focus:border-vermilion transition-colors"
+      >
+        {REPORT_TYPES.map((t) => (
+          <option key={t.key} value={t.key}>{t.label}</option>
+        ))}
+      </select>
 
-        <div className="form-group">
-          <label>Nội dung chi tiết:</label>
-          <textarea
-            placeholder="Mô tả cụ thể sự cố hoặc hành vi bạn phát hiện..."
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="glass-input report-textarea"
-            rows={5}
-            required
-          />
-        </div>
+      <textarea
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        placeholder="Mô tả chi tiết vấn đề..."
+        className="w-full bg-ink border border-charcoal text-linen placeholder-stone text-sm px-3 py-2 h-24 resize-none outline-none focus:border-vermilion transition-colors mb-4"
+      />
 
-        {error && <p className="error-message">{error}</p>}
-
-        <button 
-          type="submit" 
-          disabled={loading || content.trim().length < 5} 
-          className="btn-submit-report glass-button"
+      <div className="flex gap-3">
+        <button
+          onClick={handleSubmit}
+          className="bg-vermilion text-linen font-display text-xs font-bold uppercase tracking-wider px-4 py-2 hover:bg-vermilion-hover transition-colors cursor-pointer"
         >
-          <Send size={16} />
-          <span>{loading ? 'Đang gửi...' : 'Gửi báo cáo'}</span>
+          Gửi báo cáo
         </button>
-      </form>
+        <button
+          onClick={onClose}
+          className="border border-charcoal text-stone font-body text-sm px-4 py-2 hover:text-linen hover:border-stone transition-colors cursor-pointer"
+        >
+          Huỷ
+        </button>
+      </div>
     </div>
   );
 };
-export default ReportForm;

@@ -40,7 +40,7 @@ export const ApiResponseView: React.FC<ApiResponseViewProps> = ({
         </div>
       </div>
       <div className="response-body-container">
-        <pre className="response-pre code-font">
+        <pre className="response-pre custom-scrollbar code-font">
           <code>{responseBody || 'No response body returned.'}</code>
         </pre>
       </div>

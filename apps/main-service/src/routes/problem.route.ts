@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { problemController } from '../controllers/problem.controller';
-import { requireAuth, requireAdmin } from '../middlewares/auth.middleware';
+import { requireAuth, requireAdmin, optionalAuth } from '../middlewares/auth.middleware';
 import { validateRequest } from '../middlewares/validate.middleware';
 import {
   createProblemSchema,
@@ -146,6 +146,7 @@ router.get(
      }
    }
 */
+  optionalAuth,
   problemController.listProblems
 );
 

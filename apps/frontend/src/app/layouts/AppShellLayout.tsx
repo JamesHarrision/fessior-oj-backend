@@ -1,9 +1,10 @@
-import { type ReactNode, useCallback } from 'react';
+import { type ReactNode, useCallback, useEffect, useState } from 'react';
 import { Avatar, Dropdown, Input, Badge } from 'antd';
 import { BellOutlined, SearchOutlined, UserOutlined, SettingOutlined, LogoutOutlined } from '@ant-design/icons';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { AppLogo } from '@ocj/ui';
 import { useAuth } from '../../context/AuthContext';
+import { api } from '../../services/api';
 import { Role } from '@ocj/types';
 import { Swords, BookOpen, Trophy, Crown, Beaker, LayoutDashboard, ShoppingBag, Bot, Settings, UsersRound, Code2, ScrollText } from 'lucide-react';
 
@@ -167,12 +168,8 @@ function TopBar(props: {
       {/* ── Search (hidden on Lobby) ── */}
       <div className="flex-1 max-w-lg">
         {!hideSearch && (
-          <Input
-            prefix={<SearchOutlined className="text-stone" />}
-            placeholder="Search problems, contests, users..."
-            variant="filled"
+          <div
             className="[&_.ant-input]:!bg-ink [&_.ant-input]:!text-linen [&_.ant-input]:!placeholder-stone"
-            size="large"
           />
         )}
       </div>
@@ -188,19 +185,38 @@ function TopBar(props: {
         </div>
 
         {/* Notifications */}
-        <button
-          type="button"
-          className="relative p-2 text-stone hover:text-linen transition-colors cursor-pointer"
-          title="Notifications"
+        <Dropdown 
+          menu={{ 
+            items: [
+              {
+                key: 'header',
+                label: <div className="font-display font-bold text-linen px-2 py-1 border-b border-charcoal">Thông báo</div>,
+                disabled: true,
+              },
+              {
+                key: 'empty',
+                label: <div className="text-stone text-xs text-center py-4">Chưa có thông báo mới</div>,
+                disabled: true,
+              }
+            ] 
+          }} 
+          trigger={['click']} 
+          placement="bottomRight"
         >
-          {notificationCount > 0 ? (
-            <Badge count={notificationCount} size="small" offset={[-2, 2]}>
+          <button
+            type="button"
+            className="relative p-2 text-stone hover:text-linen transition-colors cursor-pointer"
+            title="Notifications"
+          >
+            {notificationCount > 0 ? (
+              <Badge count={notificationCount} size="small" offset={[-2, 2]}>
+                <BellOutlined className="text-lg" />
+              </Badge>
+            ) : (
               <BellOutlined className="text-lg" />
-            </Badge>
-          ) : (
-            <BellOutlined className="text-lg" />
-          )}
-        </button>
+            )}
+          </button>
+        </Dropdown>
 
         {/* User Dropdown */}
         <Dropdown menu={{ items: userDropdownItems }} trigger={['click']} placement="bottomRight">
@@ -236,6 +252,29 @@ export function AppShellLayout() {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Poll notifications every 30s
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchNotifications = async () => {
+      try {
+        const res = await api.getNotifications();
+        if (res.success && res.data) {
+          const unread = res.data.filter((n: any) => !n.is_read).length;
+          setUnreadCount(unread);
+        }
+      } catch (err) {
+        console.error('Failed to fetch notifications', err);
+      }
+    };
+
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 30000);
+
+    return () => clearInterval(interval);
+  }, [user]);
 
   const selectedKey = ((): string => {
     const pathname = location.pathname;
@@ -271,7 +310,7 @@ export function AppShellLayout() {
       {/* ── Main Content Area ── */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* ── Top Bar ── */}
-        <TopBar user={user} onLogout={handleLogout} hideSearch={location.pathname === '/match'} />
+        <TopBar user={user} onLogout={handleLogout} notificationCount={unreadCount} hideSearch={location.pathname === '/match'} />
 
         {/* ── Content ── */}
         <main className="flex-1 overflow-y-auto bg-ink">

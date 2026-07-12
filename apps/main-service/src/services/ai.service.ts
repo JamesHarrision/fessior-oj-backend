@@ -2,6 +2,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { Submission } from '../models/submission.model';
 import { Problem } from '../models/problem.model';
 import { AppError } from '@ocj/errors';
+import { prisma } from '../config/prisma';
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
 
@@ -57,56 +58,71 @@ export class AIService {
   private genAI: GoogleGenerativeAI | null = null;
 
   constructor() {
-    if (GEMINI_API_KEY) {
-      this.genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (apiKey) {
+      this.genAI = new GoogleGenerativeAI(apiKey);
+    } else {
+      this.genAI = null; // [MOCK MODE] if no API key
     }
   }
 
-  async generateRoadmap(quizAnswers: any) {
+  async generateRoadmap(userId: string, quizAnswers: any) {
+    let roadmapData = fallbackRoadmap;
+
     if (!this.genAI) {
       console.warn("GEMINI_API_KEY is not defined. Using high-quality fallback roadmap.");
-      return fallbackRoadmap;
+    } else {
+      try {
+        const model = this.genAI.getGenerativeModel({
+          model: 'gemini-2.5-flash',
+          generationConfig: { responseMimeType: 'application/json' },
+        });
+
+        const prompt = `
+          You are an expert algorithms coach.
+          Based on the user's questionnaire or skill answers below:
+          ${JSON.stringify(quizAnswers)}
+
+          Generate a personalized DSA learning roadmap in JSON format.
+          The JSON structure MUST follow this exact schema:
+          {
+            "title": "Roadmap Title",
+            "description": "Short description of the roadmap",
+            "nodes": [
+              {
+                "id": "node-1",
+                "title": "Topic Name",
+                "description": "What to learn and why",
+                "estimatedWeeks": 2,
+                "difficulty": "EASY" | "MEDIUM" | "HARD",
+                "recommendedProblems": ["slug-1", "slug-2"]
+              }
+            ]
+          }
+        `;
+
+        const result = await model.generateContent(prompt);
+        const text = result.response.text();
+        roadmapData = JSON.parse(text);
+      } catch (error) {
+        console.error("Gemini API Roadmap generation failed, using fallback:", error);
+      }
     }
 
-    try {
-      const model = this.genAI.getGenerativeModel({
-        model: 'gemini-2.5-flash',
-        generationConfig: { responseMimeType: 'application/json' },
-      });
+    // Save to history
+    await prisma.aiHistory.create({
+      data: {
+        user_id: userId,
+        type: 'ROADMAP',
+        input: JSON.stringify(quizAnswers),
+        output: JSON.stringify(roadmapData),
+      }
+    });
 
-      const prompt = `
-        You are an expert algorithms coach.
-        Based on the user's questionnaire or skill answers below:
-        ${JSON.stringify(quizAnswers)}
-
-        Generate a personalized DSA learning roadmap in JSON format.
-        The JSON structure MUST follow this exact schema:
-        {
-          "title": "Roadmap Title",
-          "description": "Short description of the roadmap",
-          "nodes": [
-            {
-              "id": "node-1",
-              "title": "Topic Name",
-              "description": "What to learn and why",
-              "estimatedWeeks": 2,
-              "difficulty": "EASY" | "MEDIUM" | "HARD",
-              "recommendedProblems": ["slug-1", "slug-2"]
-            }
-          ]
-        }
-      `;
-
-      const result = await model.generateContent(prompt);
-      const text = result.response.text();
-      return JSON.parse(text);
-    } catch (error) {
-      console.error("Gemini API Roadmap generation failed, using fallback:", error);
-      return fallbackRoadmap;
-    }
+    return roadmapData;
   }
 
-  async generateMockInterviewFeedback(submissionId: string) {
+  async generateMockInterviewFeedback(userId: string, submissionId: string) {
     const submission = await Submission.findById(submissionId);
     if (!submission) {
       throw new AppError('Submission not found', 404);
@@ -164,7 +180,25 @@ export class AIService {
     submission.aiFeedback = feedback;
     await submission.save();
 
+    // Save to history
+    await prisma.aiHistory.create({
+      data: {
+        user_id: userId,
+        type: 'INTERVIEW',
+        input: `Submission ID: ${submissionId} for Problem: ${problem.title}`,
+        output: feedback,
+      }
+    });
+
     return { feedback };
+  }
+
+  async getHistory(userId: string) {
+    return prisma.aiHistory.findMany({
+      where: { user_id: userId },
+      orderBy: { created_at: 'desc' },
+      take: 20
+    });
   }
 
   private getSimulatedInterviewerFeedback(submission: any, problem: any): string {

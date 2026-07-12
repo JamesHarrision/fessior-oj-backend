@@ -7,6 +7,7 @@ import { Server as SocketServer } from 'socket.io';
 import app from './app';
 import { connectMongoDB } from './config/mongoose';
 import { initSocket } from './sockets/socket';
+import { startContestCron } from './workers/contest.cron';
 
 const PORT = process.env.PORT || 6868;
 
@@ -22,6 +23,7 @@ const startServer = async () => {
   });
 
   initSocket(io);
+  startContestCron();
 
   server.listen(PORT, () => {
     console.log(`Server is running on PORT: ${PORT}`);
@@ -29,6 +31,3 @@ const startServer = async () => {
 };
 
 startServer();
-
-
-

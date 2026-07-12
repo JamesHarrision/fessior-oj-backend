@@ -32,12 +32,16 @@ Events duoc khai bao trong `packages/constants/src/index.ts`.
 | `forfeit-match` | client -> server | Dau hang/roi match. |
 | `join-custom-room` | client -> server | Join socket room custom. |
 | `leave-custom-room` | client -> server | Roi socket room custom. |
+| `join-match` | client -> server | Vao room cua tran dau Custom Arena. |
+| `leave-match` | client -> server | Roi room cua tran dau Custom Arena. |
 | `queue-status` | server -> client | Trang thai queue cua user. |
 | `match-found` | server -> client | Da tim thay tran 1v1. |
 | `rival-submission` | server -> client | Doi thu vua co submission update. |
 | `match-ended` | server -> client | Tran ket thuc va ELO updated. |
 | `match-started` | server -> client | Event danh cho custom/room flow. |
 | `player-left` | server -> client | Co player roi phong/tran. |
+| `player-joined` | server -> client | Co player tham gia phong custom. |
+| `player-kicked` | server -> client | Chu phong kick player khoi phong. |
 | `config-updated` | server -> client | Cau hinh room thay doi. |
 | `room-deleted` | server -> client | Room bi xoa. |
 | `notification` | server -> client | Notification realtime. |
@@ -109,8 +113,8 @@ flowchart LR
   Redis -->|subscribe| Socket[Main Service Socket]
   Socket -->|handleSubmissionUpdate| Match[Find active MySQL Match]
   Match --> Emit[RIVAL_SUBMISSION]
-  Match -->|ACCEPTED| End[endMatch transaction]
-  End --> Elo[Update ELO and streak]
+  Match -->|ACCEPTED (N-player)| End[endMatch transaction]
+  End --> Elo[Update ELO and streak for Winner Takes All]
   End --> Done[MATCH_ENDED]
 ```
 

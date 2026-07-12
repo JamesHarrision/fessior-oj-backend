@@ -1,189 +1,98 @@
+@reference "../../index.css";
+
 .api-tester-container {
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 24px;
-  padding: 24px;
-  height: calc(100vh - 80px);
-  color: #f8fafc;
-  overflow: hidden;
+  @apply grid grid-cols-1 gap-6 p-6 min-h-[calc(100vh-80px)] text-linen overflow-hidden;
+}
+@media (min-width: 1024px) {
+  .api-tester-container {
+    grid-template-columns: 320px 1fr;
+  }
 }
 
 .api-sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  overflow-y: auto;
-  padding-right: 8px;
+  @apply flex flex-col gap-4 overflow-y-auto pr-2 bg-washi border border-charcoal p-4;
 }
 
 .api-main-content {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  overflow-y: auto;
-  padding-right: 8px;
+  @apply flex flex-col gap-5 overflow-y-auto pr-2;
 }
 
 .category-group {
-  margin-bottom: 12px;
+  @apply mb-3;
 }
 
 .category-title {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #94a3b8;
-  margin-bottom: 8px;
-  font-weight: 700;
-  padding-left: 4px;
+  @apply text-xs uppercase tracking-wider text-stone mb-2 font-bold pl-1 font-display;
 }
 
 .api-item-btn {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 8px;
-  background: rgba(30, 41, 59, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  color: #cbd5e1;
-  text-align: left;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.85rem;
+  @apply flex items-center gap-3 w-full p-2.5 bg-ink border border-charcoal text-stone text-left cursor-pointer transition-all duration-200 text-sm font-body;
 }
 
 .api-item-btn:hover {
-  background: rgba(59, 130, 246, 0.15);
-  border-color: rgba(59, 130, 246, 0.3);
-  color: #fff;
+  @apply bg-charcoal/30 border-vermilion/50 text-linen;
 }
 
 .api-item-btn.active {
-  background: rgba(59, 130, 246, 0.25);
-  border-color: rgba(59, 130, 246, 0.5);
-  color: #fff;
-  box-shadow: 0 0 12px rgba(59, 130, 246, 0.2);
+  @apply bg-vermilion/10 border-vermilion text-linen;
 }
 
 .method-badge {
-  font-size: 0.7rem;
-  font-weight: 800;
-  padding: 2px 6px;
-  border-radius: 4px;
-  min-width: 48px;
-  text-align: center;
+  @apply text-[11px] font-bold px-2 py-0.5 min-w-[48px] text-center font-display tracking-wider;
 }
 
-.method-GET { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-.method-POST { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
-.method-PUT { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
-.method-DELETE { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+.method-GET { @apply bg-green-500/20 text-green-500 border border-green-500/30; }
+.method-POST { @apply bg-blue-500/20 text-blue-500 border border-blue-500/30; }
+.method-PUT { @apply bg-yellow-500/20 text-yellow-500 border border-yellow-500/30; }
+.method-DELETE { @apply bg-vermilion/20 text-vermilion border border-vermilion/30; }
 
 .endpoint-header {
-  padding: 20px;
-  border-radius: 12px;
-  background: rgba(30, 41, 59, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  @apply p-5 bg-washi border border-charcoal;
 }
 
 .endpoint-path-row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-top: 8px;
+  @apply flex items-center gap-4 mt-2;
 }
 
 .endpoint-path {
-  font-family: monospace;
-  font-size: 1.1rem;
-  color: #38bdf8;
-  word-break: break-all;
+  @apply font-mono text-lg text-linen break-all;
 }
 
 .auth-lock-badge {
-  font-size: 0.75rem;
-  color: #f43f5e;
-  background: rgba(244, 63, 94, 0.1);
-  padding: 2px 8px;
-  border-radius: 12px;
-  border: 1px solid rgba(244, 63, 94, 0.2);
+  @apply text-xs text-vermilion bg-vermilion/10 px-2 py-0.5 border border-vermilion/20 font-display uppercase tracking-wider;
 }
 
 .glass-textarea, .glass-input {
-  width: 100%;
-  padding: 12px;
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  color: #fff;
-  transition: all 0.2s ease;
+  @apply w-full p-3 bg-ink border border-charcoal text-linen transition-all duration-200 font-body placeholder-stone/50 outline-none;
 }
 
 .glass-textarea:focus, .glass-input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  @apply border-vermilion ring-1 ring-vermilion/20;
 }
 
 .param-input-group {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
+  @apply flex items-center gap-3 mb-3;
 }
 
 .param-input-group label {
-  font-family: monospace;
-  color: #f59e0b;
-  min-width: 100px;
+  @apply font-mono text-stone min-w-[100px] text-sm;
 }
 
 .btn-send-request {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  padding: 12px;
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-  border: none;
-  border-radius: 8px;
-  color: #fff;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  margin-top: 16px;
-}
-
-.btn-send-request:hover {
-  filter: brightness(1.1);
-  box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+  @apply flex items-center justify-center gap-2 w-full p-3 bg-vermilion text-linen font-display text-xs font-bold uppercase tracking-wider border-none cursor-pointer transition-all mt-4 hover:bg-vermilion-hover;
 }
 
 .response-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
+  @apply flex justify-between items-center mb-4;
 }
 
 .status-badge {
-  font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 0.85rem;
+  @apply font-bold px-2.5 py-1 text-sm font-mono border;
 }
 
-.status-success { background: rgba(16, 185, 129, 0.2); color: #10b981; }
-.status-error { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+.status-success { @apply bg-green-500/10 text-green-500 border-green-500/30; }
+.status-error { @apply bg-vermilion/10 text-vermilion border-vermilion/30; }
 
 .response-pre {
-  background: #090d16;
-  border-radius: 8px;
-  padding: 16px;
-  overflow: auto;
-  max-height: 400px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  @apply bg-ink border border-charcoal p-4 overflow-auto max-h-[400px] font-mono text-sm text-stone;
 }

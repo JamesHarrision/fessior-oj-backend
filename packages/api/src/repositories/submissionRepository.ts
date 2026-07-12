@@ -16,7 +16,7 @@ export class SubmissionRepository {
   }
 
   submit(data: SubmitCodeRequest): Promise<ApiResponse<ISubmission>> {
-    return this.http.request('POST', `${API_ROUTES.SUBMISSIONS}/submit`, { body: data });
+    return this.http.request('POST', `${API_ROUTES.SUBMISSIONS}`, { body: data });
   }
 
   run(data: RunCodeRequest): Promise<ApiResponse<ISubmission>> {
@@ -33,7 +33,7 @@ export class SubmissionRepository {
     return this.http.request('GET', `${API_ROUTES.SUBMISSIONS}/${id}`);
   }
 
-  private buildQueryString(query: Record<string, unknown>): string {
+  private buildQueryString(query: any): string {
     const parts: string[] = [];
     for (const [key, value] of Object.entries(query)) {
       if (value !== undefined && value !== null && value !== '') {

@@ -12,6 +12,8 @@ export interface ISubmission extends Document {
   testCasesPassed: number;
   testCasesTotal: number;
   aiFeedback?: string;
+  matchId?: string;
+  contestId?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -34,6 +36,8 @@ const SubmissionSchema = new Schema<ISubmission>(
     testCasesPassed: { type: Number, default: 0 },
     testCasesTotal: { type: Number, default: 0 },
     aiFeedback: { type: String },
+    matchId: { type: String, default: null, index: true },
+    contestId: { type: String, index: true },
   },
   { timestamps: true }
 );

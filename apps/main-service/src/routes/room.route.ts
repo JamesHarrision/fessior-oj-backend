@@ -58,6 +58,15 @@ router.post(
 );
 
 router.get(
+	'/current',
+/* #swagger.tags = ['Rooms']
+   #swagger.summary = 'Get current user room'
+   #swagger.description = 'Return the room the user is currently in (WAITING or PLAYING).'
+*/
+	roomController.getCurrentRoom
+);
+
+router.get(
 	'/active',
 /* #swagger.tags = ['Rooms']
    #swagger.summary = 'List active rooms'
@@ -221,6 +230,18 @@ router.post(
    }
 */
 	roomController.leaveRoom
+);
+
+router.post(
+	'/kick',
+	requireAuth,
+	roomController.kickPlayer
+);
+
+router.post(
+	'/start',
+	requireAuth,
+	roomController.startMatch
 );
 
 router.put(

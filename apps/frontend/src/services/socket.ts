@@ -46,6 +46,15 @@ export const socketService = {
     socket?.emit(SOCKET_EVENTS.FORFEIT_MATCH, { matchId });
   },
 
+  // Lobby Emitters
+  joinLobby: () => {
+    socket?.emit('join-lobby');
+  },
+
+  leaveLobby: () => {
+    socket?.emit('leave-lobby');
+  },
+
   // Custom Room Emitters
   joinCustomRoom: (roomCode: string) => {
     socket?.emit(SOCKET_EVENTS.JOIN_CUSTOM_ROOM, { roomCode });
@@ -55,7 +64,20 @@ export const socketService = {
     socket?.emit(SOCKET_EVENTS.LEAVE_CUSTOM_ROOM, { roomCode });
   },
 
+  joinMatch: (matchId: string) => {
+    socket?.emit('join-match', { matchId });
+  },
+
+  leaveMatch: (matchId: string) => {
+    socket?.emit('leave-match', { matchId });
+  },
+
   // Listeners
+  onActiveRoomsUpdate: (callback: (rooms: any[]) => void) => {
+    socket?.off(SOCKET_EVENTS.ACTIVE_ROOMS_UPDATE);
+    socket?.on(SOCKET_EVENTS.ACTIVE_ROOMS_UPDATE, callback);
+  },
+
   onQueueStatus: (callback: (data: { status: 'QUEUED' | 'IDLE' | 'MATCHED'; elo?: number; message?: string }) => void) => {
     socket?.off(SOCKET_EVENTS.QUEUE_STATUS);
     socket?.on(SOCKET_EVENTS.QUEUE_STATUS, callback);
@@ -107,9 +129,19 @@ export const socketService = {
     socket?.on(SOCKET_EVENTS.MATCH_STARTED, callback);
   },
 
+  onPlayerJoined: (callback: (data: { userId: string }) => void) => {
+    socket?.off(SOCKET_EVENTS.PLAYER_JOINED);
+    socket?.on(SOCKET_EVENTS.PLAYER_JOINED, callback);
+  },
+
   onPlayerLeft: (callback: (data: { userId: string }) => void) => {
     socket?.off(SOCKET_EVENTS.PLAYER_LEFT);
     socket?.on(SOCKET_EVENTS.PLAYER_LEFT, callback);
+  },
+
+  onPlayerKicked: (callback: (data: { userId: string }) => void) => {
+    socket?.off(SOCKET_EVENTS.PLAYER_KICKED);
+    socket?.on(SOCKET_EVENTS.PLAYER_KICKED, callback);
   },
 
   onConfigUpdated: (callback: (data: any) => void) => {

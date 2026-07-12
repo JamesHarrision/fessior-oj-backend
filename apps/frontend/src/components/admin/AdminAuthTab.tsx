@@ -7,7 +7,7 @@ export const AdminAuthTab: React.FC = () => {
   const [sessions, setSessions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [newPassword, setNewPassword] = useState('');
-  const [oldPassword, setOldPassword] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('');
   const [statusMsg, setStatusMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -61,14 +61,14 @@ export const AdminAuthTab: React.FC = () => {
     setStatusMsg('');
     setErrorMsg('');
     try {
-      const res = await api.changePassword({ oldPassword, newPassword });
+      const res = await api.changePassword({ currentPassword, newPassword });
       if (res.success) {
         setStatusMsg('Đổi mật khẩu thành công!');
         setNewPassword('');
-        setOldPassword('');
+        setCurrentPassword('');
       }
     } catch (err: any) {
-      setErrorMsg(err.message || 'Lỗi đổi mật khẩu.');
+      setErrorMsg(err.message || 'Lỗi khi đổi mật khẩu');
     }
   };
 
@@ -97,8 +97,8 @@ export const AdminAuthTab: React.FC = () => {
               <label><Key size={14} /> Mật khẩu hiện tại</label>
               <input
                 type="password"
-                value={oldPassword}
-                onChange={e => setOldPassword(e.target.value)}
+                value={currentPassword}
+                onChange={e => setCurrentPassword(e.target.value)}
                 className="prob-admin-input"
                 required
               />
