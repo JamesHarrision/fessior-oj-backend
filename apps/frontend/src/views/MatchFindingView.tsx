@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { socketService } from '../services/socket';
+import { api } from '../services/api';
 import { PlayerCard } from '../components/match/PlayerCard';
 import { FindingCircle } from '../components/match/FindingCircle';
 import { RoomBrowser } from '../components/match/RoomBrowser';
@@ -9,6 +11,7 @@ import { RecentMatchesWidget } from '../components/match/RecentMatchesWidget';
 import { LeaderboardPreviewWidget } from '../components/match/LeaderboardPreviewWidget';
 import { ContestBannerWidget } from '../components/match/ContestBannerWidget';
 import { WaitingRoom } from '../components/match/WaitingRoom';
+import { AlertTriangle } from 'lucide-react';
 
 /* =====================================================
    MatchFindingView — Ink & Vermillion Lobby
@@ -20,11 +23,27 @@ interface MatchFindingViewProps {
 
 export const MatchFindingView: React.FC<MatchFindingViewProps> = ({ onStartMatch }) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const [activeMatchId, setActiveMatchId] = useState<string | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [searchDuration, setSearchDuration] = useState(0);
   const [opponent, setOpponent] = useState<any>(null);
   const [matchData, setMatchData] = useState<any>(null);
   const [customRoom, setCustomRoom] = useState<any>(null);
+
+  useEffect(() => {
+    const checkActiveMatch = async () => {
+      try {
+        const res = await api.getActiveMatch();
+        if (res.success && res.data) {
+          setActiveMatchId(res.data.id);
+        }
+      } catch (e) {
+        // Ignore
+      }
+    };
+    checkActiveMatch();
+  }, []);
 
   useEffect(() => {
     let interval: any;
@@ -79,8 +98,26 @@ export const MatchFindingView: React.FC<MatchFindingViewProps> = ({ onStartMatch
 
   return (
     <div className="flex flex-col gap-10 pb-10">
+      {/* ── Active Match Banner ── */}
+      {activeMatchId && (
+        <div className="bg-vermilion/20 border border-vermilion p-4 flex items-center justify-between mx-auto w-full max-w-[1200px]">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="text-vermilion" size={20} />
+            <span className="font-body text-linen text-sm">
+              Bạn đang có một trận đấu chưa kết thúc! Bạn không thể tìm trận mới.
+            </span>
+          </div>
+          <button
+            onClick={() => navigate(`/match/${activeMatchId}`)}
+            className="bg-vermilion text-linen px-4 py-2 font-display text-xs font-bold uppercase tracking-wider hover:bg-vermilion-hover transition-colors"
+          >
+            Vào lại trận đấu
+          </button>
+        </div>
+      )}
+
       {/* ── Lobby Arena: Host + Circle + Opponent (all same card style, equal height) ── */}
-      <div className="flex items-stretch justify-center gap-6 lg:gap-8 flex-col lg:flex-row">
+      <div className={`flex items-stretch justify-center gap-6 lg:gap-8 flex-col lg:flex-row ${activeMatchId ? 'opacity-50 pointer-events-none' : ''}`}>
         {/* Host */}
         <PlayerCard
           name={user?.username || 'Bạn'}

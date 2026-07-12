@@ -1,11 +1,27 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Swords, Beaker, Trophy, BookOpen, Crown, Flame, ArrowRight } from 'lucide-react';
+import { Swords, Beaker, Trophy, BookOpen, Crown, Flame, ArrowRight, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../services/api';
 
 export const HomeView: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [activeMatchId, setActiveMatchId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const checkActiveMatch = async () => {
+      try {
+        const res = await api.getActiveMatch();
+        if (res.success && res.data) {
+          setActiveMatchId(res.data.id);
+        }
+      } catch (e) {
+        // Ignore
+      }
+    };
+    checkActiveMatch();
+  }, []);
 
   // Mocked Daily Challenge Data
   const dailyChallenge = {
@@ -17,6 +33,24 @@ export const HomeView: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-8 max-w-[1200px] mx-auto w-full p-4 lg:p-8">
+      {/* ── Active Match Banner ── */}
+      {activeMatchId && (
+        <div className="bg-vermilion/20 border border-vermilion p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="text-vermilion" size={20} />
+            <span className="font-body text-linen text-sm">
+              Bạn đang có một trận đấu chưa kết thúc!
+            </span>
+          </div>
+          <button
+            onClick={() => navigate(`/match/${activeMatchId}`)}
+            className="bg-vermilion text-linen px-4 py-2 font-display text-xs font-bold uppercase tracking-wider hover:bg-vermilion-hover transition-colors"
+          >
+            Vào lại trận đấu
+          </button>
+        </div>
+      )}
+
       {/* ── Welcome Banner ── */}
       <div className="bg-washi border border-charcoal p-8 relative overflow-hidden flex flex-col justify-center min-h-[200px]">
         <div className="absolute -right-10 -bottom-10 opacity-10 pointer-events-none">

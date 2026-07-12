@@ -249,6 +249,8 @@ export const api = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getMatchHistory: () => wrap<any>(matchRepository.getMatches()),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getActiveMatch: () => rawGet<any>('/matches/active'),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getMatchDetails: (id: string) => wrap<any>(matchRepository.getMatch(id)),
   deleteMatch: (id: string) => rawDelete(`/matches/${id}`),
   // =========================================================

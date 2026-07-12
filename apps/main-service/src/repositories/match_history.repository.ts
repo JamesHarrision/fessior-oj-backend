@@ -1,4 +1,5 @@
 import { prisma } from '../config/prisma';
+import { MatchStatus } from '@prisma/client';
 
 export class MatchHistoryRepository {
   async getHistory(userId: string, page: number, limit: number) {
@@ -10,6 +11,7 @@ export class MatchHistoryRepository {
           OR: [
             { player1_id: userId },
             { player2_id: userId },
+            { participants: { some: { user_id: userId } } }
           ],
         },
       }),
@@ -18,6 +20,7 @@ export class MatchHistoryRepository {
           OR: [
             { player1_id: userId },
             { player2_id: userId },
+            { participants: { some: { user_id: userId } } }
           ],
         },
         skip,
@@ -45,6 +48,32 @@ export class MatchHistoryRepository {
   async findById(matchId: string) {
     return prisma.match.findUnique({
       where: { id: matchId },
+      include: {
+        player1: {
+          select: { id: true, username: true, elo_rating: true, avatar_url: true },
+        },
+        player2: {
+          select: { id: true, username: true, elo_rating: true, avatar_url: true },
+        },
+        participants: {
+          include: {
+            user: { select: { id: true, username: true, elo_rating: true, avatar_url: true } }
+          }
+        }
+      },
+    });
+  }
+
+  async findActiveMatchByUserId(userId: string) {
+    return prisma.match.findFirst({
+      where: {
+        status: MatchStatus.PENDING,
+        OR: [
+          { player1_id: userId },
+          { player2_id: userId },
+          { participants: { some: { user_id: userId } } }
+        ],
+      },
       include: {
         player1: {
           select: { id: true, username: true, elo_rating: true, avatar_url: true },
