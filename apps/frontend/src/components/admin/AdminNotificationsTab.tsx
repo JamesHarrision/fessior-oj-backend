@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Bell, Plus, Trash2 } from 'lucide-react';
 import { api } from '../../services/api';
+import { AdminCard, AdminHeader, AdminButton, AdminInput, AdminFormGroup, AdminSelect, AdminTextarea, AdminListRow, AdminBadge } from './ui/AdminUI';
 
 export const AdminNotificationsTab: React.FC = () => {
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -77,116 +78,112 @@ export const AdminNotificationsTab: React.FC = () => {
   };
 
   return (
-    <div className="problems-tab-grid">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
       {/* Left side: Create new Notification */}
-      <form onSubmit={handleCreate} className="prob-admin-card">
-        <h3>Tạo Thông Báo Hệ Thống</h3>
-        <div className="prob-form-group">
-          <label>Tiêu đề</label>
-          <input
-            type="text"
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            className="prob-admin-input"
-            placeholder="Thông báo bảo trì, cập nhật..."
-            required
-          />
-        </div>
-
-        <div className="prob-form-group">
-          <label>Nội dung</label>
-          <textarea
-            value={content}
-            onChange={e => setContent(e.target.value)}
-            className="prob-admin-textarea"
-            placeholder="Nội dung chi tiết của thông báo..."
-            rows={4}
-            required
-          />
-        </div>
-
-        <div className="prob-form-grid-3" style={{ gridTemplateColumns: '1fr 1fr' }}>
-          <div className="prob-form-group">
-            <label>Loại thông báo</label>
-            <select
-              value={type}
-              onChange={e => setType(e.target.value)}
-              className="prob-admin-select"
-            >
-              <option value="INFO">Thông tin (Info)</option>
-              <option value="ALERT">Cảnh báo (Alert)</option>
-              <option value="MATCH">Trận đấu (Match)</option>
-            </select>
-          </div>
-
-          <div className="prob-form-group">
-            <label>ID Người Nhận (Để trống nếu gửi cho tất cả)</label>
-            <input
+      <AdminCard>
+        <AdminHeader>Tạo Thông Báo Hệ Thống</AdminHeader>
+        <form onSubmit={handleCreate} className="flex flex-col gap-4 mt-2">
+          <AdminFormGroup label="Tiêu đề">
+            <AdminInput
               type="text"
-              value={targetUserId}
-              onChange={e => setTargetUserId(e.target.value)}
-              placeholder="Tùy chọn: User ID..."
-              className="prob-admin-input"
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              placeholder="Thông báo bảo trì, cập nhật..."
+              required
             />
-          </div>
-        </div>
+          </AdminFormGroup>
 
-        <button type="submit" className="btn-prob-primary">
-          <Plus size={14} /> Gửi thông báo
-        </button>
-      </form>
+          <AdminFormGroup label="Nội dung">
+            <AdminTextarea
+              value={content}
+              onChange={e => setContent(e.target.value)}
+              placeholder="Nội dung chi tiết của thông báo..."
+              rows={4}
+              required
+            />
+          </AdminFormGroup>
+
+          <div className="grid grid-cols-2 gap-4">
+            <AdminFormGroup label="Loại thông báo">
+              <AdminSelect
+                value={type}
+                onChange={e => setType(e.target.value)}
+              >
+                <option value="INFO">Thông tin (Info)</option>
+                <option value="ALERT">Cảnh báo (Alert)</option>
+                <option value="MATCH">Trận đấu (Match)</option>
+              </AdminSelect>
+            </AdminFormGroup>
+
+            <AdminFormGroup label="ID Người Nhận (Tùy chọn)">
+              <AdminInput
+                type="text"
+                value={targetUserId}
+                onChange={e => setTargetUserId(e.target.value)}
+                placeholder="User ID..."
+              />
+            </AdminFormGroup>
+          </div>
+
+          <AdminButton type="submit" className="mt-2">
+            <Plus size={14} /> Gửi thông báo
+          </AdminButton>
+        </form>
+      </AdminCard>
 
       {/* Right side: Notification Inbox */}
-      <div className="prob-admin-card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '10px' }}>
-          <h3 style={{ borderBottom: 'none', paddingBottom: 0 }}>Hộp Thư Thông Báo</h3>
+      <AdminCard>
+        <div className="flex justify-between items-center border-b border-charcoal/50 pb-4 mb-4">
+          <h3 className="font-display font-semibold text-linen text-lg m-0">Hộp Thư Thông Báo</h3>
           {notifications.some(n => !n.isRead && !n.read) && (
-            <button onClick={handleMarkAllRead} className="prob-tag-pill" style={{ cursor: 'pointer', borderColor: '#34d399', color: '#34d399', fontSize: '0.7rem' }}>
+            <button 
+              onClick={handleMarkAllRead} 
+              className="text-xs font-semibold px-2.5 py-1 rounded-md border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 transition-colors"
+            >
               Đọc Tất Cả
             </button>
           )}
         </div>
 
-        <div className="prob-list-scroll">
+        <div className="flex flex-col gap-3 max-h-[680px] overflow-y-auto pr-1">
           {loading ? (
-            <p>Đang tải thông báo...</p>
+            <p className="text-stone text-sm">Đang tải thông báo...</p>
           ) : notifications.length === 0 ? (
-            <p style={{ color: '#64748b' }}>Hộp thư của bạn hiện đang trống.</p>
+            <p className="text-stone text-sm">Hộp thư của bạn hiện đang trống.</p>
           ) : (
             notifications.map((n, idx) => {
               const nId = n.id || n._id;
               const isUnread = !n.isRead && !n.read;
               return (
-                <div key={nId || idx} className="prob-item-row" style={{ borderLeft: isUnread ? '3px solid #3b82f6' : 'none' }}>
-                  <div className="prob-item-details">
-                    <span className="prob-item-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Bell size={12} style={{ color: isUnread ? '#3b82f6' : '#64748b' }} />
+                <AdminListRow key={nId || idx} className={`items-start ${isUnread ? 'border-l-2 border-l-blue-500' : ''}`}>
+                  <div className="flex flex-col gap-1.5 w-full">
+                    <span className="font-semibold text-sm text-linen font-body flex items-center gap-2">
+                      <Bell size={14} className={isUnread ? 'text-blue-500' : 'text-stone'} />
                       {n.title}
                     </span>
-                    <p style={{ margin: '4px 0', fontSize: '0.82rem', color: '#cbd5e1' }}>
+                    <p className="text-sm text-surface-300 leading-relaxed m-0 mb-1">
                       {n.content}
                     </p>
-                    <div className="prob-item-meta">
-                      <span className="prob-tag-pill" style={{ fontSize: '0.68rem' }}>
+                    <div className="flex items-center gap-2">
+                      <AdminBadge color={n.type === 'ALERT' ? 'red' : n.type === 'MATCH' ? 'blue' : 'gray'}>
                         {n.type}
-                      </span>
-                      <span className="prob-tag-pill" style={{ fontSize: '0.68rem' }}>
+                      </AdminBadge>
+                      <span className="text-[11px] text-stone">
                         {new Date(n.createdAt || n.created_at).toLocaleString()}
                       </span>
                     </div>
                   </div>
 
-                  <button onClick={() => handleDelete(nId)} className="btn-action-icon delete" title="Xóa thông báo">
+                  <AdminButton variant="icon-delete" onClick={() => handleDelete(nId)} title="Xóa thông báo" className="self-start ml-2">
                     <Trash2 size={14} />
-                  </button>
-                </div>
+                  </AdminButton>
+                </AdminListRow>
               );
             })
           )}
         </div>
-      </div>
+      </AdminCard>
     </div>
   );
 };
-
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Plus, Users, Trash2, Key } from 'lucide-react';
 import { api } from '../../services/api';
 import type { ICustomRoom, IProblem } from '@ocj/types';
+import { AdminCard, AdminHeader, AdminButton, AdminSelect, AdminListRow, AdminBadge, AdminFormGroup } from './ui/AdminUI';
 
 export const AdminRoomsTab: React.FC = () => {
   const [rooms, setRooms] = useState<ICustomRoom[]>([]);
@@ -72,84 +73,80 @@ export const AdminRoomsTab: React.FC = () => {
   };
 
   return (
-    <div className="problems-tab-grid">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
       {/* Left side: Create Custom Room */}
-      <div className="prob-admin-card">
-        <h3>Tạo Phòng Đấu Custom Mới</h3>
-        <form onSubmit={handleCreateRoom} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div className="prob-form-group">
-            <label>Chọn Đề Bài Cố Định (Tùy chọn)</label>
-            <select
+      <AdminCard>
+        <AdminHeader>Tạo Phòng Đấu Custom Mới</AdminHeader>
+        <form onSubmit={handleCreateRoom} className="flex flex-col gap-4">
+          <AdminFormGroup label="Chọn Đề Bài Cố Định (Tùy chọn)">
+            <AdminSelect
               value={selectedProblemId}
               onChange={e => setSelectedProblemId(e.target.value)}
-              className="prob-admin-select"
             >
               <option value="">-- Chọn ngẫu nhiên theo độ khó --</option>
               {problems.map(p => (
                 <option key={p.id || p._id} value={p.id || p._id}>{p.title} ({p.difficulty})</option>
               ))}
-            </select>
-          </div>
+            </AdminSelect>
+          </AdminFormGroup>
 
           {!selectedProblemId && (
-            <div className="prob-form-group">
-              <label>Độ Khó Phòng Đấu (Nếu chọn ngẫu nhiên)</label>
-              <select
+            <AdminFormGroup label="Độ Khó Phòng Đấu (Nếu chọn ngẫu nhiên)">
+              <AdminSelect
                 value={difficulty}
                 onChange={e => setDifficulty(e.target.value as any)}
-                className="prob-admin-select"
               >
                 <option value="EASY">Easy</option>
                 <option value="MEDIUM">Medium</option>
                 <option value="HARD">Hard</option>
-              </select>
-            </div>
+              </AdminSelect>
+            </AdminFormGroup>
           )}
 
-          <button type="submit" className="btn-prob-primary">
+          <AdminButton type="submit" className="mt-2">
             <Plus size={16} /> Tạo phòng PvP Custom
-          </button>
+          </AdminButton>
         </form>
-      </div>
+      </AdminCard>
 
       {/* Right side: Active Rooms List */}
-      <div className="prob-admin-card">
-        <h3>Danh Sách Phòng Đấu PvP Đang Hoạt Động</h3>
-        <div className="prob-list-scroll">
+      <AdminCard>
+        <AdminHeader>Danh Sách Phòng Đấu PvP Đang Hoạt Động</AdminHeader>
+        <div className="flex flex-col gap-3 max-h-[600px] overflow-y-auto pr-1">
           {loading ? (
-            <p>Đang tải...</p>
+            <p className="text-stone text-sm">Đang tải...</p>
           ) : rooms.length === 0 ? (
-            <p style={{ color: '#64748b' }}>Hiện tại không có phòng PvP nào đang chờ hoặc đang thi đấu.</p>
+            <p className="text-stone text-sm">Hiện tại không có phòng PvP nào đang chờ hoặc đang thi đấu.</p>
           ) : (
             rooms.map((r, idx) => {
               const roomId = r.id;
               return (
-                <div key={roomId || idx} className="prob-item-row">
-                  <div className="prob-item-details">
-                    <span className="prob-item-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <Key size={14} style={{ color: '#60a5fa' }} />
+                <AdminListRow key={roomId || idx}>
+                  <div className="flex flex-col gap-1.5">
+                    <span className="font-semibold text-sm text-linen font-body flex items-center gap-2">
+                      <Key size={14} className="text-blue-400" />
                       Mã Phòng: {r.room_code}
                     </span>
-                    <div className="prob-item-meta">
-                      <span className="prob-tag-pill" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.7rem' }}>
-                        <Users size={10} />
+                    <div className="flex items-center gap-2">
+                      <AdminBadge className="flex items-center gap-1.5">
+                        <Users size={12} />
                         {r._count?.participants || 1} người chơi
-                      </span>
-                      <span className="prob-tag-pill" style={{ fontSize: '0.7rem' }}>
+                      </AdminBadge>
+                      <AdminBadge color={r.status === 'WAITING' ? 'yellow' : 'green'}>
                         Trạng thái: {r.status || 'WAITING'}
-                      </span>
+                      </AdminBadge>
                     </div>
                   </div>
 
-                  <button onClick={() => handleDeleteRoom(roomId)} className="btn-action-icon delete" title="Đóng phòng đấu">
+                  <AdminButton variant="icon-delete" onClick={() => handleDeleteRoom(roomId)} title="Đóng phòng đấu">
                     <Trash2 size={14} />
-                  </button>
-                </div>
+                  </AdminButton>
+                </AdminListRow>
               );
             })
           )}
         </div>
-      </div>
+      </AdminCard>
     </div>
   );
 };

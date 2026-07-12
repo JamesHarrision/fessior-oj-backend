@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../../services/api';
 import { Plus, Trash2 } from 'lucide-react';
+import { AdminCard, AdminHeader, AdminButton, AdminInput, AdminFormGroup, AdminTextarea, AdminListRow } from './ui/AdminUI';
 
 export const AdminNewsTab: React.FC = () => {
   const [newsfeed, setNewsfeed] = useState<any[]>([]);
@@ -52,62 +53,67 @@ export const AdminNewsTab: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="bg-washi border border-charcoal p-6">
-        <h3 className="font-display text-lg font-bold text-linen mb-4 uppercase tracking-wider">Đăng Tin Tức Mới</h3>
-        <form onSubmit={handlePostNews} className="flex flex-col gap-4">
-          <input
-            type="text"
-            placeholder="Tiêu đề bản tin..."
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-            className="bg-ink border border-charcoal px-4 py-2 text-sm text-linen outline-none focus:border-vermilion"
-          />
-          <textarea
-            placeholder="Nội dung bản tin..."
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            required
-            rows={4}
-            className="bg-ink border border-charcoal px-4 py-2 text-sm text-linen outline-none focus:border-vermilion"
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex items-center justify-center gap-2 bg-vermilion text-linen py-2 font-display text-xs font-bold uppercase tracking-wider hover:bg-vermilion-hover disabled:opacity-50"
-          >
-            <Plus size={16} /> Đăng Tin
-          </button>
-        </form>
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+      <div className="lg:col-span-1">
+        <AdminCard>
+          <AdminHeader>Đăng Tin Tức Mới</AdminHeader>
+          <form onSubmit={handlePostNews} className="flex flex-col gap-4 mt-2">
+            <AdminFormGroup label="Tiêu đề">
+              <AdminInput
+                type="text"
+                placeholder="Tiêu đề bản tin..."
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+              />
+            </AdminFormGroup>
+            <AdminFormGroup label="Nội dung">
+              <AdminTextarea
+                placeholder="Nội dung bản tin..."
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                required
+                rows={6}
+              />
+            </AdminFormGroup>
+            <AdminButton type="submit" disabled={loading} className="mt-2">
+              <Plus size={16} /> Đăng Tin
+            </AdminButton>
+          </form>
+        </AdminCard>
       </div>
 
-      <div className="bg-washi border border-charcoal p-6">
-        <h3 className="font-display text-lg font-bold text-linen mb-4 uppercase tracking-wider">Danh Sách Tin Tức</h3>
-        <div className="flex flex-col gap-4">
-          {newsfeed.length === 0 ? (
-            <div className="text-center p-8 bg-ink border border-charcoal border-dashed text-stone text-sm">
-              Chưa có tin tức nào
-            </div>
-          ) : (
-            newsfeed.map((news) => (
-              <div key={news.id} className="bg-ink border border-charcoal p-4 flex flex-col md:flex-row justify-between gap-4 border-l-4 border-l-vermilion">
-                <div className="flex-1">
-                  <h4 className="font-display font-bold text-linen mb-1">{news.title}</h4>
-                  <p className="font-body text-xs text-stone mb-2">Bởi: {news.author?.username} - {new Date(news.created_at).toLocaleString('vi-VN')}</p>
-                  <p className="font-body text-sm text-stone whitespace-pre-wrap">{news.content}</p>
-                </div>
-                <button
-                  onClick={() => handleDelete(news.id)}
-                  className="self-start md:self-center text-stone hover:text-vermilion p-2 transition-colors border border-charcoal hover:border-vermilion"
-                  title="Xoá tin"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            ))
-          )}
-        </div>
+      <div className="lg:col-span-2">
+        <AdminCard>
+          <AdminHeader>Danh Sách Tin Tức</AdminHeader>
+          <div className="flex flex-col gap-3 max-h-[800px] overflow-y-auto pr-1">
+            {newsfeed.length === 0 ? (
+              <p className="text-stone text-sm">Chưa có tin tức nào</p>
+            ) : (
+              newsfeed.map((news) => (
+                <AdminListRow key={news.id} className="items-start border-l-2 border-l-vermilion">
+                  <div className="flex flex-col gap-1.5 w-full">
+                    <h4 className="font-display font-semibold text-linen m-0">{news.title}</h4>
+                    <span className="text-xs text-stone tracking-wider uppercase font-semibold">
+                      Bởi: <span className="text-linen/80">{news.author?.username}</span> • {new Date(news.created_at || news.createdAt).toLocaleString('vi-VN')}
+                    </span>
+                    <p className="font-body text-sm text-surface-300 whitespace-pre-wrap mt-1 leading-relaxed">
+                      {news.content}
+                    </p>
+                  </div>
+                  <AdminButton
+                    variant="icon-delete"
+                    onClick={() => handleDelete(news.id)}
+                    title="Xoá tin"
+                    className="self-start ml-2"
+                  >
+                    <Trash2 size={14} />
+                  </AdminButton>
+                </AdminListRow>
+              ))
+            )}
+          </div>
+        </AdminCard>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ShoppingBag, Plus, ShoppingCart } from 'lucide-react';
 import { api } from '../../services/api';
+import { AdminCard, AdminHeader, AdminButton, AdminInput, AdminFormGroup, AdminSelect, AdminListRow, AdminBadge } from './ui/AdminUI';
 
 export const AdminShopTab: React.FC = () => {
   const [items, setItems] = useState<any[]>([]);
@@ -84,148 +85,144 @@ export const AdminShopTab: React.FC = () => {
   };
 
   return (
-    <div className="problems-tab-grid">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
       {/* Left side: Create shop item */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        <form onSubmit={handleCreateItem} className="prob-admin-card">
-          <h3>Thêm Vật Phẩm Shop Mới</h3>
-          <div className="prob-form-group">
-            <label>Tên vật phẩm</label>
-            <input
-              type="text"
-              value={name}
-              onChange={e => setName(e.target.value)}
-              className="prob-admin-input"
-              required
-            />
-          </div>
-
-          <div className="prob-form-group">
-            <label>Mô tả</label>
-            <input
-              type="text"
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              className="prob-admin-input"
-              required
-            />
-          </div>
-
-          <div className="prob-form-grid-3" style={{ gridTemplateColumns: '1fr 1fr' }}>
-            <div className="prob-form-group">
-              <label>Giá (Coins / Điểm)</label>
-              <input
-                type="number"
-                value={cost}
-                onChange={e => setCost(Number(e.target.value))}
-                className="prob-admin-input"
-                min={0}
+      <div className="flex flex-col gap-6">
+        <AdminCard>
+          <AdminHeader>Thêm Vật Phẩm Shop Mới</AdminHeader>
+          <form onSubmit={handleCreateItem} className="flex flex-col gap-4 mt-2">
+            <AdminFormGroup label="Tên vật phẩm">
+              <AdminInput
+                type="text"
+                value={name}
+                onChange={e => setName(e.target.value)}
                 required
               />
+            </AdminFormGroup>
+
+            <AdminFormGroup label="Mô tả">
+              <AdminInput
+                type="text"
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                required
+              />
+            </AdminFormGroup>
+
+            <div className="grid grid-cols-2 gap-4">
+              <AdminFormGroup label="Giá (Coins / Điểm)">
+                <AdminInput
+                  type="number"
+                  value={cost}
+                  onChange={e => setCost(Number(e.target.value))}
+                  min={0}
+                  required
+                />
+              </AdminFormGroup>
+
+              <AdminFormGroup label="Loại vật phẩm">
+                <AdminSelect
+                  value={type}
+                  onChange={e => setType(e.target.value as any)}
+                >
+                  <option value="AVATAR_FRAME">Khung Avatar (Avatar Frame)</option>
+                  <option value="THEME">Giao diện (Theme)</option>
+                </AdminSelect>
+              </AdminFormGroup>
             </div>
 
-            <div className="prob-form-group">
-              <label>Loại vật phẩm</label>
-              <select
-                value={type}
-                onChange={e => setType(e.target.value as any)}
-                className="prob-admin-select"
-              >
-                <option value="AVATAR_FRAME">Khung Avatar (Avatar Frame)</option>
-                <option value="THEME">Giao diện (Theme)</option>
-              </select>
-            </div>
-          </div>
+            <AdminFormGroup label="Đường dẫn hình ảnh (Image URL)">
+              <AdminInput
+                type="text"
+                value={imageUrl}
+                onChange={e => setImageUrl(e.target.value)}
+                placeholder="https://example.com/item.png"
+              />
+            </AdminFormGroup>
 
-          <div className="prob-form-group">
-            <label>Đường dẫn hình ảnh (Image URL)</label>
-            <input
-              type="text"
-              value={imageUrl}
-              onChange={e => setImageUrl(e.target.value)}
-              placeholder="https://example.com/item.png"
-              className="prob-admin-input"
-            />
-          </div>
+            <AdminButton type="submit" className="mt-2">
+              <Plus size={14} /> Thêm vào shop
+            </AdminButton>
+          </form>
+        </AdminCard>
 
-          <button type="submit" className="btn-prob-primary">
-            <Plus size={14} /> Thêm vào shop
-          </button>
-        </form>
-
-        <div className="prob-admin-card">
-          <h3>Kho Đồ Của Quản Trị Viên (Inventory)</h3>
-          <div className="prob-list-scroll" style={{ maxHeight: '240px' }}>
+        <AdminCard>
+          <AdminHeader>Kho Đồ Của Quản Trị Viên (Inventory)</AdminHeader>
+          <div className="flex flex-col gap-3 max-h-[240px] overflow-y-auto pr-1">
             {inventory.length === 0 ? (
-              <p style={{ color: '#64748b', fontSize: '0.85rem' }}>Kho đồ rỗng.</p>
+              <p className="text-stone text-sm">Kho đồ rỗng.</p>
             ) : (
               inventory.map((inv, idx) => {
                 const invId = inv.id || inv._id;
                 return (
-                  <div key={invId || idx} className="prob-item-row">
-                    <div className="prob-item-details">
-                      <span className="prob-item-title" style={{ fontSize: '0.85rem' }}>
+                  <AdminListRow key={invId || idx}>
+                    <div className="flex flex-col gap-1.5">
+                      <span className="font-semibold text-sm text-linen font-body">
                         {inv.item?.name || 'Vật phẩm'} ({inv.item?.type})
                       </span>
-                      <div className="prob-item-meta">
-                        <span className="prob-tag-pill" style={{ fontSize: '0.68rem', color: inv.isEquipped ? '#10b981' : '#64748b' }}>
+                      <div className="flex items-center gap-2">
+                        <AdminBadge color={inv.isEquipped ? 'green' : 'gray'}>
                           {inv.isEquipped ? 'Đang trang bị' : 'Chưa trang bị'}
-                        </span>
+                        </AdminBadge>
                       </div>
                     </div>
 
-                    <button onClick={() => handleEquip(invId)} className="prob-tag-pill" style={{ cursor: 'pointer', borderColor: '#60a5fa', color: '#60a5fa', fontSize: '0.7rem' }}>
+                    <button 
+                      onClick={() => handleEquip(invId)} 
+                      className="text-xs font-semibold px-2.5 py-1 rounded-md border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 transition-colors"
+                    >
                       Trang Bị
                     </button>
-                  </div>
+                  </AdminListRow>
                 );
               })
             )}
           </div>
-        </div>
+        </AdminCard>
       </div>
 
       {/* Right side: Shop Items list */}
-      <div className="prob-admin-card">
-        <h3><ShoppingBag size={18} style={{ color: '#ec4899', marginRight: '6px', verticalAlign: 'middle' }} /> Gian Hàng Trong Shop ({items.length})</h3>
-        <div className="prob-list-scroll">
+      <AdminCard>
+        <AdminHeader>
+          <ShoppingBag size={18} className="text-pink-500" /> Gian Hàng Trong Shop ({items.length})
+        </AdminHeader>
+        <div className="flex flex-col gap-3 max-h-[800px] overflow-y-auto pr-1">
           {loading ? (
-            <p>Đang tải gian hàng...</p>
+            <p className="text-stone text-sm">Đang tải gian hàng...</p>
           ) : items.length === 0 ? (
-            <p style={{ color: '#64748b' }}>Không có vật phẩm nào được bày bán.</p>
+            <p className="text-stone text-sm">Không có vật phẩm nào được bày bán.</p>
           ) : (
             items.map((it, idx) => {
               const itId = it.id || it._id;
               return (
-                <div key={itId || idx} className="prob-item-row" style={{ padding: '12px' }}>
-                  <div className="prob-item-details">
-                    <span className="prob-item-title" style={{ fontSize: '0.92rem' }}>
+                <AdminListRow key={itId || idx} className="items-start">
+                  <div className="flex flex-col gap-2 w-full">
+                    <span className="font-semibold text-sm text-linen font-body">
                       {it.name}
                     </span>
-                    <p style={{ margin: '4px 0', fontSize: '0.8rem', color: '#8892b0' }}>
+                    <p className="text-sm text-surface-300 m-0">
                       {it.description}
                     </p>
-                    <div className="prob-item-meta">
-                      <span className="diff-pill diff-easy" style={{ background: 'rgba(236,72,153,0.15)', color: '#ec4899' }}>
+                    <div className="flex items-center gap-2 mt-1">
+                      <AdminBadge color="pink" className="bg-pink-500/10 border-pink-500/20 text-pink-400">
                         {it.cost} COINS
-                      </span>
-                      <span className="prob-tag-pill" style={{ fontSize: '0.68rem' }}>
+                      </AdminBadge>
+                      <AdminBadge>
                         Loại: {it.type}
-                      </span>
+                      </AdminBadge>
                     </div>
                   </div>
 
-                  <button onClick={() => handleBuy(itId)} className="btn-prob-primary" style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 12px', fontSize: '0.78rem' }}>
-                    <ShoppingCart size={12} /> Mua Test
-                  </button>
-                </div>
+                  <AdminButton variant="primary" onClick={() => handleBuy(itId)} className="px-3 self-center whitespace-nowrap">
+                    <ShoppingCart size={14} /> Mua Test
+                  </AdminButton>
+                </AdminListRow>
               );
             })
           )}
         </div>
-      </div>
+      </AdminCard>
     </div>
   );
 };
-
 
