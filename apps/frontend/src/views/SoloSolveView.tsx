@@ -27,13 +27,30 @@ export function SoloSolveView() {
     fetchProblem();
   }, [problemSlug, language]);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [verdict, setVerdict] = useState<string>('');
+  const [submissionId, setSubmissionId] = useState<string>('');
+
   const handleSubmit = async () => {
     if (!problem) return;
-    await api.submitCode({
-      problemId: problem.id || problem._id || problem.slug,
-      code,
-      language,
-    });
+    setIsSubmitting(true);
+    setVerdict('');
+    try {
+      const res = await api.submitCode({
+        problemId: problem.id || problem._id || problem.slug,
+        code,
+        language,
+      });
+      if (res.success && res.data) {
+        setSubmissionId(res.data.id || res.data._id);
+        // Tạm thời set verdict là PENDING, nếu có webhook/socket thì cập nhật sau
+        setVerdict('PENDING'); 
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!problem) {
@@ -64,8 +81,9 @@ export function SoloSolveView() {
           code={code}
           language={language}
           onSubmit={handleSubmit}
-          isSubmitting={false}
-          verdict={""}
+          isSubmitting={isSubmitting}
+          verdict={verdict}
+          verdictDetails={{ submissionId }}
         />
       </div>
     </div>
