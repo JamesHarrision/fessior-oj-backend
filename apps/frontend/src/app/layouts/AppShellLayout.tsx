@@ -6,7 +6,7 @@ import { AppLogo } from '@ocj/ui';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
 import { Role } from '@ocj/types';
-import { Swords, BookOpen, Trophy, Crown, Beaker, LayoutDashboard, ShoppingBag, Bot, Settings, UsersRound, Code2, ScrollText, Home } from 'lucide-react';
+import { Swords, BookOpen, Crown, Beaker, LayoutDashboard, ShoppingBag, Bot, Settings, UsersRound, Code2, ScrollText, Home } from 'lucide-react';
 
 /* =====================================================
    Navigation Items
@@ -30,7 +30,6 @@ const navItems: NavItem[] = [
   { key: '/match',       icon: <Swords size={18} />,           label: 'Lobby',        path: '/match',        section: 'main' },
   { key: '/editor',      icon: <Code2 size={18} />,            label: 'Editor',       path: '/editor',       section: 'main' },
   { key: '/problems',    icon: <BookOpen size={18} />,         label: 'Problems',     path: '/problems',     section: 'main' },
-  { key: '/contest',     icon: <Trophy size={18} />,           label: 'Contests',     path: '/contest',      section: 'main' },
   { key: '/ranking',     icon: <Crown size={18} />,            label: 'Rankings',     path: '/ranking',      section: 'main' },
 
   // ── Community ──
@@ -42,10 +41,6 @@ const navItems: NavItem[] = [
   { key: '/shop',        icon: <ShoppingBag size={18} />,       label: 'Shop',         path: '/shop',         section: 'tools' },
   { key: '/ai',          icon: <Bot size={18} />,               label: 'AI Mentor',    path: '/ai',           section: 'tools' },
   { key: '/settings',    icon: <Settings size={18} />,          label: 'Settings',     path: '/settings',     section: 'tools' },
-  { key: '/tester',      icon: <Beaker size={18} />,            label: 'API Tester',   path: '/tester',       section: 'tools' },
-
-  // ── Admin ──
-  { key: '/admin',       icon: <LayoutDashboard size={18} />,   label: 'Admin Panel',  path: '/admin/problems', section: 'tools', adminOnly: true },
 ];
 
 const sectionLabels: Record<NavSection, string> = {
@@ -168,6 +163,7 @@ function TopBar(props: {
   const userDropdownItems = [
     { key: 'profile', label: 'Tài khoản', icon: <UserOutlined />, onClick: onNavigateProfile },
     { key: 'settings', label: 'Cài đặt', icon: <SettingOutlined />, onClick: onNavigateSettings },
+    ...(user?.role === Role.ADMIN ? [{ key: 'admin', label: 'Trang Quản trị', icon: <LayoutDashboard size={14} />, onClick: () => window.location.href = '/admin' }] : []),
     { type: 'divider' as const },
     { key: 'logout', label: 'Đăng xuất', icon: <LogoutOutlined />, onClick: onLogout },
   ];

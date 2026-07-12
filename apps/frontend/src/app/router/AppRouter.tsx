@@ -8,14 +8,11 @@ import { ProblemsPage } from '../../features/problems/ProblemsPage';
 import { MatchFindingView } from '../../views/MatchFindingView';
 import { SoloSolveView } from '../../views/SoloSolveView';
 import { PvPWorkspaceView } from '../../views/PvPWorkspaceView';
-import { ContestSolveView } from '../../views/ContestSolveView';
 import { PlaygroundView } from '../../views/PlaygroundView';
 import { RankingView } from '../../views/RankingView';
 import { ShopView } from '../../views/ShopView';
-import { ContestView } from '../../views/ContestView';
 import { SettingsView } from '../../views/SettingsView';
 import { AIView } from '../../views/AIView';
-import { ApiTesterView } from '../../views/tester/ApiTesterView';
 import { SubmissionsView } from '../../views/SubmissionsView';
 import { CustomRoomsView } from '../../views/CustomRoomsView';
 import { AdminDashboard } from '../../views/AdminDashboard';
@@ -104,8 +101,8 @@ export function AppRouter() {
           <Route path="/problems" element={<ProblemsPage />} />
 
           {/* ── Competitions ── */}
-          <Route path="/contest" element={<ContestView />} />
-          <Route path="/contest/:contestId/problem/:problemId" element={<ContestSolveView />} />
+          {/* <Route path="/contest" element={<ContestView />} /> */}
+          {/* <Route path="/contest/:contestId/problem/:problemId" element={<ContestSolveView />} /> */}
           <Route path="/ranking" element={<RankingView />} />
           <Route path="/custom-rooms" element={<CustomRoomsRouteWrapper />} />
 
@@ -118,12 +115,11 @@ export function AppRouter() {
           <Route path="/shop" element={<ShopView />} />
           <Route path="/ai" element={<AIView />} />
           <Route path="/settings" element={<SettingsView />} />
-          <Route path="/tester" element={<ApiTesterView />} />
-
-          {/* ── Admin ── */}
-          <Route path="/admin/:subview" element={<AdminRouteWrapper />} />
-          <Route path="/admin" element={<Navigate to="/admin/problems" replace />} />
         </Route>
+
+        {/* ── Protected Admin Shell ── */}
+        <Route path="/admin/:subview" element={<ProtectedRoute><AdminRouteWrapper /></ProtectedRoute>} />
+        <Route path="/admin" element={<Navigate to="/admin/problems" replace />} />
       </Routes>
     </BrowserRouter>
   );

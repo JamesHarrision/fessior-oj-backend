@@ -4,7 +4,6 @@ import { api } from '../services/api';
 import {
   Settings,
   FileText,
-  Calendar,
   ShieldAlert,
   Shield,
   FileCode,
@@ -15,7 +14,8 @@ import {
   ShoppingBag,
   Bell,
   Activity,
-  X
+  X,
+  Beaker
 } from 'lucide-react';
 
 import { AdminAuthTab } from '../components/admin/AdminAuthTab';
@@ -24,7 +24,6 @@ import { AdminSubmissionsTab } from '../components/admin/AdminSubmissionsTab';
 import { AdminMatchesTab } from '../components/admin/AdminMatchesTab';
 import { AdminRoomsTab } from '../components/admin/AdminRoomsTab';
 import { AdminAiTab } from '../components/admin/AdminAiTab';
-import { AdminContestsTab } from '../components/admin/AdminContestsTab';
 import { AdminCommentsTab } from '../components/admin/AdminCommentsTab';
 import { AdminFriendsTab } from '../components/admin/AdminFriendsTab';
 import { AdminShopTab } from '../components/admin/AdminShopTab';
@@ -32,8 +31,9 @@ import { AdminLeaderboardTab } from '../components/admin/AdminLeaderboardTab';
 import { AdminNotificationsTab } from '../components/admin/AdminNotificationsTab';
 import { AdminReportsTab } from '../components/admin/AdminReportsTab';
 import { AdminNewsTab } from '../components/admin/AdminNewsTab';
+import { ApiTesterView } from './tester/ApiTesterView';
 
-import type { IProblem, IContest, IReport, ProblemDifficulty } from '@ocj/types';
+import type { IProblem, IReport, ProblemDifficulty } from '@ocj/types';
 
 interface AdminDashboardProps {
   currentSubView: string;
@@ -48,25 +48,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentSubView, 
 
   // Lists
   const [problems, setProblems] = useState<IProblem[]>([]);
-  const [contests, setContests] = useState<IContest[]>([]);
   const [reports, setReports] = useState<IReport[]>([]);
 
   // Create form states
   const [probTitle, setProbTitle] = useState('');
   const [probDesc, setProbDesc] = useState('');
   const [probDiff, setProbDiff] = useState<ProblemDifficulty>('EASY');
-  const [contestTitle, setContestTitle] = useState('');
-  const [contestStart, setContestStart] = useState('');
-  const [contestEnd, setContestEnd] = useState('');
 
   const loadData = async () => {
     try {
       if (activeTab === 'problems') {
         const res = await api.getProblems();
         setProblems(Array.isArray(res.data) ? res.data : (res.data.items || []));
-      } else if (activeTab === 'contests') {
-        const res = await api.getContests();
-        setContests(res.data || []);
       } else if (activeTab === 'reports') {
         const res = await api.getReports();
         setReports(res.data?.items || []);
@@ -120,36 +113,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentSubView, 
     }
   };
 
-  const handleCreateContest = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const res = await api.createContest({
-        title: contestTitle,
-        startTime: new Date(contestStart).toISOString(),
-        endTime: new Date(contestEnd).toISOString(),
-        problems: [],
-      });
-      if (res.success) {
-        setContestTitle('');
-        setContestStart('');
-        setContestEnd('');
-        loadData();
-      }
-    } catch (err: any) {
-      alert(err.message || 'Lỗi tạo kỳ thi');
-    }
-  };
-
-  const handleDeleteContest = async (id: string) => {
-    if (!window.confirm('Xóa kỳ thi này?')) return;
-    try {
-      await api.deleteContest(id);
-      loadData();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   const handleUpdateReport = async (reportId: string, status: 'RESOLVED' | 'REJECTED') => {
     try {
       await api.updateReportStatus(reportId, status);
@@ -166,7 +129,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentSubView, 
     { id: 'matches', label: 'Đấu Solo & Lịch sử', icon: Trophy },
     { id: 'rooms', label: 'Phòng đấu PVP Custom', icon: Users },
     { id: 'ai', label: 'Trí tuệ Nhân tạo AI', icon: Sparkles },
-    { id: 'contests', label: 'Giải đấu chính thức', icon: Calendar },
     { id: 'comments', label: 'Thảo luận & Bình luận', icon: MessageSquare },
     { id: 'friends', label: 'Bạn bè & Mạng xã hội', icon: Users },
     { id: 'shop', label: 'Cửa hàng vật phẩm', icon: ShoppingBag },
@@ -174,12 +136,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentSubView, 
     { id: 'notifications', label: 'Thông báo', icon: Bell },
     { id: 'reports', label: 'Báo cáo & Tố cáo', icon: ShieldAlert },
     { id: 'news', label: 'Tin tức & Thông báo', icon: Bell },
+    { id: 'tester', label: 'API Tester', icon: Beaker },
   ];
 
   return (
-    <div className="flex flex-col gap-6 w-full max-w-[1400px] mx-auto h-[calc(100vh-100px)]">
+    <div className="flex flex-col gap-0 w-full h-screen bg-ink">
       {/* Header */}
-      <div className="bg-washi border border-charcoal p-4 lg:p-6 flex items-center gap-4 shrink-0">
+      <div className="bg-washi border-b border-charcoal p-4 flex items-center gap-4 shrink-0">
         <div className="bg-ink p-3 border border-charcoal">
           <Settings size={28} className="text-vermilion animate-[spin_10s_linear_infinite]" />
         </div>
@@ -189,9 +152,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentSubView, 
       </div>
 
       {/* Layout Wrapper */}
-      <div className="flex flex-col lg:flex-row gap-6 flex-1 min-h-0 overflow-hidden">
+      <div className="flex flex-col lg:flex-row gap-0 flex-1 min-h-0 overflow-hidden">
         {/* Sidebar Nav */}
-        <div className="w-full lg:w-[280px] bg-washi border border-charcoal flex flex-col shrink-0 overflow-y-auto">
+        <div className="w-full lg:w-[280px] bg-ink border-r border-charcoal flex flex-col shrink-0 overflow-y-auto">
           <div className="flex flex-col p-2 gap-1 flex-1">
             {tabsList.map((tab) => {
               const TabIcon = tab.icon;
@@ -213,9 +176,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentSubView, 
             })}
           </div>
 
-          <div className="p-4 border-t border-charcoal">
+          <div className="p-4 border-t border-charcoal mt-auto">
             <button
-              onClick={() => onViewChange('match')}
+              onClick={() => window.location.href = '/home'}
               className="w-full flex items-center justify-center gap-2 font-display text-xs font-bold uppercase tracking-wider px-4 py-3 border border-vermilion/50 text-vermilion hover:bg-vermilion hover:text-linen transition-colors"
             >
               <X size={16} />
@@ -225,7 +188,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentSubView, 
         </div>
 
         {/* Content Pane */}
-        <div className="flex-1 bg-washi border border-charcoal p-6 overflow-y-auto relative min-h-[400px]">
+        <div className="flex-1 bg-ink p-6 overflow-y-auto relative min-h-[400px]">
           {activeTab === 'auth' && <AdminAuthTab />}
           
           {activeTab === 'problems' && (
@@ -250,20 +213,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentSubView, 
 
           {activeTab === 'ai' && <AdminAiTab />}
 
-          {activeTab === 'contests' && (
-            <AdminContestsTab
-              contestTitle={contestTitle}
-              setContestTitle={setContestTitle}
-              contestStart={contestStart}
-              setContestStart={setContestStart}
-              contestEnd={contestEnd}
-              setContestEnd={setContestEnd}
-              onSubmit={handleCreateContest}
-              contests={contests}
-              onDelete={handleDeleteContest}
-            />
-          )}
-
           {activeTab === 'comments' && <AdminCommentsTab />}
 
           {activeTab === 'friends' && <AdminFriendsTab />}
@@ -279,6 +228,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentSubView, 
           )}
 
           {activeTab === 'news' && <AdminNewsTab />}
+
+          {activeTab === 'tester' && <ApiTesterView />}
         </div>
       </div>
     </div>
