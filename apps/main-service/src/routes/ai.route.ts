@@ -117,6 +117,36 @@ router.post('/feedback/:submissionId', (req, res, next) => {
   aiController.generateMockInterviewFeedback(req, res, next);
 });
 
+router.post('/debug/:submissionId', (req, res, next) => {
+  /* #swagger.tags = ['AI Features']
+     #swagger.summary = 'AI explain failure for a submission'
+     #swagger.description = 'Return AI-generated explanation for a failed submission.'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.parameters['submissionId'] = {
+       in: 'path',
+       description: 'ID of the Submission to debug',
+       required: true,
+       schema: { type: 'string' }
+     }
+  */
+  aiController.explainFailure(req, res, next);
+});
+
+router.post('/interview/chat/:historyId', (req, res, next) => {
+  /* #swagger.tags = ['AI Features']
+     #swagger.summary = 'Chat with AI Mentor in an ongoing mock interview'
+     #swagger.description = 'Send a message to continue the mock interview chat.'
+     #swagger.security = [{ "bearerAuth": [] }]
+     #swagger.parameters['historyId'] = {
+       in: 'path',
+       description: 'ID of the AI History item (type INTERVIEW)',
+       required: true,
+       schema: { type: 'string' }
+     }
+  */
+  aiController.chatMockInterview(req, res, next);
+});
+
 router.get('/history', (req, res, next) => {
   /* #swagger.tags = ['AI Features']
      #swagger.summary = 'Get AI conversation history'

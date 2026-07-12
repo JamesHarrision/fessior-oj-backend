@@ -29,6 +29,41 @@ export class AIController {
     }
   }
 
+  async explainFailure(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        return res.status(401).json({ status: 'Error', message: 'Unauthorized' });
+      }
+      const submissionId = req.params.submissionId as string;
+      const explanation = await aiService.explainFailure(userId, submissionId);
+      res.status(200).json({
+        status: 'Success',
+        data: explanation,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async chatMockInterview(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        return res.status(401).json({ status: 'Error', message: 'Unauthorized' });
+      }
+      const historyId = req.params.historyId as string;
+      const message = req.body.message as string;
+      const chat = await aiService.chatMockInterview(userId, historyId, message);
+      res.status(200).json({
+        status: 'Success',
+        data: chat,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getHistory(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = (req as any).user?.id;

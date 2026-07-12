@@ -17,6 +17,14 @@ export class AiRepository {
     return this.http.request('POST', `${API_ROUTES.AI}/feedback/${submissionId}`);
   }
 
+  getDebug(submissionId: string): Promise<ApiResponse<any>> {
+    return this.http.request('POST', `${API_ROUTES.AI}/debug/${submissionId}`);
+  }
+
+  sendChatMessage(historyId: string, message: string): Promise<ApiResponse<any>> {
+    return this.http.request('POST', `${API_ROUTES.AI}/interview/chat/${historyId}`, { message });
+  }
+
   getHistory(): Promise<ApiResponse<any[]>> {
     return this.http.request('GET', `${API_ROUTES.AI}/history`);
   }

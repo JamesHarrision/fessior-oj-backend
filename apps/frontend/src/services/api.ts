@@ -227,6 +227,10 @@ export const api = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getAIFeedback: (submissionId: string) => wrap<any>(aiRepository.getFeedback(submissionId)),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getAIDebug: (submissionId: string) => wrap<any>(aiRepository.getDebug(submissionId)),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  sendAIChatMessage: (historyId: string, message: string) => wrap<any>(aiRepository.sendChatMessage(historyId, message)),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getAIHistory: () => wrap<any[]>(aiRepository.getHistory()),
 
   // =========================================================

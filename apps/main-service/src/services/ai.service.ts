@@ -176,21 +176,152 @@ export class AIService {
       }
     }
 
+    // Prepare chat history
+    const chatHistory = [
+      { role: 'model', text: feedback }
+    ];
+    const historyString = JSON.stringify(chatHistory);
+
     // Save feedback to submission
-    submission.aiFeedback = feedback;
+    submission.aiFeedback = historyString;
     await submission.save();
+
+    // Save to history
+    const historyItem = await prisma.aiHistory.create({
+      data: {
+        user_id: userId,
+        type: 'INTERVIEW',
+        input: `Submission ID: ${submissionId} for Problem: ${problem.title}`,
+        output: historyString,
+      }
+    });
+
+    return { feedback, chatHistory, historyId: historyItem.id };
+  }
+
+  async chatMockInterview(userId: string, historyId: string, message: string) {
+    const historyItem = await prisma.aiHistory.findUnique({
+      where: { id: historyId }
+    });
+
+    if (!historyItem || historyItem.user_id !== userId || historyItem.type !== 'INTERVIEW') {
+      throw new AppError('Interview history not found', 404);
+    }
+
+    let chatHistory: any[] = [];
+    try {
+      chatHistory = JSON.parse(historyItem.output);
+    } catch {
+      // Legacy string format fallback
+      chatHistory = [{ role: 'model', text: historyItem.output }];
+    }
+
+    let modelResponseText = "";
+
+    if (!this.genAI) {
+      modelResponseText = "Xin lỗi, hiện tại AI Mentor đang ở chế độ offline. Không thể tiếp tục hội thoại.";
+    } else {
+      try {
+        const model = this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+        
+        // Convert to Gemini history format
+        const geminiHistory = chatHistory.map(msg => ({
+          role: msg.role === 'model' ? 'model' : 'user',
+          parts: [{ text: msg.text }]
+        }));
+
+        const chatSession = model.startChat({
+          history: geminiHistory
+        });
+
+        const result = await chatSession.sendMessage(message);
+        modelResponseText = result.response.text();
+      } catch (error) {
+        console.error("Gemini API Chat failed:", error);
+        modelResponseText = "Lỗi hệ thống AI. Vui lòng thử lại sau.";
+      }
+    }
+
+    // Append to history
+    chatHistory.push({ role: 'user', text: message });
+    chatHistory.push({ role: 'model', text: modelResponseText });
+
+    const newHistoryString = JSON.stringify(chatHistory);
+
+    // Update history in DB
+    await prisma.aiHistory.update({
+      where: { id: historyId },
+      data: { output: newHistoryString }
+    });
+
+    return { chatHistory };
+  }
+
+  async explainFailure(userId: string, submissionId: string) {
+    const submission = await Submission.findById(submissionId);
+    if (!submission) {
+      throw new AppError('Submission not found', 404);
+    }
+
+    if (submission.status === 'ACCEPTED') {
+      throw new AppError('Submission is already ACCEPTED. No need to debug.', 400);
+    }
+
+    const problem = await Problem.findById(submission.problemId);
+    if (!problem) {
+      throw new AppError('Problem not found', 404);
+    }
+
+    let explanation = "";
+
+    if (!this.genAI) {
+      console.warn("GEMINI_API_KEY is not defined. Using mock explanation.");
+      explanation = `### 🤖 AI Mentor Debug Assistant\n\n**1. Nhận diện lỗi:**\nCode của bạn gặp lỗi **${submission.status}**. Có vẻ như bạn chưa xử lý hết các edge case hoặc có vòng lặp vô hạn.\n\n**2. Gợi ý sửa đổi:**\nHãy kiểm tra lại điều kiện dừng của vòng lặp hoặc các trường hợp null/empty input. Đừng quên phân tích kỹ giới hạn dữ liệu nhé!`;
+    } else {
+      try {
+        const model = this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+        const prompt = `
+          You are an expert programming mentor. The user submitted code for the problem "${problem.title}" but it failed.
+          
+          Problem Description:
+          ${problem.description}
+          
+          User's Code (${submission.language}):
+          \`\`\`${submission.language}
+          ${submission.code}
+          \`\`\`
+          
+          Execution Status: ${submission.status}
+          Error Message / Output: ${submission.errorMessage || 'No specific error message.'}
+          Test Cases Passed: ${submission.testCasesPassed} / ${submission.testCasesTotal}
+          
+          Please do the following:
+          1. Briefly explain why the code failed (e.g. what the bug is).
+          2. Point out the specific line or logic that is incorrect.
+          3. Provide a helpful hint on how to fix it.
+          4. IMPORTANT: DO NOT provide the fully corrected code. The goal is to guide the user to solve it themselves.
+          Format your response in Markdown and use Vietnamese language. Keep it encouraging and concise.
+        `;
+
+        const result = await model.generateContent(prompt);
+        explanation = result.response.text();
+      } catch (error) {
+        console.error("Gemini API Debug generation failed:", error);
+        explanation = `Lỗi hệ thống AI khi phân tích code. Vui lòng thử lại sau. (Error: ${error})`;
+      }
+    }
 
     // Save to history
     await prisma.aiHistory.create({
       data: {
         user_id: userId,
-        type: 'INTERVIEW',
+        type: 'DEBUG',
         input: `Submission ID: ${submissionId} for Problem: ${problem.title}`,
-        output: feedback,
+        output: explanation,
       }
     });
 
-    return { feedback };
+    return { explanation };
   }
 
   async getHistory(userId: string) {
