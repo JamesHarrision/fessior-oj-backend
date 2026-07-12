@@ -131,7 +131,7 @@ export const getUserStreak = async (userId: string) => {
   return {
     current_streak: user.streak_count,
     max_streak: user.max_streak,
-    last_active_date: user.last_active_date,
+    last_active_date: (user as any).updated_at,
     heatmap,
   };
 };
@@ -233,7 +233,7 @@ export const getUserStreakByUsername = async (username: string) => {
   return {
     current_streak: user.streak_count,
     max_streak: user.max_streak,
-    last_active_date: user.last_active_date,
+    last_active_date: (user as any).updated_at,
     heatmap,
   };
 };
