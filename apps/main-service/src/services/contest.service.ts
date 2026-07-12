@@ -29,7 +29,33 @@ export class ContestService {
     if (!contest) {
       throw new Error('Contest not found');
     }
-    return contest;
+
+    const registeredUserIds = contest.registrations.map((r) => r.user_id);
+    let registeredUsers: any[] = [];
+    if (registeredUserIds.length > 0) {
+      const dbUsers = await prisma.user.findMany({
+        where: { id: { in: registeredUserIds } },
+        select: {
+          id: true,
+          username: true,
+          full_name: true,
+          avatar_url: true,
+          elo_rating: true,
+        },
+      });
+      registeredUsers = dbUsers.map((u) => ({
+        id: u.id,
+        username: u.username,
+        fullName: u.full_name,
+        avatarUrl: u.avatar_url,
+        eloRating: u.elo_rating,
+      }));
+    }
+
+    return {
+      ...contest,
+      registeredUsers,
+    };
   }
 
   async updateContest(
@@ -317,6 +343,11 @@ export class ContestService {
     });
 
     return { success: true, message: 'Contest ended successfully' };
+  }
+
+  async getRegisteredContests(userId: string) {
+    const registrations = await contestRepository.findRegisteredContests(userId);
+    return registrations.map((r) => r.contest);
   }
 }
 
