@@ -144,6 +144,14 @@ Khi user dang trong mot tran dau (`status: PENDING`) nhung vo tinh F5 hoac bi ma
 3. Neu co, he thong se block user tim tran moi va hien thi banner de user click vao quay tro lai URL `/match/:matchId`.
 4. Khi vao lai URL `/match/:matchId`, user se tu dong join lai Socket room `match:{matchId}`.
 
+## Realtime Leaderboard & ELO Updates
+
+Component `<MultiplayerLeaderboard />` tren giao dien match se render danh sach nguoi choi kem theo trang thai realtime (Dang code..., Sai KQ, Hoan thanh). 
+De ho tro ca che do 1v1 va Arena (N-player), he thong MySQL `Match` se luon khoi tao cac ban ghi `MatchParticipant` o trang thai `CODING` tai thoi diem bat dau tran (ngay ca voi 1v1). 
+Khi Socket ban event `RIVAL_SUBMISSION`, trang thai participant se lap tuc duoc cap nhat de giao dien Leaderboard phan hoi realtime.
+
+Khi ket thuc tran (endMatch), tien trinh luu ELO (goi logic tu `calculateEloPvP` voi tran 1v1 hoac luat Penalty voi Arena) se luu so diem thay doi vao cot `score_change` cua `MatchParticipant`. Lich su `Recent Matches` o man hinh Home se dung du lieu tu day de hien thi so diem ELO cong/tru cuc ky chinh xac thay vi hardcode +25/-15.
+
 ## Production Notes
 
 Matchmaking queue dang nam trong memory cua mot main-service instance. Neu scale nhieu instance, can dua queue sang Redis hoac dung sticky session + centralized matchmaking service.
