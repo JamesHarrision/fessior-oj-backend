@@ -136,6 +136,14 @@ Payload:
 
 Server tim match, xac dinh user con lai la winner, sau do goi `endMatch`.
 
+## Active Match Recovery (F5 Reload)
+
+Khi user dang trong mot tran dau (`status: PENDING`) nhung vo tinh F5 hoac bi mat mang ket noi lai:
+1. Sockets se bi disconnect.
+2. Frontend se tu dong goi API `GET /api/v1/matches/active` de kiem tra xem co match nao dang `PENDING` khong.
+3. Neu co, he thong se block user tim tran moi va hien thi banner de user click vao quay tro lai URL `/match/:matchId`.
+4. Khi vao lai URL `/match/:matchId`, user se tu dong join lai Socket room `match:{matchId}`.
+
 ## Production Notes
 
 Matchmaking queue dang nam trong memory cua mot main-service instance. Neu scale nhieu instance, can dua queue sang Redis hoac dung sticky session + centralized matchmaking service.
