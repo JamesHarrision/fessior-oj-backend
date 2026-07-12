@@ -359,17 +359,22 @@ Files lien quan:
 - `apps/main-service/src/validators/report.validator.ts`
 - `apps/main-service/prisma/schema.prisma`
 
-## 12. AI Roadmap And Feedback
+## 12. AI Roadmap, Debug Assistant And Mock Interview
 
-AI module dung Google Gemini de tao roadmap hoc DSA va mock interview (phỏng vấn). Lich su AI (roadmap, interview) se duoc luu lai trong MySQL bang `AiHistory`. (API Key của Gemini được cấu hình bảo mật thông qua `.env` server side).
+AI module dung Google Gemini de tro thanh mot AI Mentor toan dien:
+- **Roadmap Loop**: Tao roadmap hoc DSA va lien ket truc tiep cac bai tap goi y toi man hinh giai bai.
+- **AI Debug Assistant**: Khi user nop bai bi sai (WA, TLE, RE, CE), AI se phan tich code, doc testcase va dua ra goi y de user tu sua loi thay vi chi truc tiep code dung.
+- **Mock Interview Chat**: Khi nop bai thanh cong (AC), AI dong vai tro nguoi phong van danh gia do phuc tap va de xuat toi uu thong qua giao dien Chat tuong tac.
+
+Lich su AI (roadmap, debug, interview) duoc luu lai trong MySQL bang `AiHistory`. Giao dien Chat ho tro tuong tac lien tuc dua vao lich su json tu DB. (API Key Gemini duoc cau hinh bao mat thong qua `.env` server side, ho tro mock/offline fallback neu thieu key).
 
 ```mermaid
 flowchart LR
-  FE[AIView / Feedback UI] --> API[AI routes]
+  FE[AIView / ExecutionResultPanel] --> API[AI routes]
   API --> Auth[requireAuth]
   Auth --> Controller[ai.controller]
   Controller --> Service[ai.service]
-  Service --> Gemini[Google Gemini]
+  Service --> Gemini[Google Gemini API]
   Service --> Mongo[(Submission)]
   Service --> MySQL[(ai_histories)]
 ```
@@ -377,6 +382,7 @@ flowchart LR
 Files lien quan:
 
 - `apps/frontend/src/views/AIView.tsx`
+- `apps/frontend/src/components/editor/ExecutionResultPanel.tsx`
 - `apps/frontend/src/components/admin/AdminAiTab.tsx`
 - `apps/main-service/src/routes/ai.route.ts`
 - `apps/main-service/src/controllers/ai.controller.ts`

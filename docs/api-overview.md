@@ -22,7 +22,7 @@ Route prefixes duoc khai bao trong `packages/constants/src/index.ts` va register
 | `/api/v1/users` | `user.route.ts` | Public profile, current user, avatar, admin user management, user stats. |
 | `/api/v1/problems` | `problem.route.ts` | CRUD problem, testcase, tags, problem listing/detail. |
 | `/api/v1/submissions` | `submission.route.ts` | Submit code, run code sandbox, list/detail submissions. |
-| `/api/v1/ai` | `ai.route.ts` | DSA roadmap va AI feedback. |
+| `/api/v1/ai` | `ai.route.ts` | DSA roadmap, AI Debug Assistant, va Mock Interview Chat. |
 | `/api/v1/leaderboard` | `leaderboard.route.ts` | Bang xep hang. |
 | `/api/v1/rooms` | `room.route.ts` | Custom competition rooms. |
 | `/api/v1/matches` | `match_history.route.ts` | Lich su match. |
