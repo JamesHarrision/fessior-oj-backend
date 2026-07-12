@@ -145,7 +145,7 @@ export const AccountSettings: React.FC = () => {
             )}
           </div>
           <div className="flex flex-col items-center md:items-start flex-1 gap-2">
-            <h2 className="font-display text-2xl font-bold text-linen">{user?.fullName || user?.username}</h2>
+            <h2 className="font-display text-2xl font-bold text-linen">{(user as any)?.fullName || user?.username}</h2>
             <span className="font-mono text-xs text-stone bg-ink px-3 py-1 border border-charcoal">@{user?.username}</span>
             <span className="font-body text-sm text-stone mt-1">{user?.email}</span>
             <span className="font-body text-xs text-stone">Quyền: <strong className="text-linen uppercase">{user?.role}</strong></span>

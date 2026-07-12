@@ -6,7 +6,7 @@ import { AppLogo } from '@ocj/ui';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
 import { Role } from '@ocj/types';
-import { Swords, BookOpen, Trophy, Crown, Beaker, LayoutDashboard, ShoppingBag, Bot, Settings, UsersRound, Code2, ScrollText } from 'lucide-react';
+import { Swords, BookOpen, Trophy, Crown, Beaker, LayoutDashboard, ShoppingBag, Bot, Settings, UsersRound, Code2, ScrollText, Home } from 'lucide-react';
 
 /* =====================================================
    Navigation Items
@@ -26,6 +26,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   // ── Main ──
+  { key: '/home',        icon: <Home size={18} />,             label: 'Dashboard',    path: '/home',         section: 'main' },
   { key: '/match',       icon: <Swords size={18} />,           label: 'Lobby',        path: '/match',        section: 'main' },
   { key: '/editor',      icon: <Code2 size={18} />,            label: 'Editor',       path: '/editor',       section: 'main' },
   { key: '/problems',    icon: <BookOpen size={18} />,         label: 'Problems',     path: '/problems',     section: 'main' },
@@ -35,7 +36,7 @@ const navItems: NavItem[] = [
   // ── Community ──
   { key: '/custom-rooms', icon: <Beaker size={18} />,           label: 'Custom Arena', path: '/custom-rooms', section: 'community' },
   { key: '/submissions', icon: <ScrollText size={18} />,       label: 'Submissions',  path: '/submissions',  section: 'community' },
-  { key: '/friends',     icon: <UsersRound size={18} />,        label: 'Friends',      path: '/friends',      section: 'community' },
+  { key: '/friends',     icon: <UsersRound size={18} />,        label: 'Social',       path: '/friends',      section: 'community' },
 
   // ── Tools ──
   { key: '/shop',        icon: <ShoppingBag size={18} />,       label: 'Shop',         path: '/shop',         section: 'tools' },
@@ -151,13 +152,14 @@ function Sidebar(props: {
 function TopBar(props: {
   user: ReturnType<typeof useAuth>['user'];
   onLogout: () => void;
+  onNavigateProfile: () => void;
   notificationCount?: number;
   hideSearch?: boolean;
 }) {
-  const { user, onLogout, notificationCount = 0, hideSearch = false } = props;
+  const { user, onLogout, onNavigateProfile, notificationCount = 0, hideSearch = false } = props;
 
   const userDropdownItems = [
-    { key: 'profile', label: 'Tài khoản', icon: <UserOutlined /> },
+    { key: 'profile', label: 'Tài khoản', icon: <UserOutlined />, onClick: onNavigateProfile },
     { key: 'settings', label: 'Cài đặt', icon: <SettingOutlined /> },
     { type: 'divider' as const },
     { key: 'logout', label: 'Đăng xuất', icon: <LogoutOutlined />, onClick: onLogout },
@@ -281,7 +283,7 @@ export function AppShellLayout() {
     if (pathname.startsWith('/admin')) return '/admin';
     const sorted = [...navItems].sort((a, b) => b.key.length - a.key.length);
     const match = sorted.find((x) => pathname.startsWith(x.key));
-    return match?.key ?? '/match';
+    return match?.key ?? '/home';
   })();
 
   const handleNavigate = useCallback(
@@ -310,7 +312,13 @@ export function AppShellLayout() {
       {/* ── Main Content Area ── */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* ── Top Bar ── */}
-        <TopBar user={user} onLogout={handleLogout} notificationCount={unreadCount} hideSearch={location.pathname === '/match'} />
+        <TopBar 
+          user={user} 
+          onLogout={handleLogout} 
+          onNavigateProfile={() => handleNavigate(`/profile/${user?.username}`)}
+          notificationCount={unreadCount} 
+          hideSearch={location.pathname === '/match' || location.pathname === '/home'} 
+        />
 
         {/* ── Content ── */}
         <main className="flex-1 overflow-y-auto bg-ink">

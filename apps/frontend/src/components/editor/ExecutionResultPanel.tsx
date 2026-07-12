@@ -3,7 +3,7 @@ import { AlertCircle, Clock, Cpu } from 'lucide-react';
 import { formatExecutionTime, formatMemoryKb } from '@ocj/utils';
 import { StatusBadge } from '@ocj/ui';
 import { Spin } from 'antd';
-import { api } from '../../../services/api';
+import { api } from '../../services/api';
 
 /* =====================================================
    ExecutionResultPanel — Ink & Vermillion

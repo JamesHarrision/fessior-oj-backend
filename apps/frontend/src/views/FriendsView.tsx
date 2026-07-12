@@ -7,7 +7,7 @@ export const FriendsView: React.FC = () => {
   const { user } = useAuth();
   const [friends, setFriends] = useState<any[]>([]);
   const [requests, setRequests] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<'friends' | 'requests'>('friends');
+  const [activeTab, setActiveTab] = useState<'friends' | 'requests' | 'newsfeed'>('friends');
   const [addUsername, setAddUsername] = useState('');
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
@@ -123,6 +123,16 @@ export const FriendsView: React.FC = () => {
               </span>
             )}
           </button>
+          <button
+            className={`px-6 py-2 font-display text-sm font-bold uppercase tracking-wider transition-colors border-b-2 ${
+              activeTab === 'newsfeed'
+                ? 'text-vermilion border-vermilion'
+                : 'text-stone border-transparent hover:text-linen hover:border-charcoal'
+            }`}
+            onClick={() => { setActiveTab('newsfeed'); setMessage(''); }}
+          >
+            Tin Tức
+          </button>
         </div>
 
         <form onSubmit={handleSendRequest} className="flex gap-2 w-full md:w-auto">
@@ -153,7 +163,7 @@ export const FriendsView: React.FC = () => {
           <div className="animate-spin w-8 h-8 rounded-full border-2 border-charcoal border-t-vermilion" />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className={`grid ${activeTab === 'newsfeed' ? 'grid-cols-1 max-w-3xl mx-auto w-full' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'} gap-6`}>
           {activeTab === 'friends' ? (
             friends.length === 0 ? (
               <div className="col-span-full bg-ink border border-charcoal border-dashed p-12 text-center">
@@ -181,7 +191,7 @@ export const FriendsView: React.FC = () => {
                 </div>
               ))
             )
-          ) : (
+          ) : activeTab === 'requests' ? (
             requests.length === 0 ? (
               <div className="col-span-full bg-ink border border-charcoal border-dashed p-12 text-center">
                 <p className="font-body text-stone text-sm">Không có lời mời kết bạn nào đang chờ xử lý.</p>
@@ -221,7 +231,54 @@ export const FriendsView: React.FC = () => {
                 );
               })
             )
-          )}
+          ) : activeTab === 'newsfeed' ? (
+            <div className="flex flex-col gap-4">
+              {/* Mock Server Announcement */}
+              <div className="bg-washi border border-charcoal p-6 border-l-4 border-l-vermilion">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="bg-vermilion p-2 text-linen">
+                    <UsersRound size={16} />
+                  </div>
+                  <div>
+                    <h3 className="font-display font-bold text-linen text-sm">Hệ Thống OCJ</h3>
+                    <p className="font-body text-xs text-stone">Vài phút trước</p>
+                  </div>
+                </div>
+                <h4 className="font-display text-lg font-bold text-linen mb-2">Bảo trì máy chủ định kỳ</h4>
+                <p className="font-body text-sm text-stone">
+                  Hệ thống sẽ tiến hành bảo trì từ 2:00 AM đến 4:00 AM sáng mai để nâng cấp tính năng AI Mentor và Custom Arena. Mong các bạn thông cảm!
+                </p>
+              </div>
+              
+              {/* Mock User Activity */}
+              <div className="bg-ink border border-charcoal p-6">
+                <div className="flex items-center gap-3 mb-3">
+                  <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=Alice" alt="Alice" className="w-8 h-8 border border-charcoal bg-washi" />
+                  <div>
+                    <h3 className="font-display font-bold text-linen text-sm">Alice</h3>
+                    <p className="font-body text-xs text-stone">1 giờ trước</p>
+                  </div>
+                </div>
+                <p className="font-body text-sm text-stone">
+                  Vừa đạt chuỗi <span className="text-vermilion font-bold">10 ngày</span> code liên tiếp! Đang hướng tới mốc 30 ngày. 🔥
+                </p>
+              </div>
+
+              {/* Mock User Activity */}
+              <div className="bg-ink border border-charcoal p-6">
+                <div className="flex items-center gap-3 mb-3">
+                  <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=Bob" alt="Bob" className="w-8 h-8 border border-charcoal bg-washi" />
+                  <div>
+                    <h3 className="font-display font-bold text-linen text-sm">Bob</h3>
+                    <p className="font-body text-xs text-stone">Hôm qua</p>
+                  </div>
+                </div>
+                <p className="font-body text-sm text-stone">
+                  Vừa giải thành công bài <span className="text-linen font-bold font-mono">Two Sum</span> với độ phức tạp O(N). Rất tự hào về bản thân 😎
+                </p>
+              </div>
+            </div>
+          ) : null}
         </div>
       )}
     </div>

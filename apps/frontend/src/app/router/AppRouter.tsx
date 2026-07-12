@@ -3,6 +3,7 @@ import type { IMatch } from '@ocj/types';
 import { ProtectedRoute } from './ProtectedRoute';
 import { AppShellLayout } from '../layouts/AppShellLayout';
 import { AuthPage } from '../../features/auth/AuthPage';
+import { HomeView } from '../../views/HomeView';
 import { ProblemsPage } from '../../features/problems/ProblemsPage';
 import { MatchFindingView } from '../../views/MatchFindingView';
 import { SoloSolveView } from '../../views/SoloSolveView';
@@ -90,7 +91,8 @@ export function AppRouter() {
             </ProtectedRoute>
           }
         >
-          <Route path="/" element={<Navigate to="/match" replace />} />
+          <Route path="/" element={<Navigate to="/home" replace />} />
+          <Route path="/home" element={<HomeView />} />
 
           {/* ── Match & Solving ── */}
           <Route path="/match" element={<MatchRouteWrapper />} />

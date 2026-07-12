@@ -126,7 +126,8 @@ export function PvPWorkspaceView() {
         setSubmissionId(res.data.id || res.data._id);
         toast.success('Đã nộp bài thành công! Đang chờ chấm điểm...', { theme: 'dark' });
       } else {
-        toast.error(res.message || 'Lỗi khi nộp bài', { theme: 'dark' });
+        toast.error((res as any).message || 'Lỗi khi nộp bài', { theme: 'dark' });
+        setIsSubmitting(false);
       }
     } catch (err: any) {
       toast.error(err.message || 'Lỗi hệ thống khi nộp bài', { theme: 'dark' });
@@ -164,7 +165,6 @@ export function PvPWorkspaceView() {
           </div>
           <div className="h-[280px] bg-washi border border-charcoal shadow-lg shrink-0">
             <ConsolePane
-              onRun={handleRunCode as any}
               onSubmit={handleSubmit}
               isSubmitting={isSubmitting}
               verdict={verdict}
