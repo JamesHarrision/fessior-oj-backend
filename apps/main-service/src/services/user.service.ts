@@ -204,6 +204,40 @@ export const getUserTagStatsByUsername = async (username: string) => {
   };
 };
 
+export const getUserEloHistoryByUsername = async (username: string, page: number = 1, limit: number = 10) => {
+  const user = await userRepo.findUserByUsername(username);
+  if (!user) {
+    throw new AppError('User not found', 404);
+  }
+  return await userRepo.getUserEloHistory(user.id, page, limit);
+};
+
+export const getUserStreakByUsername = async (username: string) => {
+  const user = await userRepo.findUserByUsername(username);
+  if (!user) {
+    throw new AppError('User not found', 404);
+  }
+  
+  const endDate = new Date();
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - 364); 
+  
+  const activities = await userRepo.getUserActivities(user.id, startDate, endDate);
+  
+  const heatmap: Record<string, number> = {};
+  activities.forEach(activity => {
+    const dateStr = activity.activity_date.toISOString().split('T')[0];
+    heatmap[dateStr] = activity.problems_solved_count;
+  });
+  
+  return {
+    current_streak: user.streak_count,
+    max_streak: user.max_streak,
+    last_active_date: user.last_active_date,
+    heatmap,
+  };
+};
+
 export const adminUpdateUser = async (id: string, data: {
   username?: string;
   email?: string;
