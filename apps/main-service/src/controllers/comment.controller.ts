@@ -7,11 +7,12 @@ export class CommentController {
       const userId = req.user.userId;
       const comment = await commentService.createComment(userId, req.body);
       res.status(201).json({
-        success: true,
+        status: 'Success',
+        message: 'Comment created successfully',
         data: comment,
       });
     } catch (error: any) {
-      res.status(400).json({ success: false, message: error.message });
+      res.status(400).json({ status: 'Error', message: error.message });
     }
   }
 
@@ -28,11 +29,12 @@ export class CommentController {
 
       const comments = await commentService.getComments(targetId, targetType, page, limit);
       res.status(200).json({
-        success: true,
+        status: 'Success',
+        message: 'Comments retrieved successfully',
         data: comments,
       });
     } catch (error: any) {
-      res.status(400).json({ success: false, message: error.message });
+      res.status(400).json({ status: 'Error', message: error.message });
     }
   }
 
@@ -43,11 +45,12 @@ export class CommentController {
       const { content } = req.body;
       const updated = await commentService.updateComment(commentId as string, userId, content);
       res.status(200).json({
-        success: true,
+        status: 'Success',
+        message: 'Comment updated successfully',
         data: updated,
       });
     } catch (error: any) {
-      res.status(400).json({ success: false, message: error.message });
+      res.status(400).json({ status: 'Error', message: error.message });
     }
   }
 
@@ -58,11 +61,11 @@ export class CommentController {
       const commentId = req.params.commentId as string;
       await commentService.deleteComment(commentId, userId, userRole);
       res.status(200).json({
-        success: true,
+        status: 'Success',
         message: 'Comment deleted successfully',
       });
     } catch (error: any) {
-      res.status(400).json({ success: false, message: error.message });
+      res.status(400).json({ status: 'Error', message: error.message });
     }
   }
 
@@ -72,11 +75,12 @@ export class CommentController {
       const commentId = req.params.commentId as string;
       const result = await commentService.toggleLike(commentId, userId);
       res.status(200).json({
-        success: true,
+        status: 'Success',
+        message: 'Like toggled successfully',
         data: result,
       });
     } catch (error: any) {
-      res.status(400).json({ success: false, message: error.message });
+      res.status(400).json({ status: 'Error', message: error.message });
     }
   }
 }
