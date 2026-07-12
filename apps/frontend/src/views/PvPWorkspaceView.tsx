@@ -103,9 +103,6 @@ export function PvPWorkspaceView() {
     };
   }, [matchId]); // Removed problem dependency to avoid infinite loops
 
-  const handleRunCode = async () => {
-    // Basic run functionality if needed
-  };
 
   const [submissionId, setSubmissionId] = useState<string>('');
 

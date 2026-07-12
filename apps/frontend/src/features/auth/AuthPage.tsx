@@ -15,7 +15,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 type AuthMode = 'login' | 'register';
 
 // Hard, brutalist animation variants
-const staggerContainer = {
+const staggerContainer: any = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -26,7 +26,7 @@ const staggerContainer = {
   }
 };
 
-const sharpReveal = {
+const sharpReveal: any = {
   hidden: { opacity: 0, y: 20 },
   visible: { 
     opacity: 1, 
@@ -35,7 +35,7 @@ const sharpReveal = {
   }
 };
 
-const badgeFlash = {
+const badgeFlash: any = {
   hidden: { opacity: 0, scale: 0.9 },
   visible: {
     opacity: 1,

@@ -48,7 +48,8 @@ export const AIView: React.FC = () => {
         try {
           const res = await api.getSubmissions();
           if (res.success && res.data) {
-            setSubmissions(res.data);
+            const list = Array.isArray(res.data) ? res.data : (res.data.items || []);
+            setSubmissions(list);
           }
         } catch (err) {
           console.error(err);
@@ -146,11 +147,13 @@ export const AIView: React.FC = () => {
 
   return (
     <div className="max-w-[1200px] mx-auto w-full p-4 lg:p-8 flex flex-col gap-8">
-      <PageHeader 
-        title="AI Mentor"
-        description="Lộ trình học tập cá nhân hóa & nhận xét code tự động từ AI"
-        icon={<Sparkles size={24} className="text-vermilion" />}
-      />
+      <div>
+        <PageHeader 
+          title="AI Mentor"
+          
+        />
+        <p className="font-body text-stone mt-2">Lộ trình học tập cá nhân hóa & nhận xét code tự động từ AI</p>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
         {/* Sidebar History */}
@@ -161,9 +164,13 @@ export const AIView: React.FC = () => {
           </div>
           <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
             {historyLoading ? (
-              <SkeletonBlock lines={4} />
+              <div className="flex flex-col gap-2">
+                <SkeletonBlock />
+                <SkeletonBlock />
+                <SkeletonBlock />
+              </div>
             ) : history.length === 0 ? (
-              <EmptyState message="Chưa có lịch sử" />
+              <EmptyState title="Chưa có lịch sử" />
             ) : (
               history.map((h) => (
                 <div 
@@ -296,34 +303,37 @@ export const AIView: React.FC = () => {
                 <div className="w-full lg:w-1/3 flex flex-col gap-3">
                   <h4 className="font-display text-[10px] font-bold text-stone uppercase tracking-wider mb-2">Bài nộp gần đây</h4>
                   {submissions.length === 0 ? (
-                    <EmptyState message="Chưa có bài nộp" />
+                    <EmptyState title="Chưa có bài nộp" />
                   ) : (
-                    submissions.slice(0, 10).map((sub) => (
-                      <div 
-                        key={sub.id} 
-                        onClick={() => handleGetFeedback(sub.id)}
-                        className={`p-3 border cursor-pointer transition-colors ${
-                          selectedSubId === sub.id ? 'border-vermilion bg-vermilion/5' : 'border-charcoal bg-washi hover:border-stone'
-                        }`}
-                      >
-                        <div className="flex justify-between items-center mb-1">
-                          <span className={`text-[10px] font-bold uppercase tracking-wider ${sub.status === 'ACCEPTED' ? 'text-green-500' : 'text-red-500'}`}>
-                            {sub.status}
-                          </span>
-                          <span className="font-mono text-[10px] text-stone">{sub.language}</span>
+                    submissions.slice(0, 10).map((sub) => {
+                      const id = sub.id || sub._id;
+                      return (
+                        <div 
+                          key={id} 
+                          onClick={() => handleGetFeedback(id)}
+                          className={`p-3 border cursor-pointer transition-colors ${
+                            selectedSubId === id ? 'border-vermilion bg-vermilion/5' : 'border-charcoal bg-washi hover:border-stone'
+                          }`}
+                        >
+                          <div className="flex justify-between items-center mb-1">
+                            <span className={`text-[10px] font-bold uppercase tracking-wider ${sub.status === 'ACCEPTED' ? 'text-green-500' : 'text-red-500'}`}>
+                              {sub.status}
+                            </span>
+                            <span className="font-mono text-[10px] text-stone">{sub.language}</span>
                         </div>
-                        <div className="font-body text-xs text-linen truncate">{sub.problemId}</div>
+                        <div className="font-body text-xs text-linen truncate">{sub.problemId?.title || sub.problemId || 'Unknown'}</div>
                       </div>
-                    ))
+                      );
+                    })
                   )}
                 </div>
 
                 <div className="w-full lg:w-2/3 bg-washi border border-charcoal flex flex-col min-h-[500px]">
                   {feedbackLoading ? (
                     <div className="flex flex-col gap-4 p-5">
-                      <SkeletonBlock lines={1} />
-                      <SkeletonBlock lines={4} />
-                      <SkeletonBlock lines={3} />
+                      <SkeletonBlock />
+                      <SkeletonBlock />
+                      <SkeletonBlock />
                     </div>
                   ) : chatHistory.length > 0 ? (
                     <>
@@ -376,7 +386,7 @@ export const AIView: React.FC = () => {
                     </>
                   ) : (
                     <div className="p-5">
-                      <EmptyState message="Chọn một bài nộp để AI phân tích và đưa ra nhận xét chi tiết" />
+                      <EmptyState title="Chọn một bài nộp để AI phân tích và đưa ra nhận xét chi tiết" />
                     </div>
                   )}
                 </div>

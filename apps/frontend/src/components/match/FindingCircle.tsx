@@ -91,7 +91,7 @@ export const FindingCircle: React.FC<FindingCircleProps> = ({
                 }
               `}
             >
-              {isTimeout ? 'TÌM LẠI' : isSearching ? 'HUỶ' : 'TÌM ĐỐI THỦ'}
+              {isTimeout ? 'TÌM LẠI' : isSearching ? 'HUỶ' : 'TÌM ĐỐI THỦ (1V1)'}
             </button>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import { type ReactNode, useCallback, useEffect, useState } from 'react';
-import { Avatar, Dropdown, Input, Badge } from 'antd';
-import { BellOutlined, SearchOutlined, UserOutlined, SettingOutlined, LogoutOutlined } from '@ant-design/icons';
+import { Avatar, Dropdown, Badge } from 'antd';
+import { BellOutlined, UserOutlined, SettingOutlined, LogoutOutlined } from '@ant-design/icons';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { AppLogo } from '@ocj/ui';
 import { useAuth } from '../../context/AuthContext';
@@ -76,7 +76,10 @@ function Sidebar(props: {
   return (
     <aside className="flex flex-col h-screen bg-ink border-r border-charcoal overflow-y-auto">
       {/* ── Logo ── */}
-      <div className="px-5 pt-6 pb-4">
+      <div 
+        className="px-5 pt-6 pb-4 cursor-pointer"
+        onClick={() => onNavigate('/home')}
+      >
         <AppLogo />
       </div>
 
@@ -121,7 +124,10 @@ function Sidebar(props: {
       </nav>
 
       {/* ── User Profile (bottom) ── */}
-      <div className="px-3 pb-6 pt-3 border-t border-charcoal">
+      <div 
+        className="px-3 pb-6 pt-3 border-t border-charcoal cursor-pointer hover:bg-washi/5 transition-colors"
+        onClick={() => onNavigate(`/profile/${user?.username}`)}
+      >
         <div className="flex items-center gap-3 px-3 py-2.5 bg-charcoal/30">
           <Avatar
             size={36}
@@ -153,14 +159,15 @@ function TopBar(props: {
   user: ReturnType<typeof useAuth>['user'];
   onLogout: () => void;
   onNavigateProfile: () => void;
+  onNavigateSettings: () => void;
   notificationCount?: number;
   hideSearch?: boolean;
 }) {
-  const { user, onLogout, onNavigateProfile, notificationCount = 0, hideSearch = false } = props;
+  const { user, onLogout, onNavigateProfile, onNavigateSettings, notificationCount = 0, hideSearch = false } = props;
 
   const userDropdownItems = [
     { key: 'profile', label: 'Tài khoản', icon: <UserOutlined />, onClick: onNavigateProfile },
-    { key: 'settings', label: 'Cài đặt', icon: <SettingOutlined /> },
+    { key: 'settings', label: 'Cài đặt', icon: <SettingOutlined />, onClick: onNavigateSettings },
     { type: 'divider' as const },
     { key: 'logout', label: 'Đăng xuất', icon: <LogoutOutlined />, onClick: onLogout },
   ];
@@ -316,6 +323,7 @@ export function AppShellLayout() {
           user={user} 
           onLogout={handleLogout} 
           onNavigateProfile={() => handleNavigate(`/profile/${user?.username}`)}
+          onNavigateSettings={() => handleNavigate('/settings')}
           notificationCount={unreadCount} 
           hideSearch={location.pathname === '/match' || location.pathname === '/home'} 
         />

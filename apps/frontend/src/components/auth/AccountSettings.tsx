@@ -18,7 +18,6 @@ export const AccountSettings: React.FC = () => {
   const [sessions, setSessions] = useState<any[]>([]);
   const [sessionsLoading, setSessionsLoading] = useState(true);
   const [sessionError, setSessionError] = useState('');
-  const [sessionSuccess, setSessionSuccess] = useState('');
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [revokeAllLoading, setRevokeAllLoading] = useState(false);
 
@@ -87,11 +86,11 @@ export const AccountSettings: React.FC = () => {
     if (!window.confirm('Bạn có chắc chắn muốn đăng xuất thiết bị này?')) return;
     setActionLoadingId(sessionId);
     setSessionError('');
-    setSessionSuccess('');
+
     try {
       const res = await api.revokeSession(sessionId);
       if (res.success) {
-        setSessionSuccess('Đã đăng xuất thiết bị.');
+
         setSessions(sessions.filter(s => s.id !== sessionId));
       }
     } catch (err: any) {
@@ -105,11 +104,11 @@ export const AccountSettings: React.FC = () => {
     if (!window.confirm('Đăng xuất tất cả thiết bị khác? (Trừ thiết bị hiện tại)')) return;
     setRevokeAllLoading(true);
     setSessionError('');
-    setSessionSuccess('');
+
     try {
       const res = await api.revokeAllSessions();
       if (res.success) {
-        setSessionSuccess('Đã đăng xuất tất cả các thiết bị khác.');
+
         fetchSessions(); // Refresh list to just show current
       }
     } catch (err: any) {

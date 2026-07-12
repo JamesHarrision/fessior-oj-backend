@@ -22,7 +22,7 @@ export class AiRepository {
   }
 
   sendChatMessage(historyId: string, message: string): Promise<ApiResponse<any>> {
-    return this.http.request('POST', `${API_ROUTES.AI}/interview/chat/${historyId}`, { message });
+    return this.http.request('POST', `${API_ROUTES.AI}/interview/chat/${historyId}`, { body: { message } });
   }
 
   getHistory(): Promise<ApiResponse<any[]>> {

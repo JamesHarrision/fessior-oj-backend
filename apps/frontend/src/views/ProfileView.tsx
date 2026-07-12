@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { User, Activity, Trophy, TrendingUp, Calendar, Zap, AlertCircle } from 'lucide-react';
-import { PageHeader, SkeletonBlock, EmptyState } from '@ocj/ui';
+import { SkeletonBlock, EmptyState } from '@ocj/ui';
 import { api } from '../services/api';
 import { RankBadge } from '../components/editor/RankBadge';
 
@@ -55,12 +55,12 @@ export const ProfileView: React.FC = () => {
   if (loading) {
     return (
       <div className="max-w-[1200px] mx-auto w-full p-4 lg:p-8 flex flex-col gap-8">
-        <SkeletonBlock lines={1} className="h-24" />
+        <SkeletonBlock  className="h-24" />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <SkeletonBlock lines={4} className="h-64" />
+          <SkeletonBlock  className="h-64" />
           <div className="lg:col-span-2 flex flex-col gap-8">
-            <SkeletonBlock lines={4} className="h-64" />
-            <SkeletonBlock lines={4} className="h-64" />
+            <SkeletonBlock  className="h-64" />
+            <SkeletonBlock  className="h-64" />
           </div>
         </div>
       </div>
@@ -71,7 +71,7 @@ export const ProfileView: React.FC = () => {
     return (
       <div className="max-w-[1200px] mx-auto w-full p-4 lg:p-8">
         <EmptyState 
-          message={error || 'Không tìm thấy người dùng'} 
+          title={error || 'Không tìm thấy người dùng'} 
           icon={<AlertCircle size={48} className="text-vermilion" />}
         />
       </div>
@@ -155,7 +155,7 @@ export const ProfileView: React.FC = () => {
             </div>
             <div className="p-4 flex flex-col gap-3">
               {tagStats.length === 0 ? (
-                <EmptyState message="Chưa giải bài nào" />
+                <EmptyState title="Chưa giải bài nào" />
               ) : (
                 tagStats.map(tag => (
                   <div key={tag.tag_id} className="flex items-center justify-between">
@@ -178,7 +178,7 @@ export const ProfileView: React.FC = () => {
             </div>
             <div className="p-6 h-64 relative">
               {eloHistory.length < 2 ? (
-                <EmptyState message="Chưa có đủ dữ liệu đấu" />
+                <EmptyState title="Chưa có đủ dữ liệu đấu" />
               ) : (
                 <div className="w-full h-full relative">
                   <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full overflow-visible">

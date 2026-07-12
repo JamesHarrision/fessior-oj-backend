@@ -17,7 +17,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   const totalPages = Math.ceil(totalItems / pageSize);
   if (totalPages <= 1) return null;
 
-  const pages = [];
+  const pages: (number | string)[] = [];
   for (let i = 1; i <= totalPages; i++) {
     // Basic logic to show pages (always show first, last, current, and adjacent)
     if (
