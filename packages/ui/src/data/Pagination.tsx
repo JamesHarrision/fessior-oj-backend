@@ -14,8 +14,8 @@ export const Pagination: React.FC<PaginationProps> = ({
   pageSize,
   onPageChange,
 }) => {
-  const totalPages = Math.ceil(totalItems / pageSize);
-  if (totalPages <= 1) return null;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  // Always show pagination UI even if 1 page or empty to keep layout consistent
 
   const pages: (number | string)[] = [];
   for (let i = 1; i <= totalPages; i++) {

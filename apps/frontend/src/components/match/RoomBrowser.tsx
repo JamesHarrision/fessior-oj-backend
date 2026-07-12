@@ -144,10 +144,10 @@ export const RoomBrowser: React.FC<RoomBrowserProps> = ({ onJoinRoom }) => {
             <tbody className="divide-y divide-charcoal">
               {rooms.map((room) => (
                 <tr key={room.id} className="hover:bg-charcoal/20 transition-colors">
-                  <td className="py-2.5 px-3 font-display text-sm font-bold text-linen">{room.code}</td>
+                  <td className="py-2.5 px-3 font-display text-sm font-bold text-linen">{room.room_code}</td>
                   <td className="py-2.5 px-3"><DifficultyBadge difficulty={room.difficulty} size="small" /></td>
                   <td className="py-2.5 px-3 font-body text-xs text-stone">
-                    {room.hostName} ({room.playersCount}/2)
+                    {room.creator?.username || 'Ẩn danh'} ({room.participants?.length || 1}/{room.max_participants || 2})
                   </td>
                   <td className="py-2.5 px-3 text-right">
                     <button

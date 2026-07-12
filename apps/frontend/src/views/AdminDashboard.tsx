@@ -31,6 +31,7 @@ import { AdminShopTab } from '../components/admin/AdminShopTab';
 import { AdminLeaderboardTab } from '../components/admin/AdminLeaderboardTab';
 import { AdminNotificationsTab } from '../components/admin/AdminNotificationsTab';
 import { AdminReportsTab } from '../components/admin/AdminReportsTab';
+import { AdminNewsTab } from '../components/admin/AdminNewsTab';
 
 import type { IProblem, IContest, IReport, ProblemDifficulty } from '@ocj/types';
 
@@ -172,6 +173,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentSubView, 
     { id: 'leaderboard', label: 'Bảng xếp hạng chung', icon: Activity },
     { id: 'notifications', label: 'Thông báo', icon: Bell },
     { id: 'reports', label: 'Báo cáo & Tố cáo', icon: ShieldAlert },
+    { id: 'news', label: 'Tin tức & Thông báo', icon: Bell },
   ];
 
   return (
@@ -275,6 +277,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentSubView, 
           {activeTab === 'reports' && (
             <AdminReportsTab reports={reports} onUpdateStatus={handleUpdateReport} />
           )}
+
+          {activeTab === 'news' && <AdminNewsTab />}
         </div>
       </div>
     </div>

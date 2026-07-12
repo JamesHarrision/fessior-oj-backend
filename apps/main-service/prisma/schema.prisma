@@ -40,6 +40,7 @@ model User {
   custom_room_participations CustomRoomParticipant[]
   match_participations       MatchParticipant[]
   AiHistory                  AiHistory[]
+  news_authored              News[]
 
   @@map("users")
 }
@@ -464,4 +465,19 @@ model AiHistory {
   @@index([user_id])
   @@index([created_at])
   @@map("ai_histories")
+}
+
+// 9. News / Announcements
+model News {
+  id         String   @id @default(uuid()) @db.VarChar(36)
+  title      String   @db.VarChar(255)
+  content    String   @db.Text
+  author_id  String   @db.VarChar(36)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  author User @relation(fields: [author_id], references: [id], onDelete: Cascade)
+
+  @@index([created_at])
+  @@map("news")
 }

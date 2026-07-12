@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { api } from '../services/api';
 import { Eye, Sparkles } from 'lucide-react';
-import { PageHeader, StatusBadge } from '@ocj/ui';
-import { Spin, Pagination } from 'antd';
+import { PageHeader, StatusBadge, Pagination as UiPagination } from '@ocj/ui';
+import { Spin } from 'antd';
 
 export const SubmissionsView: React.FC = () => {
   const [submissions, setSubmissions] = useState<any[]>([]);
@@ -136,13 +136,12 @@ export const SubmissionsView: React.FC = () => {
           </div>
           
           {submissions.length > 0 && (
-            <div className="!px-6 !py-4 !border-t !border-charcoal !flex !justify-end">
-              <Pagination
-                current={currentPage}
-                total={submissions.length}
+            <div className="!px-6 !py-4 !border-t !border-charcoal !flex !justify-end bg-washi">
+              <UiPagination
+                currentPage={currentPage}
+                totalItems={submissions.length}
                 pageSize={pageSize}
-                onChange={setCurrentPage}
-                showSizeChanger={false}
+                onPageChange={setCurrentPage}
               />
             </div>
           )}

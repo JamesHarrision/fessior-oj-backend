@@ -7,6 +7,7 @@ export const FriendsView: React.FC = () => {
   const { user } = useAuth();
   const [friends, setFriends] = useState<any[]>([]);
   const [requests, setRequests] = useState<any[]>([]);
+  const [newsfeed, setNewsfeed] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'friends' | 'requests' | 'newsfeed'>('friends');
   const [addUsername, setAddUsername] = useState('');
   const [loading, setLoading] = useState(true);
@@ -17,8 +18,10 @@ export const FriendsView: React.FC = () => {
       setLoading(true);
       const friendsRes = await api.getFriends();
       const reqRes = await api.getPendingRequests();
+      const newsRes = await api.getNews();
       if (friendsRes.success) setFriends(friendsRes.data);
       if (reqRes.success) setRequests(reqRes.data);
+      if (newsRes.success && newsRes.data) setNewsfeed(newsRes.data.items || newsRes.data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -233,50 +236,33 @@ export const FriendsView: React.FC = () => {
             )
           ) : activeTab === 'newsfeed' ? (
             <div className="flex flex-col gap-4">
-              {/* Mock Server Announcement */}
-              <div className="bg-washi border border-charcoal p-6 border-l-4 border-l-vermilion">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="bg-vermilion p-2 text-linen">
-                    <UsersRound size={16} />
-                  </div>
-                  <div>
-                    <h3 className="font-display font-bold text-linen text-sm">Hệ Thống OCJ</h3>
-                    <p className="font-body text-xs text-stone">Vài phút trước</p>
-                  </div>
+              {newsfeed.length === 0 ? (
+                <div className="bg-ink border border-charcoal border-dashed p-12 text-center">
+                  <p className="font-body text-stone text-sm">Chưa có bản tin nào.</p>
                 </div>
-                <h4 className="font-display text-lg font-bold text-linen mb-2">Bảo trì máy chủ định kỳ</h4>
-                <p className="font-body text-sm text-stone">
-                  Hệ thống sẽ tiến hành bảo trì từ 2:00 AM đến 4:00 AM sáng mai để nâng cấp tính năng AI Mentor và Custom Arena. Mong các bạn thông cảm!
-                </p>
-              </div>
-              
-              {/* Mock User Activity */}
-              <div className="bg-ink border border-charcoal p-6">
-                <div className="flex items-center gap-3 mb-3">
-                  <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=Alice" alt="Alice" className="w-8 h-8 border border-charcoal bg-washi" />
-                  <div>
-                    <h3 className="font-display font-bold text-linen text-sm">Alice</h3>
-                    <p className="font-body text-xs text-stone">1 giờ trước</p>
+              ) : (
+                newsfeed.map((news) => (
+                  <div key={news.id} className="bg-washi border border-charcoal p-6 border-l-4 border-l-vermilion">
+                    <div className="flex items-center gap-3 mb-3">
+                      {news.author?.role === 'ADMIN' ? (
+                        <div className="bg-vermilion p-2 text-linen">
+                          <UsersRound size={16} />
+                        </div>
+                      ) : (
+                        <img src={news.author?.avatar_url || `https://api.dicebear.com/7.x/adventurer/svg?seed=${news.author?.username}`} alt={news.author?.username} className="w-8 h-8 border border-charcoal bg-washi" />
+                      )}
+                      <div>
+                        <h3 className="font-display font-bold text-linen text-sm">
+                          {news.author?.role === 'ADMIN' ? 'Hệ Thống OCJ' : news.author?.username}
+                        </h3>
+                        <p className="font-body text-xs text-stone">{new Date(news.created_at).toLocaleString('vi-VN')}</p>
+                      </div>
+                    </div>
+                    <h4 className="font-display text-lg font-bold text-linen mb-2">{news.title}</h4>
+                    <p className="font-body text-sm text-stone whitespace-pre-wrap">{news.content}</p>
                   </div>
-                </div>
-                <p className="font-body text-sm text-stone">
-                  Vừa đạt chuỗi <span className="text-vermilion font-bold">10 ngày</span> code liên tiếp! Đang hướng tới mốc 30 ngày. 🔥
-                </p>
-              </div>
-
-              {/* Mock User Activity */}
-              <div className="bg-ink border border-charcoal p-6">
-                <div className="flex items-center gap-3 mb-3">
-                  <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=Bob" alt="Bob" className="w-8 h-8 border border-charcoal bg-washi" />
-                  <div>
-                    <h3 className="font-display font-bold text-linen text-sm">Bob</h3>
-                    <p className="font-body text-xs text-stone">Hôm qua</p>
-                  </div>
-                </div>
-                <p className="font-body text-sm text-stone">
-                  Vừa giải thành công bài <span className="text-linen font-bold font-mono">Two Sum</span> với độ phức tạp O(N). Rất tự hào về bản thân 😎
-                </p>
-              </div>
+                ))
+              )}
             </div>
           ) : null}
         </div>

@@ -29,7 +29,9 @@ export const ProblemDescription: React.FC<ProblemProps> = ({ problem }) => {
     setLoading(true);
     try {
       const res = await api.getComments(problemId, 'PROBLEM');
-      if (res.success && res.data) setComments(res.data);
+      if (res.success && res.data) {
+        setComments(res.data.items || res.data || []);
+      }
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
   };
@@ -84,7 +86,7 @@ export const ProblemDescription: React.FC<ProblemProps> = ({ problem }) => {
           onClick={() => setActiveTab('discuss')}
         >
           <MessageSquare size={13} />
-          Thảo luận ({comments.length})
+          Thảo luận ({comments.length || 0})
         </button>
       </div>
 
@@ -136,13 +138,13 @@ export const ProblemDescription: React.FC<ProblemProps> = ({ problem }) => {
                 {comments.map((c) => {
                   const isOwner = c.userId === user?.id || c.user?.id === user?.id;
                   const commentUser = c.username || c.user?.username || 'Đấu sĩ';
-                  const hasLiked = c.likes?.includes(user?.id);
+                  const hasLiked = c.likes?.some?.((l: any) => l.user_id === user?.id) || c.likes?.includes?.(user?.id);
                   return (
                     <div key={c.id || c._id} className="bg-ink/30 border border-charcoal/50 p-3">
                       <div className="flex justify-between items-center mb-1.5">
                         <span className="font-body text-sm font-semibold text-linen">{commentUser}</span>
                         <span className="font-body text-[11px] text-stone">
-                          {new Date(c.createdAt).toLocaleDateString('vi-VN')}
+                          {new Date(c.createdAt || c.created_at || Date.now()).toLocaleDateString('vi-VN')}
                         </span>
                       </div>
                       <p className="font-body text-sm text-linen/80 mb-2">{c.content}</p>

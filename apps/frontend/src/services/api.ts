@@ -251,6 +251,12 @@ export const api = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getMatchDetails: (id: string) => wrap<any>(matchRepository.getMatch(id)),
   deleteMatch: (id: string) => rawDelete(`/matches/${id}`),
+  // =========================================================
+  // News
+  // =========================================================
+  getNews: (page = 1, limit = 10) => rawGet<any>(`/news?page=${page}&limit=${limit}`),
+  createNews: (data: Record<string, unknown>) => rawPost<any>('/news', data),
+  deleteNews: (id: string) => rawDelete(`/news/${id}`),
 };
 
 export default api;
