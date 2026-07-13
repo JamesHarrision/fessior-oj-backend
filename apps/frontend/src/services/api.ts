@@ -71,7 +71,7 @@ export const api = {
   // Public Profile
   getUserProfile: (username: string) => rawGet<any>(`/users/profile/${username}`),
   getUserProfileSubmissions: (username: string) => rawGet<any>(`/users/profile/${username}/submissions`),
-  getUserProfileTagStats: (username: string) => rawGet<any>(`/users/profile/${username}/tag-stats`),
+  getUserProfileTagStats: (username: string) => rawGet<any>(`/users/${username}/tag-stats`),
   getUserProfileEloHistory: (username: string) => rawGet<any>(`/users/profile/${username}/elo-history`),
   getUserProfileStreak: (username: string) => rawGet<any>(`/users/profile/${username}/streak`),
 
@@ -136,7 +136,7 @@ export const api = {
   buyItem: (itemId: string) => wrap(shopRepository.purchaseItem(itemId)),
   equipItem: (inventoryItemId: string) => wrap(shopRepository.equipItem(inventoryItemId)),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  createShopItem: (data: Record<string, unknown>) => rawPost<any>('/shop/items', data),
+  createShopItem: (data: Record<string, unknown>) => rawPost<any>('/shop', data),
 
   // =========================================================
   // Friends & Social

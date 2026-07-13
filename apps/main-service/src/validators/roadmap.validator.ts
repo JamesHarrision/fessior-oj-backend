@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const generateRoadmapSchema = z.object({
   body: z.object({
     prompt: z.string().min(1, 'Prompt is required'),
-    startDate: z.string().optional(),
+    startDate: z.string().nullable().optional(),
   }),
 });
 
