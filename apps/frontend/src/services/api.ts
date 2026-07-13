@@ -234,6 +234,16 @@ export const api = {
   getAIHistory: () => wrap<any[]>(aiRepository.getHistory()),
 
   // =========================================================
+  // Roadmaps
+  // =========================================================
+  generateRoadmap: (data: any) => rawPost<any>('/roadmaps', data),
+  getUserRoadmaps: () => rawGet<any>('/roadmaps'),
+  getRoadmapDetail: (id: string) => rawGet<any>(`/roadmaps/${id}`),
+  updateRoadmapSession: (id: string, data: any) => wrap<any>(httpClient.request('PATCH', `/roadmaps/sessions/${id}`, { body: data })),
+  toggleRoadmapShare: (id: string, isShared: boolean) => wrap<any>(httpClient.request('PATCH', `/roadmaps/${id}/share`, { body: { is_shared: isShared } })),
+  deleteRoadmap: (id: string) => rawDelete(`/roadmaps/${id}`),
+
+  // =========================================================
   // Notifications
   // =========================================================
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -131,7 +131,7 @@ export const HomeView: React.FC = () => {
             </div>
             
             <div 
-              onClick={() => navigate('/contest')}
+              // onClick={() => navigate('/contest')}
               className="bg-washi border border-charcoal p-6 cursor-pointer hover:border-stone group transition-colors flex flex-col gap-3"
             >
               <div className="bg-ink p-3 w-fit border border-charcoal group-hover:border-vermilion transition-colors">

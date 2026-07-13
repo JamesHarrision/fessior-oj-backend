@@ -416,6 +416,52 @@ export interface ISession {
   isRevoked: boolean;
 }
 
+export interface IRoadmapSessionProblem {
+  session_id: string;
+  mongo_problem_id: string;
+  is_completed: boolean;
+  completed_at?: string | Date | null;
+  problem?: IProblem;
+}
+
+export interface IRoadmapSession {
+  id: string;
+  phase_id: string;
+  title: string;
+  description?: string | null;
+  date?: string | Date | null;
+  is_completed: boolean;
+  completed_at?: string | Date | null;
+  order: number;
+  created_at: string | Date;
+  updated_at: string | Date;
+  problems?: IRoadmapSessionProblem[];
+}
+
+export interface IRoadmapPhase {
+  id: string;
+  roadmap_id: string;
+  title: string;
+  description?: string | null;
+  order: number;
+  created_at: string | Date;
+  updated_at: string | Date;
+  sessions?: IRoadmapSession[];
+}
+
+export interface IRoadmap {
+  id: string;
+  user_id: string;
+  title: string;
+  description?: string | null;
+  is_active: boolean;
+  is_shared: boolean;
+  created_at: string | Date;
+  updated_at: string | Date;
+  user?: IUser;
+  phases?: IRoadmapPhase[];
+}
+
 // ============================================================
 // API Response DTOs
 // ============================================================
@@ -687,3 +733,18 @@ export interface SocketMatchEnded {
 export interface SocketNotification {
   notification: INotification;
 }
+
+// ============================================================
+// Roadmap DTOs
+// ============================================================
+
+export interface GenerateRoadmapRequest {
+  prompt: string;
+  startDate?: string;
+}
+
+export interface UpdateRoadmapSessionRequest {
+  date?: string;
+  is_completed?: boolean;
+}
+

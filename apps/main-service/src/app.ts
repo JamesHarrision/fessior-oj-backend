@@ -17,6 +17,7 @@ import notificationRoutes from './routes/notification.route';
 import reportRoutes from './routes/report.route';
 import userRoutes from './routes/user.route';
 import newsRoutes from './routes/news.route';
+import roadmapRoutes from './routes/roadmap.route';
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from '../swagger-output.json';
 import { errorMiddleware } from './middlewares/error.middleware';
@@ -44,6 +45,7 @@ app.use(`/api/v1${API_ROUTES.FRIENDS}`, friendshipRoutes);
 app.use(`/api/v1${API_ROUTES.SHOP}`, shopRoutes);
 app.use(`/api/v1${API_ROUTES.NOTIFICATIONS}`, notificationRoutes);
 app.use(`/api/v1${API_ROUTES.REPORTS}`, reportRoutes);
+app.use(`/api/v1${API_ROUTES.ROADMAPS}`, roadmapRoutes);
 app.use('/api/v1/news', newsRoutes);
 
 app.get('/', async (req, res) => {

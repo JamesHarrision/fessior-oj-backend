@@ -12,7 +12,8 @@ import { PlaygroundView } from '../../views/PlaygroundView';
 import { RankingView } from '../../views/RankingView';
 import { ShopView } from '../../views/ShopView';
 import { SettingsView } from '../../views/SettingsView';
-import { AIView } from '../../views/AIView';
+import { RoadmapsListView } from '../../features/roadmaps/RoadmapsListView';
+import { RoadmapDetailView } from '../../features/roadmaps/RoadmapDetailView';
 import { SubmissionsView } from '../../views/SubmissionsView';
 import { CustomRoomsView } from '../../views/CustomRoomsView';
 import { AdminDashboard } from '../../views/AdminDashboard';
@@ -113,7 +114,8 @@ export function AppRouter() {
 
           {/* ── Tools ── */}
           <Route path="/shop" element={<ShopView />} />
-          <Route path="/ai" element={<AIView />} />
+          <Route path="/roadmaps" element={<RoadmapsListView />} />
+          <Route path="/roadmaps/:id" element={<RoadmapDetailView />} />
           <Route path="/settings" element={<SettingsView />} />
         </Route>
 

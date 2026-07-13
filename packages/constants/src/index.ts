@@ -24,6 +24,7 @@ export const API_ROUTES = {
   SHOP: '/shop',
   NOTIFICATIONS: '/notifications',
   REPORTS: '/reports',
+  ROADMAPS: '/roadmaps',
 } as const;
 
 // Các sự kiện Socket.io dùng chung giữa FE và BE
