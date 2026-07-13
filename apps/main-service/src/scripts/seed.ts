@@ -16,6 +16,7 @@ async function main() {
 
   console.log('Cleaning up existing data...');
   // Clear MySQL tables in order of dependency
+  await prisma.inventoryItem.deleteMany({});
   await prisma.userActivity.deleteMany({});
   await prisma.eloHistory.deleteMany({});
   await prisma.report.deleteMany({});
@@ -148,14 +149,6 @@ async function main() {
     },
   });
 
-  // Equiping item for tester
-  await prisma.inventoryItem.create({
-    data: {
-      user_id: tester.id,
-      item_id: itemPurple.id,
-      is_equipped: true,
-    },
-  });
 
   // 4. Seed Tags
   console.log('Seeding tags...');
@@ -445,6 +438,22 @@ async function main() {
   await prisma.userActivity.createMany({ 
     data: Array.from(uniqueActivitiesMap.values()) 
   });
+
+  // 11. Seed Inventory Items for Tester
+  console.log('Seeding Inventory Items for tester...');
+  const shopItems = await prisma.shopItem.findMany();
+  const avatarFrame = shopItems.find(i => i.item_type === 'AVATAR_FRAME');
+  const titleItem = shopItems.find(i => i.item_type === 'TITLE');
+  const badgeItem = shopItems.find(i => i.item_type === 'BADGE');
+
+  const inventoryData = [];
+  if (avatarFrame) inventoryData.push({ user_id: tester.id, item_id: avatarFrame.id, is_equipped: true });
+  if (titleItem) inventoryData.push({ user_id: tester.id, item_id: titleItem.id, is_equipped: true });
+  if (badgeItem) inventoryData.push({ user_id: tester.id, item_id: badgeItem.id, is_equipped: true });
+
+  if (inventoryData.length > 0) {
+    await prisma.inventoryItem.createMany({ data: inventoryData });
+  }
 
   console.log('Seeding completed successfully!');
 }
