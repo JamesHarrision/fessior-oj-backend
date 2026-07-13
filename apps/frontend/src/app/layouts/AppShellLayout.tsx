@@ -6,7 +6,7 @@ import { AppLogo } from '@ocj/ui';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
 import { Role } from '@ocj/types';
-import { Swords, BookOpen, Crown, Beaker, LayoutDashboard, ShoppingBag, Map, Settings, UsersRound, Code2, ScrollText, Home } from 'lucide-react';
+import { Swords, BookOpen, Crown, Beaker, LayoutDashboard, ShoppingBag, Map as MapIcon, Settings, UsersRound, Code2, ScrollText, Home } from 'lucide-react';
 
 /* =====================================================
    Navigation Items
@@ -39,7 +39,7 @@ const navItems: NavItem[] = [
 
   // ── Tools ──
   { key: '/shop',        icon: <ShoppingBag size={18} />,       label: 'Shop',         path: '/shop',         section: 'tools' },
-  { key: '/roadmaps',    icon: <Map size={18} />,               label: 'Roadmaps',     path: '/roadmaps',     section: 'tools' },
+  { key: '/roadmaps',    icon: <MapIcon size={18} />,               label: 'Roadmaps',     path: '/roadmaps',     section: 'tools' },
   { key: '/settings',    icon: <Settings size={18} />,          label: 'Settings',     path: '/settings',     section: 'tools' },
 ];
 
