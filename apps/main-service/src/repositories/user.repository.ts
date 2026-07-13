@@ -17,6 +17,14 @@ export const findUserById = async (id: string) => {
       full_name: true,
       created_at: true,
       last_active_date: true,
+      inventory_items: {
+        where: { is_equipped: true },
+        include: {
+          item: {
+            select: { name: true, item_type: true, asset_url: true },
+          },
+        },
+      },
     },
   });
 };
@@ -61,6 +69,14 @@ export const findUserByUsername = async (username: string) => {
       bio: true,
       full_name: true,
       created_at: true,
+      inventory_items: {
+        where: { is_equipped: true },
+        include: {
+          item: {
+            select: { name: true, item_type: true, asset_url: true },
+          },
+        },
+      },
     },
   });
 };

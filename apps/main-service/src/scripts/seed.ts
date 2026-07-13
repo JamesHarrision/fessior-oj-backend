@@ -16,6 +16,8 @@ async function main() {
 
   console.log('Cleaning up existing data...');
   // Clear MySQL tables in order of dependency
+  await prisma.userActivity.deleteMany({});
+  await prisma.eloHistory.deleteMany({});
   await prisma.report.deleteMany({});
   await prisma.commentLike.deleteMany({});
   await prisma.comment.deleteMany({});
@@ -386,6 +388,62 @@ async function main() {
         ]
       }
     }
+  });
+
+  // 10. Seed Elo History and Activities
+  console.log('Seeding Elo History and Activities for tester...');
+  
+  // Create 10 fake Elo history records
+  const eloRecords = [];
+  let currentElo = 1100;
+  for (let i = 9; i >= 0; i--) {
+    const change = Math.floor(Math.random() * 40) - 15; // -15 to +25
+    currentElo += change;
+    eloRecords.push({
+      user_id: tester.id,
+      old_elo: currentElo - change,
+      new_elo: currentElo,
+      change: change,
+      reason: change >= 0 ? 'MATCH_WIN' : 'MATCH_LOSS',
+      created_at: new Date(now.getTime() - i * 2 * 24 * 60 * 60 * 1000)
+    });
+  }
+  await prisma.eloHistory.createMany({ data: eloRecords });
+  
+  // Update tester final elo
+  await prisma.user.update({
+    where: { id: tester.id },
+    data: { elo_rating: currentElo }
+  });
+
+  // Create fake UserActivities for heatmap
+  const activityRecords = [];
+  for (let i = 0; i < 30; i++) {
+    // random days in the past year
+    const daysAgo = Math.floor(Math.random() * 365);
+    const activityDate = new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000);
+    activityDate.setHours(0,0,0,0);
+    activityRecords.push({
+      user_id: tester.id,
+      activity_date: activityDate,
+      submissions_count: Math.floor(Math.random() * 10) + 1,
+      problems_solved_count: Math.floor(Math.random() * 5) + 1,
+    });
+  }
+  
+  // Need to filter out duplicates by date
+  const uniqueActivitiesMap = new Map();
+  activityRecords.forEach(act => {
+    const dateStr = act.activity_date.toISOString().split('T')[0];
+    if (!uniqueActivitiesMap.has(dateStr)) {
+      uniqueActivitiesMap.set(dateStr, act);
+    } else {
+      uniqueActivitiesMap.get(dateStr).problems_solved_count += act.problems_solved_count;
+    }
+  });
+  
+  await prisma.userActivity.createMany({ 
+    data: Array.from(uniqueActivitiesMap.values()) 
   });
 
   console.log('Seeding completed successfully!');

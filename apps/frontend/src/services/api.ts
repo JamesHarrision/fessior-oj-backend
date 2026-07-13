@@ -67,6 +67,7 @@ export const api = {
   revokeAllSessions: () => rawDelete('/auth/sessions'),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   updateProfile: (data: Record<string, unknown>) => wrap<any>(userRepository.updateProfile(data)),
+  updateProfileAvatar: (formData: FormData) => rawPost<any>('/users/me/avatar', formData),
   
   // Public Profile
   getUserProfile: (username: string) => rawGet<any>(`/users/profile/${username}`),

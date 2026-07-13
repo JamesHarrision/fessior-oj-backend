@@ -42,6 +42,7 @@ model User {
   AiHistory                  AiHistory[]
   news_authored              News[]
   roadmaps                   Roadmap[]
+  inventory_items            InventoryItem[]
 
   @@map("users")
 }
@@ -412,6 +413,7 @@ model InventoryItem {
   acquired_at DateTime @default(now())
 
   item ShopItem @relation(fields: [item_id], references: [id], onDelete: Cascade)
+  user User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@unique([user_id, item_id])
   @@map("inventory_items")
