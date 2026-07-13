@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { IRoadmap } from '@ocj/types';
+import type { IRoadmap } from '@ocj/types';
 import { Calendar, ChevronRight, Share2, Target } from 'lucide-react';
 import { format } from 'date-fns';
 

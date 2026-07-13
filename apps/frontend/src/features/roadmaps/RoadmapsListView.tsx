@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Plus, Compass, Map as MapIcon } from 'lucide-react';
 import { api } from '../../services/api';
-import { IRoadmap } from '@ocj/types';
+import type { IRoadmap } from '@ocj/types';
 import { message } from 'antd';
 import { RoadmapCard } from './RoadmapCard';
 import { CreateRoadmapModal } from './CreateRoadmapModal';

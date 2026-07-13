@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
-import { IRoadmap, IRoadmapSession } from '@ocj/types';
+import type { IRoadmap, IRoadmapSession } from '@ocj/types';
 import { message, Switch, Popconfirm } from 'antd';
 import { ArrowLeft, Share2, Trash2, Calendar as CalendarIcon, CheckCircle2, Circle } from 'lucide-react';
 import { format, isSameDay, startOfWeek, addDays, getMonth, getYear } from 'date-fns';
