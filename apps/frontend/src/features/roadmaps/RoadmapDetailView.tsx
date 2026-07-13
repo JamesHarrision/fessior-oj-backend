@@ -241,8 +241,39 @@ export function RoadmapDetailView() {
             <div className="bg-washi border border-charcoal p-6">
               <div className="flex items-start justify-between mb-6">
                 <div>
-                  <div className="text-vermilion text-xs font-bold uppercase tracking-widest mb-1">
-                    {selectedSession.date ? format(new Date(selectedSession.date), 'EEEE, MMMM d') : 'No Date'}
+                  <div className="text-vermilion text-xs font-bold uppercase tracking-widest mb-1 flex items-center gap-2">
+                    {selectedSession.date ? format(new Date(selectedSession.date), 'EEEE, MMMM d, yyyy') : 'No Date'}
+                    <Popconfirm
+                      title="Đổi ngày học"
+                      description={
+                        <div className="mt-2">
+                          <input 
+                            type="date" 
+                            className="border border-charcoal bg-ink text-linen p-1 text-sm rounded w-full"
+                            id="reschedule-date"
+                            defaultValue={selectedSession.date ? format(new Date(selectedSession.date), 'yyyy-MM-dd') : ''}
+                          />
+                        </div>
+                      }
+                      onConfirm={async () => {
+                        const input = document.getElementById('reschedule-date') as HTMLInputElement;
+                        if (input && input.value) {
+                          try {
+                            const res = await api.updateRoadmapSession(selectedSession.id, { date: input.value });
+                            if (res.success) {
+                              message.success('Đã dời lịch học');
+                              fetchRoadmap();
+                            }
+                          } catch (e) {
+                            message.error('Lỗi khi đổi ngày');
+                          }
+                        }
+                      }}
+                    >
+                      <button className="text-stone hover:text-vermilion transition-colors border border-charcoal hover:border-vermilion px-2 py-0.5 rounded text-[10px]">
+                        Dời lịch
+                      </button>
+                    </Popconfirm>
                   </div>
                   <h3 className="font-display font-bold text-2xl text-linen">{selectedSession.title}</h3>
                   <p className="text-stone mt-2">{selectedSession.description}</p>

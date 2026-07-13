@@ -112,10 +112,7 @@ export class RoadmapService {
             order: pIndex,
             sessions: {
               create: phase.sessions.map((session, sIndex) => {
-                // Calculate estimated date: 1 session per day roughly? Let's space them by 1 day
                 const sessionDate = addDays(baseDate, pIndex * 7 + sIndex);
-                
-                // Filter only valid problems
                 const validProblemMongoIds = (session.recommendedProblemSlugs || [])
                   .filter((slug: string) => validSlugs.has(slug))
                   .map((slug: string) => slugToMongoId.get(slug)!);
@@ -146,6 +143,16 @@ export class RoadmapService {
             }
           }
         }
+      }
+    });
+
+    // Create Notification
+    await prisma.notification.create({
+      data: {
+        user_id: userId,
+        title: 'Roadmap Generated!',
+        content: `Your new DSA roadmap "${createdRoadmap.title}" is ready. Don't forget to stick to the schedule!`,
+        type: 'SYSTEM',
       }
     });
 

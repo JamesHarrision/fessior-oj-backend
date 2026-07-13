@@ -365,32 +365,36 @@ Files lien quan:
 ## 12. AI Roadmap, Debug Assistant And Mock Interview
 
 AI module dung Google Gemini de tro thanh mot AI Mentor toan dien:
-- **Roadmap Loop**: Tao roadmap hoc DSA va lien ket truc tiep cac bai tap goi y toi man hinh giai bai.
+- **Roadmap Loop**: Tao roadmap hoc DSA va lien ket truc tiep cac bai tap goi y toi man hinh giai bai. Du lieu roadmap duoc luu o `roadmaps`, `roadmap_phases`, `roadmap_sessions`.
 - **AI Debug Assistant**: Khi user nop bai bi sai (WA, TLE, RE, CE), AI se phan tich code, doc testcase va dua ra goi y de user tu sua loi thay vi chi truc tiep code dung.
 - **Mock Interview Chat**: Khi nop bai thanh cong (AC), AI dong vai tro nguoi phong van danh gia do phuc tap va de xuat toi uu thong qua giao dien Chat tuong tac.
 
-Lich su AI (roadmap, debug, interview) duoc luu lai trong MySQL bang `AiHistory`. Giao dien Chat ho tro tuong tac lien tuc dua vao lich su json tu DB. (API Key Gemini duoc cau hinh bao mat thong qua `.env` server side, ho tro mock/offline fallback neu thieu key).
+Lich su AI (debug, interview) duoc luu lai trong MySQL bang `AiHistory`. Giao dien Chat ho tro tuong tac lien tuc dua vao lich su json tu DB. (API Key Gemini duoc cau hinh bao mat thong qua `.env` server side, ho tro mock/offline fallback neu thieu key).
 
 ```mermaid
 flowchart LR
-  FE[AIView / ExecutionResultPanel] --> API[AI routes]
+  FE[RoadmapsListView / RoadmapDetailView / AIView / ExecutionResultPanel] --> API[AI/Roadmap routes]
   API --> Auth[requireAuth]
-  Auth --> Controller[ai.controller]
-  Controller --> Service[ai.service]
+  Auth --> Controller[ai.controller / roadmap.controller]
+  Controller --> Service[ai.service / roadmap.service]
   Service --> Gemini[Google Gemini API]
   Service --> Mongo[(Submission)]
-  Service --> MySQL[(ai_histories)]
+  Service --> MySQL[(ai_histories / roadmaps / roadmap_phases / roadmap_sessions)]
 ```
 
 Files lien quan:
 
+- `apps/frontend/src/features/roadmaps/*`
 - `apps/frontend/src/views/AIView.tsx`
 - `apps/frontend/src/components/editor/ExecutionResultPanel.tsx`
-- `apps/frontend/src/components/admin/AdminAiTab.tsx`
 - `apps/main-service/src/routes/ai.route.ts`
 - `apps/main-service/src/controllers/ai.controller.ts`
 - `apps/main-service/src/services/ai.service.ts`
+- `apps/main-service/src/routes/roadmap.route.ts`
+- `apps/main-service/src/controllers/roadmap.controller.ts`
+- `apps/main-service/src/services/roadmap.service.ts`
 - `apps/main-service/src/models/submission.model.ts`
+- `apps/main-service/prisma/schema.prisma`
 
 ## 13. Leaderboard And User Stats
 
