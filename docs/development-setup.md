@@ -50,6 +50,12 @@ Worker service local dev can env rieng trong:
 apps/worker-service/.env
 ```
 
+Tao tu file mau:
+
+```bash
+cp apps/worker-service/.env.example apps/worker-service/.env
+```
+
 Bien moi truong quan trong:
 
 | Env | Muc dich |
