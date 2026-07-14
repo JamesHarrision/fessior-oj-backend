@@ -2,7 +2,7 @@
   "name": "@ocj/executor",
   "version": "1.0.0",
   "main": "dist/index.js",
-  "types": "src/index.ts",
+  "types": "dist/index.d.ts",
   "private": true,
   "scripts": {
     "build": "tsc"
