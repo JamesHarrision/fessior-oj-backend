@@ -169,7 +169,7 @@ export const AdminShopTab: React.FC = () => {
 
                     <button 
                       onClick={() => handleEquip(invId)} 
-                      className="text-xs font-semibold px-2.5 py-1 rounded-md border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 transition-colors"
+                      className="text-xs font-semibold px-2.5 py-1 rounded-xl border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 transition-colors"
                     >
                       Trang Bị
                     </button>

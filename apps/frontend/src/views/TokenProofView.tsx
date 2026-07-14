@@ -49,7 +49,7 @@ function EloTickerDemo() {
 
   return (
     <div className="text-center">
-      <div className="relative inline-flex items-center gap-1 mb-6 p-4 border border-charcoal rounded max-w-full overflow-x-auto">
+      <div className="relative inline-flex items-center gap-1 mb-6 p-4 border border-charcoal rounded-xl max-w-full overflow-x-auto">
         {digits.map((_, i) => (
           <span
             key={i}
@@ -84,7 +84,7 @@ function EloTickerDemo() {
         ))}
         {/* Flash overlay */}
         {animating && (
-          <div className="absolute inset-0 pointer-events-none animate-vermilion-flash rounded" />
+          <div className="absolute inset-0 pointer-events-none animate-vermilion-flash rounded-xl" />
         )}
       </div>
 
@@ -92,14 +92,14 @@ function EloTickerDemo() {
         <button
           onClick={() => triggerAnimation(true)}
           disabled={animating}
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-vermilion text-linen font-display text-sm font-bold uppercase tracking-wider hover:bg-accent-hover disabled:opacity-50 transition-colors rounded"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-vermilion text-linen font-display text-sm font-bold uppercase tracking-wider hover:bg-accent-hover disabled:opacity-50 transition-colors rounded-xl"
         >
           ▲  Win (+25)
         </button>
         <button
           onClick={() => triggerAnimation(false)}
           disabled={animating}
-          className="inline-flex items-center gap-2 px-5 py-2.5 border border-vermilion text-vermilion font-display text-sm font-bold uppercase tracking-wider hover:bg-vermilion/10 disabled:opacity-50 transition-colors rounded"
+          className="inline-flex items-center gap-2 px-5 py-2.5 border border-vermilion text-vermilion font-display text-sm font-bold uppercase tracking-wider hover:bg-vermilion/10 disabled:opacity-50 transition-colors rounded-xl"
         >
           ▼  Lose (−15)
         </button>
@@ -264,7 +264,7 @@ export function TokenProofView() {
               <div className="text-[10px] font-display font-bold tracking-[0.2em] text-stone uppercase">
                 Primary CTA — Fill Vermilion
               </div>
-              <button className="inline-flex items-center gap-2 px-6 py-3 bg-vermilion text-linen font-display text-sm font-bold uppercase tracking-wider hover:bg-accent-hover transition-colors rounded">
+              <button className="inline-flex items-center gap-2 px-6 py-3 bg-vermilion text-linen font-display text-sm font-bold uppercase tracking-wider hover:bg-accent-hover transition-colors rounded-xl">
                 TÌM ĐỐI THỦ
               </button>
             </div>
@@ -274,7 +274,7 @@ export function TokenProofView() {
               <div className="text-[10px] font-display font-bold tracking-[0.2em] text-stone uppercase">
                 Secondary — Outline Vermilion
               </div>
-              <button className="inline-flex items-center gap-2 px-6 py-3 border border-vermilion text-vermilion font-display text-sm font-bold uppercase tracking-wider hover:bg-vermilion/10 transition-colors rounded">
+              <button className="inline-flex items-center gap-2 px-6 py-3 border border-vermilion text-vermilion font-display text-sm font-bold uppercase tracking-wider hover:bg-vermilion/10 transition-colors rounded-xl">
                 XEM CHI TIẾT
               </button>
             </div>
@@ -295,10 +295,10 @@ export function TokenProofView() {
                 Win / Loss — Fill vs Outline + ▲▼ Icon
               </div>
               <div className="flex flex-wrap gap-4">
-                <div className="flex items-center gap-2 px-5 py-2.5 bg-vermilion text-linen font-display text-sm font-bold uppercase tracking-wider rounded">
+                <div className="flex items-center gap-2 px-5 py-2.5 bg-vermilion text-linen font-display text-sm font-bold uppercase tracking-wider rounded-xl">
                   ▲  Win +25
                 </div>
-                <div className="flex items-center gap-2 px-5 py-2.5 border border-vermilion text-vermilion font-display text-sm font-bold uppercase tracking-wider rounded">
+                <div className="flex items-center gap-2 px-5 py-2.5 border border-vermilion text-vermilion font-display text-sm font-bold uppercase tracking-wider rounded-xl">
                   ▼  Lose −15
                 </div>
               </div>
@@ -383,7 +383,7 @@ export function TokenProofView() {
                     </td>
                     <td className="p-3 font-mono text-xs">{row.ratio}</td>
                     <td className="p-3">
-                      <span className={`font-display text-xs font-bold px-2 py-0.5 rounded ${row.wcag === 'AAA' ? 'bg-vermilion/20 text-vermilion' : 'bg-charcoal text-stone'}`}>
+                      <span className={`font-display text-xs font-bold px-2 py-0.5 rounded-xl ${row.wcag === 'AAA' ? 'bg-vermilion/20 text-vermilion' : 'bg-charcoal text-stone'}`}>
                         {row.wcag}
                       </span>
                     </td>

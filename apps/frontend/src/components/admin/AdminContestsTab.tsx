@@ -202,14 +202,14 @@ export const AdminContestsTab: React.FC<AdminContestsTabProps> = ({
                     <div className="flex gap-2 flex-wrap justify-end sm:flex-nowrap items-start mt-2 sm:mt-0 sm:ml-4">
                       <button
                         onClick={() => handleRegisterTest(cid)}
-                        className="text-xs font-semibold px-2.5 py-1 rounded-md border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 transition-colors whitespace-nowrap"
+                        className="text-xs font-semibold px-2.5 py-1 rounded-xl border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 transition-colors whitespace-nowrap"
                         title="Đăng ký test"
                       >
                         Đăng Ký
                       </button>
                       <button
                         onClick={() => handleUnregisterTest(cid)}
-                        className="text-xs font-semibold px-2.5 py-1 rounded-md border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors whitespace-nowrap"
+                        className="text-xs font-semibold px-2.5 py-1 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors whitespace-nowrap"
                         title="Hủy đăng ký test"
                       >
                         Hủy
@@ -311,7 +311,7 @@ export const AdminContestsTab: React.FC<AdminContestsTabProps> = ({
                       const pid = p.id || (p as any)._id;
                       const isChecked = editProblems.includes(pid);
                       return (
-                        <label key={pid} className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-all ${isChecked ? 'bg-vermilion/10 border-vermilion/50 text-linen' : 'bg-washi/30 border-charcoal/50 text-stone hover:bg-washi/50'}`}>
+                        <label key={pid} className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${isChecked ? 'bg-vermilion/10 border-vermilion/50 text-linen' : 'bg-washi/30 border-charcoal/50 text-stone hover:bg-washi/50'}`}>
                           <span className="flex items-center gap-3 font-body text-sm font-medium">
                             <div className={`w-4 h-4 rounded-[4px] border flex items-center justify-center transition-colors ${isChecked ? 'bg-vermilion border-vermilion' : 'border-stone/50 bg-ink'}`}>
                               {isChecked && <svg width="10" height="8" viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 4L4 7L9 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
@@ -348,7 +348,7 @@ export const AdminContestsTab: React.FC<AdminContestsTabProps> = ({
                   ) : (
                     <div className="flex flex-col gap-2">
                       {leaderboard.map((u, idx) => (
-                        <div key={idx} className="flex justify-between items-center p-3 bg-washi/30 border border-charcoal/50 rounded-lg">
+                        <div key={idx} className="flex justify-between items-center p-3 bg-washi/30 border border-charcoal/50 rounded-xl">
                           <div className="flex items-center gap-3">
                             <span className="font-bold text-yellow-400">#{idx + 1}</span>
                             <span className="text-linen font-medium text-sm">{u.username || u.userId || 'User'}</span>

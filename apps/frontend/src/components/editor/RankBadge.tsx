@@ -48,7 +48,7 @@ export const RankBadge: React.FC<RankBadgeProps> = ({ elo, showLabel = false, si
   };
 
   return (
-    <div className={`flex items-center gap-1.5 px-2 py-0.5 border ${bgClass} rounded-sm`}>
+    <div className={`flex items-center gap-1.5 px-2 py-0.5 border ${bgClass} rounded-xl`}>
       <Icon size={iconSizes[size]} className={colorClass} />
       {showLabel && (
         <span className={`font-display font-bold uppercase tracking-wider ${colorClass} ${textSizes[size]}`}>

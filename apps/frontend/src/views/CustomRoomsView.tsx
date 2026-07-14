@@ -211,9 +211,9 @@ export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomM
   return (
     <div className="flex flex-col gap-6 max-w-[1200px] mx-auto w-full p-4 lg:p-8">
       {/* Header */}
-      <div className="bg-washi border border-charcoal p-6 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div className="bg-washi border border-charcoal p-6 flex flex-col md:flex-row justify-between items-center gap-4 rounded-xl overflow-hidden">
         <div className="flex items-center gap-4">
-          <div className="bg-ink p-3 border border-charcoal">
+          <div className="bg-ink p-3 border border-charcoal rounded-xl">
             <Shield size={32} className="text-vermilion" />
           </div>
           <div>
@@ -237,27 +237,27 @@ export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomM
                 setRoomCodeInput(val);
                 setSearchQuery(val);
               }}
-              className="w-full bg-ink border border-charcoal text-linen py-3 pl-10 pr-4 font-mono text-sm outline-none focus:border-vermilion transition-colors placeholder:text-stone/50 placeholder:font-body"
+              className="w-full bg-ink border border-charcoal text-linen py-3 pl-10 pr-4 font-mono text-sm outline-none focus:border-vermilion transition-colors placeholder:text-stone/50 placeholder:font-body rounded-xl"
               maxLength={6}
             />
           </div>
           <button 
             onClick={() => handleJoinRoom()} 
             disabled={loading || !roomCodeInput}
-            className="shrink-0 bg-vermilion text-linen font-display text-[12px] font-bold uppercase tracking-wider px-6 py-3 hover:bg-vermilion-hover transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+            className="shrink-0 bg-vermilion text-linen font-display text-[12px] font-bold uppercase tracking-wider px-6 py-3 hover:bg-vermilion-hover transition-colors flex items-center justify-center gap-2 disabled:opacity-50 rounded-xl"
           >
             Tham gia <ArrowRight size={16} />
           </button>
         </div>
 
         {/* Toolbar: Filters & Create Room */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-ink border border-charcoal p-4">
+        <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-ink border border-charcoal p-4 rounded-xl">
           <div className="flex items-center gap-3 w-full sm:w-auto">
             <span className="font-display text-[11px] font-bold text-stone uppercase tracking-wider shrink-0">Lọc:</span>
             <select 
               value={filterDifficulty} 
               onChange={(e) => setFilterDifficulty(e.target.value)}
-              className="bg-washi border border-charcoal text-linen px-3 py-2 font-body text-sm outline-none focus:border-vermilion transition-colors appearance-none cursor-pointer w-full sm:w-auto min-w-[120px]"
+              className="bg-washi border border-charcoal text-linen px-3 py-2 font-body text-sm outline-none focus:border-vermilion transition-colors appearance-none cursor-pointer w-full sm:w-auto min-w-[120px] rounded-xl"
             >
               <option value="">Tất cả độ khó</option>
               <option value="EASY">Dễ (Easy)</option>
@@ -271,7 +271,7 @@ export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomM
              <select 
               value={difficulty} 
               onChange={(e: any) => setDifficulty(e.target.value)}
-              className="bg-washi border border-charcoal text-linen px-3 py-2 font-body text-sm outline-none focus:border-vermilion transition-colors appearance-none cursor-pointer flex-1 sm:flex-none"
+              className="bg-washi border border-charcoal text-linen px-3 py-2 font-body text-sm outline-none focus:border-vermilion transition-colors appearance-none cursor-pointer flex-1 sm:flex-none rounded-xl"
             >
               <option value="EASY">Dễ</option>
               <option value="MEDIUM">TB</option>
@@ -280,7 +280,7 @@ export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomM
             <select 
               value={maxParticipants} 
               onChange={(e: any) => setMaxParticipants(parseInt(e.target.value))}
-              className="bg-washi border border-charcoal text-linen px-3 py-2 font-body text-sm outline-none focus:border-vermilion transition-colors appearance-none cursor-pointer flex-1 sm:flex-none"
+              className="bg-washi border border-charcoal text-linen px-3 py-2 font-body text-sm outline-none focus:border-vermilion transition-colors appearance-none cursor-pointer flex-1 sm:flex-none rounded-xl"
             >
               {[2, 3, 4, 5, 6, 8, 10].map(n => (
                 <option key={n} value={n}>{n} users</option>
@@ -289,7 +289,7 @@ export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomM
             <button 
               onClick={handleCreateRoom} 
               disabled={loading}
-              className="bg-washi border border-charcoal text-linen font-display text-[11px] font-bold uppercase tracking-wider px-4 py-2 hover:border-vermilion hover:text-vermilion transition-colors flex items-center justify-center gap-2 disabled:opacity-50 shrink-0"
+              className="bg-washi border border-charcoal text-linen font-display text-[11px] font-bold uppercase tracking-wider px-4 py-2 hover:border-vermilion hover:text-vermilion transition-colors flex items-center justify-center gap-2 disabled:opacity-50 shrink-0 rounded-xl"
             >
               <Plus size={14} /> Tạo mới
             </button>

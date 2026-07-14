@@ -28,8 +28,13 @@
     "postcss": "^8.5.16",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
+    "react-icons": "^5.7.0",
+    "react-markdown": "^10.1.0",
+    "react-resizable-panels": "^4.12.2",
     "react-router-dom": "^7.18.1",
     "react-toastify": "^11.1.0",
+    "remark-breaks": "^4.0.0",
+    "remark-gfm": "^4.0.1",
     "socket.io-client": "^4.8.3",
     "tailwindcss": "^4.3.2",
     "zustand": "^5.0.14"

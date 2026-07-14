@@ -1,18 +1,19 @@
 import { type ReactNode, useCallback, useEffect, useState } from 'react';
 import { Avatar, Dropdown, Badge } from 'antd';
-import { BellOutlined, UserOutlined, SettingOutlined, LogoutOutlined } from '@ant-design/icons';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { AppLogo } from '@ocj/ui';
+import { BellOutlined, UserOutlined, SettingOutlined, LogoutOutlined, SunOutlined, MoonOutlined } from '@ant-design/icons';
+import { Outlet, useLocation, useNavigate, NavLink } from 'react-router-dom';
+import LogoImage from '../../assets/Logo.png';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import { api } from '../../services/api';
 import { Role } from '@ocj/types';
-import { Swords, BookOpen, Crown, Beaker, LayoutDashboard, ShoppingBag, Bot, Settings, UsersRound, Code2, ScrollText, Home } from 'lucide-react';
+import { Home, Share2, Map, Handshake, BookOpen, Sparkles, Crown, LayoutDashboard } from 'lucide-react';
 
 /* =====================================================
    Navigation Items
    ===================================================== */
 
-type NavSection = 'main' | 'community' | 'tools';
+type NavSection = 'main';
 
 interface NavItem {
   key: string;
@@ -25,29 +26,13 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  // ── Main ──
-  { key: '/home',        icon: <Home size={18} />,             label: 'Dashboard',    path: '/home',         section: 'main' },
-  { key: '/match',       icon: <Swords size={18} />,           label: 'Lobby',        path: '/match',        section: 'main' },
-  { key: '/editor',      icon: <Code2 size={18} />,            label: 'Editor',       path: '/editor',       section: 'main' },
-  { key: '/problems',    icon: <BookOpen size={18} />,         label: 'Problems',     path: '/problems',     section: 'main' },
-  { key: '/ranking',     icon: <Crown size={18} />,            label: 'Rankings',     path: '/ranking',      section: 'main' },
-
-  // ── Community ──
-  { key: '/custom-rooms', icon: <Beaker size={18} />,           label: 'Custom Arena', path: '/custom-rooms', section: 'community' },
-  { key: '/submissions', icon: <ScrollText size={18} />,       label: 'Submissions',  path: '/submissions',  section: 'community' },
-  { key: '/friends',     icon: <UsersRound size={18} />,        label: 'Social',       path: '/friends',      section: 'community' },
-
-  // ── Tools ──
-  { key: '/shop',        icon: <ShoppingBag size={18} />,       label: 'Shop',         path: '/shop',         section: 'tools' },
-  { key: '/ai',          icon: <Bot size={18} />,               label: 'AI Mentor',    path: '/ai',           section: 'tools' },
-  { key: '/settings',    icon: <Settings size={18} />,          label: 'Settings',     path: '/settings',     section: 'tools' },
+  { key: '/home', icon: <Home size={22} />, label: 'Home', path: '/home', section: 'main' },
+  { key: '/chat', icon: <Share2 size={22} />, label: "Arya's Space", path: '/chat', section: 'main' },
+  { key: '/ai', icon: <Map size={22} />, label: 'Roadmap', path: '/ai', section: 'main' },
+  { key: '/match', icon: <Handshake size={22} />, label: 'Solo Code 1vs1', path: '/match', section: 'main' },
+  { key: '/editor', icon: <BookOpen size={22} />, label: 'Code Editor', path: '/editor', section: 'main' },
+  { key: '/interview', icon: <Sparkles size={22} />, label: 'Mock Interview', path: '/interview', section: 'main' },
 ];
-
-const sectionLabels: Record<NavSection, string> = {
-  main: 'MAIN',
-  community: 'COMMUNITY',
-  tools: 'TOOLS',
-};
 
 /* =====================================================
    Sidebar — 240px, Ink bg, Vermilion left-border active
@@ -60,79 +45,58 @@ function Sidebar(props: {
 }) {
   const { user, selectedKey, onNavigate } = props;
 
-  const grouped = new Map<NavSection, NavItem[]>();
-  for (const item of navItems) {
-    if (item.adminOnly && user?.role !== Role.ADMIN) continue;
-    const grp = grouped.get(item.section) ?? [];
-    grp.push(item);
-    grouped.set(item.section, grp);
-  }
-
   return (
-    <aside className="flex flex-col h-screen bg-ink border-r border-charcoal overflow-y-auto">
-      {/* ── Logo ── */}
-      <div 
-        className="px-5 pt-6 pb-4 cursor-pointer"
-        onClick={() => onNavigate('/home')}
-      >
-        <AppLogo />
-      </div>
-
+    <aside className="absolute top-0 left-0 h-full bg-washi border-r border-charcoal overflow-y-auto overflow-x-hidden w-[64px] hover:w-[260px] group transition-all duration-300 flex flex-col hover:shadow-[4px_0_24px_rgba(0,0,0,0.15)] z-30">
       {/* ── Navigation ── */}
-      <nav className="flex-1 px-3 space-y-5">
-        {Array.from(grouped.entries()).map(([section, items]) => (
-          <div key={section}>
-            <div className="px-3 mb-2 font-display text-[10px] font-bold tracking-[0.15em] text-stone uppercase select-none">
-              {sectionLabels[section]}
-            </div>
-            <ul className="space-y-0.5">
-              {items.map((item) => {
-                const isActive = selectedKey === item.key || (item.key === '/admin' && selectedKey.startsWith('/admin'));
-                return (
-                  <li key={item.key}>
-                    <button
-                      type="button"
-                      onClick={() => onNavigate(item.path)}
-                      className={`
-                        w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-colors cursor-pointer
-                        border-l-[3px] border-l-transparent
-                        ${isActive
-                          ? 'border-l-vermilion bg-washi text-linen'
-                          : 'text-stone hover:text-linen hover:bg-charcoal/40'
-                        }
-                      `}
-                    >
-                      <span className={isActive ? 'text-vermilion' : 'text-stone'}>
-                        {item.icon}
-                      </span>
-                      <span>{item.label}</span>
-                      {item.badge != null && item.badge > 0 && (
-                        <Badge count={item.badge} size="small" className="ml-auto" />
-                      )}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        ))}
+      <nav className="flex-1 pt-6 pb-4">
+        <ul className="space-y-1.5 px-2">
+          {navItems.map((item) => {
+            if (item.adminOnly && user?.role !== Role.ADMIN) return null;
+            const isActive = selectedKey === item.key || (item.key === '/admin' && selectedKey.startsWith('/admin'));
+            return (
+              <li key={item.key}>
+                <button
+                  type="button"
+                  onClick={() => onNavigate(item.path)}
+                  className={`
+                    w-full flex items-center gap-4 pl-[13px] pr-4 py-3 text-[15px] font-semibold transition-colors cursor-pointer rounded-xl
+                    ${isActive
+                      ? 'bg-charcoal/20 text-linen'
+                      : 'text-stone hover:bg-charcoal/10 hover:text-linen'
+                    }
+                  `}
+                >
+                  <span className={isActive ? 'text-linen shrink-0' : 'text-stone shrink-0'}>
+                    {item.icon}
+                  </span>
+                  <span className="whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    {item.label}
+                  </span>
+                  {item.badge != null && item.badge > 0 && (
+                    <Badge count={item.badge} size="small" className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  )}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
       </nav>
 
       {/* ── User Profile (bottom) ── */}
-      <div 
-        className="px-3 pb-6 pt-3 border-t border-charcoal cursor-pointer hover:bg-washi/5 transition-colors"
+      <div
+        className="px-[14px] pb-6 pt-3 border-t border-charcoal cursor-pointer hover:bg-washi/5 transition-colors overflow-hidden"
         onClick={() => onNavigate(`/profile/${user?.username}`)}
       >
-        <div className="flex items-center gap-3 px-3 py-2.5 bg-charcoal/30">
+        <div className="flex items-center gap-3 py-2.5">
           <Avatar
             size={36}
-            src={user?.avatarUrl ?? user?.avatar_url}
+            src={user?.avatar || user?.avatarUrl || (user as any)?.avatar_url}
             icon={<UserOutlined />}
             className="shrink-0 border border-charcoal"
           >
             {user?.username?.charAt(0)?.toUpperCase()}
           </Avatar>
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 flex-1 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <div className="font-body text-sm font-semibold text-linen truncate">
               {user?.username ?? 'User'}
             </div>
@@ -159,10 +123,12 @@ function TopBar(props: {
   hideSearch?: boolean;
 }) {
   const { user, onLogout, onNavigateProfile, onNavigateSettings, notificationCount = 0, hideSearch = false } = props;
+  const { theme, toggleTheme } = useTheme();
 
   const userDropdownItems = [
     { key: 'profile', label: 'Tài khoản', icon: <UserOutlined />, onClick: onNavigateProfile },
     { key: 'settings', label: 'Cài đặt', icon: <SettingOutlined />, onClick: onNavigateSettings },
+    { key: 'theme', label: theme === 'dark' ? 'Chế độ Sáng' : 'Chế độ Tối', icon: theme === 'dark' ? <SunOutlined /> : <MoonOutlined />, onClick: toggleTheme },
     ...(user?.role === Role.ADMIN ? [{ key: 'admin', label: 'Trang Quản trị', icon: <LayoutDashboard size={14} />, onClick: () => window.location.href = '/admin' }] : []),
     { type: 'divider' as const },
     { key: 'logout', label: 'Đăng xuất', icon: <LogoutOutlined />, onClick: onLogout },
@@ -170,14 +136,35 @@ function TopBar(props: {
 
   return (
     <header className="h-16 flex items-center justify-between px-6 bg-washi border-b border-charcoal shrink-0">
-      {/* ── Search (hidden on Lobby) ── */}
-      <div className="flex-1 max-w-lg">
-        {!hideSearch && (
-          <div
-            className="[&_.ant-input]:!bg-ink [&_.ant-input]:!text-linen [&_.ant-input]:!placeholder-stone"
-          />
-        )}
+      {/* ── Logo ── */}
+      <div
+        className="flex items-center cursor-pointer shrink-0"
+        onClick={() => window.location.href = '/home'}
+      >
+        <img src={LogoImage} alt="Logo" className="h-[42px] w-auto object-contain" />
       </div>
+
+      {/* ── Top Navigation Links ── */}
+      <nav className="flex-1 flex items-center gap-8 ml-10">
+        {[
+          { id: 1, label: 'Problems', url: '/problems' },
+          { id: 2, label: 'Rooms', url: '/custom-rooms' },
+          { id: 3, label: 'Submissions', url: '/submissions' },
+          { id: 4, label: 'Ranking', url: '/ranking' },
+          { id: 5, label: 'About', url: '/about' },
+          { id: 6, label: 'Report', url: '/report' },
+        ].map(item => (
+          <NavLink
+            key={item.id}
+            to={item.url}
+            className={({ isActive }) =>
+              `text-[16px] font-semibold transition-colors ${isActive ? 'text-linen' : 'text-stone hover:text-linen'}`
+            }
+          >
+            {item.label}
+          </NavLink>
+        ))}
+      </nav>
 
       {/* ── Right Section ── */}
       <div className="flex items-center gap-4 ml-6">
@@ -190,8 +177,8 @@ function TopBar(props: {
         </div>
 
         {/* Notifications */}
-        <Dropdown 
-          menu={{ 
+        <Dropdown
+          menu={{
             items: [
               {
                 key: 'header',
@@ -203,9 +190,9 @@ function TopBar(props: {
                 label: <div className="text-stone text-xs text-center py-4">Chưa có thông báo mới</div>,
                 disabled: true,
               }
-            ] 
-          }} 
-          trigger={['click']} 
+            ]
+          }}
+          trigger={['click']}
           placement="bottomRight"
         >
           <button
@@ -228,7 +215,7 @@ function TopBar(props: {
           <div className="flex items-center gap-2.5 cursor-pointer px-2 py-1 hover:bg-charcoal/30 transition-colors">
             <Avatar
               size={32}
-              src={user?.avatarUrl ?? user?.avatar_url}
+              src={user?.avatar || user?.avatarUrl || (user as any)?.avatar_url}
               icon={<UserOutlined />}
               className="shrink-0"
             >
@@ -302,34 +289,39 @@ export function AppShellLayout() {
   }, [logout, navigate]);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-ink">
-      {/* ── Sidebar: 240px (lg+), hidden on mobile (no hamburger yet) ── */}
-      <div className="w-[240px] shrink-0 hidden lg:block">
-        <Sidebar
-          user={user}
-          selectedKey={selectedKey}
-          onNavigate={handleNavigate}
-        />
-      </div>
+    <div className="flex flex-col h-screen overflow-hidden bg-ink">
+      {/* ── Top Bar ── */}
+      <TopBar
+        user={user}
+        onLogout={handleLogout}
+        onNavigateProfile={() => handleNavigate(`/profile/${user?.username}`)}
+        onNavigateSettings={() => handleNavigate('/settings')}
+        notificationCount={unreadCount}
+        hideSearch={location.pathname === '/match' || location.pathname === '/home'}
+      />
 
-      {/* ── Main Content Area ── */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* ── Top Bar ── */}
-        <TopBar 
-          user={user} 
-          onLogout={handleLogout} 
-          onNavigateProfile={() => handleNavigate(`/profile/${user?.username}`)}
-          onNavigateSettings={() => handleNavigate('/settings')}
-          notificationCount={unreadCount} 
-          hideSearch={location.pathname === '/match' || location.pathname === '/home'} 
-        />
+      <div className="flex flex-1 overflow-hidden">
+        {/* ── Sidebar: collapsible 64px -> 260px ── */}
+        <div className="w-[64px] shrink-0 hidden lg:block relative z-30">
+          <Sidebar
+            user={user}
+            selectedKey={selectedKey}
+            onNavigate={handleNavigate}
+          />
+        </div>
 
-        {/* ── Content ── */}
-        <main className="flex-1 overflow-y-auto bg-ink">
-          <div className="p-6 mx-auto w-full max-w-7xl">
-            <Outlet />
-          </div>
-        </main>
+        {/* ── Main Content Area ── */}
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-ink">
+          <main className="flex-1 flex flex-col overflow-y-auto">
+            <div className={
+              location.pathname.startsWith('/chat') || location.pathname.startsWith('/ai')
+                ? "flex-1 w-full h-full"
+                : "p-6 mx-auto w-full max-w-7xl"
+            }>
+              <Outlet />
+            </div>
+          </main>
+        </div>
       </div>
     </div>
   );

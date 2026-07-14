@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { ConfigProvider } from 'antd';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '../../context/AuthContext';
+import { ThemeProvider, useTheme } from '../../context/ThemeContext';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -30,7 +31,7 @@ const queryClient = new QueryClient({
  * into the UI. Everything the user sees should come from
  * one of the 6 palette colors.
  */
-const inkVermillionToken = {
+const inkVermillionTokenDark = {
   // ── Primary / Accent: Vermilion ──
   colorPrimary: '#D83A2C',
   colorPrimaryBg: 'rgba(216,58,44,0.1)',
@@ -127,11 +128,43 @@ const inkVermillionToken = {
   colorFillQuaternary: 'rgba(120,120,120,0.02)',
 };
 
-export function AppProviders(props: { children: ReactNode }) {
+const inkVermillionTokenLight = {
+  ...inkVermillionTokenDark,
+  
+  // ── Background: Light Mode ──
+  colorBgBase: '#F4F4F4',
+  colorBgContainer: '#FFFFFF',
+  colorBgElevated: '#FFFFFF',
+  colorBgLayout: '#F4F4F4',
+  colorBgSpotlight: '#FFFFFF',
+  colorBgMask: 'rgba(0,0,0,0.45)',
+
+  // ── Text: Light Mode ──
+  colorTextBase: '#1A1A1A',
+  colorText: '#1A1A1A',
+  colorTextSecondary: '#787878',
+  colorTextTertiary: '#787878',
+  colorTextQuaternary: '#787878',
+  colorTextPlaceholder: '#787878',
+  colorTextDisabled: '#E0E0E0',
+  colorTextHeading: '#1A1A1A',
+
+  // ── Border & Radius ──
+  colorBorder: '#E0E0E0',
+  colorBorderSecondary: '#F4F4F4',
+  colorSplit: '#E0E0E0',
+
+  boxShadowSecondary: '0 0 0 1px rgba(224,224,224,0.5)',
+};
+
+function AppConfigProvider({ children }: { children: ReactNode }) {
+  const { theme } = useTheme();
+  const token = theme === 'dark' ? inkVermillionTokenDark : inkVermillionTokenLight;
+
   return (
     <ConfigProvider
       theme={{
-        token: inkVermillionToken,
+        token,
         components: {
           Menu: {
             itemBorderRadius: 4,
@@ -139,88 +172,87 @@ export function AppProviders(props: { children: ReactNode }) {
             itemHeight: 42,
             iconSize: 18,
             collapsedIconSize: 20,
-            darkItemBg: '#1A1A1A',
-            darkItemColor: '#E6E0D8',
+            darkItemBg: 'var(--theme-washi)',
+            darkItemColor: 'var(--theme-linen)',
             darkItemSelectedBg: 'rgba(216,58,44,0.12)',
             darkItemSelectedColor: '#D83A2C',
             darkItemHoverBg: 'rgba(120,120,120,0.08)',
-            darkItemHoverColor: '#E6E0D8',
-            darkSubMenuItemBg: '#1A1A1A',
-            darkPopupBg: '#1A1A1A',
+            darkItemHoverColor: 'var(--theme-linen)',
+            darkSubMenuItemBg: 'var(--theme-washi)',
+            darkPopupBg: 'var(--theme-washi)',
           },
           Button: {
             fontWeight: 600,
             paddingInline: 20,
             paddingInlineLG: 28,
             primaryShadow: 'none',
-            defaultBorderColor: '#2E2E2E',
-            defaultColor: '#E6E0D8',
-            defaultBg: '#1A1A1A',
-            defaultHoverBg: '#2E2E2E',
-            defaultHoverBorderColor: '#787878',
-            defaultHoverColor: '#E6E0D8',
+            defaultBorderColor: 'var(--theme-charcoal)',
+            defaultColor: 'var(--theme-linen)',
+            defaultBg: 'var(--theme-washi)',
+            defaultHoverBg: 'var(--theme-charcoal)',
+            defaultHoverBorderColor: 'var(--theme-stone)',
+            defaultHoverColor: 'var(--theme-linen)',
           },
           Card: {
             paddingLG: 24,
             borderRadiusLG: 4,
-            colorBgContainer: '#1A1A1A',
+            colorBgContainer: 'var(--theme-washi)',
           },
           Table: {
-            headerBg: '#1A1A1A',
-            headerColor: '#787878',
+            headerBg: 'var(--theme-washi)',
+            headerColor: 'var(--theme-stone)',
             rowHoverBg: 'rgba(216,58,44,0.04)',
-            borderColor: '#2E2E2E',
+            borderColor: 'var(--theme-charcoal)',
           },
           Modal: {
             borderRadiusLG: 4,
             paddingLG: 24,
-            colorBgElevated: '#1A1A1A',
-            headerBg: '#1A1A1A',
-            contentBg: '#1A1A1A',
+            colorBgElevated: 'var(--theme-washi)',
+            headerBg: 'var(--theme-washi)',
+            contentBg: 'var(--theme-washi)',
           },
           Tag: {
             borderRadiusSM: 2,
             defaultBg: 'rgba(120,120,120,0.1)',
-            defaultColor: '#E6E0D8',
+            defaultColor: 'var(--theme-linen)',
           },
           Tabs: {
             inkBarColor: '#D83A2C',
             itemActiveColor: '#D83A2C',
-            itemHoverColor: '#E6E0D8',
+            itemHoverColor: 'var(--theme-linen)',
             itemSelectedColor: '#D83A2C',
           },
           Input: {
             activeBorderColor: '#D83A2C',
-            hoverBorderColor: '#787878',
-            colorBgContainer: '#1A1A1A',
-            colorBorder: '#2E2E2E',
-            colorText: '#E6E0D8',
-            colorTextPlaceholder: '#787878',
+            hoverBorderColor: 'var(--theme-stone)',
+            colorBgContainer: 'var(--theme-washi)',
+            colorBorder: 'var(--theme-charcoal)',
+            colorText: 'var(--theme-linen)',
+            colorTextPlaceholder: 'var(--theme-stone)',
             borderRadius: 4,
           },
           Select: {
-            colorBgContainer: '#1A1A1A',
-            colorBorder: '#2E2E2E',
-            colorText: '#E6E0D8',
-            colorTextPlaceholder: '#787878',
+            colorBgContainer: 'var(--theme-washi)',
+            colorBorder: 'var(--theme-charcoal)',
+            colorText: 'var(--theme-linen)',
+            colorTextPlaceholder: 'var(--theme-stone)',
             optionActiveBg: 'rgba(216,58,44,0.1)',
             optionSelectedBg: 'rgba(216,58,44,0.12)',
             borderRadius: 4,
           },
           Dropdown: {
-            colorBgElevated: '#1A1A1A',
+            colorBgElevated: 'var(--theme-washi)',
             controlItemBgHover: 'rgba(216,58,44,0.1)',
           },
           Tooltip: {
-            // colorBgDefault: '#1A1A1A',
-            colorTextLightSolid: '#E6E0D8',
+            colorTextLightSolid: 'var(--theme-linen)',
           },
           Notification: {
-            colorBgElevated: '#1A1A1A',
+            colorBgElevated: 'var(--theme-washi)',
           },
           Message: {
-            colorBgElevated: '#1A1A1A',
-            contentBg: '#1A1A1A',
+            colorBgElevated: 'var(--theme-washi)',
+            contentBg: 'var(--theme-washi)',
           },
           Spin: {
             colorPrimary: '#D83A2C',
@@ -249,10 +281,9 @@ export function AppProviders(props: { children: ReactNode }) {
           },
           DatePicker: {
             activeBorderColor: '#D83A2C',
-            hoverBorderColor: '#787878',
+            hoverBorderColor: 'var(--theme-stone)',
             cellActiveWithRangeBg: 'rgba(216,58,44,0.1)',
             cellHoverWithRangeBg: 'rgba(216,58,44,0.05)',
-            // cellRangeEdgeTodayHoverBorderColor: '#D83A2C',
           },
           Pagination: {
             itemActiveBg: '#D83A2C',
@@ -266,12 +297,22 @@ export function AppProviders(props: { children: ReactNode }) {
         },
       }}
     >
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          {props.children}
-          <ToastContainer position="bottom-right" />
-        </AuthProvider>
-      </QueryClientProvider>
+      {children}
     </ConfigProvider>
+  );
+}
+
+export function AppProviders(props: { children: ReactNode }) {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <AppConfigProvider>
+          <AuthProvider>
+            {props.children}
+            <ToastContainer position="bottom-right" />
+          </AuthProvider>
+        </AppConfigProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }

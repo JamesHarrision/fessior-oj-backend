@@ -64,18 +64,21 @@ export function SoloSolveView() {
   return (
     <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 min-h-0">
       {/* Left: Problem Description */}
-      <div className="overflow-y-auto">
+      <div className="overflow-y-auto bg-washi border border-charcoal shadow-lg rounded-xl flex flex-col min-h-0">
         <ProblemDescription problem={problem} />
       </div>
 
       {/* Right: Editor + Console */}
-      <div className="flex flex-col gap-3 min-h-0">
-        <CodeEditorPane
-          code={code}
+      <div className="flex flex-col gap-4 lg:gap-6 min-h-0">
+        <div className="flex-1 bg-ink border border-charcoal shadow-lg min-h-0 rounded-xl overflow-hidden">
+          <CodeEditorPane
+            code={code}
           language={language}
           onCodeChange={setCode}
           onLanguageChange={(lang) => setLanguage(lang as any)}
         />
+        </div>
+        <div className="h-[280px] bg-washi border border-charcoal shadow-lg shrink-0 rounded-xl overflow-hidden">
         <ConsolePane
           problem={problem}
           code={code}
@@ -85,6 +88,7 @@ export function SoloSolveView() {
           verdict={verdict}
           verdictDetails={{ submissionId }}
         />
+        </div>
       </div>
     </div>
   );

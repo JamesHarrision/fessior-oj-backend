@@ -84,7 +84,7 @@ export const AdminAiTab: React.FC = () => {
         </form>
 
         {roadmapResult && (
-          <div className="mt-4 bg-ink/40 border border-charcoal/50 rounded-lg p-4">
+          <div className="mt-4 bg-ink/40 border border-charcoal/50 rounded-xl p-4">
             <h4 className="text-linen text-sm font-semibold mb-2">Lộ trình được đề xuất:</h4>
             <div className="text-sm text-surface-300 whitespace-pre-wrap leading-relaxed">
               {typeof roadmapResult === 'string' ? roadmapResult : JSON.stringify(roadmapResult, null, 2)}
@@ -116,7 +116,7 @@ export const AdminAiTab: React.FC = () => {
         </form>
 
         {feedbackResult && (
-          <div className="mt-4 bg-ink/40 border border-charcoal/50 rounded-lg p-4">
+          <div className="mt-4 bg-ink/40 border border-charcoal/50 rounded-xl p-4">
             <h4 className="text-linen text-sm font-semibold mb-2">Phân tích từ AI Assistant:</h4>
             <div className="text-sm text-surface-300 whitespace-pre-wrap leading-relaxed">
               {typeof feedbackResult === 'string' ? feedbackResult : JSON.stringify(feedbackResult, null, 2)}

@@ -168,7 +168,7 @@ export const AdminSubmissionsTab: React.FC = () => {
 
               {selectedSub.errorMessage && (
                 <AdminFormGroup label="Thông báo lỗi (Compilation/Runtime Error)">
-                  <pre className="bg-red-500/10 text-red-400 p-3 rounded-lg text-xs whitespace-pre-wrap font-mono">
+                  <pre className="bg-red-500/10 text-red-400 p-3 rounded-xl text-xs whitespace-pre-wrap font-mono">
                     {selectedSub.errorMessage}
                   </pre>
                 </AdminFormGroup>
@@ -233,7 +233,7 @@ export const AdminSubmissionsTab: React.FC = () => {
             <div className="mt-4 border-t border-charcoal pt-4 flex flex-col gap-2">
               <h4 className="text-linen text-sm font-semibold mb-2">Kết quả thử nghiệm:</h4>
               {runResult.map((res: any, index: number) => (
-                <div key={index} className="bg-black border border-charcoal/50 rounded-lg p-3 text-xs flex flex-col gap-1.5">
+                <div key={index} className="bg-black border border-charcoal/50 rounded-xl p-3 text-xs flex flex-col gap-1.5">
                   <div className="flex justify-between items-center mb-1">
                     <span className={`font-semibold ${res.status?.id === 3 ? 'text-emerald-400' : 'text-red-400'}`}>
                       Testcase #{index + 1}: {res.status?.description || 'Done'}

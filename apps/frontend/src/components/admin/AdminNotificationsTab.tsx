@@ -138,7 +138,7 @@ export const AdminNotificationsTab: React.FC = () => {
           {notifications.some(n => !n.isRead && !n.read) && (
             <button 
               onClick={handleMarkAllRead} 
-              className="text-xs font-semibold px-2.5 py-1 rounded-md border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 transition-colors"
+              className="text-xs font-semibold px-2.5 py-1 rounded-xl border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 transition-colors"
             >
               Đọc Tất Cả
             </button>

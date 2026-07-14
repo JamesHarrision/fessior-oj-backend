@@ -315,7 +315,7 @@ export const AdminProblemsTab: React.FC<AdminProblemsTabProps> = ({
       {/* Edit Problem Overlay Modal */}
       {editingProblem && (
         <div className="fixed inset-0 bg-ink/80 backdrop-blur-sm flex items-center justify-center z-[1000] p-5">
-          <div className="bg-washi border border-charcoal rounded-2xl w-full max-w-[850px] max-h-[90vh] flex flex-col overflow-hidden shadow-2xl animate-fade-in-up">
+          <div className="bg-washi border border-charcoal rounded-xl w-full max-w-[850px] max-h-[90vh] flex flex-col overflow-hidden shadow-2xl animate-fade-in-up">
             {/* Modal Header */}
             <div className="flex items-center justify-between px-6 py-5 border-b border-charcoal">
               <h3 className="text-xl font-bold text-linen font-display m-0">Chỉnh Sửa Bài Tập: {editingProblem.title}</h3>
@@ -327,19 +327,19 @@ export const AdminProblemsTab: React.FC<AdminProblemsTabProps> = ({
             {/* Modal Tabs */}
             <div className="flex bg-ink/50 p-1.5 border-b border-charcoal">
               <button
-                className={`flex-1 bg-transparent border-none p-3 rounded-lg cursor-pointer font-semibold text-sm transition-colors duration-200 flex items-center justify-center gap-2 ${modalTab === 'info' ? 'text-vermilion bg-vermilion/10' : 'text-stone hover:text-linen hover:bg-charcoal/30'}`}
+                className={`flex-1 bg-transparent border-none p-3 rounded-xl cursor-pointer font-semibold text-sm transition-colors duration-200 flex items-center justify-center gap-2 ${modalTab === 'info' ? 'text-vermilion bg-vermilion/10' : 'text-stone hover:text-linen hover:bg-charcoal/30'}`}
                 onClick={() => setModalTab('info')}
               >
                 <FileText size={16} /> Đề bài & Cấu hình
               </button>
               <button
-                className={`flex-1 bg-transparent border-none p-3 rounded-lg cursor-pointer font-semibold text-sm transition-colors duration-200 flex items-center justify-center gap-2 ${modalTab === 'code' ? 'text-vermilion bg-vermilion/10' : 'text-stone hover:text-linen hover:bg-charcoal/30'}`}
+                className={`flex-1 bg-transparent border-none p-3 rounded-xl cursor-pointer font-semibold text-sm transition-colors duration-200 flex items-center justify-center gap-2 ${modalTab === 'code' ? 'text-vermilion bg-vermilion/10' : 'text-stone hover:text-linen hover:bg-charcoal/30'}`}
                 onClick={() => setModalTab('code')}
               >
                 <Code size={16} /> starterCodes
               </button>
               <button
-                className={`flex-1 bg-transparent border-none p-3 rounded-lg cursor-pointer font-semibold text-sm transition-colors duration-200 flex items-center justify-center gap-2 ${modalTab === 'testcases' ? 'text-vermilion bg-vermilion/10' : 'text-stone hover:text-linen hover:bg-charcoal/30'}`}
+                className={`flex-1 bg-transparent border-none p-3 rounded-xl cursor-pointer font-semibold text-sm transition-colors duration-200 flex items-center justify-center gap-2 ${modalTab === 'testcases' ? 'text-vermilion bg-vermilion/10' : 'text-stone hover:text-linen hover:bg-charcoal/30'}`}
                 onClick={() => setModalTab('testcases')}
               >
                 <CheckSquare size={16} /> Testcases ({testcases.length})
@@ -403,7 +403,7 @@ export const AdminProblemsTab: React.FC<AdminProblemsTabProps> = ({
                       {tags.map((t) => {
                         const isChecked = editSelectedTags.includes(t.id || t._id);
                         return (
-                          <label key={t.id || t.slug} className={`flex items-center gap-2 px-3.5 py-2.5 rounded-lg border cursor-pointer text-xs transition-colors duration-200 select-none ${isChecked ? 'bg-blue-500/10 border-blue-500/40 text-blue-400' : 'bg-ink/40 border-charcoal text-stone hover:bg-charcoal/20'}`}>
+                          <label key={t.id || t.slug} className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl border cursor-pointer text-xs transition-colors duration-200 select-none ${isChecked ? 'bg-blue-500/10 border-blue-500/40 text-blue-400' : 'bg-ink/40 border-charcoal text-stone hover:bg-charcoal/20'}`}>
                             <input
                               type="checkbox"
                               checked={isChecked}
@@ -511,19 +511,19 @@ export const AdminProblemsTab: React.FC<AdminProblemsTabProps> = ({
                         {testcases.map((tc, index) => {
                           const tcId = tc.id || tc._id;
                           return (
-                            <div key={tcId || index} className="bg-ink/30 border border-charcoal rounded-lg p-3 flex items-start justify-between">
+                            <div key={tcId || index} className="bg-ink/30 border border-charcoal rounded-xl p-3 flex items-start justify-between">
                               <div className="flex flex-col gap-2 flex-1">
-                                <span className={`text-[11px] font-bold px-2 py-0.5 rounded w-fit font-display tracking-wider ${tc.isExample ? 'bg-green-500/15 text-green-500' : 'bg-yellow-500/15 text-yellow-500'}`}>
+                                <span className={`text-[11px] font-bold px-2 py-0.5 rounded-xl w-fit font-display tracking-wider ${tc.isExample ? 'bg-green-500/15 text-green-500' : 'bg-yellow-500/15 text-yellow-500'}`}>
                                   {tc.isExample ? 'TESTCASE MẪU' : 'TESTCASE ẨN'}
                                 </span>
                                 <div className="grid grid-cols-2 gap-3 font-mono text-[11px] text-stone">
                                   <div>
                                     <span>Input:</span>
-                                    <div className="bg-ink border border-charcoal rounded-md p-2 whitespace-pre-wrap max-h-[60px] overflow-y-auto text-linen">{tc.input}</div>
+                                    <div className="bg-ink border border-charcoal rounded-xl p-2 whitespace-pre-wrap max-h-[60px] overflow-y-auto text-linen">{tc.input}</div>
                                   </div>
                                   <div>
                                     <span>Output:</span>
-                                    <div className="bg-ink border border-charcoal rounded-md p-2 whitespace-pre-wrap max-h-[60px] overflow-y-auto text-linen">{tc.output}</div>
+                                    <div className="bg-ink border border-charcoal rounded-xl p-2 whitespace-pre-wrap max-h-[60px] overflow-y-auto text-linen">{tc.output}</div>
                                   </div>
                                 </div>
                               </div>

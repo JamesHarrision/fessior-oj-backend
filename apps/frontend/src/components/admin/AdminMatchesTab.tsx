@@ -117,7 +117,7 @@ export const AdminMatchesTab: React.FC = () => {
               </h4>
               <div className="flex flex-col gap-3">
                 {[selectedMatch.player1, selectedMatch.player2].map((p, index) => p && (
-                  <div key={index} className="bg-ink/50 p-3 rounded-lg border border-charcoal/50 flex flex-col gap-1">
+                  <div key={index} className="bg-ink/50 p-3 rounded-xl border border-charcoal/50 flex flex-col gap-1">
                     <div><strong className="text-stone">Người chơi {index + 1}:</strong> <span className="text-linen font-semibold">{p.username || p.id}</span></div>
                     <div><strong className="text-stone">ELO:</strong> <span className="text-linen">{p.elo_rating ?? p.eloRating ?? '—'}</span></div>
                   </div>

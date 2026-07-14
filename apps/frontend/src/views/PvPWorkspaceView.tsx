@@ -146,13 +146,13 @@ export function PvPWorkspaceView() {
 
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 min-h-0">
         {/* Left Side: Problem Statement */}
-        <div className="bg-washi border border-charcoal flex flex-col min-h-0 shadow-lg">
+        <div className="bg-washi border border-charcoal flex flex-col min-h-0 shadow-lg rounded-xl overflow-hidden">
           <ProblemDescription problem={problem} />
         </div>
 
         {/* Right Side: Code Editor & Console */}
         <div className="flex flex-col gap-4 lg:gap-6 min-h-0">
-          <div className="flex-1 bg-ink border border-charcoal shadow-lg min-h-0">
+          <div className="flex-1 bg-ink border border-charcoal shadow-lg min-h-0 rounded-xl overflow-hidden">
             <CodeEditorPane
               code={code}
               onCodeChange={setCode}
@@ -160,7 +160,7 @@ export function PvPWorkspaceView() {
               onLanguageChange={setLanguage as any}
             />
           </div>
-          <div className="h-[280px] bg-washi border border-charcoal shadow-lg shrink-0">
+          <div className="h-[280px] bg-washi border border-charcoal shadow-lg shrink-0 rounded-xl overflow-hidden">
             <ConsolePane
               onSubmit={handleSubmit}
               isSubmitting={isSubmitting}
