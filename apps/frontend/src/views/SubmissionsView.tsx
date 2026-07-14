@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { api } from '../services/api';
-import { Eye, Sparkles, Search, Filter, ArrowUpDown, X } from 'lucide-react';
+import { Sparkles, Search, Filter, ArrowUpDown, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 function formatRelativeTime(timestamp?: string | number): string {

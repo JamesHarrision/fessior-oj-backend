@@ -120,9 +120,8 @@ function TopBar(props: {
   onNavigateProfile: () => void;
   onNavigateSettings: () => void;
   notificationCount?: number;
-  hideSearch?: boolean;
 }) {
-  const { user, onLogout, onNavigateProfile, onNavigateSettings, notificationCount = 0, hideSearch = false } = props;
+  const { user, onLogout, onNavigateProfile, onNavigateSettings, notificationCount = 0 } = props;
   const { theme, toggleTheme } = useTheme();
 
   const userDropdownItems = [
@@ -297,7 +296,6 @@ export function AppShellLayout() {
         onNavigateProfile={() => handleNavigate(`/profile/${user?.username}`)}
         onNavigateSettings={() => handleNavigate('/settings')}
         notificationCount={unreadCount}
-        hideSearch={location.pathname === '/match' || location.pathname === '/home'}
       />
 
       <div className="flex flex-1 overflow-hidden">

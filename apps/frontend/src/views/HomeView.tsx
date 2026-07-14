@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Swords, Beaker, Trophy, BookOpen, Crown, Flame, ArrowRight, AlertTriangle, Compass, Activity, Star, Calendar } from 'lucide-react';
+import { Trophy, BookOpen, Flame, ArrowRight, AlertTriangle, Compass, Activity, Star, Calendar } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import { getSubmissions } from '../features/submission/api/submissionApi';
-import { fetchLeaderboard } from '../features/ranking/api/rankingApi';
-import { fetchProblems, fetchProblemsFromApi } from '../features/problem/api/problemApi';
+import { fetchProblemsFromApi } from '../features/problem/api/problemApi';
 
 export const HomeView: React.FC = () => {
   const { user } = useAuth();
@@ -40,7 +39,9 @@ export const HomeView: React.FC = () => {
         if (res.success && res.data) {
           setActiveMatchId(res.data.id);
         }
-      } catch (e) { }
+      } catch (e) {
+        console.error(e);
+      }
     };
     checkActiveMatch();
 
@@ -61,7 +62,9 @@ export const HomeView: React.FC = () => {
             notAccepted: total - accepted
           });
         }
-      } catch (e) { }
+      } catch (e) {
+        console.error(e);
+      }
       setSubmissionsLoading(false);
 
       try {
@@ -77,7 +80,9 @@ export const HomeView: React.FC = () => {
           all.sort((a: any, b: any) => (b.eloRating || 0) - (a.eloRating || 0));
           setRankings(all.slice(0, 3));
         }
-      } catch (e) { }
+      } catch (e) {
+        console.error(e);
+      }
       setRankingsLoading(false);
 
       try {
@@ -87,7 +92,9 @@ export const HomeView: React.FC = () => {
           const shuffled = [...probRes.items].sort(() => 0.5 - Math.random());
           setFeaturedProblems(shuffled.slice(0, 3));
         }
-      } catch (e) { }
+      } catch (e) {
+        console.error(e);
+      }
       setProblemsLoading(false);
     };
 

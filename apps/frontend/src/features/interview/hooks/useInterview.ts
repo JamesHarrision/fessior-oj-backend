@@ -1,8 +1,6 @@
 import { useState, useCallback, useRef } from "react";
 import type { InterviewConfig, InterviewMessage, InterviewReport, InterviewSession } from "../types/interview.types";
 import { startInterview, sendAnswer, generateReport } from "../api/interviewApi";
-import { api } from "../../../services/api";
-
 import { problemRepository } from "../../../app/api/client";
 
 function ensureArray<T>(raw: unknown): T[] {

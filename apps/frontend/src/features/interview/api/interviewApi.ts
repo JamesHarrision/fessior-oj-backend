@@ -25,8 +25,8 @@ Rules:
 }
 
 async function callClaude(
-  messages: { role: "user" | "assistant"; content: string }[],
-  system: string
+  _messages: { role: "user" | "assistant"; content: string }[],
+  _system: string
 ): Promise<string> {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -35,7 +35,7 @@ async function callClaude(
   });
 }
 
-export async function startInterview(config: InterviewConfig): Promise<string> {
+export async function startInterview(_config: InterviewConfig): Promise<string> {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve(`Xin chào! Tôi là Arya, người phỏng vấn của bạn hôm nay. Tôi đã chuẩn bị 3 bài toán. Bạn đã sẵn sàng chưa?`);
@@ -58,41 +58,10 @@ export async function sendAnswer(
 
 export async function generateReport(
   config: InterviewConfig,
-  history: InterviewMessage[],
+  _history: InterviewMessage[],
   durationSeconds: number
 ): Promise<InterviewReport> {
-  const transcript = history
-    .map((m) => `${m.role === "interviewer" ? "INTERVIEWER" : "CANDIDATE"}: ${m.content}`)
-    .join("\n\n");
-
-  const prompt = `Evaluate this technical interview for "${TOPIC_LABELS[config.topic]}" (${config.difficulty}).
-
-TRANSCRIPT:
-${transcript}
-
-Return ONLY valid JSON, no markdown fences:
-{
-  "totalScore": <0-100>,
-  "overallFeedback": "<2-3 sentences>",
-  "recommendation": "<strong-hire|hire|no-hire>",
-  "evaluations": [
-    {
-      "questionIndex": 0,
-      "question": "<question text>",
-      "score": <0-10>,
-      "feedback": "<specific feedback>",
-      "strengths": ["<strength>"],
-      "improvements": ["<improvement>"]
-    }
-  ],
-  "skillBreakdown": [
-    { "label": "Problem Solving", "score": <0-100> },
-    { "label": "Technical Knowledge", "score": <0-100> },
-    { "label": "Communication", "score": <0-100> },
-    { "label": "Code Quality", "score": <0-100> },
-    { "label": "Depth of Answer", "score": <0-100> }
-  ]
-}`;
+  // Mock data
 
   const raw = `
   {

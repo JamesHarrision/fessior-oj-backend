@@ -188,7 +188,7 @@ export const CustomRoomsView: React.FC<CustomRoomsViewProps> = ({ onStartCustomM
     });
   }, [rooms, searchQuery, filterDifficulty]);
 
-  React.useMemo(() => {
+  useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, filterDifficulty]);
 

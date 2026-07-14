@@ -55,7 +55,9 @@ export const AIView: React.FC = () => {
               if (Array.isArray(parsed)) {
                 feedbackData = parsed;
               }
-            } catch(e) {}
+            } catch(e) {
+              console.error(e);
+            }
           }
 
           if (Array.isArray(feedbackData)) {

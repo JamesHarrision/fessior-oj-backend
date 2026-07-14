@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Form, Input } from 'antd';
 import {
-  CodeOutlined,
   UserOutlined,
   LockOutlined,
   ArrowRightOutlined,
@@ -13,36 +12,6 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 type AuthMode = 'login' | 'register';
-
-// Hard, brutalist animation variants
-const staggerContainer: any = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.2
-    }
-  }
-};
-
-const sharpReveal: any = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { type: 'tween', ease: 'circOut', duration: 0.4 }
-  }
-};
-
-const badgeFlash: any = {
-  hidden: { opacity: 0, scale: 0.9 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: { type: 'tween', ease: 'easeOut', duration: 0.3 }
-  }
-};
 
 export function AuthPage() {
   const navigate = useNavigate();

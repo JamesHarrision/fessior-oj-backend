@@ -4,7 +4,7 @@ import { Search, Bot, CheckCircle2, Filter, ArrowUpDown, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom';
 import { useProblems } from './hooks/useProblems';
 import { useMatchStore } from '../../stores/match.store';
-import type { IProblem, ITag } from '@ocj/types';
+import type { ITag } from '@ocj/types';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -174,8 +174,7 @@ export function ProblemsPage() {
     });
   }, [problems, search, difficulty, selectedTag]);
 
-  // Reset page when filters change
-  useMemo(() => {
+  useEffect(() => {
     setCurrentPage(1);
   }, [search, difficulty, selectedTag]);
 
