@@ -1,0 +1,6 @@
+{
+  "buildCommand": "npm run build -- --filter=frontend",
+  "outputDirectory": "apps/frontend/dist",
+  "installCommand": "npm install",
+  "framework": "vite"
+}
