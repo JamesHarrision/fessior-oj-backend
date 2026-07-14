@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { Wrench, Send, Shield, Activity, RefreshCw, LogOut, ChevronRight, AlertCircle } from 'lucide-react';
+import { Send, Shield, Activity, ChevronRight, AlertCircle } from 'lucide-react';
 import { PageHeader, EmptyState, SkeletonBlock } from '@ocj/ui';
 import { AccountSettings } from '../components/auth/AccountSettings';
 
@@ -59,8 +59,8 @@ export const SettingsView: React.FC = () => {
     <div className="max-w-[1200px] mx-auto w-full p-4 lg:p-8 flex flex-col gap-8">
       <PageHeader 
         title="Thiết Lập & Lịch Sử"
-        description="Quản lý cấu hình tài khoản, phiên đăng nhập, lịch sử đấu và báo cáo lỗi"
-        icon={<Wrench size={24} className="text-vermilion" />}
+        
+        
       />
 
       <div className="bg-ink border border-charcoal min-h-[600px] flex flex-col lg:flex-row">
@@ -96,11 +96,11 @@ export const SettingsView: React.FC = () => {
                 
                 {historyLoading ? (
                   <div className="flex flex-col gap-3">
-                    <SkeletonBlock lines={3} />
-                    <SkeletonBlock lines={3} />
+                    <SkeletonBlock  />
+                    <SkeletonBlock  />
                   </div>
                 ) : history.length === 0 ? (
-                  <EmptyState message="Bạn chưa tham gia trận đấu nào" />
+                  <EmptyState title="Bạn chưa tham gia trận đấu nào" />
                 ) : (
                   <div className="flex flex-col gap-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
                     {history.map((m) => {

@@ -136,8 +136,8 @@ export const ContestView: React.FC = () => {
             contests.map((contest) => {
               const startTime = new Date(contest.start_time);
               
-              let status = contest.status || 'UPCOMING';
-              let statusColor = 'text-stone border-stone';
+              const status = contest.status || 'UPCOMING';
+              let statusColor;
               
               if (status === 'ONGOING') {
                 statusColor = 'text-vermilion border-vermilion bg-vermilion/10';

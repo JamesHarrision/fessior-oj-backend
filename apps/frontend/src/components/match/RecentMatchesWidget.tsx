@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 
 /* =====================================================
    RecentMatchesWidget — Last 5 finished matches
@@ -15,6 +16,7 @@ interface MatchRow {
 }
 
 export const RecentMatchesWidget: React.FC = () => {
+  const { user } = useAuth();
   const [matches, setMatches] = useState<MatchRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,12 +28,29 @@ export const RecentMatchesWidget: React.FC = () => {
         if (res.success && res.data) {
           const items = (res.data?.items ?? res.data ?? []).slice(0, 5);
           const rows: MatchRow[] = items.map((m: any) => {
-            const isWinner = m.winner_id === m.player1_id; // simplified
+            const isWinner = user ? m.winner_id === user.id : m.winner_id === m.player1_id;
+            
+            let opponentName = m.opponent_name;
+            if (!opponentName && user) {
+               if (m.player1?.id === user.id) opponentName = m.player2?.username;
+               else if (m.player2?.id === user.id) opponentName = m.player1?.username;
+            }
+            opponentName = opponentName ?? 'Đối thủ';
+
+            let realEloChange = m.elo_change;
+            if (realEloChange === undefined && m.participants && m.participants.length > 0) {
+               const myParticipant = m.participants.find((p: any) => p.user_id === user?.id || p.user?.id === user?.id);
+               if (myParticipant) {
+                  realEloChange = myParticipant.score_change;
+               }
+            }
+            realEloChange = realEloChange ?? (isWinner ? 25 : -15);
+
             return {
               id: m.id,
-              opponent: m.opponent_name ?? 'Đối thủ',
+              opponent: opponentName,
               result: isWinner ? 'win' : 'loss',
-              eloChange: m.elo_change ?? (isWinner ? 25 : -15),
+              eloChange: realEloChange,
               when: m.ended_at ? formatRelativeTime(new Date(m.ended_at)) : 'Vừa xong',
             };
           });

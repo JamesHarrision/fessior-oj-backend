@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { UserCheck, UserX, UserPlus, Users } from 'lucide-react';
 import { api } from '../../services/api';
+import { AdminCard, AdminHeader, AdminButton, AdminInput, AdminFormGroup, AdminListRow, AdminBadge } from './ui/AdminUI';
 
 export const AdminFriendsTab: React.FC = () => {
   const [friends, setFriends] = useState<any[]>([]);
@@ -86,97 +87,96 @@ export const AdminFriendsTab: React.FC = () => {
   };
 
   return (
-    <div className="problems-tab-grid">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
       {/* Left side: Send Friend Request and pending requests */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        <div className="prob-admin-card">
-          <h3>Gửi Yêu Cầu Kết Bạn (Simulate)</h3>
-          <form onSubmit={handleSendRequest} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <div className="prob-form-group">
-              <label>User ID người nhận</label>
-              <input
+      <div className="flex flex-col gap-6">
+        <AdminCard>
+          <AdminHeader>Gửi Yêu Cầu Kết Bạn (Simulate)</AdminHeader>
+          <form onSubmit={handleSendRequest} className="flex flex-col gap-4 mt-2">
+            <AdminFormGroup label="User ID người nhận">
+              <AdminInput
                 type="text"
                 value={receiverId}
                 onChange={e => setReceiverId(e.target.value)}
                 placeholder="Nhập ID người chơi khác..."
-                className="prob-admin-input"
                 required
               />
-            </div>
-            <button type="submit" className="btn-prob-primary">
+            </AdminFormGroup>
+            <AdminButton type="submit" className="mt-2">
               <UserPlus size={14} /> Gửi yêu cầu kết bạn
-            </button>
+            </AdminButton>
           </form>
-        </div>
+        </AdminCard>
 
-        <div className="prob-admin-card">
-          <h3>Yêu Cầu Kết Bạn Đang Chờ</h3>
-          <div className="prob-list-scroll" style={{ maxHeight: '300px' }}>
+        <AdminCard>
+          <AdminHeader>Yêu Cầu Kết Bạn Đang Chờ</AdminHeader>
+          <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto pr-1">
             {loading ? (
-              <p>Đang tải...</p>
+              <p className="text-stone text-sm">Đang tải...</p>
             ) : pending.length === 0 ? (
-              <p style={{ color: '#64748b', fontSize: '0.85rem' }}>Không có yêu cầu kết bạn nào đang chờ.</p>
+              <p className="text-stone text-sm">Không có yêu cầu kết bạn nào đang chờ.</p>
             ) : (
               pending.map((p, idx) => {
                 const pId = p.id || p._id || p.senderId || p.sender?.id;
                 return (
-                  <div key={pId || idx} className="prob-item-row">
-                    <div className="prob-item-details">
-                      <span className="prob-item-title" style={{ fontSize: '0.85rem' }}>
+                  <AdminListRow key={pId || idx}>
+                    <div className="flex flex-col gap-1.5">
+                      <span className="font-semibold text-sm text-linen font-body">
                         ID: {pId?.slice(-8) || p.sender?.username || 'User'}
                       </span>
                     </div>
-                    <div className="action-btn-container">
-                      <button onClick={() => handleAccept(pId)} className="btn-action-icon edit" title="Chấp nhận">
-                        <UserCheck size={12} style={{ color: '#34d399' }} />
-                      </button>
-                      <button onClick={() => handleDecline(pId)} className="btn-action-icon delete" title="Từ chối">
-                        <UserX size={12} />
-                      </button>
+                    <div className="flex gap-2">
+                      <AdminButton variant="icon-edit" onClick={() => handleAccept(pId)} title="Chấp nhận" className="!text-emerald-400 !bg-emerald-400/10 hover:!bg-emerald-400/20 border border-emerald-400/20">
+                        <UserCheck size={14} />
+                      </AdminButton>
+                      <AdminButton variant="icon-delete" onClick={() => handleDecline(pId)} title="Từ chối">
+                        <UserX size={14} />
+                      </AdminButton>
                     </div>
-                  </div>
+                  </AdminListRow>
                 );
               })
             )}
           </div>
-        </div>
+        </AdminCard>
       </div>
 
       {/* Right side: Friends List */}
-      <div className="prob-admin-card">
-        <h3><Users size={16} style={{ color: '#60a5fa', marginRight: '6px', verticalAlign: 'middle' }} /> Danh Sách Bạn Bè ({friends.length})</h3>
-        <div className="prob-list-scroll">
+      <AdminCard>
+        <AdminHeader>
+          <Users size={16} className="text-blue-400" /> Danh Sách Bạn Bè ({friends.length})
+        </AdminHeader>
+        <div className="flex flex-col gap-3 max-h-[600px] overflow-y-auto pr-1">
           {loading ? (
-            <p>Đang tải danh sách bạn bè...</p>
+            <p className="text-stone text-sm">Đang tải danh sách bạn bè...</p>
           ) : friends.length === 0 ? (
-            <p style={{ color: '#64748b' }}>Bạn chưa có kết nối bạn bè nào.</p>
+            <p className="text-stone text-sm">Bạn chưa có kết nối bạn bè nào.</p>
           ) : (
             friends.map((f, idx) => {
               const fId = f.id || f._id || f.friendId || f.friend?.id;
               return (
-                <div key={fId || idx} className="prob-item-row">
-                  <div className="prob-item-details">
-                    <span className="prob-item-title">
+                <AdminListRow key={fId || idx}>
+                  <div className="flex flex-col gap-1.5">
+                    <span className="font-semibold text-sm text-linen font-body">
                       {f.friend?.username || f.username || `User: ${fId?.slice(-8)}`}
                     </span>
-                    <div className="prob-item-meta">
-                      <span className="prob-tag-pill" style={{ fontSize: '0.7rem' }}>
+                    <div className="flex items-center gap-2">
+                      <AdminBadge>
                         ELO: {f.friend?.elo_rating || f.elo_rating || 1000}
-                      </span>
+                      </AdminBadge>
                     </div>
                   </div>
 
-                  <button onClick={() => handleRemove(fId)} className="btn-action-icon delete" title="Hủy kết bạn">
+                  <AdminButton variant="icon-delete" onClick={() => handleRemove(fId)} title="Hủy kết bạn">
                     <UserX size={14} />
-                  </button>
-                </div>
+                  </AdminButton>
+                </AdminListRow>
               );
             })
           )}
         </div>
-      </div>
+      </AdminCard>
     </div>
   );
 };
-
 

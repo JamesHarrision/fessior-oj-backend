@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Trash2, Heart, Plus, Edit2 } from 'lucide-react';
 import { api } from '../../services/api';
 import type { IProblem } from '@ocj/types';
+import { AdminCard, AdminHeader, AdminButton, AdminInput, AdminSelect, AdminTextarea, AdminListRow, AdminFormGroup } from './ui/AdminUI';
 
 export const AdminCommentsTab: React.FC = () => {
   const [problems, setProblems] = useState<IProblem[]>([]);
@@ -108,112 +109,114 @@ export const AdminCommentsTab: React.FC = () => {
   };
 
   return (
-    <div className="problems-tab-grid">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
       {/* Left side: Problem selector & comment creator */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        <div className="prob-admin-card">
-          <h3>Chọn Chủ Đề Thảo Luận</h3>
-          <div className="prob-form-group">
-            <label>Chọn Bài Tập</label>
-            <select
+      <div className="flex flex-col gap-6">
+        <AdminCard>
+          <AdminHeader>Chọn Chủ Đề Thảo Luận</AdminHeader>
+          <AdminFormGroup label="Chọn Bài Tập" className="mt-2">
+            <AdminSelect
               value={selectedProblemId}
               onChange={e => setSelectedProblemId(e.target.value)}
-              className="prob-admin-select"
             >
               {problems.map(p => (
                 <option key={p.id || p._id} value={p.id || p._id}>{p.title}</option>
               ))}
-            </select>
-          </div>
-        </div>
+            </AdminSelect>
+          </AdminFormGroup>
+        </AdminCard>
 
-        <div className="prob-admin-card">
-          <h3>Đăng Bình Luận Quản Trị</h3>
-          <form onSubmit={handleCreateComment} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <textarea
+        <AdminCard>
+          <AdminHeader>Đăng Bình Luận Quản Trị</AdminHeader>
+          <form onSubmit={handleCreateComment} className="flex flex-col gap-4 mt-2">
+            <AdminTextarea
               placeholder="Nhập nội dung thảo luận hoặc thông báo..."
               value={newComment}
               onChange={e => setNewComment(e.target.value)}
-              className="prob-admin-textarea"
               rows={4}
               required
             />
-            <button type="submit" className="btn-prob-primary">
+            <AdminButton type="submit">
               <Plus size={14} /> Đăng bình luận
-            </button>
+            </AdminButton>
           </form>
-        </div>
+        </AdminCard>
       </div>
 
       {/* Right side: Comments list & Moderation actions */}
-      <div className="prob-admin-card">
-        <h3>Điều Phối Bình Luận (Moderation)</h3>
-        <div className="prob-list-scroll">
+      <AdminCard>
+        <AdminHeader>Điều Phối Bình Luận (Moderation)</AdminHeader>
+        <div className="flex flex-col gap-3 max-h-[680px] overflow-y-auto pr-1">
           {loading ? (
-            <p>Đang tải bình luận...</p>
+            <p className="text-stone text-sm">Đang tải bình luận...</p>
           ) : comments.length === 0 ? (
-            <p style={{ color: '#64748b' }}>Không có bình luận nào cho bài tập này.</p>
+            <p className="text-stone text-sm">Không có bình luận nào cho bài tập này.</p>
           ) : (
             comments.map((c, idx) => {
               const cid = c.id || c._id;
               const isEditing = editingCommentId === cid;
               return (
-                <div key={cid || idx} className="prob-item-row" style={{ alignItems: 'flex-start', padding: '12px' }}>
-                  <div className="prob-item-details" style={{ width: '100%' }}>
-                    <span className="prob-item-title" style={{ fontSize: '0.85rem', color: '#8892b0' }}>
-                      Người dùng: {c.userId || c.user?.username || 'User'}
+                <AdminListRow key={cid || idx} className="items-start">
+                  <div className="flex flex-col gap-2 w-full">
+                    <span className="text-xs text-stone font-display tracking-wider uppercase font-semibold">
+                      Người dùng: <span className="text-linen">{c.userId || c.user?.username || 'User'}</span>
                     </span>
                     
                     {isEditing ? (
-                      <div style={{ marginTop: '8px', display: 'flex', gap: '8px', width: '100%' }}>
-                        <input
+                      <div className="flex gap-2 w-full mt-1">
+                        <AdminInput
                           type="text"
                           value={editContent}
                           onChange={e => setEditContent(e.target.value)}
-                          className="prob-admin-input"
-                          style={{ margin: 0 }}
+                          className="flex-1 min-w-0"
                         />
-                        <button onClick={() => handleUpdateComment(cid)} className="btn-prob-primary" style={{ padding: '6px 12px' }}>
+                        <AdminButton variant="primary" onClick={() => handleUpdateComment(cid)} className="px-3">
                           Lưu
-                        </button>
-                        <button onClick={() => setEditingCommentId(null)} className="btn-prob-secondary" style={{ padding: '6px 12px' }}>
+                        </AdminButton>
+                        <AdminButton variant="secondary" onClick={() => setEditingCommentId(null)} className="px-3">
                           Hủy
-                        </button>
+                        </AdminButton>
                       </div>
                     ) : (
-                      <p style={{ color: '#cbd5e1', margin: '6px 0', fontSize: '0.9rem', lineHeight: '1.4' }}>
+                      <p className="text-sm text-surface-300 leading-relaxed m-0">
                         {c.content}
                       </p>
                     )}
 
-                    <div className="prob-item-meta" style={{ marginTop: '8px' }}>
-                      <button onClick={() => handleLike(cid)} style={{ background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: '4px', color: '#fb7185', cursor: 'pointer', padding: 0 }}>
-                        <Heart size={12} fill={c.likes?.length ? '#fb7185' : 'none'} />
-                        <span style={{ fontSize: '0.72rem' }}>{c.likes?.length || 0} Thích</span>
+                    <div className="flex items-center gap-3 mt-1">
+                      <button 
+                        onClick={() => handleLike(cid)} 
+                        className="bg-transparent border-none flex items-center gap-1.5 text-rose-400 cursor-pointer p-0 hover:text-rose-300 transition-colors"
+                      >
+                        <Heart size={12} fill={c.likes?.length ? 'currentColor' : 'none'} />
+                        <span className="text-xs font-semibold">{c.likes?.length || 0} Thích</span>
                       </button>
-                      <span className="prob-tag-pill" style={{ fontSize: '0.68rem' }}>
+                      <span className="text-[11px] text-stone">
                         {new Date(c.createdAt || c.created_at).toLocaleString()}
                       </span>
                     </div>
                   </div>
 
-                  <div className="action-btn-container" style={{ alignSelf: 'center' }}>
+                  <div className="flex gap-2 self-start ml-2">
                     {!isEditing && (
-                      <button onClick={() => { setEditingCommentId(cid); setEditContent(c.content); }} className="btn-action-icon edit" title="Sửa nội dung">
-                        <Edit2 size={12} />
-                      </button>
+                      <AdminButton 
+                        variant="icon-edit" 
+                        onClick={() => { setEditingCommentId(cid); setEditContent(c.content); }} 
+                        title="Sửa nội dung"
+                      >
+                        <Edit2 size={14} />
+                      </AdminButton>
                     )}
-                    <button onClick={() => handleDeleteComment(cid)} className="btn-action-icon delete" title="Xóa bình luận">
-                      <Trash2 size={12} />
-                    </button>
+                    <AdminButton variant="icon-delete" onClick={() => handleDeleteComment(cid)} title="Xóa bình luận">
+                      <Trash2 size={14} />
+                    </AdminButton>
                   </div>
-                </div>
+                </AdminListRow>
               );
             })
           )}
         </div>
-      </div>
+      </AdminCard>
     </div>
   );
 };
-

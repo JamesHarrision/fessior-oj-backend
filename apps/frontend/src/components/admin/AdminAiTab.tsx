@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Sparkles, Compass } from 'lucide-react';
 import { api } from '../../services/api';
+import { AdminCard, AdminHeader, AdminButton, AdminInput, AdminSelect, AdminFormGroup } from './ui/AdminUI';
 
 export const AdminAiTab: React.FC = () => {
   // Roadmap simulator
@@ -19,7 +20,7 @@ export const AdminAiTab: React.FC = () => {
     setRoadmapLoading(true);
     setRoadmapResult(null);
     try {
-      const res = await api.getAIRoadmap( /* { skillLevel, focusArea } */ );
+      const res = await api.getAIRoadmap({ skillLevel, focusArea });
       if (res.success) {
         setRoadmapResult(res.data);
       }
@@ -48,83 +49,82 @@ export const AdminAiTab: React.FC = () => {
   };
 
   return (
-    <div className="problems-tab-grid">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
       {/* Left side: AI Roadmap Generator Tester */}
-      <div className="prob-admin-card">
-        <h3><Compass size={18} style={{ color: '#60a5fa', marginRight: '6px', verticalAlign: 'middle' }} /> Trình Tạo Lộ Trình AI (Roadmap Generator)</h3>
-        <form onSubmit={handleGenerateRoadmap} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div className="prob-form-group">
-            <label>Trình độ (Skill Level)</label>
-            <select
+      <AdminCard>
+        <AdminHeader>
+          <Compass size={18} className="text-blue-400" /> 
+          Trình Tạo Lộ Trình AI (Roadmap Generator)
+        </AdminHeader>
+        <form onSubmit={handleGenerateRoadmap} className="flex flex-col gap-4">
+          <AdminFormGroup label="Trình độ (Skill Level)">
+            <AdminSelect
               value={skillLevel}
               onChange={e => setSkillLevel(e.target.value)}
-              className="prob-admin-select"
             >
               <option value="Beginner">Nhập môn (Beginner)</option>
               <option value="Intermediate">Trung cấp (Intermediate)</option>
               <option value="Advanced">Nâng cao (Advanced)</option>
-            </select>
-          </div>
+            </AdminSelect>
+          </AdminFormGroup>
 
-          <div className="prob-form-group">
-            <label>Chủ đề trọng tâm (Focus Area)</label>
-            <input
+          <AdminFormGroup label="Chủ đề trọng tâm (Focus Area)">
+            <AdminInput
               type="text"
               value={focusArea}
               onChange={e => setFocusArea(e.target.value)}
               placeholder="Ví dụ: Dynamic Programming, Graph Algorithms..."
-              className="prob-admin-input"
               required
             />
-          </div>
+          </AdminFormGroup>
 
-          <button type="submit" className="btn-prob-primary" disabled={roadmapLoading}>
+          <AdminButton type="submit" disabled={roadmapLoading} className="mt-2">
             {roadmapLoading ? 'Đang tạo lộ trình...' : 'Tạo lộ trình học tập AI'}
-          </button>
+          </AdminButton>
         </form>
 
         {roadmapResult && (
-          <div style={{ marginTop: '16px', background: '#0b0f19', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', padding: '16px' }}>
-            <h4 style={{ color: '#fff', fontSize: '0.9rem', marginBottom: '10px' }}>Lộ trình được đề xuất:</h4>
-            <div style={{ fontSize: '0.82rem', color: '#cbd5e1', whiteSpace: 'pre-wrap', lineHeight: '1.6' }}>
+          <div className="mt-4 bg-ink/40 border border-charcoal/50 rounded-xl p-4">
+            <h4 className="text-linen text-sm font-semibold mb-2">Lộ trình được đề xuất:</h4>
+            <div className="text-sm text-surface-300 whitespace-pre-wrap leading-relaxed">
               {typeof roadmapResult === 'string' ? roadmapResult : JSON.stringify(roadmapResult, null, 2)}
             </div>
           </div>
         )}
-      </div>
+      </AdminCard>
 
       {/* Right side: AI Feedback Simulator */}
-      <div className="prob-admin-card">
-        <h3><Sparkles size={18} style={{ color: '#fbbf24', marginRight: '6px', verticalAlign: 'middle' }} /> Trình Đánh Giá Code AI (Submission Feedback)</h3>
-        <form onSubmit={handleGenerateFeedback} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div className="prob-form-group">
-            <label>Nhập ID Lượt Nộp Bài (Submission ID)</label>
-            <input
+      <AdminCard>
+        <AdminHeader>
+          <Sparkles size={18} className="text-yellow-500" /> 
+          Trình Đánh Giá Code AI (Submission Feedback)
+        </AdminHeader>
+        <form onSubmit={handleGenerateFeedback} className="flex flex-col gap-4">
+          <AdminFormGroup label="Nhập ID Lượt Nộp Bài (Submission ID)">
+            <AdminInput
               type="text"
               value={submissionId}
               onChange={e => setSubmissionId(e.target.value)}
               placeholder="Nhập MongoDB ObjectId của Submission..."
-              className="prob-admin-input"
               required
             />
-          </div>
+          </AdminFormGroup>
 
-          <button type="submit" className="btn-prob-primary" disabled={feedbackLoading}>
+          <AdminButton type="submit" disabled={feedbackLoading} className="mt-2">
             {feedbackLoading ? 'Đang phân tích code...' : 'Tạo nhận xét code AI'}
-          </button>
+          </AdminButton>
         </form>
 
         {feedbackResult && (
-          <div style={{ marginTop: '16px', background: '#0b0f19', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', padding: '16px' }}>
-            <h4 style={{ color: '#fff', fontSize: '0.9rem', marginBottom: '10px' }}>Phân tích từ AI Assistant:</h4>
-            <div style={{ fontSize: '0.82rem', color: '#cbd5e1', whiteSpace: 'pre-wrap', lineHeight: '1.6' }}>
+          <div className="mt-4 bg-ink/40 border border-charcoal/50 rounded-xl p-4">
+            <h4 className="text-linen text-sm font-semibold mb-2">Phân tích từ AI Assistant:</h4>
+            <div className="text-sm text-surface-300 whitespace-pre-wrap leading-relaxed">
               {typeof feedbackResult === 'string' ? feedbackResult : JSON.stringify(feedbackResult, null, 2)}
             </div>
           </div>
         )}
-      </div>
+      </AdminCard>
     </div>
   );
 };
-
 

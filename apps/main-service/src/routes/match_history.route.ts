@@ -57,6 +57,20 @@ router.get(
 );
 
 router.get(
+	'/active',
+/* #swagger.tags = ['MatchHistory']
+   #swagger.summary = 'Get active match for current user'
+   #swagger.description = 'Returns the pending match the user is currently participating in.'
+   #swagger.security = [{ "bearerAuth": [] }]
+   #swagger.responses[200] = { 
+     description: 'Active match', 
+   }
+*/
+	requireAuth,
+	matchHistoryController.getActiveMatch
+);
+
+router.get(
 	'/:matchId',
 /* #swagger.tags = ['MatchHistory']
    #swagger.summary = 'Get details for a match'

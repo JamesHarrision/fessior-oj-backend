@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../../services/api';
-import { Plus, Users, LogIn } from 'lucide-react';
+import { Plus, Users, LogIn, ArrowRight } from 'lucide-react';
 import { DifficultyBadge } from '@ocj/ui';
+import { Link } from 'react-router-dom';
 
 interface RoomBrowserProps {
   onJoinRoom: (roomData: any) => void;
@@ -65,11 +66,16 @@ export const RoomBrowser: React.FC<RoomBrowserProps> = ({ onJoinRoom }) => {
   };
 
   return (
-    <div className="bg-washi border border-charcoal p-4 flex-1 flex-col gap-4 min-h-[400px]">
+    <div className="bg-washi border border-charcoal p-4 flex-1 flex flex-col gap-4 min-h-[400px]">
       {/* ── Header ── */}
-      <div className="flex items-center gap-2">
-        <Users size={18} className="text-stone" />
-        <h3 className="font-display text-base font-bold text-linen">Phòng đấu tùy chọn</h3>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Users size={18} className="text-stone" />
+          <h3 className="font-display text-base font-bold text-linen">Phòng đấu tùy chọn</h3>
+        </div>
+        <Link to="/custom-rooms" className="text-[10px] font-bold text-stone hover:text-vermilion transition-colors uppercase tracking-wider flex items-center gap-1">
+          Xem tất cả <ArrowRight size={12} />
+        </Link>
       </div>
 
       {/* ── Controls ── */}
@@ -119,31 +125,42 @@ export const RoomBrowser: React.FC<RoomBrowserProps> = ({ onJoinRoom }) => {
         <p className="font-body text-xs text-vermilion">{message}</p>
       )}
 
-      {/* ── Room grid ── */}
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-3 overflow-y-auto max-h-[240px]">
+      {/* ── Room Table ── */}
+      <div className="overflow-y-auto max-h-[240px] border border-charcoal">
         {rooms.length === 0 ? (
-          <p className="col-span-full text-xs text-stone text-center py-10">
+          <p className="text-xs text-stone text-center py-10 bg-ink/30">
             Hiện không có phòng đấu nào đang chờ.
           </p>
         ) : (
-          rooms.map((room) => (
-            <div key={room.id} className="bg-ink/30 border border-charcoal p-4 flex flex-col gap-3 hover:border-stone transition-colors">
-              <div className="flex justify-between items-center">
-                <span className="font-display text-sm font-bold text-linen">{room.code}</span>
-                <DifficultyBadge difficulty={room.difficulty} size="small" />
-              </div>
-              <div className="flex flex-col gap-1 font-body text-[11px] text-stone">
-                <span>Chủ phòng: {room.hostName}</span>
-                <span>{room.playersCount}/2 người chơi</span>
-              </div>
-              <button
-                onClick={() => onJoinRoom(room)}
-                className="w-full py-2 border border-charcoal text-linen font-display text-[10px] font-bold uppercase tracking-wider hover:border-vermilion transition-colors cursor-pointer"
-              >
-                Vào phòng
-              </button>
-            </div>
-          ))
+          <table className="w-full text-left border-collapse bg-ink/30">
+            <thead>
+              <tr className="border-b border-charcoal bg-charcoal/50">
+                <th className="py-2.5 px-3 text-[10px] font-bold text-stone uppercase tracking-wider">Mã phòng</th>
+                <th className="py-2.5 px-3 text-[10px] font-bold text-stone uppercase tracking-wider">Độ khó</th>
+                <th className="py-2.5 px-3 text-[10px] font-bold text-stone uppercase tracking-wider">Chủ phòng</th>
+                <th className="py-2.5 px-3 text-[10px] font-bold text-stone uppercase tracking-wider text-right"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-charcoal">
+              {rooms.map((room) => (
+                <tr key={room.id} className="hover:bg-charcoal/20 transition-colors">
+                  <td className="py-2.5 px-3 font-display text-sm font-bold text-linen">{room.room_code}</td>
+                  <td className="py-2.5 px-3"><DifficultyBadge difficulty={room.difficulty} size="small" /></td>
+                  <td className="py-2.5 px-3 font-body text-xs text-stone">
+                    {room.creator?.username || 'Ẩn danh'} ({room.participants?.length || 1}/{room.max_participants || 2})
+                  </td>
+                  <td className="py-2.5 px-3 text-right">
+                    <button
+                      onClick={() => onJoinRoom(room)}
+                      className="px-3 py-1.5 bg-washi border border-charcoal text-linen font-display text-[10px] font-bold uppercase tracking-wider hover:border-vermilion hover:text-vermilion transition-colors cursor-pointer"
+                    >
+                      Vào
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
     </div>

@@ -1,140 +1,152 @@
-import { useMemo, useState } from 'react';
-import { Input, Select, Spin, Tag } from 'antd';
-import { SearchOutlined, BookOutlined, ArrowRightOutlined } from '@ant-design/icons';
+import { useEffect, useMemo, useState } from 'react';
+import { Spin } from 'antd';
+import { Search, Bot, CheckCircle2, Filter, ArrowUpDown, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { PageHeader, EmptyState, DifficultyBadge } from '@ocj/ui';
 import { useProblems } from './hooks/useProblems';
 import { useMatchStore } from '../../stores/match.store';
-import { Pagination } from '@ocj/ui';
-import type { IProblem, ITag } from '@ocj/types';
+import type { ITag } from '@ocj/types';
 
-/* ─── Constants ─── */
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const DIFFICULTY_OPTIONS = [
-  { value: '', label: 'All Difficulties' },
-  { value: 'EASY', label: 'Easy' },
-  { value: 'MEDIUM', label: 'Medium' },
-  { value: 'HARD', label: 'Hard' },
-];
+function DifficultyBadge({ level }: { level: string }) {
+  const map: Record<string, { label: string; bg: string; text: string }> = {
+    EASY: { label: "Dễ", bg: "bg-green-500/10", text: "text-green-400" },
+    MEDIUM: { label: "Trung bình", bg: "bg-yellow-500/10", text: "text-yellow-400" },
+    HARD: { label: "Khó", bg: "bg-red-500/10", text: "text-red-400" },
+  };
+  const { label, bg, text } = map[level] || map.MEDIUM;
+  return (
+    <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-[0.75rem] font-bold ${bg} ${text}`}>
+      {label}
+    </span>
+  );
+}
 
-/* ─── ProblemRow ─── */
+function StatusLabel({ isSolved }: { isSolved?: boolean }) {
+  if (!isSolved) return <span className="font-bold text-stone/50">—</span>;
+  return <span className="font-bold text-green-500">AC</span>;
+}
 
-function ProblemRow(props: { problem: IProblem & { isSolved?: boolean; acceptanceRate?: number; totalSubmissions?: number }; onSelect: (slug: string) => void }) {
-  const { problem, onSelect } = props;
-  const difficulty = (problem.difficulty ?? 'EASY') as 'EASY' | 'MEDIUM' | 'HARD';
-  const tags = (problem.tags ?? []) as ITag[];
+function CustomPagination({ page, total, limit, onPage }: { page: number; total: number; limit: number; onPage: (p: number) => void }) {
+  const totalPages = Math.max(1, Math.ceil(total / limit));
+  const pages: (number | "...")[] = [];
+
+  if (totalPages <= 7) {
+    for (let i = 1; i <= totalPages; i++) pages.push(i);
+  } else {
+    pages.push(1, 2, 3);
+    if (page > 5) pages.push("...");
+    if (page > 3 && page < totalPages - 2) pages.push(page);
+    if (page < totalPages - 4) pages.push("...");
+    pages.push(totalPages);
+  }
 
   return (
-    <div
-      className="!bg-washi !border-b !border-charcoal !px-6 !py-4
-                 hover:!bg-ink transition-colors cursor-pointer !flex !flex-col sm:!flex-row !items-start sm:!items-center !justify-between !gap-4 relative"
-      onClick={() => onSelect(problem.slug)}
-    >
-      <div className="!flex !items-center !gap-4 flex-1">
-        <div className="!w-6 !h-6 !flex-shrink-0 !flex !items-center !justify-center">
-          {problem.isSolved ? (
-            <div className="!w-5 !h-5 !bg-green-500 !rounded-full !flex !items-center !justify-center">
-              <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-          ) : (
-            <div className="!w-2 !h-2 !bg-stone !rounded-full opacity-30"></div>
-          )}
-        </div>
-        
-        <div className="flex-1">
-          <div className="!flex !items-center !gap-3 !mb-1">
-            <h3 className={`!text-[15px] !font-semibold !leading-snug !m-0 ${problem.isSolved ? '!text-green-500' : '!text-linen'}`}
-                style={{ fontFamily: "'Clash Display', sans-serif" }}>
-              {problem.title}
-            </h3>
-            <DifficultyBadge difficulty={difficulty} />
-          </div>
-
-          <div className="!flex !items-center !gap-3">
-            <span className="!text-[11px] !font-medium !text-stone !uppercase !tracking-wider">
-              {problem.acceptanceRate !== undefined ? `${problem.acceptanceRate}% Tỷ lệ giải` : 'Chưa có tỷ lệ'}
-            </span>
-            
-            {tags.length > 0 && (
-              <div className="!flex !flex-wrap !gap-1.5 !ml-2">
-                {tags.slice(0, 3).map((t) => (
-                  <Tag key={t.id ?? t.slug} color="default" className="!text-[10px] !m-0 !rounded-md !border-charcoal !bg-ink !text-stone">
-                    {t.name}
-                  </Tag>
-                ))}
-                {tags.length > 3 && (
-                  <span className="!text-[10px] !text-stone !self-center">+{tags.length - 3}</span>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <button
-        className={`!shrink-0 !flex !items-center !justify-center !gap-2 !px-5 !py-2 !rounded-lg
-                   !text-linen !text-[12px] !font-semibold !border-none !cursor-pointer transition-colors duration-200
-                   ${problem.isSolved ? '!bg-green-600 hover:!bg-green-500' : '!bg-vermilion hover:!bg-vermilion-hover'}`}
-        onClick={(e) => { e.stopPropagation(); onSelect(problem.slug); }}
+    <div className="flex items-center justify-center gap-2 mt-6 font-sans">
+      <button 
+        disabled={page <= 1} 
+        onClick={() => onPage(page - 1)}
+        className="px-3 py-1.5 border border-charcoal rounded-md text-stone text-sm bg-washi disabled:opacity-50 hover:bg-charcoal/20 transition-colors"
       >
-        {problem.isSolved ? 'Đã giải' : 'Solve Now'} <ArrowRightOutlined className="!text-xs" />
+        Previous
+      </button>
+      {pages.map((p, i) =>
+        p === "..." ? (
+          <span key={`ellipsis-${i}`} className="text-stone px-1">...</span>
+        ) : (
+          <button
+            key={p}
+            onClick={() => onPage(p as number)}
+            className={`px-3 py-1.5 border border-charcoal rounded-md text-sm transition-colors ${p === page ? 'bg-vermilion text-linen border-vermilion' : 'bg-washi text-stone hover:bg-charcoal/20'}`}
+          >
+            {p}
+          </button>
+        )
+      )}
+      <button
+        disabled={page >= totalPages}
+        onClick={() => onPage(page + 1)}
+        className="px-3 py-1.5 border border-charcoal rounded-md text-stone text-sm bg-washi disabled:opacity-50 hover:bg-charcoal/20 transition-colors"
+      >
+        Next
       </button>
     </div>
   );
 }
 
-/* ─── FilterBar ─── */
+// ─── Filter Bar ────────────────────────────────────────────────────────────────
 
-function FilterBar(props: {
-  search: string;
-  onSearchChange: (v: string) => void;
-  difficulty: string;
-  onDifficultyChange: (v: string) => void;
-  selectedTag: string;
-  onTagChange: (v: string) => void;
+function FilterBar({ tags, activeTag, activeDiff, onTag, onDiff }: {
   tags: ITag[];
+  activeTag: string;
+  activeDiff: string;
+  onTag: (t: string) => void;
+  onDiff: (d: string) => void;
 }) {
+  const difficulties = ["EASY", "MEDIUM", "HARD"];
+  const diffLabel: Record<string, string> = {
+    EASY: "Dễ",
+    MEDIUM: "Trung bình",
+    HARD: "Khó",
+  };
+
   return (
-    <div className="!bg-washi !rounded-2xl !border !border-charcoal !p-4
-                    !grid !grid-cols-1 sm:!grid-cols-[2fr_1fr_1fr] !gap-3">
-      <Input
-        prefix={<SearchOutlined className="!text-stone" />}
-        placeholder="Search problems..."
-        value={props.search}
-        onChange={(e) => props.onSearchChange(e.target.value)}
-        allowClear
-        className="!h-[42px] !rounded-lg !bg-ink !border-charcoal hover:!border-vermilion"
-      />
+    <div className="flex flex-col gap-4 p-5 bg-ink rounded-xl border border-charcoal mb-4 animate-fade-in-up shadow-lg">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+        <span className="flex items-center gap-2 text-sm font-bold text-stone w-[80px]">
+          <Filter size={16} /> Độ khó
+        </span>
+        <div className="flex flex-wrap gap-2">
+          <button
+            className={`px-3 py-1.5 rounded-md text-[0.8rem] font-semibold border transition-colors ${!activeDiff ? 'bg-washi border-vermilion text-linen' : 'bg-ink border-charcoal text-stone hover:bg-charcoal/30'}`}
+            onClick={() => onDiff("")}
+          >
+            Tất cả
+          </button>
+          {difficulties.map((d) => (
+            <button
+              key={d}
+              className={`px-3 py-1.5 rounded-md text-[0.8rem] font-semibold border transition-colors ${activeDiff === d ? 'bg-washi border-vermilion text-linen' : 'bg-ink border-charcoal text-stone hover:bg-charcoal/30'}`}
+              onClick={() => onDiff(activeDiff === d ? "" : d)}
+            >
+              {diffLabel[d]}
+            </button>
+          ))}
+        </div>
+      </div>
 
-      <Select
-        value={props.difficulty}
-        onChange={props.onDifficultyChange}
-        options={DIFFICULTY_OPTIONS}
-        className="!w-full"
-        classNames={{ popup: { root: '!rounded-lg' } }}
-        size="large"
-      />
-
-      <Select
-        value={props.selectedTag}
-        onChange={props.onTagChange}
-        placeholder="All Topics"
-        allowClear
-        options={[
-          { value: '', label: 'All Topics' },
-          ...props.tags.map((t) => ({ value: t.slug ?? t.name ?? '', label: t.name })),
-        ]}
-        className="!w-full"
-        classNames={{ popup: { root: '!rounded-lg' } }}
-        size="large"
-      />
+      {tags.length > 0 && (
+        <div className="flex flex-col sm:flex-row sm:items-start gap-3">
+          <span className="flex items-center gap-2 text-sm font-bold text-stone w-[80px] mt-1.5">
+            Tag
+          </span>
+          <div className="flex flex-wrap gap-2">
+            <button
+              className={`px-3 py-1.5 rounded-md text-[0.8rem] font-semibold border transition-colors ${!activeTag ? 'bg-washi border-vermilion text-linen' : 'bg-ink border-charcoal text-stone hover:bg-charcoal/30'}`}
+              onClick={() => onTag("")}
+            >
+              Tất cả
+            </button>
+            {tags.slice(0, 15).map((t) => {
+              const val = t.slug ?? t.name ?? "";
+              return (
+                <button
+                  key={val}
+                  className={`px-3 py-1.5 rounded-md text-[0.8rem] font-semibold border transition-colors ${activeTag === val ? 'bg-washi border-vermilion text-linen' : 'bg-ink border-charcoal text-stone hover:bg-charcoal/30'}`}
+                  onClick={() => onTag(activeTag === val ? "" : val)}
+                >
+                  {t.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-/* ─── ProblemsPage ─── */
+// ─── ProblemsPage ───
 
 export function ProblemsPage() {
   const navigate = useNavigate();
@@ -144,9 +156,10 @@ export function ProblemsPage() {
   const [search, setSearch] = useState('');
   const [difficulty, setDifficulty] = useState('');
   const [selectedTag, setSelectedTag] = useState('');
+  const [showFilter, setShowFilter] = useState(false);
   
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 10;
+  const pageSize = 15;
 
   const filtered = useMemo(() => {
     return problems.filter((p) => {
@@ -161,8 +174,7 @@ export function ProblemsPage() {
     });
   }, [problems, search, difficulty, selectedTag]);
 
-  // Reset page when filters change
-  useMemo(() => {
+  useEffect(() => {
     setCurrentPage(1);
   }, [search, difficulty, selectedTag]);
 
@@ -178,79 +190,161 @@ export function ProblemsPage() {
   };
 
   return (
-    <div className="!space-y-6">
-      <div className="!flex !flex-col sm:!flex-row !justify-between !items-start sm:!items-center !gap-4">
-        <PageHeader
-          title="Problems"
-          subtitle="Browse our collection of algorithm challenges and sharpen your skills"
-        />
-        <button
-          onClick={() => {
-            if (filtered.length > 0) {
-              const randIdx = Math.floor(Math.random() * filtered.length);
-              handleSelect(filtered[randIdx].slug);
-            }
-          }}
-          className="!flex !items-center !gap-2 !bg-ink !border !border-charcoal !px-4 !py-2 !rounded-lg !text-linen !font-semibold hover:!border-vermilion hover:!text-vermilion transition-colors"
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-          </svg>
-          Pick Random
-        </button>
-      </div>
+    <div className="max-w-[1000px] mx-auto w-full flex flex-col py-8 font-sans">
+      {/* ── Header ── */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-[2rem] font-extrabold text-linen m-0 tracking-tight font-display">Problems</h1>
+          <p className="text-[1rem] text-stone m-0">Top problems today</p>
+        </div>
 
-      <FilterBar
-        search={search}
-        onSearchChange={setSearch}
-        difficulty={difficulty}
-        onDifficultyChange={setDifficulty}
-        selectedTag={selectedTag}
-        onTagChange={setSelectedTag}
-        tags={tags}
-      />
-
-      {isLoading ? (
-        <div className="!flex !justify-center !py-20">
-          <Spin size="large" />
-        </div>
-      ) : isError ? (
-        <div className="!bg-washi !rounded-2xl !border !border-charcoal !p-12">
-          <EmptyState
-            icon={<BookOutlined style={{ fontSize: 48, color: '#94A3B8' }} />}
-            title="Failed to load problems"
-            description="Please check your connection and try again."
-          />
-        </div>
-      ) : filtered.length === 0 ? (
-        <div className="!bg-washi !rounded-2xl !border !border-charcoal !p-12">
-          <EmptyState
-            icon={<BookOutlined style={{ fontSize: 48, color: '#94A3B8' }} />}
-            title="No problems found"
-            description="Try adjusting your filters or search query."
-          />
-        </div>
-      ) : (
-        <div className="!bg-ink !border !border-charcoal !rounded-2xl !overflow-hidden">
-          <div className="!flex !flex-col">
-            {currentProblems.map((p) => (
-              <ProblemRow
-                key={p.id ?? p._id ?? p.slug}
-                problem={p}
-                onSelect={handleSelect}
-              />
-            ))}
-          </div>
-          
-          <div className="!p-6 !border-t !border-charcoal !bg-washi">
-            <Pagination 
-              currentPage={currentPage}
-              totalItems={filtered.length}
-              pageSize={pageSize}
-              onPageChange={setCurrentPage}
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-stone" size={16} />
+            <input
+              type="text"
+              placeholder="Search problems..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9 pr-4 py-2.5 bg-ink border border-charcoal rounded-lg text-sm text-linen focus:outline-none focus:border-vermilion transition-colors w-[240px]"
             />
           </div>
+
+          <button
+            onClick={() => setShowFilter((v) => !v)}
+            className={`flex items-center gap-2 px-4 py-2.5 border rounded-lg text-sm font-semibold transition-colors shadow-sm ${showFilter ? 'bg-charcoal/50 border-vermilion text-linen' : 'bg-ink border-charcoal text-linen hover:bg-charcoal/30'}`}
+          >
+            <Filter size={16} /> Filter
+          </button>
+          
+          <button className="flex items-center gap-2 px-4 py-2.5 border border-charcoal rounded-lg bg-ink text-linen text-sm font-semibold hover:bg-charcoal/30 transition-colors shadow-sm">
+            <ArrowUpDown size={16} /> Sort by
+          </button>
         </div>
+      </div>
+
+      {/* ── Filter panel ── */}
+      {showFilter && (
+        <FilterBar
+          tags={tags}
+          activeTag={selectedTag}
+          activeDiff={difficulty}
+          onTag={setSelectedTag}
+          onDiff={setDifficulty}
+        />
+      )}
+
+      {/* ── Active filters indicator ── */}
+      {(difficulty || selectedTag || search) && (
+        <div className="flex items-center gap-2 mb-4 flex-wrap">
+          {difficulty && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-vermilion/10 text-vermilion text-xs font-bold border border-vermilion/20">
+              Độ khó: {difficulty}
+              <button onClick={() => setDifficulty("")} className="hover:text-linen"><X size={12} /></button>
+            </span>
+          )}
+          {selectedTag && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-vermilion/10 text-vermilion text-xs font-bold border border-vermilion/20">
+              Tag: {tags.find((t) => (t.slug ?? t.name) === selectedTag)?.name || selectedTag}
+              <button onClick={() => setSelectedTag("")} className="hover:text-linen"><X size={12} /></button>
+            </span>
+          )}
+          {search && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-vermilion/10 text-vermilion text-xs font-bold border border-vermilion/20">
+              Tìm: "{search}"
+              <button
+                onClick={() => setSearch("")}
+                className="hover:text-linen"
+              >
+                <X size={12} />
+              </button>
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* ── Table ── */}
+      <div className="bg-washi border border-charcoal rounded-xl overflow-hidden shadow-sm">
+        {isLoading ? (
+          <div className="p-12 flex justify-center text-stone"><Spin size="large" /></div>
+        ) : isError ? (
+          <div className="p-12 text-center text-vermilion">⚠ Lỗi khi tải danh sách bài tập.</div>
+        ) : filtered.length === 0 ? (
+          <div className="p-16 flex flex-col items-center justify-center gap-4 text-stone">
+            <CheckCircle2 size={40} className="text-charcoal" />
+            <p className="text-lg font-semibold">Không tìm thấy bài toán nào.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-left text-sm whitespace-nowrap">
+              <thead>
+                <tr className="border-b border-charcoal bg-ink/30">
+                  <th className="px-6 py-5 font-bold text-stone tracking-wider uppercase text-[0.75rem] w-[100px]">Trạng thái</th>
+                  <th className="px-6 py-5 font-bold text-stone tracking-wider uppercase text-[0.75rem]">Tên bài</th>
+                  <th className="px-6 py-5 font-bold text-stone tracking-wider uppercase text-[0.75rem] text-right">Tỉ lệ AC</th>
+                  <th className="px-6 py-5 font-bold text-stone tracking-wider uppercase text-[0.75rem] text-center w-[120px]">Độ khó</th>
+                  <th className="px-6 py-5 font-bold text-stone tracking-wider uppercase text-[0.75rem] text-center w-[100px]">Hỏi Arya</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-charcoal">
+                {currentProblems.map((p) => {
+                  const probTags = (p.tags ?? []) as ITag[];
+                  return (
+                    <tr
+                      key={p.id ?? p._id ?? p.slug}
+                      className="hover:bg-ink/40 cursor-pointer transition-colors"
+                      onClick={() => handleSelect(p.slug)}
+                    >
+                      <td className="px-6 py-5 align-middle">
+                        <StatusLabel isSolved={(p as any).isSolved} />
+                      </td>
+                      <td className="px-6 py-4 align-middle">
+                        <div className="flex flex-col gap-1.5">
+                          <span className="font-bold text-linen text-[15px]">{p.title}</span>
+                          <div className="flex flex-wrap gap-2">
+                            {probTags.map((tag) => (
+                              <span key={tag.slug ?? tag.name} className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-ink text-stone border border-charcoal">
+                                {tag.name}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-5 align-middle text-right">
+                        <span className="font-bold text-linen">{(p as any).acceptanceRate !== undefined ? `${(p as any).acceptanceRate}%` : 'N/A'}</span>
+                      </td>
+                      <td className="px-6 py-5 align-middle text-center">
+                        <DifficultyBadge level={p.difficulty ?? "EASY"} />
+                      </td>
+                      <td className="px-6 py-5 align-middle text-center">
+                        <button
+                          className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-ink border border-charcoal text-stone hover:text-vermilion hover:border-vermilion/50 transition-colors"
+                          title="Hỏi Arya AI"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // TODO: open AI hint panel
+                          }}
+                        >
+                          <Bot size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* ── Pagination ── */}
+      {filtered.length > pageSize && (
+        <CustomPagination
+          page={currentPage}
+          total={filtered.length}
+          limit={pageSize}
+          onPage={setCurrentPage}
+        />
       )}
     </div>
   );

@@ -103,14 +103,14 @@ export function PvPWorkspaceView() {
     };
   }, [matchId]); // Removed problem dependency to avoid infinite loops
 
-  const handleRunCode = async () => {
-    // Basic run functionality if needed
-  };
+
+  const [submissionId, setSubmissionId] = useState<string>('');
 
   const handleSubmit = async () => {
     if (!problem || !activeMatch?.id) return;
     
     setIsSubmitting(true);
+    setVerdict('');
     try {
       const res = await api.submitCode({
         problemId: problem.id || problem._id || problem.slug,
@@ -119,10 +119,12 @@ export function PvPWorkspaceView() {
         matchId: activeMatch.id,
       });
 
-      if (res.success) {
+      if (res.success && res.data) {
+        setSubmissionId(res.data.id || res.data._id);
         toast.success('Đã nộp bài thành công! Đang chờ chấm điểm...', { theme: 'dark' });
       } else {
-        toast.error(res.message || 'Lỗi khi nộp bài', { theme: 'dark' });
+        toast.error((res as any).message || 'Lỗi khi nộp bài', { theme: 'dark' });
+        setIsSubmitting(false);
       }
     } catch (err: any) {
       toast.error(err.message || 'Lỗi hệ thống khi nộp bài', { theme: 'dark' });
@@ -144,13 +146,13 @@ export function PvPWorkspaceView() {
 
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 min-h-0">
         {/* Left Side: Problem Statement */}
-        <div className="bg-washi border border-charcoal flex flex-col min-h-0 shadow-lg">
+        <div className="bg-washi border border-charcoal flex flex-col min-h-0 shadow-lg rounded-xl overflow-hidden">
           <ProblemDescription problem={problem} />
         </div>
 
         {/* Right Side: Code Editor & Console */}
         <div className="flex flex-col gap-4 lg:gap-6 min-h-0">
-          <div className="flex-1 bg-ink border border-charcoal shadow-lg min-h-0">
+          <div className="flex-1 bg-ink border border-charcoal shadow-lg min-h-0 rounded-xl overflow-hidden">
             <CodeEditorPane
               code={code}
               onCodeChange={setCode}
@@ -158,12 +160,15 @@ export function PvPWorkspaceView() {
               onLanguageChange={setLanguage as any}
             />
           </div>
-          <div className="h-[280px] bg-washi border border-charcoal shadow-lg shrink-0">
+          <div className="h-[280px] bg-washi border border-charcoal shadow-lg shrink-0 rounded-xl overflow-hidden">
             <ConsolePane
-              onRun={handleRunCode}
               onSubmit={handleSubmit}
               isSubmitting={isSubmitting}
               verdict={verdict}
+              verdictDetails={{ submissionId }}
+              problem={problem}
+              code={code}
+              language={language}
             />
           </div>
         </div>

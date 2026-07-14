@@ -89,7 +89,7 @@ export const CodeEditorPane: React.FC<CodeEditorPaneProps> = ({
     <div className="flex flex-col h-[480px] bg-ink border border-charcoal overflow-hidden">
       {/* ── Header ── */}
       <div className="h-12 bg-washi border-b border-charcoal flex items-center justify-between px-4 shrink-0">
-        <div className="flex items-center gap-2 bg-charcoal/20 border-x border-t border-charcoal rounded-t px-4 py-1.5 h-full">
+        <div className="flex items-center gap-2 bg-charcoal/20 border-x border-t border-charcoal rounded-t-xl px-4 py-1.5 h-full">
           <div className="w-1.5 h-1.5 rounded-full bg-vermilion" />
           <span className="font-mono text-xs font-medium text-linen">
             solution.{getExtension()}

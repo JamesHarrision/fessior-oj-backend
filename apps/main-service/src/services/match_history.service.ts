@@ -13,6 +13,10 @@ export class MatchHistoryService {
     return match;
   }
 
+  async getActiveMatch(userId: string) {
+    return matchHistoryRepository.findActiveMatchByUserId(userId);
+  }
+
   async deleteMatch(matchId: string) {
     const match = await matchHistoryRepository.findById(matchId);
     if (!match) {

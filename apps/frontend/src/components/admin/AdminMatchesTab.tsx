@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Trophy, Trash2, Eye, Award } from 'lucide-react';
 import { api } from '../../services/api';
 import type { IMatch } from '@ocj/types';
+import { AdminCard, AdminHeader, AdminButton, AdminListRow, AdminBadge } from './ui/AdminUI';
 
 export const AdminMatchesTab: React.FC = () => {
   const [history, setHistory] = useState<IMatch[]>([]);
@@ -54,83 +55,88 @@ export const AdminMatchesTab: React.FC = () => {
   };
 
   return (
-    <div className="problems-tab-grid">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
       {/* Left side: List Match History */}
-      <div className="prob-admin-card" style={{ flex: 1 }}>
-        <h3>Lịch Sử Trận Đấu Toàn Hệ Thống</h3>
-        <div className="prob-list-scroll">
+      <AdminCard>
+        <AdminHeader>Lịch Sử Trận Đấu Toàn Hệ Thống</AdminHeader>
+        <div className="flex flex-col gap-3 max-h-[600px] overflow-y-auto pr-1">
           {loading ? (
-            <p>Đang tải...</p>
+            <p className="text-stone text-sm">Đang tải...</p>
           ) : history.length === 0 ? (
-            <p style={{ color: '#64748b' }}>Chưa có trận đấu nào được lưu trữ.</p>
+            <p className="text-stone text-sm">Chưa có trận đấu nào được lưu trữ.</p>
           ) : (
             history.map((m, idx) => {
               const mid = m.id;
               return (
-                <div key={mid || idx} className="prob-item-row">
-                  <div className="prob-item-details">
-                    <span className="prob-item-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Trophy size={14} style={{ color: '#fbbf24' }} />
+                <AdminListRow key={mid || idx}>
+                  <div className="flex flex-col gap-1.5">
+                    <span className="font-semibold text-sm text-linen font-body flex items-center gap-2">
+                      <Trophy size={14} className="text-yellow-500" />
                       Trận Đấu #{mid?.slice(-6)}
                     </span>
-                    <div className="prob-item-meta">
-                      <span className="prob-tag-pill" style={{ fontSize: '0.7rem' }}>
+                    <div className="flex items-center gap-2">
+                      <AdminBadge color={m.status === 'FINISHED' ? 'green' : 'yellow'}>
                         Trạng thái: {m.status || 'FINISHED'}
-                      </span>
-                      <span className="prob-tag-pill" style={{ fontSize: '0.7rem' }}>
+                      </AdminBadge>
+                      <AdminBadge>
                         {m.started_at ? new Date(m.started_at).toLocaleDateString() : '—'}
-                      </span>
+                      </AdminBadge>
                     </div>
                   </div>
 
-                  <div className="action-btn-container">
-                    <button onClick={() => handleInspect(mid)} className="btn-action-icon edit" title="Xem chi tiết trận đấu">
+                  <div className="flex gap-2">
+                    <AdminButton variant="icon-edit" onClick={() => handleInspect(mid)} title="Xem chi tiết trận đấu">
                       <Eye size={14} />
-                    </button>
-                    <button onClick={() => handleDelete(mid)} className="btn-action-icon delete" title="Xóa bản ghi">
+                    </AdminButton>
+                    <AdminButton variant="icon-delete" onClick={() => handleDelete(mid)} title="Xóa bản ghi">
                       <Trash2 size={14} />
-                    </button>
+                    </AdminButton>
                   </div>
-                </div>
+                </AdminListRow>
               );
             })
           )}
         </div>
-      </div>
+      </AdminCard>
 
       {/* Right side: Detailed View */}
-      <div className="prob-admin-card">
-        <h3>Chi Tiết Trận Đấu</h3>
+      <AdminCard>
+        <AdminHeader>Chi Tiết Trận Đấu</AdminHeader>
         {selectedMatch ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontSize: '0.9rem', color: '#cbd5e1' }}>
-            <div><strong>Mã trận đấu:</strong> {selectedMatch.id}</div>
-            <div><strong>Trạng thái:</strong> <span className="diff-pill diff-easy">{selectedMatch.status}</span></div>
-            <div><strong>Bài tập:</strong> {selectedMatch.problem?.title || selectedMatch.problem_id}</div>
+          <div className="flex flex-col gap-4 text-sm text-surface-300">
+            <div><strong className="text-linen">Mã trận đấu:</strong> {selectedMatch.id}</div>
+            <div className="flex items-center gap-2">
+              <strong className="text-linen">Trạng thái:</strong> 
+              <AdminBadge color={selectedMatch.status === 'FINISHED' ? 'green' : 'yellow'}>{selectedMatch.status}</AdminBadge>
+            </div>
+            <div><strong className="text-linen">Bài tập:</strong> {selectedMatch.problem?.title || selectedMatch.problem_id}</div>
             
-            <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '12px' }}>
-              <h4 style={{ color: '#fff', fontSize: '0.95rem', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}><Award size={14} /> Danh sách người chơi</h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div className="border-t border-charcoal pt-4 mt-1">
+              <h4 className="text-linen text-sm mb-3 flex items-center gap-2 font-semibold">
+                <Award size={14} className="text-yellow-500" /> Danh sách người chơi
+              </h4>
+              <div className="flex flex-col gap-3">
                 {[selectedMatch.player1, selectedMatch.player2].map((p, index) => p && (
-                  <div key={index} style={{ background: 'rgba(15,23,42,0.4)', padding: '10px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.04)' }}>
-                    <div><strong>Người chơi {index + 1}:</strong> {p.username || p.id}</div>
-                    <div><strong>ELO:</strong> {p.elo_rating ?? p.eloRating ?? '—'}</div>
+                  <div key={index} className="bg-ink/50 p-3 rounded-xl border border-charcoal/50 flex flex-col gap-1">
+                    <div><strong className="text-stone">Người chơi {index + 1}:</strong> <span className="text-linen font-semibold">{p.username || p.id}</span></div>
+                    <div><strong className="text-stone">ELO:</strong> <span className="text-linen">{p.elo_rating ?? p.eloRating ?? '—'}</span></div>
                   </div>
                 ))}
                 {!selectedMatch.player1 && !selectedMatch.player2 && (
-                  <div style={{ color: '#64748b' }}>Player IDs: {selectedMatch.player1_id} vs {selectedMatch.player2_id}</div>
+                  <div className="text-stone text-xs">Player IDs: {selectedMatch.player1_id} vs {selectedMatch.player2_id}</div>
                 )}
               </div>
             </div>
 
-            <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '12px', fontSize: '0.8rem', color: '#64748b' }}>
+            <div className="border-t border-charcoal pt-4 mt-1 text-xs text-stone flex flex-col gap-1">
               <div>Bắt đầu: {selectedMatch.started_at ? new Date(selectedMatch.started_at).toLocaleString() : '—'}</div>
               {selectedMatch.ended_at && <div>Kết thúc: {new Date(selectedMatch.ended_at).toLocaleString()}</div>}
             </div>
           </div>
         ) : (
-          <p style={{ color: '#64748b' }}>Nhấp vào biểu tượng con mắt ở danh sách để xem chi tiết trận đấu và người chơi.</p>
+          <p className="text-stone text-sm">Nhấp vào biểu tượng con mắt ở danh sách để xem chi tiết trận đấu và người chơi.</p>
         )}
-      </div>
+      </AdminCard>
     </div>
   );
 };

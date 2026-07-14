@@ -152,6 +152,7 @@ export interface IUser {
   streakCount?: number;
   max_streak?: number;
   maxStreak?: number;
+  avatar?: string;
   avatar_url?: string;
   avatarUrl?: string;
 }

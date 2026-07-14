@@ -7,7 +7,8 @@ export const FriendsView: React.FC = () => {
   const { user } = useAuth();
   const [friends, setFriends] = useState<any[]>([]);
   const [requests, setRequests] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<'friends' | 'requests'>('friends');
+  const [newsfeed, setNewsfeed] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState<'friends' | 'requests' | 'newsfeed'>('friends');
   const [addUsername, setAddUsername] = useState('');
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
@@ -17,8 +18,10 @@ export const FriendsView: React.FC = () => {
       setLoading(true);
       const friendsRes = await api.getFriends();
       const reqRes = await api.getPendingRequests();
+      const newsRes = await api.getNews();
       if (friendsRes.success) setFriends(friendsRes.data);
       if (reqRes.success) setRequests(reqRes.data);
+      if (newsRes.success && newsRes.data) setNewsfeed(newsRes.data.items || newsRes.data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -123,6 +126,16 @@ export const FriendsView: React.FC = () => {
               </span>
             )}
           </button>
+          <button
+            className={`px-6 py-2 font-display text-sm font-bold uppercase tracking-wider transition-colors border-b-2 ${
+              activeTab === 'newsfeed'
+                ? 'text-vermilion border-vermilion'
+                : 'text-stone border-transparent hover:text-linen hover:border-charcoal'
+            }`}
+            onClick={() => { setActiveTab('newsfeed'); setMessage(''); }}
+          >
+            Tin Tức
+          </button>
         </div>
 
         <form onSubmit={handleSendRequest} className="flex gap-2 w-full md:w-auto">
@@ -153,7 +166,7 @@ export const FriendsView: React.FC = () => {
           <div className="animate-spin w-8 h-8 rounded-full border-2 border-charcoal border-t-vermilion" />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className={`grid ${activeTab === 'newsfeed' ? 'grid-cols-1 max-w-3xl mx-auto w-full' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'} gap-6`}>
           {activeTab === 'friends' ? (
             friends.length === 0 ? (
               <div className="col-span-full bg-ink border border-charcoal border-dashed p-12 text-center">
@@ -181,7 +194,7 @@ export const FriendsView: React.FC = () => {
                 </div>
               ))
             )
-          ) : (
+          ) : activeTab === 'requests' ? (
             requests.length === 0 ? (
               <div className="col-span-full bg-ink border border-charcoal border-dashed p-12 text-center">
                 <p className="font-body text-stone text-sm">Không có lời mời kết bạn nào đang chờ xử lý.</p>
@@ -221,7 +234,37 @@ export const FriendsView: React.FC = () => {
                 );
               })
             )
-          )}
+          ) : activeTab === 'newsfeed' ? (
+            <div className="flex flex-col gap-4">
+              {newsfeed.length === 0 ? (
+                <div className="bg-ink border border-charcoal border-dashed p-12 text-center">
+                  <p className="font-body text-stone text-sm">Chưa có bản tin nào.</p>
+                </div>
+              ) : (
+                newsfeed.map((news) => (
+                  <div key={news.id} className="bg-washi border border-charcoal p-6 border-l-4 border-l-vermilion">
+                    <div className="flex items-center gap-3 mb-3">
+                      {news.author?.role === 'ADMIN' ? (
+                        <div className="bg-vermilion p-2 text-linen">
+                          <UsersRound size={16} />
+                        </div>
+                      ) : (
+                        <img src={news.author?.avatar_url || `https://api.dicebear.com/7.x/adventurer/svg?seed=${news.author?.username}`} alt={news.author?.username} className="w-8 h-8 border border-charcoal bg-washi" />
+                      )}
+                      <div>
+                        <h3 className="font-display font-bold text-linen text-sm">
+                          {news.author?.role === 'ADMIN' ? 'Hệ Thống OCJ' : news.author?.username}
+                        </h3>
+                        <p className="font-body text-xs text-stone">{new Date(news.created_at).toLocaleString('vi-VN')}</p>
+                      </div>
+                    </div>
+                    <h4 className="font-display text-lg font-bold text-linen mb-2">{news.title}</h4>
+                    <p className="font-body text-sm text-stone whitespace-pre-wrap">{news.content}</p>
+                  </div>
+                ))
+              )}
+            </div>
+          ) : null}
         </div>
       )}
     </div>

@@ -18,12 +18,18 @@ export const AccountSettings: React.FC = () => {
   const [sessions, setSessions] = useState<any[]>([]);
   const [sessionsLoading, setSessionsLoading] = useState(true);
   const [sessionError, setSessionError] = useState('');
-  const [sessionSuccess, setSessionSuccess] = useState('');
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [revokeAllLoading, setRevokeAllLoading] = useState(false);
 
   // Profile Refresh State
   const [profileLoading, setProfileLoading] = useState(false);
+
+  // Edit Avatar State
+  const avatarToDisplay = user?.avatar || user?.avatarUrl || (user as any)?.avatar_url;
+  const [avatarInput, setAvatarInput] = useState(avatarToDisplay || '');
+  const [avatarLoading, setAvatarLoading] = useState(false);
+  const [avatarSuccess, setAvatarSuccess] = useState('');
+  const [avatarError, setAvatarError] = useState('');
 
   const fetchSessions = async () => {
     setSessionsLoading(true);
@@ -52,6 +58,26 @@ export const AccountSettings: React.FC = () => {
       console.error(err);
     } finally {
       setProfileLoading(false);
+    }
+  };
+
+  const handleChangeAvatar = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAvatarLoading(true);
+    setAvatarSuccess('');
+    setAvatarError('');
+    try {
+      const res = await api.updateProfile({ avatarUrl: avatarInput });
+      if (res.success) {
+        setAvatarSuccess('Cập nhật avatar thành công!');
+        await refreshProfile();
+      } else {
+        setAvatarError('Lỗi cập nhật avatar.');
+      }
+    } catch (err: any) {
+      setAvatarError(err.message || 'Lỗi khi cập nhật avatar.');
+    } finally {
+      setAvatarLoading(false);
     }
   };
 
@@ -87,11 +113,11 @@ export const AccountSettings: React.FC = () => {
     if (!window.confirm('Bạn có chắc chắn muốn đăng xuất thiết bị này?')) return;
     setActionLoadingId(sessionId);
     setSessionError('');
-    setSessionSuccess('');
+
     try {
       const res = await api.revokeSession(sessionId);
       if (res.success) {
-        setSessionSuccess('Đã đăng xuất thiết bị.');
+
         setSessions(sessions.filter(s => s.id !== sessionId));
       }
     } catch (err: any) {
@@ -105,11 +131,11 @@ export const AccountSettings: React.FC = () => {
     if (!window.confirm('Đăng xuất tất cả thiết bị khác? (Trừ thiết bị hiện tại)')) return;
     setRevokeAllLoading(true);
     setSessionError('');
-    setSessionSuccess('');
+
     try {
       const res = await api.revokeAllSessions();
       if (res.success) {
-        setSessionSuccess('Đã đăng xuất tất cả các thiết bị khác.');
+
         fetchSessions(); // Refresh list to just show current
       }
     } catch (err: any) {
@@ -136,16 +162,16 @@ export const AccountSettings: React.FC = () => {
           </button>
         </h3>
         
-        <div className="bg-washi border border-charcoal p-6 flex flex-col md:flex-row items-center md:items-start gap-6 relative">
+        <div className="bg-washi border border-charcoal p-6 flex flex-col md:flex-row items-center md:items-start gap-6 relative rounded-xl">
           <div className="w-20 h-20 bg-ink border border-charcoal rounded-full overflow-hidden flex items-center justify-center shrink-0">
-            {user?.avatarUrl ? (
-              <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+            {avatarToDisplay ? (
+              <img src={avatarToDisplay} alt="Avatar" className="w-full h-full object-cover" />
             ) : (
               <User size={32} className="text-stone" />
             )}
           </div>
           <div className="flex flex-col items-center md:items-start flex-1 gap-2">
-            <h2 className="font-display text-2xl font-bold text-linen">{user?.fullName || user?.username}</h2>
+            <h2 className="font-display text-2xl font-bold text-linen">{(user as any)?.fullName || user?.username}</h2>
             <span className="font-mono text-xs text-stone bg-ink px-3 py-1 border border-charcoal">@{user?.username}</span>
             <span className="font-body text-sm text-stone mt-1">{user?.email}</span>
             <span className="font-body text-xs text-stone">Quyền: <strong className="text-linen uppercase">{user?.role}</strong></span>
@@ -160,7 +186,52 @@ export const AccountSettings: React.FC = () => {
         </div>
       </div>
 
-      {/* 2. Change Password */}
+      {/* 2. Change Avatar */}
+      <div className="flex flex-col gap-4">
+        <h3 className="font-display text-lg font-bold text-linen uppercase tracking-wider border-b border-charcoal pb-2">
+          <User size={20} className="inline-block mr-2 text-vermilion" /> Đổi Avatar
+        </h3>
+        
+        <form onSubmit={handleChangeAvatar} className="bg-washi border border-charcoal p-6 flex flex-col gap-4 rounded-xl">
+          <div className="flex flex-col gap-2">
+            <label className="font-display text-[10px] font-bold text-stone uppercase tracking-wider">Đường dẫn ảnh (URL)</label>
+            <input 
+              type="url" 
+              required
+              value={avatarInput}
+              onChange={(e) => setAvatarInput(e.target.value)}
+              placeholder="https://example.com/avatar.jpg"
+              className="w-full bg-ink border border-charcoal text-linen p-3 font-body text-sm outline-none focus:border-vermilion transition-colors rounded-xl"
+            />
+          </div>
+          
+          {avatarError && (
+            <div className="bg-vermilion/10 border border-vermilion p-3 flex items-start gap-2 rounded-xl">
+              <AlertCircle size={16} className="text-vermilion shrink-0 mt-0.5" />
+              <span className="font-body text-sm text-vermilion">{avatarError}</span>
+            </div>
+          )}
+          {avatarSuccess && (
+            <div className="bg-green-500/10 border border-green-500 p-3 flex items-start gap-2 rounded-xl">
+              <CheckCircle size={16} className="text-green-500 shrink-0 mt-0.5" />
+              <span className="font-body text-sm text-green-500">{avatarSuccess}</span>
+            </div>
+          )}
+
+          <div className="flex justify-end mt-2">
+            <button 
+              type="submit" 
+              disabled={avatarLoading || !avatarInput.trim()}
+              className="bg-vermilion text-linen px-6 py-2 font-display text-[10px] font-bold uppercase tracking-wider hover:bg-vermilion-hover transition-colors flex items-center gap-2 disabled:opacity-50 rounded-xl"
+            >
+              {avatarLoading ? <RefreshCw size={14} className="animate-spin" /> : null}
+              Cập Nhật Avatar
+            </button>
+          </div>
+        </form>
+      </div>
+
+      {/* 3. Change Password */}
       <div className="flex flex-col gap-4">
         <h3 className="font-display text-lg font-bold text-linen uppercase tracking-wider border-b border-charcoal pb-2">
           <Key size={20} className="inline-block mr-2 text-vermilion" /> Đổi Mật Khẩu
@@ -259,7 +330,7 @@ export const AccountSettings: React.FC = () => {
                 return (
                   <div key={session.id} className="p-4 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-ink border border-charcoal rounded flex items-center justify-center shrink-0">
+                      <div className="w-10 h-10 bg-ink border border-charcoal rounded-xl flex items-center justify-center shrink-0">
                         {isMobile ? <Smartphone size={20} className="text-stone" /> : <Monitor size={20} className="text-stone" />}
                       </div>
                       <div className="flex flex-col gap-1">
@@ -268,7 +339,7 @@ export const AccountSettings: React.FC = () => {
                             {session.device || (isMobile ? 'Thiết bị di động' : 'Máy tính')}
                           </span>
                           {isCurrent && (
-                            <span className="font-display text-[9px] font-bold uppercase tracking-widest bg-green-500/20 text-green-500 border border-green-500/50 px-1.5 py-0.5 rounded-sm">
+                            <span className="font-display text-[9px] font-bold uppercase tracking-widest bg-green-500/20 text-green-500 border border-green-500/50 px-1.5 py-0.5 rounded-xl">
                               Hiện tại
                             </span>
                           )}

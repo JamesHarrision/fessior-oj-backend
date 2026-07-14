@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Shield, Key, Trash2 } from 'lucide-react';
 import { api } from '../../services/api';
+import { AdminCard, AdminHeader, AdminInput, AdminFormGroup, AdminButton, AdminListRow, AdminBadge } from './ui/AdminUI';
 
 export const AdminAuthTab: React.FC = () => {
   const [profile, setProfile] = useState<any>(null);
@@ -73,98 +74,95 @@ export const AdminAuthTab: React.FC = () => {
   };
 
   return (
-    <div className="problems-tab-grid">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
       {/* Left side: Profile and Password Change */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        <div className="prob-admin-card">
-          <h3>Thông Tin Quản Trị Viên</h3>
+      <div className="flex flex-col gap-6">
+        <AdminCard>
+          <AdminHeader>Thông Tin Quản Trị Viên</AdminHeader>
           {profile ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.9rem', color: '#cbd5e1' }}>
-              <div><strong>Tài khoản:</strong> {profile.username}</div>
-              <div><strong>Email:</strong> {profile.email}</div>
-              <div><strong>Vai trò:</strong> <span className="diff-pill diff-easy">{profile.role}</span></div>
-              <div><strong>ELO hiện tại:</strong> {profile.elo_rating}</div>
+            <div className="flex flex-col gap-2.5 text-sm text-surface-300">
+              <div><strong className="text-linen">Tài khoản:</strong> {profile.username}</div>
+              <div><strong className="text-linen">Email:</strong> {profile.email}</div>
+              <div className="flex items-center gap-2">
+                <strong className="text-linen">Vai trò:</strong> 
+                <AdminBadge color="green">{profile.role}</AdminBadge>
+              </div>
+              <div><strong className="text-linen">ELO hiện tại:</strong> {profile.elo_rating}</div>
             </div>
           ) : (
-            <p>Đang tải thông tin cá nhân...</p>
+            <p className="text-stone text-sm">Đang tải thông tin cá nhân...</p>
           )}
-        </div>
+        </AdminCard>
 
-        <div className="prob-admin-card">
-          <h3>Đổi Mật Khẩu Quản Trị</h3>
-          <form onSubmit={handleChangePassword} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <div className="prob-form-group">
-              <label><Key size={14} /> Mật khẩu hiện tại</label>
-              <input
+        <AdminCard>
+          <AdminHeader>Đổi Mật Khẩu Quản Trị</AdminHeader>
+          <form onSubmit={handleChangePassword} className="flex flex-col gap-4 mt-2">
+            <AdminFormGroup label={<><Key size={14} /> Mật khẩu hiện tại</>}>
+              <AdminInput
                 type="password"
                 value={currentPassword}
                 onChange={e => setCurrentPassword(e.target.value)}
-                className="prob-admin-input"
                 required
               />
-            </div>
-            <div className="prob-form-group">
-              <label><Key size={14} /> Mật khẩu mới</label>
-              <input
+            </AdminFormGroup>
+            <AdminFormGroup label={<><Key size={14} /> Mật khẩu mới</>}>
+              <AdminInput
                 type="password"
                 value={newPassword}
                 onChange={e => setNewPassword(e.target.value)}
-                className="prob-admin-input"
                 required
               />
-            </div>
-            <button type="submit" className="btn-prob-primary">Cập nhật mật khẩu</button>
+            </AdminFormGroup>
+            <AdminButton type="submit" className="mt-2">Cập nhật mật khẩu</AdminButton>
           </form>
-          {statusMsg && <p style={{ color: '#34d399', fontSize: '0.85rem', marginTop: '8px' }}>{statusMsg}</p>}
-          {errorMsg && <p style={{ color: '#f87171', fontSize: '0.85rem', marginTop: '8px' }}>{errorMsg}</p>}
-        </div>
+          {statusMsg && <p className="text-emerald-400 text-sm mt-1">{statusMsg}</p>}
+          {errorMsg && <p className="text-red-400 text-sm mt-1">{errorMsg}</p>}
+        </AdminCard>
       </div>
 
       {/* Right side: Session List */}
-      <div className="prob-admin-card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '10px' }}>
-          <h3 style={{ borderBottom: 'none', paddingBottom: 0 }}>Danh Sách Phiên Đăng Nhập</h3>
-          {sessions.length > 1 && (
-            <button onClick={handleRevokeAll} className="btn-action-icon delete" title="Đăng xuất khỏi toàn bộ thiết bị khác">
-              <Trash2 size={14} />
-            </button>
-          )}
-        </div>
+      <AdminCard>
+        <AdminHeader 
+          rightNode={
+            sessions.length > 1 && (
+              <AdminButton variant="icon-delete" onClick={handleRevokeAll} title="Đăng xuất khỏi toàn bộ thiết bị khác">
+                <Trash2 size={14} />
+              </AdminButton>
+            )
+          }
+        >
+          Danh Sách Phiên Đăng Nhập
+        </AdminHeader>
 
-        <div className="prob-list-scroll">
+        <div className="flex flex-col gap-3 max-h-[520px] overflow-y-auto pr-1">
           {loading ? (
-            <p>Đang tải...</p>
+            <p className="text-stone text-sm">Đang tải...</p>
           ) : sessions.length === 0 ? (
-            <p style={{ color: '#64748b' }}>Không tìm thấy phiên làm việc nào.</p>
+            <p className="text-stone text-sm">Không tìm thấy phiên làm việc nào.</p>
           ) : (
             sessions.map((s, idx) => (
-              <div key={s.id || idx} className="prob-item-row">
-                <div className="prob-item-details">
-                  <span className="prob-item-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Shield size={14} style={{ color: s.isCurrent ? '#34d399' : '#64748b' }} />
+              <AdminListRow key={s.id || idx}>
+                <div className="flex flex-col gap-1.5">
+                  <span className="font-semibold text-sm text-linen font-body flex items-center gap-2">
+                    <Shield size={14} className={s.isCurrent ? 'text-emerald-400' : 'text-stone'} />
                     Session ID: {s.id?.slice(-8) || idx} {s.isCurrent && '(Hiện tại)'}
                   </span>
-                  <div className="prob-item-meta">
-                    <span className="prob-tag-pill" style={{ fontSize: '0.7rem' }}>
-                      IP: {s.ipAddress || '127.0.0.1'}
-                    </span>
-                    <span className="prob-tag-pill" style={{ fontSize: '0.7rem' }}>
-                      HĐH: {s.device || 'Windows Chrome'}
-                    </span>
+                  <div className="flex items-center gap-2">
+                    <AdminBadge>IP: {s.ipAddress || '127.0.0.1'}</AdminBadge>
+                    <AdminBadge>HĐH: {s.device || 'Windows Chrome'}</AdminBadge>
                   </div>
                 </div>
 
                 {!s.isCurrent && (
-                  <button onClick={() => handleRevokeSession(s.id)} className="btn-action-icon delete" title="Thu hồi phiên">
+                  <AdminButton variant="icon-delete" onClick={() => handleRevokeSession(s.id)} title="Thu hồi phiên">
                     <Trash2 size={14} />
-                  </button>
+                  </AdminButton>
                 )}
-              </div>
+              </AdminListRow>
             ))
           )}
         </div>
-      </div>
+      </AdminCard>
     </div>
   );
 };
-

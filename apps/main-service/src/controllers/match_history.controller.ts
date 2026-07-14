@@ -18,6 +18,20 @@ export class MatchHistoryController {
     }
   }
 
+  async getActiveMatch(req: Request, res: Response) {
+    try {
+      const userId = req.user.userId;
+      const match = await matchHistoryService.getActiveMatch(userId);
+      res.status(200).json({
+        status: 'Success',
+        message: 'Success',
+        data: match,
+      });
+    } catch (error: any) {
+      res.status(400).json({ status: 'Error', message: error.message });
+    }
+  }
+
   async getMatchDetails(req: Request, res: Response) {
     try {
       const matchId = req.params.matchId as string;
