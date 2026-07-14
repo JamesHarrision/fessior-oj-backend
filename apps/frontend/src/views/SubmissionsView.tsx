@@ -33,11 +33,14 @@ function mapLanguageLabel(lang: string): string {
 
 function getStatusDisplay(status: string) {
   const s = (status || '').toUpperCase();
-  if (s === 'ACCEPTED' || s === 'FULL_ACCEPTED') return { label: 'Full Accepted', color: '#10b981' };
-  if (s === 'WRONG_ANSWER') return { label: 'Wrong Answer', color: '#ef4444' };
-  if (s === 'TIME_LIMIT_EXCEEDED') return { label: 'Time Limit Exceeded', color: '#f59e0b' };
-  if (s === 'COMPILE_ERROR') return { label: 'Compile Error', color: '#f59e0b' };
-  if (s === 'RUNTIME_ERROR') return { label: 'Runtime Error', color: '#f59e0b' };
+  if (s === 'ACCEPTED' || s === 'FULL_ACCEPTED') return { label: 'Accepted', color: '#10b981' };
+  if (s === 'WA' || s === 'WRONG_ANSWER') return { label: 'Wrong Answer', color: '#ef4444' };
+  if (s === 'TLE' || s === 'TIME_LIMIT_EXCEEDED') return { label: 'Time Limit Exceeded', color: '#f59e0b' };
+  if (s === 'MLE' || s === 'MEMORY_LIMIT_EXCEEDED') return { label: 'Memory Limit Exceeded', color: '#f59e0b' };
+  if (s === 'CE' || s === 'COMPILE_ERROR') return { label: 'Compile Error', color: '#f59e0b' };
+  if (s === 'RE' || s === 'RUNTIME_ERROR') return { label: 'Runtime Error', color: '#f59e0b' };
+  if (s === 'PROCESSING') return { label: 'Processing...', color: '#60a5fa' };
+  if (s === 'PENDING') return { label: 'Pending...', color: '#9ca3af' };
   return { label: status || 'Unknown', color: '#6b7280' };
 }
 

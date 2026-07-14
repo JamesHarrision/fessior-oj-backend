@@ -4,7 +4,7 @@ import { Trophy, BookOpen, Flame, ArrowRight, AlertTriangle, Compass, Activity, 
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import { getSubmissions } from '../features/submission/api/submissionApi';
-import { fetchProblemsFromApi } from '../features/problem/api/problemApi';
+import { fetchProblems } from '../features/problem/api/problemApi';
 
 export const HomeView: React.FC = () => {
   const { user } = useAuth();
@@ -87,7 +87,7 @@ export const HomeView: React.FC = () => {
 
       try {
         // 3. Featured Problems (random 3)
-        const probRes = await fetchProblemsFromApi({ page: 1, limit: 50 });
+        const probRes = await fetchProblems({ page: 1, limit: 50 });
         if (probRes && probRes.items) {
           const shuffled = [...probRes.items].sort(() => 0.5 - Math.random());
           setFeaturedProblems(shuffled.slice(0, 3));

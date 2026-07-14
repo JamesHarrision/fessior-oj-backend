@@ -30,11 +30,13 @@ export function SoloSolveView() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [verdict, setVerdict] = useState<string>('');
   const [submissionId, setSubmissionId] = useState<string>('');
+  const [verdictDetails, setVerdictDetails] = useState<any>({});
 
   const handleSubmit = async () => {
     if (!problem) return;
     setIsSubmitting(true);
     setVerdict('');
+    setVerdictDetails({});
     try {
       const res = await api.submitCode({
         problemId: problem.id || problem._id || problem.slug,
@@ -42,16 +44,45 @@ export function SoloSolveView() {
         language,
       });
       if (res.success && res.data) {
-        setSubmissionId(res.data.id || res.data._id);
-        // Tạm thời set verdict là PENDING, nếu có webhook/socket thì cập nhật sau
-        setVerdict('PENDING'); 
+        const subId = res.data.id || res.data._id;
+        setSubmissionId(subId);
+        setVerdict('PENDING');
+        setIsSubmitting(false);
+
+        // Poll for verdict every 2s until it's no longer PENDING/PROCESSING
+        const poll = setInterval(async () => {
+          try {
+            const detail = await api.getSubmissionDetail(subId);
+            if (detail.success && detail.data) {
+              const s = detail.data.status;
+              if (s && s !== 'PENDING' && s !== 'PROCESSING') {
+                setVerdict(s);
+                setVerdictDetails({
+                  submissionId: subId,
+                  testCasesPassed: detail.data.testCasesPassed ?? 0,
+                  testCasesTotal: detail.data.testCasesTotal ?? 0,
+                  error: detail.data.errorMessage ?? '',
+                });
+                clearInterval(poll);
+              } else {
+                // Still pending/processing — update label only
+                setVerdict(s || 'PENDING');
+              }
+            }
+          } catch {
+            clearInterval(poll);
+          }
+        }, 2000);
+
+        // Safety: stop polling after 60s
+        setTimeout(() => clearInterval(poll), 60000);
       }
     } catch (err) {
       console.error(err);
-    } finally {
       setIsSubmitting(false);
     }
   };
+
 
   if (!problem) {
     return (
@@ -86,7 +117,7 @@ export function SoloSolveView() {
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
           verdict={verdict}
-          verdictDetails={{ submissionId }}
+          verdictDetails={verdictDetails.submissionId ? verdictDetails : { submissionId }}
         />
         </div>
       </div>
