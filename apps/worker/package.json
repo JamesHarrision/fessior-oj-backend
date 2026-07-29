@@ -1,0 +1,8 @@
+{
+  "name": "@fessior/worker",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "check": "node -e \"console.log('Worker workspace OK')\""
+  }
+}
