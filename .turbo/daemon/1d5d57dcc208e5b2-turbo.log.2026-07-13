@@ -1,0 +1,58 @@
+2026-07-13T04:36:52.767697Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo")}
+2026-07-13T04:36:52.767737Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-07-13T04:36:53.372152Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo")}
+2026-07-13T04:36:53.372179Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-07-13T04:36:54.476307Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-07-13T04:36:54.566814Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf(".turbo")}
+2026-07-13T04:36:54.566835Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Root, path: AnchoredSystemPathBuf("") }}))
+2026-07-13T04:38:20.318906Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\frontend\\src\\features\\roadmaps\\RoadmapCard.tsx"), AnchoredSystemPathBuf("apps\\frontend\\src\\features\\roadmaps\\RoadmapsListView.tsx")}
+2026-07-13T04:38:20.318969Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("frontend"), path: AnchoredSystemPathBuf("apps\\frontend") }}))
+2026-07-13T04:38:22.984935Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\frontend\\src\\features\\roadmaps\\RoadmapDetailView.tsx")}
+2026-07-13T04:38:22.984960Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("frontend"), path: AnchoredSystemPathBuf("apps\\frontend") }}))
+2026-07-13T04:38:22.985078Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-07-13T04:39:41.122666Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\frontend\\src\\app\\layouts\\AppShellLayout.tsx")}
+2026-07-13T04:39:41.122710Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("frontend"), path: AnchoredSystemPathBuf("apps\\frontend") }}))
+2026-07-13T04:39:43.265296Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\frontend\\src\\app\\layouts\\AppShellLayout.tsx")}
+2026-07-13T04:39:43.265312Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("frontend"), path: AnchoredSystemPathBuf("apps\\frontend") }}))
+2026-07-13T04:39:43.265370Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-07-13T04:49:26.168470Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\main-service\\src\\validators\\roadmap.validator.ts")}
+2026-07-13T04:49:26.168505Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("main-service"), path: AnchoredSystemPathBuf("apps\\main-service") }}))
+2026-07-13T04:49:44.872642Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\frontend\\src\\services\\api.ts")}
+2026-07-13T04:49:44.872671Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("frontend"), path: AnchoredSystemPathBuf("apps\\frontend") }}))
+2026-07-13T04:50:14.166352Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\frontend\\src\\services\\api.ts")}
+2026-07-13T04:50:14.166382Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("frontend"), path: AnchoredSystemPathBuf("apps\\frontend") }}))
+2026-07-13T04:53:31.405457Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\main-service\\src\\scripts\\seed.ts")}
+2026-07-13T04:53:31.405502Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("main-service"), path: AnchoredSystemPathBuf("apps\\main-service") }}))
+2026-07-13T04:53:45.495658Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\main-service\\src\\scripts\\seed.ts")}
+2026-07-13T04:53:45.495735Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("main-service"), path: AnchoredSystemPathBuf("apps\\main-service") }}))
+2026-07-13T04:53:57.550790Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\main-service\\src\\scripts\\seed.ts")}
+2026-07-13T04:53:57.550830Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("main-service"), path: AnchoredSystemPathBuf("apps\\main-service") }}))
+2026-07-13T04:54:11.626984Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\main-service\\src\\scripts\\seed.ts")}
+2026-07-13T04:54:11.627024Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("main-service"), path: AnchoredSystemPathBuf("apps\\main-service") }}))
+2026-07-13T05:03:50.987703Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\main-service\\prisma\\schema.prisma")}
+2026-07-13T05:03:50.987758Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("main-service"), path: AnchoredSystemPathBuf("apps\\main-service") }}))
+2026-07-13T05:03:57.768868Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\main-service\\prisma\\schema.prisma")}
+2026-07-13T05:03:57.769001Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("main-service"), path: AnchoredSystemPathBuf("apps\\main-service") }}))
+2026-07-13T05:04:36.463860Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\main-service\\src\\repositories\\user.repository.ts")}
+2026-07-13T05:04:36.463887Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("main-service"), path: AnchoredSystemPathBuf("apps\\main-service") }}))
+2026-07-13T05:04:39.306022Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\main-service\\src\\repositories\\user.repository.ts")}
+2026-07-13T05:04:39.306037Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("main-service"), path: AnchoredSystemPathBuf("apps\\main-service") }}))
+2026-07-13T05:04:39.306108Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2026-07-13T05:05:04.757198Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\main-service\\src\\scripts\\seed.ts")}
+2026-07-13T05:05:04.757288Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("main-service"), path: AnchoredSystemPathBuf("apps\\main-service") }}))
+2026-07-13T05:05:32.674523Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\frontend\\src\\services\\api.ts")}
+2026-07-13T05:05:32.674552Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("frontend"), path: AnchoredSystemPathBuf("apps\\frontend") }}))
+2026-07-13T05:05:52.215395Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\frontend\\src\\components\\profile"), AnchoredSystemPathBuf("apps\\frontend\\src\\components\\profile\\EditProfileModal.tsx"), AnchoredSystemPathBuf("apps\\frontend\\src\\components")}
+2026-07-13T05:05:52.215444Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("frontend"), path: AnchoredSystemPathBuf("apps\\frontend") }}))
+2026-07-13T05:06:36.791207Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\frontend\\src\\views\\ProfileView.tsx")}
+2026-07-13T05:06:36.791377Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("frontend"), path: AnchoredSystemPathBuf("apps\\frontend") }}))
+2026-07-13T05:07:21.927229Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\frontend\\src\\services\\api.ts")}
+2026-07-13T05:07:21.927277Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("frontend"), path: AnchoredSystemPathBuf("apps\\frontend") }}))
+2026-07-13T05:07:28.567836Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\frontend\\src\\components\\profile\\EditProfileModal.tsx")}
+2026-07-13T05:07:28.567868Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("frontend"), path: AnchoredSystemPathBuf("apps\\frontend") }}))
+2026-07-13T05:08:37.551516Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\main-service\\src\\scripts\\seed.ts")}
+2026-07-13T05:08:37.551591Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("main-service"), path: AnchoredSystemPathBuf("apps\\main-service") }}))
+2026-07-13T05:08:42.976876Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\main-service\\src\\scripts\\seed.ts")}
+2026-07-13T05:08:42.976900Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("main-service"), path: AnchoredSystemPathBuf("apps\\main-service") }}))
+2026-07-13T05:09:12.104381Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps\\main-service\\src\\scripts\\seed.ts")}
+2026-07-13T05:09:12.104421Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("main-service"), path: AnchoredSystemPathBuf("apps\\main-service") }}))
