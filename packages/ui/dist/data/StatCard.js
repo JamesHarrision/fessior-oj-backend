@@ -1,6 +1,0 @@
-import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
-import React from 'react';
-import { ArrowUp, ArrowDown } from 'lucide-react';
-export const StatCard = React.memo(function StatCard({ label, value, icon, trend, }) {
-    return (_jsx("div", { className: "bg-washi border border-charcoal p-5", children: _jsxs("div", { className: "flex items-start justify-between", children: [_jsxs("div", { className: "min-w-0", children: [_jsx("div", { className: "font-body text-xs font-semibold uppercase tracking-[0.1em] text-stone mb-2", children: label }), _jsx("div", { className: "font-display text-3xl font-bold text-linen tracking-[-0.02em]", children: value }), trend && (_jsx("div", { className: "flex items-center gap-1 mt-2", children: trend.isUp ? (_jsxs(_Fragment, { children: [_jsx(ArrowUp, { size: 14, className: "text-vermilion" }), _jsxs("span", { className: "font-display text-xs font-bold text-vermilion", children: ["+", trend.value, "%"] })] })) : (_jsxs(_Fragment, { children: [_jsx(ArrowDown, { size: 14, className: "text-vermilion" }), _jsxs("span", { className: "font-display text-xs font-bold text-vermilion", children: ["-", trend.value, "%"] })] })) }))] }), icon && _jsx("div", { className: "text-stone shrink-0 ml-4 mt-1", children: icon })] }) }));
-});
