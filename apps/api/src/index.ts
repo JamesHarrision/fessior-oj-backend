@@ -1,10 +1,12 @@
+import { env } from "./config/env.js";
+
 const serviceName = "api";
 
-console.log("Hello World");
+
 console.log({
   service: serviceName,
-  env: process.env.NODE_ENV ?? "DEVELOPMENT",
-  id: process.pid ?? "2401",
-  startedAt: new Date().toISOString()
+  env: env.NODE_ENV,
+  message: "Hello World from API SERVICE"
 })
 
+console.log("Server is running on PORT: ", env.API_PORT);
