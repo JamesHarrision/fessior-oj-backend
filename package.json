@@ -11,7 +11,14 @@
     "infra:up": "docker compose --env-file .env -f infrastructure/docker-compose.yml up -d",
     "infra:down": "docker compose --env-file .env -f infrastructure/docker-compose.yml down",
     "infra:status": "docker compose --env-file .env -f infrastructure/docker-compose.yml ps",
-    "infra:logs": "docker compose --env-file .env -f infrastructure/docker-compose.yml logs -f"
+    "infra:logs": "docker compose --env-file .env -f infrastructure/docker-compose.yml logs -f",
+    "db:generate": "pnpm --filter @fessior/database prisma:generate",
+    "db:validate": "pnpm --filter @fessior/database prisma:validate",
+    "db:format": "pnpm --filter @fessior/database prisma:format",
+    "db:migrate": "pnpm --filter @fessior/database db:migrate",
+    "db:status": "pnpm --filter @fessior/database db:status",
+    "db:studio": "pnpm --filter @fessior/database db:studio",
+    "db:test": "pnpm --filter @fessior/database db:test"
   },
   "engines": {
     "node": ">=22"
