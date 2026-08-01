@@ -1,0 +1,26 @@
+{
+  "name": "@fessior/queue",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "dev": "tsc -p tsconfig.json --watch",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "check": "pnpm typecheck"
+  },
+  "dependencies": {
+    "bullmq": "^5.81.3"
+  },
+  "devDependencies": {
+    "@fessior/typescript-config": "workspace:*",
+    "@types/node": "^24.13.3",
+    "typescript": "^5.9.3"
+  }
+}

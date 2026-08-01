@@ -3,6 +3,8 @@ import { createServer } from "node:http";
 import { env } from "./config/env.js";
 import app from './app.js'
 
+import { systemQueue } from "./queues/system.queue.js";
+
 const server = createServer(app);
 
 server.listen(env.API_PORT, () => {
@@ -21,11 +23,12 @@ async function handleGracefulShutdown(signal: ShutdownSignal) {
 
   console.log(`\n🛑 Nhận tín hiệu ${signal}. Bắt đầu quá trình Graceful Shutdown...`);
 
-  // 2. Ngừng nhận request mới 
-  // 3. Hoàn tất request đang chạy 
-  // 4. Đóng HTTP server
+  // Ngừng nhận request mới 
+  // Hoàn tất request đang chạy 
+  // Đóng HTTP server
   // Hàm server.close() sẽ dừng nhận connection mới ngay lập tức, 
   // nhưng vẫn CHỜ các request đang xử lý dở dang (active connections) hoàn thành xong.
+
   server.close(async (err) => {
     if (err) {
       console.error('❌ Lỗi khi đóng HTTP server:', err);
@@ -34,13 +37,14 @@ async function handleGracefulShutdown(signal: ShutdownSignal) {
     console.log('🔹 HTTP server: Đã đóng (Ngừng nhận request mới, hoàn tất request cũ).');
 
     try {
-      // 5. Sau này đóng Prisma và Redis
+      // Sau này đóng Prisma và Redis
       // console.log('🔹 Bắt đầu ngắt kết nối các dịch vụ nền...');
       // await prisma.$disconnect();
       // await redis.quit();
       // console.log('🔹 Đã đóng toàn bộ kết nối database và bộ nhớ đệm.');
+      await systemQueue.close();
 
-      // 6. Process kết thúc
+      // Process kết thúc
       console.log('🏁 Graceful shutdown hoàn tất ổn thỏa. Tạm biệt! 👋');
       process.exit(0);
     } catch (error) {

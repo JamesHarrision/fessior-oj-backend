@@ -40,6 +40,8 @@ const apiEnvSchema = z.object({
     .min(1, "Must be between 1 and 65535")
     .max(65535, "Must be between 1 and 65535")
     .default(3000),
+
+  REDIS_URL: z.string().min(1),
 });
 
 // ==========================================

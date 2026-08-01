@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet'
 
 import healthRoutes from './routes/health.route.js'
+import queueRoutes from "./routes/queue.route.js";
 
 import { notFoundHandler } from "./middlewares/not-found-handler.js";
 import { errorHandler } from "./middlewares/error-handler.js";
@@ -14,6 +15,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/health', healthRoutes);
+app.use("/api/v1", queueRoutes);
 
 // --- ĐĂNG KÝ MIDDLEWARE MỚI TẠI ĐÂY ---
 // 1. Bắt tất cả các request không khớp route nào phía trên (Xử lý 404)

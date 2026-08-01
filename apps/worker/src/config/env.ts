@@ -29,6 +29,8 @@ const workerEnvSchema = z.object({
     .min(1, "Must be between 1 and 20")
     .max(20, "Must be between 1 and 20")
     .default(1),
+
+  REDIS_URL: z.string().min(1),
 });
 
 const result = workerEnvSchema.safeParse(process.env);

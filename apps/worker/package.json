@@ -17,6 +17,8 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@fessior/queue": "workspace:*",
+    "bullmq": "^5.81.3",
     "zod": "^4.4.3"
   }
 }
