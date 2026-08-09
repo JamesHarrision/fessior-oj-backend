@@ -78,9 +78,10 @@ Socket.io server nam trong main-service:
 
 ## Deployment View
 
-Docker Compose hien tai chay 5 service:
+Docker Compose hien tai chay 6 service:
 
 ```text
+frontend     -> port 5173:5173
 mysql         -> port 3307:3306
 mongodb       -> port 27017:27017
 redis         -> port 6379:6379

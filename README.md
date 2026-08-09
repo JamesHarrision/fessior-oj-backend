@@ -83,13 +83,13 @@ Cách này tự động cấu hình và kết nối tất cả các cơ sở d�
    ```bash
    cp .env.docker.example .env.docker
    ```
-   *(Nhập khóa `GEMINI_API_KEY` trong file `.env.docker` để kích hoạt tính năng AI).*
+   *(Tùy chọn cho local/dev vì Docker Compose có thể dùng `.env.docker.example` làm default. Nhập khóa `GEMINI_API_KEY` trong file `.env.docker` để kích hoạt tính năng AI).*
 
 2. **Chạy Docker Compose**:
    ```bash
-   docker compose up -d --build
+   npm run dev:docker
    ```
-   Hệ thống API chính sẽ lắng nghe tại cổng `http://localhost:6868`.
+   Frontend sẽ lắng nghe tại `http://localhost:5173`, API chính tại `http://localhost:6868`.
 
 3. **Theo dõi log hoạt động**:
    * API chính: `docker compose logs -f main-service`
@@ -108,6 +108,7 @@ Cách này tự động cấu hình và kết nối tất cả các cơ sở d�
    ```bash
    npm install
    ```
+   Sau do chi can `npm run dev`; script se tu generate Prisma client va build shared packages can `dist`.
 
 2. **Khởi chạy hạ tầng cơ sở dữ liệu**:
    ```bash
@@ -129,6 +130,7 @@ Cách này tự động cấu hình và kết nối tất cả các cơ sở d�
      ```bash
      npm run dev
      ```
+     `npm run dev` hiện là alias của `npm run dev:hybrid`, tự bật MySQL/MongoDB/Redis container, generate Prisma client, build shared packages rồi chạy frontend, main-service và worker-service local qua Turbo.
    * Hoặc chạy riêng biệt từng service:
      * Main Service: `cd apps/main-service && npm run dev`
      * Worker Service: `cd apps/worker-service && npm run dev`

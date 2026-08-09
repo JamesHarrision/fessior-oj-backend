@@ -26,17 +26,34 @@ Root workspace gom:
 
 ## Environment
 
-Docker Compose dung:
+Docker Compose dung default env tu:
+
+```text
+.env.docker.example
+```
+
+Neu can override secrets/local config, tao them:
 
 ```text
 .env.docker
 ```
 
-Tao tu file mau:
+Bang cach copy tu file mau:
 
 ```bash
 cp .env.docker.example .env.docker
 ```
+
+Voi setup hybrid mac dinh, neu chua tao `.env` rieng cho app, code se dung default local dev:
+
+```text
+DATABASE_URL=mysql://root:ocj_root_secret@localhost:3307/ocj_main_db
+MONGO_URI=mongodb://mongoadmin:mongosecret@localhost:27017/ocj_database?authSource=admin
+REDIS_HOST=localhost
+REDIS_PORT=6379
+```
+
+Default nay nam trong `apps/main-service/src/config/env.ts` va `apps/worker-service/src/config/env.ts`. Tao `.env` trong tung app neu can override.
 
 Main service local dev can env rieng trong:
 
@@ -88,6 +105,21 @@ MongoDB: localhost:27017
 Redis:   localhost:6379
 ```
 
+## Root Dev Scripts
+
+Tu root repo, cac script dev chinh la:
+
+| Script | Muc dich |
+| --- | --- |
+| `npm run dev` | Mac dinh chay hybrid: bat MySQL, MongoDB, Redis bang Docker, sau do chay frontend/main-service/worker-service local qua Turbo. |
+| `npm run dev:hybrid` | Giong `npm run dev`, dung cho vong lap dev hang ngay. |
+| `npm run dev:local` | Generate Prisma client, build shared packages, roi chay dev server local cho `frontend`, `main-service`, `worker-service`; dung khi infra da duoc bat san. |
+| `npm run dev:prepare` | Chay rieng buoc chuan bi: `prisma generate` va build cac package `@ocj/*` can `dist`; build package chi in log khi co loi. |
+| `npm run dev:apps` | Chi chay 3 dev server local, khong prepare va khong bat Docker. |
+| `npm run dev:docker` | Chay full Docker Compose stack: frontend, main-service, worker-service, MySQL, MongoDB va Redis. |
+
+Luu y: `dev` va `dev:hybrid` can Docker dang chay. Neu chua co `.env.docker`, Docker Compose se dung `.env.docker.example` lam default cho local/dev.
+
 ## Prisma
 
 Chay trong `apps/main-service`:
@@ -130,7 +162,7 @@ Luu y:
 
 ## Run All Dev Services
 
-Chay tu root:
+Chay tu root theo setup hybrid mac dinh:
 
 ```bash
 npm run dev
@@ -139,7 +171,27 @@ npm run dev
 Script nay goi:
 
 ```bash
-turbo run dev
+docker compose up -d --wait --wait-timeout 120 mysql mongodb redis
+npm run dev:prepare
+npm run dev:apps
+```
+
+Neu MySQL/MongoDB/Redis da chay san va chi muon start cac app local:
+
+```bash
+npm run dev:local
+```
+
+Neu vua clone repo va muon kiem tra buoc chuan bi truoc khi chay server:
+
+```bash
+npm run dev:prepare
+```
+
+Neu muon chay toan bo stack trong Docker:
+
+```bash
+npm run dev:docker
 ```
 
 ## Run Services Separately
@@ -177,6 +229,12 @@ Swagger UI:
 
 ```text
 http://localhost:6868/api-docs
+```
+
+Frontend Vite listen:
+
+```text
+http://localhost:5173
 ```
 
 ## Build

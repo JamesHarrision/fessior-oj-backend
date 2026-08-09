@@ -8,7 +8,14 @@
   ],
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev --concurrency 15",
+    "dev": "npm run dev:hybrid",
+    "dev:apps": "turbo run dev --filter=frontend --filter=main-service --filter=worker-service --concurrency 15",
+    "dev:local": "npm run dev:prepare && npm run dev:apps",
+    "dev:hybrid": "docker compose up -d --wait --wait-timeout 120 mysql mongodb redis && npm run dev:local",
+    "dev:prepare": "npm run db:generate && npm run build:packages",
+    "dev:docker": "docker compose up -d --build --wait --wait-timeout 120",
+    "build:packages": "turbo run build --filter=@ocj/api --filter=@ocj/constants --filter=@ocj/errors --filter=@ocj/executor --filter=@ocj/types --filter=@ocj/ui --filter=@ocj/utils --filter=@ocj/validators --output-logs=errors-only",
+    "db:generate": "node scripts/generate-prisma-client.cjs",
     "lint": "turbo run lint",
     "seed": "npm --workspace main-service run seed",
     "test": "turbo run test",
@@ -17,7 +24,7 @@
   "devDependencies": {
     "concurrently": "^10.0.3",
     "prettier": "^3.0.0",
-    "turbo": "2.0.0",
+    "turbo": "2.10.7",
     "typescript": "^6.0.3"
   },
   "dependencies": {

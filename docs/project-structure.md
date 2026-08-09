@@ -78,6 +78,8 @@ src/
 
 Route registration nam trong `src/app.ts`. Server bootstrap nam trong `src/server.ts`.
 
+`src/config/env.ts` load `.env` neu co va dat default local dev cho MySQL/MongoDB/Redis de fresh clone co the chay `npm install` roi `npm run dev`.
+
 ### `apps/worker-service`
 
 Worker xu ly queue cham bai. Service nay ket noi MongoDB va Redis, lang nghe BullMQ queue `submission_queue`, chay code qua `@ocj/executor`, cap nhat submission va publish ket qua qua Redis Pub/Sub.
@@ -91,6 +93,8 @@ src/
   tests/
   workers/
 ```
+
+`src/config/env.ts` dat default local dev cho MongoDB/Redis khi chay worker ngoai Docker.
 
 ## Shared Packages
 
@@ -108,9 +112,9 @@ src/
 
 | File | Vai tro |
 | --- | --- |
-| `package.json` | Khai bao workspace `apps/*`, `packages/*`, script `dev/build/test/lint/format`. |
+| `package.json` | Khai bao workspace `apps/*`, `packages/*`, script `dev/dev:prepare/build/test/lint/format`. |
 | `turbo.json` | Cau hinh Turborepo pipeline. |
-| `docker-compose.yml` | Chay MySQL, MongoDB, Redis, main-service, worker-service. |
+| `docker-compose.yml` | Chay frontend, main-service, worker-service, MySQL, MongoDB va Redis. |
 | `.env.docker.example` | Mau env cho Docker Compose. |
 | `deploy-vps.sh`, `setup_vps.sh` | Script ho tro trien khai VPS. |
 | `ocj_postman_collection.json` | Postman collection. |

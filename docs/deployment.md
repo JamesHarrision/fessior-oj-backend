@@ -11,6 +11,7 @@ Repo hien co Docker Compose va script ho tro VPS:
 
 ```mermaid
 flowchart TB
+  Frontend[frontend :5173] --> Main[main-service :6868]
   Main[main-service :6868] --> MySQL[(mysql :3306)]
   Main --> Mongo[(mongodb :27017)]
   Main --> Redis[(redis :6379)]
@@ -23,6 +24,7 @@ flowchart TB
 | `mysql` | `mysql:8.0` | `ocj_mysql` | `3307:3306` |
 | `mongodb` | `mongo:6.0` | `ocj_mongodb` | `27017:27017` |
 | `redis` | `redis:7-alpine` | `ocj_redis` | `6379:6379` |
+| `frontend` | build `apps/frontend/Dockerfile` | `ocj_frontend` | `5173:5173` |
 | `main-service` | build `apps/main-service/Dockerfile` | `ocj_main_service` | `6868:6868` |
 | `worker-service` | build `apps/worker-service/Dockerfile` | `ocj_worker_service` | none exposed |
 
@@ -32,6 +34,7 @@ flowchart TB
 mysql_data -> /var/lib/mysql
 mongo_data -> /data/db
 redis_data -> /data
+frontend_node_modules -> /app/node_modules
 ```
 
 Redis chay voi:
@@ -53,6 +56,10 @@ redis-server --appendonly yes
 - MongoDB started.
 - Redis started.
 
+`frontend` phu thuoc:
+
+- main-service started.
+
 MySQL co healthcheck:
 
 ```text
@@ -67,13 +74,15 @@ mysqladmin ping -h localhost
    cp .env.docker.example .env.docker
    ```
 
-2. Dien secrets va connection config trong `.env.docker`.
+2. Dien secrets va connection config trong `.env.docker`. File `.env.docker.example` duoc Docker Compose dung lam default cho dev, con `.env.docker` la override tuy chon nhung nen co trong staging/production.
 
 3. Build va chay:
 
    ```bash
-   docker compose up -d --build
+   npm run dev:docker
    ```
+
+   Lenh nay tuong duong `docker compose up -d --build --wait --wait-timeout 120`.
 
 4. Xem logs:
 
@@ -125,8 +134,9 @@ Trong Docker deploy nen dung Prisma migration workflow phu hop production, vi `d
 Neu deploy mac dinh:
 
 ```text
+Frontend: http://<host>:5173
 Main API: http://<host>:6868
 Swagger:  http://<host>:6868/api-docs
 ```
 
-Frontend deployment khong duoc khai bao trong root Docker Compose hien tai; neu can production frontend, can build `apps/frontend` va serve static bang Nginx/CDN hoac them service rieng.
+Frontend service hien tai la Vite dev server de tien chay full stack bang Docker trong qua trinh dev. Neu can production frontend nghiem tuc, nen build `apps/frontend` va serve static bang Nginx/CDN hoac mot container static rieng.

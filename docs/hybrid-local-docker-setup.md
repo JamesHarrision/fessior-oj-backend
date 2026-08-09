@@ -21,7 +21,7 @@ Can co san:
 Repo da duoc neo `turbo` ve dung version:
 
 ```text
-2.0.0
+2.10.7
 ```
 
 Neu can kiem tra nhanh:
@@ -202,11 +202,35 @@ Set-Location 'D:\.Learn\Fessior\online-code-judge'
 npm run dev
 ```
 
-Lenh nay se dung `turbo run dev` de chay cac app co script `dev`, bao gom:
+Lenh nay se bat MySQL, MongoDB va Redis bang Docker, doi infra san sang bang `--wait`, generate Prisma client, build cac shared packages `@ocj/*`, sau do dung `turbo run dev` voi filter de chi chay cac app co dev server that:
 
 - `frontend`
 - `main-service`
 - `worker-service`
+
+Neu cac container infra da chay san va chi muon start cac app local, dung:
+
+```powershell
+npm run dev:local
+```
+
+Neu chi muon chay buoc prepare sau khi clone repo:
+
+```powershell
+npm run dev:prepare
+```
+
+Lenh tuong duong day du cua setup hybrid la:
+
+```powershell
+npm run dev:hybrid
+```
+
+Neu muon chay toan bo stack bang Docker Compose, gom ca frontend container:
+
+```powershell
+npm run dev:docker
+```
 
 ### Cach B: Chay tung service o 3 terminal rieng
 
@@ -252,7 +276,7 @@ npx turbo --version
 Ky vong:
 
 ```text
-2.0.0
+2.10.7
 ```
 
 Neu van loi cache cu, thu xoa thu muc `.turbo` roi chay lai:

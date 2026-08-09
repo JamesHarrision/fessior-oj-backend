@@ -1,5 +1,4 @@
-import dotenv from 'dotenv';
-dotenv.config();
+import './config/env';
 
 import { connectMongoDB } from './config/mongoose';
 import { startSubmissionWorker } from './workers/submission.worker';

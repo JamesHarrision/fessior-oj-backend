@@ -1,5 +1,4 @@
-import dotenv from 'dotenv';
-dotenv.config();
+import '../config/env';
 import { PrismaClient } from '@prisma/client';
 import mongoose from 'mongoose';
 import { Problem } from '../models/problem.model';
