@@ -4,8 +4,6 @@ dotenv.config();
 
 process.env.DATABASE_URL =
   process.env.DATABASE_URL || 'mysql://root:ocj_root_secret@localhost:3307/ocj_main_db';
-process.env.MONGO_URI =
-  process.env.MONGO_URI || 'mongodb://mongoadmin:mongosecret@localhost:27017/ocj_database?authSource=admin';
 process.env.REDIS_HOST = process.env.REDIS_HOST || 'localhost';
 process.env.REDIS_PORT = process.env.REDIS_PORT || '6379';
 process.env.JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || 'your_jwt_access_secret_here';
