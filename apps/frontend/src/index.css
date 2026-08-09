@@ -4818,47 +4818,6 @@ About Page
   animation: pulse 2s infinite;
 }
 
-/* Past Contests Table Section */
-.past-table-wrap {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
-}
-
-.past-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-}
-
-.past-table th {
-  background: #f9fafb;
-  padding: 0.85rem 1.25rem;
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: #6b7280;
-  text-transform: uppercase;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.past-table td {
-  padding: 1rem 1.25rem;
-  font-size: 0.875rem;
-  color: #4b5563;
-  border-bottom: 1px solid #f3f4f6;
-}
-
-.past-table tr:last-child td {
-  border-bottom: none;
-}
-
-.past-title-cell strong {
-  color: #111827;
-  font-weight: 600;
-}
-
 /* ─────────────────────────────────────────────────────────────────────────────
    VIEW 2: CALENDAR STYLES
    ────────────────────────────────────────────────────────────────────────── */

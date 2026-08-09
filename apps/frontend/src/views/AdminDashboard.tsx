@@ -10,8 +10,7 @@ import {
   Users,
   MessageSquare,
   Activity,
-  X,
-  Beaker
+  X
 } from 'lucide-react';
 
 import { AdminAuthTab } from '../components/admin/AdminAuthTab';
@@ -21,7 +20,6 @@ import { AdminMatchesTab } from '../components/admin/AdminMatchesTab';
 import { AdminRoomsTab } from '../components/admin/AdminRoomsTab';
 import { AdminCommentsTab } from '../components/admin/AdminCommentsTab';
 import { AdminLeaderboardTab } from '../components/admin/AdminLeaderboardTab';
-import { ApiTesterView } from './tester/ApiTesterView';
 
 import type { IProblem, ProblemDifficulty } from '@ocj/types';
 
@@ -107,7 +105,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentSubView, 
     { id: 'rooms', label: 'Phòng đấu PVP Custom', icon: Users },
     { id: 'comments', label: 'Thảo luận & Bình luận', icon: MessageSquare },
     { id: 'leaderboard', label: 'Bảng xếp hạng chung', icon: Activity },
-    { id: 'tester', label: 'API Tester', icon: Beaker },
   ];
 
   return (
@@ -186,7 +183,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentSubView, 
 
           {activeTab === 'leaderboard' && <AdminLeaderboardTab />}
 
-          {activeTab === 'tester' && <ApiTesterView />}
         </div>
       </div>
     </div>
