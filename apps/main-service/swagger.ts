@@ -20,19 +20,15 @@ const doc = {
 
 const outputFile = './swagger-output.json';
 const endpointsFiles = [
-    './src/routes/ai.route.ts',
     './src/routes/auth.route.ts',
     './src/routes/user.route.ts',
     './src/routes/comment.route.ts',
-    './src/routes/contest.route.ts',
-    './src/routes/friendship.route.ts',
     './src/routes/leaderboard.route.ts',
     './src/routes/match_history.route.ts',
-    './src/routes/notification.route.ts',
     './src/routes/problem.route.ts',
-    './src/routes/report.route.ts',
-    './src/routes/shop.route.ts',
+    './src/routes/room.route.ts',
     './src/routes/submission.route.ts',
+    './src/routes/chat.route.ts',
 ];
 
 swaggerAutogen({ openapi: '3.0.0' })(outputFile, endpointsFiles, doc);
