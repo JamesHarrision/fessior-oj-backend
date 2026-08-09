@@ -29,8 +29,6 @@ Khong coi task la hoan tat neu code da doi nhung docs lien quan chua duoc sync.
 | Cau truc folder, workspace, package moi | `project-structure.md`, `architecture.md`, `README.md` |
 | App/service moi | `architecture.md`, `project-structure.md`, `deployment.md`, `feature-flows.md` |
 | Prisma schema/migration | `database-mysql-prisma-erd.md`, `database-boundaries.md`, `feature-flows.md` |
-| Mongoose model/schema | `database-mongodb.md`, `database-boundaries.md`, `feature-flows.md` |
-| Cross-database reference | `database-boundaries.md`, database docs lien quan |
 | API route/controller/service moi | `api-overview.md`, `feature-flows.md` |
 | Auth/role/session/permission | `auth-and-permissions.md`, `api-overview.md`, `feature-flows.md` |
 | Submission/queue/worker/executor | `submission-flow.md`, `architecture.md`, `feature-flows.md`, `deployment.md` neu co infra |
@@ -48,14 +46,7 @@ Neu thay doi `apps/main-service/prisma/schema.prisma`:
 - Cap nhat ERD trong `database-mysql-prisma-erd.md`.
 - Cap nhat phan nhom bang/field neu model/field moi co y nghia nghiep vu.
 - Ghi ro quan he nao la Prisma `@relation`, quan he nao chi la logical reference.
-- Cap nhat `database-boundaries.md` neu field lien ket MySQL-MongoDB thay doi.
-
-Neu thay doi Mongoose model trong:
-
-- `apps/main-service/src/models/*`
-- `apps/worker-service/src/models/*`
-
-Thi phai cap nhat `database-mongodb.md`, gom field, enum, index, default va relation logical.
+- Cap nhat `database-boundaries.md` neu ownership hoac consistency cua MySQL data thay doi.
 
 ## API Rules
 
@@ -124,7 +115,7 @@ Truoc khi ket thuc task, agent phai tu hoi:
 - Code/config/schema/API vua doi co lam docs nao sai khong?
 - `docs/README.md` co can them link khong?
 - `feature-flows.md` co can them/sua flow khong?
-- Database docs co con khop Prisma/Mongoose khong?
+- Database docs co con khop Prisma schema khong?
 - Setup/deployment/testing docs co con chay dung command moi khong?
 - Mermaid diagram co con dung voi source khong?
 - `git status` co cho thay docs da duoc cap nhat khi can khong?

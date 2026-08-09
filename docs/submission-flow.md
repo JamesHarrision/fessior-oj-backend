@@ -8,7 +8,7 @@ Submission flow duoc thiet ke bat dong bo: HTTP request chi tao submission va en
 sequenceDiagram
   participant FE as Frontend
   participant API as Main Service
-  participant Mongo as MongoDB
+  participant MySQL as MySQL
   participant Redis as Redis / BullMQ
   participant Worker as Worker Service
   participant Judge as Judge0 / Executor
@@ -16,21 +16,21 @@ sequenceDiagram
 
   FE->>API: POST /api/v1/submissions
   API->>API: requireAuth + validate request
-  API->>Mongo: create Submission(PENDING)
+  API->>MySQL: create Submission(PENDING)
   API->>Redis: add job to submission_queue
   API-->>FE: 201 Submission queued
 
   Redis->>Worker: deliver job
-  Worker->>Mongo: find Submission
-  Worker->>Mongo: update status PROCESSING
-  Worker->>Mongo: find Problem + Testcases
+  Worker->>MySQL: find Submission
+  Worker->>MySQL: update status PROCESSING
+  Worker->>MySQL: find Problem + Testcases
 
   loop Each testcase
     Worker->>Judge: executeTestCase(code, input, expected output)
     Judge-->>Worker: status, time, memory, error
   end
 
-  Worker->>Mongo: update final verdict/result
+  Worker->>MySQL: update final verdict/result
   Worker->>Redis: publish submission-updates (includes matchId)
   Redis->>Socket: main-service subscriber receives update
   Socket-->>FE: rival-submission / match-ended when relevant
@@ -74,9 +74,8 @@ Request:
 - `language`: `cpp`, `java`, hoac `python` (required)
 - `code` (required)
 - `matchId` (optional) — link submission to a PvP match
-- `contestId` (optional) — link submission to a contest
 
-Submission duoc tao trong MongoDB voi status ban dau:
+Submission duoc tao trong MySQL voi status ban dau:
 
 ```text
 PENDING
@@ -86,19 +85,18 @@ PENDING
 
 | Field | Type | Required | Indexed | Notes |
 |-------|------|----------|---------|-------|
-| `userId` | string | ✅ | ✅ | |
-| `problemId` | ObjectId (ref: Problem) | ✅ | ✅ | |
+| `user_id` | string | yes | yes | FK to `users.id`. |
+| `problem_id` | string | yes | yes | FK to `problems.id`. |
 | `code` | string | ✅ | | |
 | `language` | enum (cpp/java/python) | ✅ | | |
 | `status` | enum | ✅ (default PENDING) | ✅ | See Verdicts |
-| `matchId` | string (nullable) | | ✅ | Links to MySQL `matches.id` |
-| `contestId` | string (nullable) | | ✅ | Links to contest |
-| `executionTime` | number | | | |
-| `memoryUsed` | number | | | |
-| `errorMessage` | string | | | |
-| `testCasesPassed` | number | | | Default 0 |
-| `testCasesTotal` | number | | | Default 0 |
-| `aiFeedback` | string | | | |
+| `match_id` | string (nullable) | | ✅ | Links to `matches.id`. |
+| `execution_time` | number | | | |
+| `memory_used` | number | | | |
+| `error_message` | string | | | |
+| `test_cases_passed` | number | | | Default 0. |
+| `test_cases_total` | number | | | Default 0. |
+| `ai_feedback` | string | | | Reserved optional field. |
 
 ## Worker Processing
 
@@ -124,7 +122,7 @@ Xu ly:
 
 ## Verdicts
 
-MongoDB `Submission.status` co cac gia tri:
+MySQL `Submission.status` co cac gia tri:
 
 ```text
 PENDING
@@ -167,7 +165,7 @@ Khi submission update lien quan den match dang `PENDING`:
 
 1. Main-service nhan `matchId` tu pub/sub payload.
 2. Neu co `matchId`, tim `Match` directly qua `prisma.match.findUnique({ id: matchId })`.
-3. Neu KHONG co `matchId` (legacy submissions cu), fallback tim `Match` theo `problem_id`, `userId`, status `PENDING`. (deprecated — chi ton tai cho submissions tao truoc khi `matchId` duoc them vao model)
+3. Neu KHONG co `matchId`, fallback tim `Match` theo `problem_id`, `userId`, status `PENDING`.
 4. Hê thống emit `rival-submission` vao room `match:{matchId}` (hoặc room custom).
 5. Neu status la `ACCEPTED`, goi `endMatch`. Đối với Custom Arena (N-player), luật Winner Takes All được kích hoạt (người AC đầu tiên thắng, những người còn lại bị phạt ELO).
 6. `endMatch` update MySQL `matches`, user ELO/streak bang Prisma transaction.
@@ -175,7 +173,7 @@ Khi submission update lien quan den match dang `PENDING`:
 
 ## Known Limitations
 
-- **`matchId` cross-database reference**: `matchId` trong MongoDB `Submission` tham chieu toi `Match` trong MySQL/Prisma. Khong co foreign key integrity tu dong — day la tham chieu logic, khong duoc DB engine kiem tra. Code phai xu ly case match khong ton tai (da xu ly: return early).
+- `match_id` is currently a logical reference instead of a Prisma relation. Match update code handles missing/inactive matches by returning early.
 
 ## Ad-Hoc Run
 
@@ -189,8 +187,8 @@ Muc dich: chay code nhanh, khong tao persistent submission theo route descriptio
 
 ### Luồng xử lý Testcase trong Ad-Hoc Run
 
-- **Lấy Testcase mẫu**: Frontend khi gọi API lấy danh sách testcase mẫu sẽ truyền cờ `?example=true` để chỉ lấy các testcase public (`isExample: true`). Backend sẽ bỏ qua các testcase ẩn.
-- **Chạy Testcase mẫu**: Backend (hàm `runCode`) tự động lọc `Testcase.find({ isExample: true })` và chạy toàn bộ các testcase mẫu. Trả về `ACCEPTED` hoặc `WA` dựa trên so sánh output.
+- **Lấy Testcase mẫu**: Frontend khi gọi API lấy danh sách testcase mẫu sẽ truyền cờ `?example=true` để chỉ lấy các testcase public (`is_example: true`). Backend sẽ bỏ qua các testcase ẩn.
+- **Chạy Testcase mẫu**: Backend (hàm `runCode`) tự động lọc `prisma.testcase.findMany({ is_example: true })` và chạy toàn bộ các testcase mẫu. Trả về `ACCEPTED` hoặc `WA` dựa trên so sánh output.
 - **Chạy Tùy biến Input (Custom Input)**: Nếu request gửi kèm `customInput`, Backend sẽ không so sánh `expectedOutput`. Miễn là tiến trình không gặp lỗi (CE, RE, TLE), kết quả sẽ được đánh dấu là `ACCEPTED` (để Frontend có thể hiển thị `actualOutput` thay vì báo `WA`).
 
 ## Cơ chế Executor (Judge0 / Local Fallback)

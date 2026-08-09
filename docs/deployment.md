@@ -13,16 +13,14 @@ Repo hien co Docker Compose va script ho tro VPS:
 flowchart TB
   Frontend[frontend :5173] --> Main[main-service :6868]
   Main[main-service :6868] --> MySQL[(mysql :3306)]
-  Main --> Mongo[(mongodb :27017)]
   Main --> Redis[(redis :6379)]
-  Worker[worker-service] --> Mongo
+  Worker[worker-service] --> MySQL
   Worker --> Redis
 ```
 
 | Service | Image/Build | Container | Port |
 | --- | --- | --- | --- |
 | `mysql` | `mysql:8.0` | `ocj_mysql` | `3307:3306` |
-| `mongodb` | `mongo:6.0` | `ocj_mongodb` | `27017:27017` |
 | `redis` | `redis:7-alpine` | `ocj_redis` | `6379:6379` |
 | `frontend` | build `apps/frontend/Dockerfile` | `ocj_frontend` | `5173:5173` |
 | `main-service` | build `apps/main-service/Dockerfile` | `ocj_main_service` | `6868:6868` |
@@ -32,7 +30,6 @@ flowchart TB
 
 ```text
 mysql_data -> /var/lib/mysql
-mongo_data -> /data/db
 redis_data -> /data
 frontend_node_modules -> /app/node_modules
 ```
@@ -48,12 +45,10 @@ redis-server --appendonly yes
 `main-service` phu thuoc:
 
 - MySQL healthy.
-- MongoDB started.
 - Redis started.
 
 `worker-service` phu thuoc:
 
-- MongoDB started.
 - Redis started.
 
 `frontend` phu thuoc:
@@ -82,7 +77,7 @@ mysqladmin ping -h localhost
    npm run dev:docker
    ```
 
-   Lenh nay tuong duong `docker compose up -d --build --wait --wait-timeout 120`.
+   Lenh nay tuong duong `docker compose up -d --build --remove-orphans --wait --wait-timeout 120`.
 
 4. Xem logs:
 
@@ -102,7 +97,6 @@ mysqladmin ping -h localhost
 Truoc khi deploy production/staging, kiem tra:
 
 - `DATABASE_URL` tro dung MySQL trong network Docker.
-- `MONGO_URI` co username/password va `authSource` dung.
 - `REDIS_HOST` la service name `redis` neu chay trong Docker network.
 - JWT secrets khong dung default.
 - Judge0/RapidAPI config san sang.
@@ -126,7 +120,7 @@ Trong Docker deploy nen dung Prisma migration workflow phu hop production, vi `d
 - Socket.io khi scale nhieu instance can adapter Redis va sticky sessions/load balancer config.
 - Worker concurrency hien la `2`; can tune theo CPU/RAM va Judge0 throughput.
 - `removeOnFail: false` giup giu failed queue jobs de debug.
-- Nen backup ca MySQL volume va MongoDB volume.
+- Nen backup MySQL volume.
 - Nen monitor Redis memory vi queue va Pub/Sub deu phu thuoc Redis.
 
 ## Public Endpoints

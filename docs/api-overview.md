@@ -22,16 +22,11 @@ Route prefixes duoc khai bao trong `packages/constants/src/index.ts` va register
 | `/api/v1/users` | `user.route.ts` | Public profile, current user, avatar, admin user management, user stats. |
 | `/api/v1/problems` | `problem.route.ts` | CRUD problem, testcase, tags, problem listing/detail. |
 | `/api/v1/submissions` | `submission.route.ts` | Submit code, run code sandbox, list/detail submissions. |
-| `/api/v1/ai` | `ai.route.ts` | DSA roadmap, AI Debug Assistant, va Mock Interview Chat. |
 | `/api/v1/leaderboard` | `leaderboard.route.ts` | Bang xep hang. |
 | `/api/v1/rooms` | `room.route.ts` | Custom competition rooms. |
 | `/api/v1/matches` | `match_history.route.ts` | Lich su match. |
-| `/api/v1/contests` | `contest.route.ts` | Contest, problem trong contest, registration, scoreboard. |
 | `/api/v1/comments` | `comment.route.ts` | Comment/reply/like theo target. |
-| `/api/v1/friends` | `friendship.route.ts` | Friend request, accept, block, list. |
-| `/api/v1/shop` | `shop.route.ts` | Shop item, purchase, inventory, equip. |
-| `/api/v1/notifications` | `notification.route.ts` | Tao/doc/mark-read/delete notification. |
-| `/api/v1/reports` | `report.route.ts` | User report va admin moderation. |
+| `/api/v1/chat` | `chat.route.ts` | Chatbox sessions and messages. |
 
 ## Common Request Flow
 
@@ -41,8 +36,8 @@ flowchart LR
   Route --> Middleware[Auth / role / upload / validate]
   Middleware --> Controller[Controller]
   Controller --> Service[Service]
-  Service --> Repository[Repository or Mongoose model]
-  Repository --> DB[(MySQL / MongoDB)]
+  Service --> Repository[Repository or Prisma client]
+  Repository --> DB[(MySQL)]
   Service --> Response[JSON response]
 ```
 
@@ -65,7 +60,6 @@ Vi du:
 - `auth.validator.ts`
 - `submission.validator.ts`
 - `problem.validator.ts`
-- `contest.validator.ts`
 - `room.validator.ts`
 
 ## Response Shape

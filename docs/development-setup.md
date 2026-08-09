@@ -1,137 +1,105 @@
 # Development Setup
 
-Tai lieu nay huong dan chay OCJ o local/dev.
+This guide explains how to run OCJ locally.
 
 ## Requirements
 
-- Node.js compatible voi npm workspace hien tai.
-- npm `10.9.2` theo `packageManager` trong root `package.json`.
-- Docker va Docker Compose neu chay MySQL/MongoDB/Redis bang container.
+- Node.js compatible with the root `packageManager` npm version.
+- npm `10.9.2`.
+- Docker and Docker Compose for MySQL/Redis or the full Docker stack.
 
-## Install Dependencies
+## Install
 
-Chay tu root repo:
+Run from the repository root:
 
 ```bash
 npm install
 ```
 
-Root workspace gom:
+Then start the project:
 
-```json
-{
-  "workspaces": ["apps/*", "packages/*"]
-}
+```bash
+npm run dev
 ```
+
+`npm run dev` maps to `npm run dev:hybrid`.
 
 ## Environment
 
-Docker Compose dung default env tu:
+Docker Compose reads defaults from:
 
 ```text
 .env.docker.example
 ```
 
-Neu can override secrets/local config, tao them:
-
-```text
-.env.docker
-```
-
-Bang cach copy tu file mau:
+Create `.env.docker` only when you want to override local secrets/config:
 
 ```bash
 cp .env.docker.example .env.docker
 ```
 
-Voi setup hybrid mac dinh, neu chua tao `.env` rieng cho app, code se dung default local dev:
+Default local values are set in `apps/main-service/src/config/env.ts` and `apps/worker-service/src/config/env.ts`:
 
 ```text
 DATABASE_URL=mysql://root:ocj_root_secret@localhost:3307/ocj_main_db
-MONGO_URI=mongodb://mongoadmin:mongosecret@localhost:27017/ocj_database?authSource=admin
 REDIS_HOST=localhost
 REDIS_PORT=6379
 ```
 
-Default nay nam trong `apps/main-service/src/config/env.ts` va `apps/worker-service/src/config/env.ts`. Tao `.env` trong tung app neu can override.
+Important env vars:
 
-Main service local dev can env rieng trong:
-
-```text
-apps/main-service/.env
-```
-
-Worker service local dev can env rieng trong:
-
-```text
-apps/worker-service/.env
-```
-
-Tao tu file mau:
-
-```bash
-cp apps/worker-service/.env.example apps/worker-service/.env
-```
-
-Bien moi truong quan trong:
-
-| Env | Muc dich |
+| Env | Purpose |
 | --- | --- |
-| `DATABASE_URL` | MySQL connection string cho Prisma. |
-| `MONGO_URI` | MongoDB connection string. |
+| `DATABASE_URL` | MySQL connection string for Prisma. |
 | `REDIS_HOST` | Redis host. |
 | `REDIS_PORT` | Redis port. |
-| `JWT_ACCESS_SECRET` | Secret ky access token. |
-| `JWT_REFRESH_SECRET` | Secret ky refresh token. |
-| `RAPIDAPI_KEY` | Judge0 RapidAPI key neu dung RapidAPI. |
-| `RAPIDAPI_HOST` | Judge0 RapidAPI host. |
-| `JUDGE0_URL` | Judge0 endpoint override. |
-| `GEMINI_API_KEY` | Google Gemini API key. |
-| `CLOUDINARY_*` | Cloudinary upload config. |
+| `JWT_ACCESS_SECRET` | Access token signing secret. |
+| `JWT_REFRESH_SECRET` | Refresh token signing secret. |
+| `RAPIDAPI_KEY` | Optional Judge0 RapidAPI key. |
+| `RAPIDAPI_HOST` | Optional Judge0 RapidAPI host. |
+| `JUDGE0_URL` | Optional Judge0 endpoint override. |
+| `GEMINI_API_KEY` | Optional chatbox API key. |
+| `CLOUDINARY_*` | Optional avatar upload config. |
 
-## Run Infrastructure Only
+## Root Scripts
 
-Chay database/queue cho local dev:
+| Script | Purpose |
+| --- | --- |
+| `npm run dev` | Default hybrid dev flow. |
+| `npm run dev:hybrid` | Starts MySQL + Redis in Docker, prepares DB/packages, then runs frontend/main-service/worker-service locally. |
+| `npm run dev:local` | Prepares DB/packages and runs local app dev servers. Use when MySQL/Redis are already running. |
+| `npm run dev:prepare` | Runs Prisma generate, Prisma db push, and shared package builds. |
+| `npm run dev:apps` | Runs frontend/main-service/worker-service local dev servers only. |
+| `npm run dev:docker` | Runs the full Docker Compose stack. |
+| `npm run seed` | Seeds local MySQL with demo users/problems/testcases/submissions. |
+
+## Infrastructure Only
 
 ```bash
-docker compose up -d mysql mongodb redis
+docker compose up -d --remove-orphans --wait --wait-timeout 120 mysql redis
 ```
 
-Ports mac dinh trong `docker-compose.yml`:
+Default ports:
 
 ```text
-MySQL:   localhost:3307 -> container 3306
-MongoDB: localhost:27017
-Redis:   localhost:6379
+MySQL: localhost:3307 -> container 3306
+Redis: localhost:6379
 ```
-
-## Root Dev Scripts
-
-Tu root repo, cac script dev chinh la:
-
-| Script | Muc dich |
-| --- | --- |
-| `npm run dev` | Mac dinh chay hybrid: bat MySQL, MongoDB, Redis bang Docker, sau do chay frontend/main-service/worker-service local qua Turbo. |
-| `npm run dev:hybrid` | Giong `npm run dev`, dung cho vong lap dev hang ngay. |
-| `npm run dev:local` | Generate Prisma client, build shared packages, roi chay dev server local cho `frontend`, `main-service`, `worker-service`; dung khi infra da duoc bat san. |
-| `npm run dev:prepare` | Chay rieng buoc chuan bi: `prisma generate` va build cac package `@ocj/*` can `dist`; build package chi in log khi co loi. |
-| `npm run dev:apps` | Chi chay 3 dev server local, khong prepare va khong bat Docker. |
-| `npm run dev:docker` | Chay full Docker Compose stack: frontend, main-service, worker-service, MySQL, MongoDB va Redis. |
-
-Luu y: `dev` va `dev:hybrid` can Docker dang chay. Neu chua co `.env.docker`, Docker Compose se dung `.env.docker.example` lam default cho local/dev.
 
 ## Prisma
 
-Chay trong `apps/main-service`:
+From root:
 
 ```bash
+npm run db:generate
 npm run db:push
 ```
 
-Mo Prisma Studio:
+From `apps/main-service` if you provide your own env:
 
 ```bash
-npm run db:studio
+npm run db:generate
+npm run db:push
 ```
 
 Prisma schema:
@@ -142,128 +110,34 @@ apps/main-service/prisma/schema.prisma
 
 ## Seed Data
 
-Sau khi da co `apps/main-service/.env` dung va database local da chay, co the seed du lieu mau tu root repo:
+After MySQL is running and schema has been pushed:
 
 ```bash
 npm run seed
 ```
 
-Lenh root nay se forward sang workspace `main-service` de chay file:
+The seed script is local/dev only. It clears demo data and creates sample users, tags, problems, testcases, and submissions in MySQL.
+
+## URLs
 
 ```text
-apps/main-service/src/scripts/seed.ts
-```
-
-Luu y:
-
-- Script seed se xoa mot so data hien co trong MySQL va MongoDB truoc khi tao lai bo du lieu mau.
-- Nen chay `npm run db:push` trong `apps/main-service` truoc khi seed neu schema MySQL vua thay doi.
-- Chi dung cho local/dev, khong dung tren moi truong co data that.
-
-## Run All Dev Services
-
-Chay tu root theo setup hybrid mac dinh:
-
-```bash
-npm run dev
-```
-
-Script nay goi:
-
-```bash
-docker compose up -d --wait --wait-timeout 120 mysql mongodb redis
-npm run dev:prepare
-npm run dev:apps
-```
-
-Neu MySQL/MongoDB/Redis da chay san va chi muon start cac app local:
-
-```bash
-npm run dev:local
-```
-
-Neu vua clone repo va muon kiem tra buoc chuan bi truoc khi chay server:
-
-```bash
-npm run dev:prepare
-```
-
-Neu muon chay toan bo stack trong Docker:
-
-```bash
-npm run dev:docker
-```
-
-## Run Services Separately
-
-Main API:
-
-```bash
-cd apps/main-service
-npm run dev
-```
-
-Worker:
-
-```bash
-cd apps/worker-service
-npm run dev
-```
-
-Frontend:
-
-```bash
-cd apps/frontend
-npm run dev
-```
-
-## API URLs
-
-Mac dinh main-service listen:
-
-```text
-http://localhost:6868
-```
-
-Swagger UI:
-
-```text
-http://localhost:6868/api-docs
-```
-
-Frontend Vite listen:
-
-```text
-http://localhost:5173
+Frontend: http://localhost:5173
+API:      http://localhost:6868
+Swagger:  http://localhost:6868/api-docs
+MySQL:    localhost:3307
+Redis:    localhost:6379
 ```
 
 ## Build
-
-Build all workspaces:
 
 ```bash
 npm run build
 ```
 
-Build tung app:
+Build individual apps:
 
 ```bash
 cd apps/main-service && npm run build
 cd apps/worker-service && npm run build
 cd apps/frontend && npm run build
-```
-
-## Lint And Format
-
-Root scripts:
-
-```bash
-npm run lint
-npm run format
-```
-
-`format` se format cac file:
-
-```text
-**/*.{ts,tsx,md}
 ```

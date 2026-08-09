@@ -39,19 +39,10 @@ Test files:
 
 ```text
 apps/main-service/src/tests/
-  ai.test.ts
   auth.test.ts
   comment.test.ts
-  contest.test.ts
-  friendship.test.ts
   leaderboard.test.ts
-  notification.test.ts
-  problem.test.ts
-  report.test.ts
-  room.test.ts
   setup.ts
-  shop.test.ts
-  submission.test.ts
 ```
 
 Chay mot suite:
@@ -88,20 +79,13 @@ apps/frontend/src/components/layout/Navbar.test.tsx
 
 ## Worker Tests
 
-Worker co end-to-end test file:
-
-```text
-apps/worker-service/src/tests/test_judge0_end_to_end.ts
-```
-
-File nay khoi dong worker va add job vao `submission_queue`, phu thuoc Redis/MongoDB/Judge0/env. Khi chay can dam bao infra va env da san sang.
+Worker E2E tests need to be rebuilt for the current MySQL-only judge flow. New tests should seed MySQL `problems`, `testcases`, and `submissions`, enqueue a BullMQ job, then assert the updated MySQL submission verdict.
 
 ## Test Dependencies
 
 Test backend co the can:
 
 - MySQL running neu test cham Prisma.
-- MongoDB running neu test cham Mongoose models.
 - Redis running neu test cham queue/socket.
 - Env JWT secrets.
 - Mock hoac API key neu test cham external services.
@@ -122,16 +106,11 @@ Test backend co the can:
    npm run test
    ```
 
-3. Chay worker E2E khi can verify queue/Judge0:
-
-   ```bash
-   cd apps/worker-service
-   npx tsx src/tests/test_judge0_end_to_end.ts
-   ```
+3. Chay worker E2E sau khi viet lai suite MySQL-only cho queue/Judge0.
 
 ## Coverage Gaps To Watch
 
-- Cross-database consistency MySQL/MongoDB.
+- Worker E2E coverage for MySQL-only submission judging.
 - Queue retry/recovery khi worker fail giua chung.
 - Socket matchmaking khi multi-instance.
 - Judge0 timeout/error mapping.

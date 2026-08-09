@@ -56,16 +56,15 @@ src/
 
 ### `apps/main-service`
 
-Express API service chinh. Service nay ket noi MySQL bang Prisma, MongoDB bang Mongoose, Redis bang ioredis/BullMQ, va Socket.io.
+Express API service chinh. Service nay ket noi MySQL bang Prisma, Redis bang ioredis/BullMQ, va Socket.io.
 
 Cau truc noi bo:
 
 ```text
 src/
-  config/        # prisma, mongoose, redis, queue, cloudinary
+  config/        # prisma, redis, queue, cloudinary, env
   controllers/   # HTTP controller layer
   middlewares/   # auth, validate, upload, error
-  models/        # Mongoose models
   repositories/  # DB access layer
   routes/        # Express route declarations
   scripts/       # seed and utility scripts
@@ -78,23 +77,22 @@ src/
 
 Route registration nam trong `src/app.ts`. Server bootstrap nam trong `src/server.ts`.
 
-`src/config/env.ts` load `.env` neu co va dat default local dev cho MySQL/MongoDB/Redis de fresh clone co the chay `npm install` roi `npm run dev`.
+`src/config/env.ts` load `.env` neu co va dat default local dev cho MySQL/Redis de fresh clone co the chay `npm install` roi `npm run dev`.
 
 ### `apps/worker-service`
 
-Worker xu ly queue cham bai. Service nay ket noi MongoDB va Redis, lang nghe BullMQ queue `submission_queue`, chay code qua `@ocj/executor`, cap nhat submission va publish ket qua qua Redis Pub/Sub.
+Worker xu ly queue cham bai. Service nay ket noi MySQL va Redis, lang nghe BullMQ queue `submission_queue`, chay code qua `@ocj/executor`, cap nhat submission va publish ket qua qua Redis Pub/Sub.
 
 Cau truc noi bo:
 
 ```text
 src/
   config/
-  models/
   tests/
   workers/
 ```
 
-`src/config/env.ts` dat default local dev cho MongoDB/Redis khi chay worker ngoai Docker.
+`src/config/env.ts` dat default local dev cho MySQL/Redis khi chay worker ngoai Docker.
 
 ## Shared Packages
 
@@ -114,7 +112,7 @@ src/
 | --- | --- |
 | `package.json` | Khai bao workspace `apps/*`, `packages/*`, script `dev/dev:prepare/build/test/lint/format`. |
 | `turbo.json` | Cau hinh Turborepo pipeline. |
-| `docker-compose.yml` | Chay frontend, main-service, worker-service, MySQL, MongoDB va Redis. |
+| `docker-compose.yml` | Chay frontend, main-service, worker-service, MySQL va Redis. |
 | `.env.docker.example` | Mau env cho Docker Compose. |
 | `deploy-vps.sh`, `setup_vps.sh` | Script ho tro trien khai VPS. |
 | `ocj_postman_collection.json` | Postman collection. |
@@ -126,11 +124,10 @@ flowchart LR
   FE[apps/frontend] --> API[apps/main-service]
   FE --> Socket[Socket.io server]
   API --> MySQL[(MySQL via Prisma)]
-  API --> Mongo[(MongoDB via Mongoose)]
   API --> Redis[(Redis)]
   API --> Queue[BullMQ submission_queue]
   Worker[apps/worker-service] --> Queue
-  Worker --> Mongo
+  Worker --> MySQL
   Worker --> Redis
   Worker --> Executor["@ocj/executor / Judge0"]
   API --> Shared["packages/*"]

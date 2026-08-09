@@ -76,7 +76,6 @@ sequenceDiagram
   participant C2 as Client B
   participant Socket as Main Service Socket
   participant MySQL as MySQL
-  participant Mongo as MongoDB
 
   C1->>Socket: join-queue
   Socket->>MySQL: get user + ELO
@@ -85,7 +84,7 @@ sequenceDiagram
   C2->>Socket: join-queue
   Socket->>MySQL: get user + ELO
   Socket->>Socket: sort queue by ELO and pick closest pair
-  Socket->>Mongo: pick random Problem
+  Socket->>MySQL: pick random Problem
   Socket->>MySQL: create Match(PENDING)
   Socket->>Socket: join both sockets to match:{matchId}
   Socket-->>C1: match-found
@@ -101,7 +100,7 @@ Implementation: `apps/main-service/src/sockets/matchmaking.ts`
 3. Khi co it nhat 2 player, sort queue theo ELO tang dan.
 4. Tim cap player lien ke co ELO diff nho nhat.
 5. Remove 2 player khoi queue.
-6. Pick random MongoDB `Problem`.
+6. Pick random MySQL `Problem`.
 7. Tao MySQL `Match` status `PENDING`.
 8. Emit `match-found`.
 
