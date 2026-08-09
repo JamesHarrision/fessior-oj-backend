@@ -182,4 +182,4 @@ Key files:
 
 ## Removed From Current Learning Scope
 
-The previous contest, social/friendship, shop, notification, report/moderation, AI roadmap/debug, and mock interview flows are no longer part of the active backend surface. Some legacy Prisma tables may remain temporarily for compatibility, but routes for these modules are not mounted.
+The previous contest, social/friendship, shop, notification, report/moderation, AI roadmap/debug, news, and mock interview flows are no longer part of the active product surface.

@@ -32,7 +32,7 @@ online-code-judge/
 React/Vite client. Frontend dung:
 
 - `@monaco-editor/react` cho code editor.
-- `socket.io-client` cho realtime matchmaking, custom room, notification.
+- `socket.io-client` cho realtime matchmaking va custom room.
 - Shared packages `@ocj/constants`, `@ocj/types`, `@ocj/utils`, `@ocj/validators`.
 
 Cau truc noi bo:
@@ -43,7 +43,6 @@ src/
   components/
     admin/
     auth/
-    contest/
     editor/
     layout/
     match/

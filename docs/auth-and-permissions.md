@@ -119,10 +119,7 @@ Admin-only behavior nam rai rac trong route files, vi du:
 
 - User management.
 - Problem create/update/delete.
-- Contest management.
-- Report moderation.
-- Notification creation.
-- Shop item management.
+- Submission, match, room, comment, and leaderboard inspection.
 
 ## Ban Behavior
 

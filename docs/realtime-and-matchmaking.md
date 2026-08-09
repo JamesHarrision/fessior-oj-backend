@@ -44,13 +44,12 @@ Events duoc khai bao trong `packages/constants/src/index.ts`.
 | `player-kicked` | server -> client | Chu phong kick player khoi phong. |
 | `config-updated` | server -> client | Cau hinh room thay doi. |
 | `room-deleted` | server -> client | Room bi xoa. |
-| `notification` | server -> client | Notification realtime. |
 
 ## Rooms
 
 | Room name | Muc dich |
 | --- | --- |
-| `user:{userId}` | Room rieng tung user, dung cho notification/direct event. |
+| `user:{userId}` | Room rieng tung user, dung cho direct/user-scoped event. |
 | `match:{matchId}` | Room cua tran 1v1 matchmaking. |
 | `custom-room:{roomCode}` | Room realtime cua custom room. |
 

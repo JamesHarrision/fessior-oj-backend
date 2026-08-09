@@ -348,14 +348,10 @@ Không dùng `Segmented` của Ant Design trên dark theme — thay bằng custo
 │  • Problems   │  ┌─ Content Grid ─────────────┐   │
 │  • Rankings   │  │ [Section ...]               │   │
 │               │  └────────────────────────────┘   │
-│  COMMUNITY    │                                   │
 │  • Rooms      │                                   │
 │  • Submissions│                                   │
-│  • Friends    │                                   │
 │               │                                   │
 │  TOOLS        │                                   │
-│  • Shop       │                                   │
-│  • AI Mentor  │                                   │
 │  • Settings   │                                   │
 ├───────────────┤                                   │
 │  [User Avatar]│                                   │
