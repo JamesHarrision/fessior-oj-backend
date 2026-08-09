@@ -85,46 +85,6 @@ export const removeUserAvatar = async (id: string) => {
   });
 };
 
-export const getUserContests = async (userId: string, page: number = 1, limit: number = 10) => {
-  const skip = (page - 1) * limit;
-  
-  const [contests, total] = await Promise.all([
-    prisma.contestRegistration.findMany({
-      where: { user_id: userId },
-      skip,
-      take: limit,
-      orderBy: { registered_at: 'desc' },
-      include: {
-        contest: {
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            start_time: true,
-            end_time: true,
-          },
-        },
-      },
-    }),
-    prisma.contestRegistration.count({
-      where: { user_id: userId },
-    }),
-  ]);
-  
-  return {
-    contests: contests.map(reg => ({
-      registered_at: reg.registered_at,
-      contest: reg.contest,
-    })),
-    pagination: {
-      page,
-      limit,
-      total,
-      totalPages: Math.ceil(total / limit),
-    },
-  };
-};
-
 export const getUserBadges = async (userId: string) => {
   return prisma.userBadge.findMany({
     where: { user_id: userId },
