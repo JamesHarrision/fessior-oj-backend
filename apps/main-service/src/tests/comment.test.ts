@@ -6,7 +6,7 @@ import bcrypt from 'bcrypt';
 describe('Comments & Discussions Integration Tests', () => {
   let userToken: string;
   let userId: string;
-  let targetId = '6659f8a3c8bf08be14023242'; // Simulated MongoDB ObjectId
+  let targetId = '11111111-1111-4111-8111-111111111111';
   let createdCommentId: string;
   let createdReplyId: string;
 
@@ -51,7 +51,7 @@ describe('Comments & Discussions Integration Tests', () => {
       });
 
     expect(res.status).toBe(201);
-    expect(res.body.success).toBe(true);
+    expect(res.body.status).toBe('Success');
     expect(res.body.data).toHaveProperty('id');
     expect(res.body.data.content).toBe('This is a test comment about the problem.');
     expect(res.body.data.user_id).toBe(userId);
@@ -71,7 +71,7 @@ describe('Comments & Discussions Integration Tests', () => {
       });
 
     expect(res.status).toBe(201);
-    expect(res.body.success).toBe(true);
+    expect(res.body.status).toBe('Success');
     expect(res.body.data.parent_id).toBe(createdCommentId);
 
     createdReplyId = res.body.data.id;
@@ -86,7 +86,7 @@ describe('Comments & Discussions Integration Tests', () => {
       });
 
     expect(res.status).toBe(200);
-    expect(res.body.success).toBe(true);
+    expect(res.body.status).toBe('Success');
     expect(res.body.data.items.length).toBe(1);
 
     const topComment = res.body.data.items[0];
@@ -104,7 +104,7 @@ describe('Comments & Discussions Integration Tests', () => {
       .set('Authorization', `Bearer ${userToken}`);
 
     expect(res.status).toBe(200);
-    expect(res.body.success).toBe(true);
+    expect(res.body.status).toBe('Success');
     expect(res.body.data.liked).toBe(true);
 
     // Get list to verify like count
@@ -119,7 +119,7 @@ describe('Comments & Discussions Integration Tests', () => {
       .set('Authorization', `Bearer ${userToken}`);
 
     expect(res.status).toBe(200);
-    expect(res.body.success).toBe(true);
+    expect(res.body.status).toBe('Success');
     expect(res.body.data.liked).toBe(false);
   });
 
@@ -132,7 +132,7 @@ describe('Comments & Discussions Integration Tests', () => {
       });
 
     expect(res.status).toBe(200);
-    expect(res.body.success).toBe(true);
+    expect(res.body.status).toBe('Success');
     expect(res.body.data.content).toBe('This comment has been updated.');
   });
 
@@ -142,6 +142,6 @@ describe('Comments & Discussions Integration Tests', () => {
       .set('Authorization', `Bearer ${userToken}`);
 
     expect(res.status).toBe(200);
-    expect(res.body.success).toBe(true);
+    expect(res.body.status).toBe('Success');
   });
 });
