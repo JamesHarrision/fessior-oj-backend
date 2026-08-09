@@ -1,10 +1,8 @@
 import { Worker, Job } from 'bullmq';
-import { redisOptions, redis } from '../config/redis';
-import { Submission } from '../models/submission.model';
-import { Problem } from '../models/problem.model';
-import { Testcase } from '../models/testcase.model';
-import { executeTestCase, getLanguageId, LanguageKey } from '@ocj/executor';
 import { DEFAULT_LIMITS, REDIS_CHANNELS } from '@ocj/constants';
+import { executeTestCase, getLanguageId, LanguageKey } from '@ocj/executor';
+import { prisma } from '../config/prisma';
+import { redisOptions, redis } from '../config/redis';
 
 const getRapidApiKey = () => process.env.RAPIDAPI_KEY || '';
 const getRapidApiHost = () => process.env.RAPIDAPI_HOST || 'judge0-ce.p.rapidapi.com';
@@ -18,31 +16,45 @@ export const startSubmissionWorker = () => {
       console.log(`Processing Job ${job.id} for Submission ${submissionId}`);
 
       try {
-        // 1. Update status to PROCESSING
-        const submission = await Submission.findById(submissionId);
+        const submission = await prisma.submission.findUnique({
+          where: { id: submissionId },
+        });
         if (!submission) {
           console.error(`Submission ${submissionId} not found in database`);
           return;
         }
 
-        submission.status = 'PROCESSING';
-        await submission.save();
+        await prisma.submission.update({
+          where: { id: submissionId },
+          data: { status: 'PROCESSING' },
+        });
 
-        // 2. Fetch problem limits
-        const problem = await Problem.findById(problemId);
+        const problem = await prisma.problem.findUnique({
+          where: { id: problemId },
+        });
         if (!problem) {
-          submission.status = 'CE';
-          submission.errorMessage = 'Problem context not found';
-          await submission.save();
+          await prisma.submission.update({
+            where: { id: submissionId },
+            data: {
+              status: 'CE',
+              error_message: 'Problem context not found',
+            },
+          });
           return;
         }
 
-        // 3. Fetch testcases
-        const testCases = await Testcase.find({ problemId });
+        const testCases = await prisma.testcase.findMany({
+          where: { problem_id: problemId },
+          orderBy: { id: 'asc' },
+        });
         if (testCases.length === 0) {
-          submission.status = 'CE';
-          submission.errorMessage = 'No testcases found for this problem';
-          await submission.save();
+          await prisma.submission.update({
+            where: { id: submissionId },
+            data: {
+              status: 'CE',
+              error_message: 'No testcases found for this problem',
+            },
+          });
           return;
         }
 
@@ -54,7 +66,6 @@ export const startSubmissionWorker = () => {
 
         const languageId = getLanguageId(language as LanguageKey);
 
-        // Run each testcase sequentially
         for (let i = 0; i < testCases.length; i++) {
           const tc = testCases[i];
           const result = await executeTestCase(
@@ -62,7 +73,7 @@ export const startSubmissionWorker = () => {
             languageId,
             tc.input,
             tc.output,
-            problem.timeLimit || DEFAULT_LIMITS.TIME_LIMIT_MS,
+            problem.time_limit || DEFAULT_LIMITS.TIME_LIMIT_MS,
             {
               judge0Url: getJudge0Url(),
               rapidApiKey: getRapidApiKey(),
@@ -73,46 +84,49 @@ export const startSubmissionWorker = () => {
           if (result.status === 'ACCEPTED') {
             passedCount++;
           } else {
-            finalStatus = result.status;
+            finalStatus = result.status as typeof finalStatus;
             errorMsg = result.error || `Failed on testcase ${i + 1}`;
-            break; // Stop executing on first failed testcase
+            break;
           }
 
           totalTime += result.time;
           maxMemory = Math.max(maxMemory, result.memory);
         }
 
-        // 4. Update Submission with results
-        submission.status = finalStatus;
-        submission.testCasesPassed = passedCount;
-        submission.testCasesTotal = testCases.length;
-        submission.executionTime = totalTime;
-        submission.memoryUsed = maxMemory;
-        if (errorMsg) submission.errorMessage = errorMsg;
-
-        await submission.save();
+        await prisma.submission.update({
+          where: { id: submissionId },
+          data: {
+            status: finalStatus,
+            test_cases_passed: passedCount,
+            test_cases_total: testCases.length,
+            execution_time: totalTime,
+            memory_used: maxMemory,
+            error_message: errorMsg || null,
+          },
+        });
         console.log(`Submission ${submissionId} evaluated: ${finalStatus} (${passedCount}/${testCases.length})`);
 
-        // 5. Publish update to Redis channel for Realtime Solo 1vs1 match updates
         await redis.publish(
           REDIS_CHANNELS.SUBMISSION_UPDATES,
           JSON.stringify({
             submissionId,
-            userId: submission.userId,
+            userId: submission.user_id,
             problemId,
             status: finalStatus,
             testCasesPassed: passedCount,
             testCasesTotal: testCases.length,
-            matchId: submission.matchId ?? undefined,
+            matchId: submission.match_id ?? undefined,
           })
         );
       } catch (err: any) {
         console.error(`Error processing job ${job.id}:`, err);
-        // Put submission into runtime error state
         try {
-          await Submission.findByIdAndUpdate(submissionId, {
-            status: 'RE',
-            errorMessage: err.message || 'Unknown runner error',
+          await prisma.submission.update({
+            where: { id: submissionId },
+            data: {
+              status: 'RE',
+              error_message: err.message || 'Unknown runner error',
+            },
           });
         } catch (dbErr) {
           console.error('Failed to update submission on failure state:', dbErr);

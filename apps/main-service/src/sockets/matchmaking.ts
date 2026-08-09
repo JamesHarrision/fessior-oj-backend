@@ -1,5 +1,4 @@
 import { prisma } from '../config/prisma';
-import { Problem } from '../models/problem.model';
 import { MatchStatus, PlayerMatchStatus } from '@prisma/client';
 import { io } from './socket';
 import { SOCKET_EVENTS } from '@ocj/constants';
@@ -48,18 +47,18 @@ export const tryMatchmaking = async () => {
 
 export const startMatch = async (p1: QueuePlayer, p2: QueuePlayer) => {
   try {
-    const problemsCount = await Problem.countDocuments();
+    const problemsCount = await prisma.problem.count();
     if (problemsCount === 0) throw new Error('No problems found in database to match');
     
     const randomIndex = Math.floor(Math.random() * problemsCount);
-    const problem = await Problem.findOne().skip(randomIndex);
+    const problem = await prisma.problem.findFirst({ skip: randomIndex });
     if (!problem) throw new Error('Failed to fetch matched problem');
 
     const match = await prisma.match.create({
       data: {
         player1_id: p1.userId,
         player2_id: p2.userId,
-        problem_id: problem._id.toString(),
+        problem_id: problem.id,
         status: MatchStatus.PENDING,
         participants: {
           create: [
@@ -80,14 +79,18 @@ export const startMatch = async (p1: QueuePlayer, p2: QueuePlayer) => {
     io?.to(roomName).emit(SOCKET_EVENTS.MATCH_FOUND, {
       matchId: match.id,
       problem: {
-        id: problem._id,
+        id: problem.id,
         title: problem.title,
         slug: problem.slug,
         description: problem.description,
         difficulty: problem.difficulty,
-        timeLimit: problem.timeLimit,
-        memoryLimit: problem.memoryLimit,
-        starterCodes: problem.starterCodes,
+        timeLimit: problem.time_limit,
+        memoryLimit: problem.memory_limit,
+        starterCodes: {
+          cpp: problem.starter_code_cpp,
+          java: problem.starter_code_java,
+          python: problem.starter_code_python,
+        },
       },
       player1: { userId: p1.userId, username: p1.username, elo: p1.elo },
       player2: { userId: p2.userId, username: p2.username, elo: p2.elo },

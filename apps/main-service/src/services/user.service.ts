@@ -2,7 +2,30 @@ import * as userRepo from '../repositories/user.repository';
 import * as authRepo from '../repositories/auth.repository';
 import { AppError } from '@ocj/errors';
 import { deleteAvatar, uploadAvatar } from './cloudinary.service';
-import { Submission } from '../models/submission.model';
+import { prisma } from '../config/prisma';
+
+const formatSubmission = (submission: any) => ({
+  id: submission.id,
+  _id: submission.id,
+  userId: submission.user_id,
+  problemId: submission.problem_id,
+  language: submission.language,
+  status: submission.status,
+  executionTime: submission.execution_time,
+  memoryUsed: submission.memory_used,
+  errorMessage: submission.error_message,
+  testCasesPassed: submission.test_cases_passed,
+  testCasesTotal: submission.test_cases_total,
+  createdAt: submission.created_at,
+  problem: submission.problem
+    ? {
+        id: submission.problem.id,
+        title: submission.problem.title,
+        slug: submission.problem.slug,
+        difficulty: submission.problem.difficulty,
+      }
+    : undefined,
+});
 
 export const getMe = async (userId: string) => {
   const user = await userRepo.findUserById(userId);
@@ -57,16 +80,22 @@ export const getUserSubmissions = async (userId: string, page: number = 1, limit
   const skip = (page - 1) * limit;
   
   const [submissions, total] = await Promise.all([
-    Submission.find({ userId })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .populate('problemId', 'title slug difficulty'),
-    Submission.countDocuments({ userId }),
+    prisma.submission.findMany({
+      where: { user_id: userId },
+      orderBy: { created_at: 'desc' },
+      skip,
+      take: limit,
+      include: {
+        problem: {
+          select: { id: true, title: true, slug: true, difficulty: true },
+        },
+      },
+    }),
+    prisma.submission.count({ where: { user_id: userId } }),
   ]);
   
   return {
-    submissions,
+    submissions: submissions.map(formatSubmission),
     pagination: {
       page,
       limit,
@@ -74,10 +103,6 @@ export const getUserSubmissions = async (userId: string, page: number = 1, limit
       totalPages: Math.ceil(total / limit),
     },
   };
-};
-
-export const getUserContests = async (userId: string, page: number = 1, limit: number = 10) => {
-  return await userRepo.getUserContests(userId, page, limit);
 };
 
 export const getUserBadges = async (userId: string) => {
@@ -157,24 +182,31 @@ export const getUserSubmissionsByUsername = async (username: string, page: numbe
   const skip = (page - 1) * limit;
   
   const [submissions, total] = await Promise.all([
-    Submission.find({ 
-      userId: user.id,
-      status: 'ACCEPTED',
-    })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .populate('problemId', 'title slug difficulty')
-      .select('-code'),
-    Submission.countDocuments({ 
-      userId: user.id,
-      status: 'ACCEPTED',
+    prisma.submission.findMany({
+      where: {
+        user_id: user.id,
+        status: 'ACCEPTED',
+      },
+      orderBy: { created_at: 'desc' },
+      skip,
+      take: limit,
+      include: {
+        problem: {
+          select: { id: true, title: true, slug: true, difficulty: true },
+        },
+      },
+    }),
+    prisma.submission.count({
+      where: {
+        user_id: user.id,
+        status: 'ACCEPTED',
+      },
     }),
   ]);
   
   return {
     username: user.username,
-    submissions,
+    submissions: submissions.map(formatSubmission),
     pagination: {
       page,
       limit,

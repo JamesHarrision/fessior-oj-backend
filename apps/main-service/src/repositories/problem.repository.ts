@@ -1,127 +1,163 @@
+import { Difficulty, Prisma } from '@prisma/client';
 import { prisma } from '../config/prisma';
-import { Problem, IProblem } from '../models/problem.model';
-import { Testcase, ITestcase } from '../models/testcase.model';
-import { Submission } from '../models/submission.model';
-import { Difficulty } from '@prisma/client';
+
+type ProblemInput = {
+  title?: string;
+  slug?: string;
+  description?: string;
+  difficulty?: Difficulty;
+  timeLimit?: number;
+  memoryLimit?: number;
+  starterCodes?: {
+    cpp?: string;
+    java?: string;
+    python?: string;
+  };
+  editorialMarkdown?: string;
+  editorialVideoUrl?: string;
+  tags?: string[];
+};
+
+const problemInclude = {
+  tags: {
+    include: {
+      tag: true,
+    },
+  },
+} satisfies Prisma.ProblemInclude;
+
+const formatProblem = (problem: Prisma.ProblemGetPayload<{ include: typeof problemInclude }>) => ({
+  id: problem.id,
+  _id: problem.id,
+  title: problem.title,
+  slug: problem.slug,
+  description: problem.description,
+  difficulty: problem.difficulty,
+  timeLimit: problem.time_limit,
+  memoryLimit: problem.memory_limit,
+  starterCodes: {
+    cpp: problem.starter_code_cpp,
+    java: problem.starter_code_java,
+    python: problem.starter_code_python,
+  },
+  editorialMarkdown: problem.editorial_markdown,
+  editorialVideoUrl: problem.editorial_video_url,
+  createdAt: problem.created_at,
+  updatedAt: problem.updated_at,
+  tags: problem.tags.map((item) => item.tag),
+});
+
+const formatTestcase = (testcase: {
+  id: string;
+  problem_id: string;
+  is_example: boolean;
+  input: string;
+  output: string;
+}) => ({
+  id: testcase.id,
+  _id: testcase.id,
+  problemId: testcase.problem_id,
+  isExample: testcase.is_example,
+  input: testcase.input,
+  output: testcase.output,
+});
+
+const toProblemData = (data: ProblemInput): Prisma.ProblemUpdateInput => {
+  const update: Prisma.ProblemUpdateInput = {};
+
+  if (data.title !== undefined) update.title = data.title;
+  if (data.slug !== undefined) update.slug = data.slug;
+  if (data.description !== undefined) update.description = data.description;
+  if (data.difficulty !== undefined) update.difficulty = data.difficulty;
+  if (data.timeLimit !== undefined) update.time_limit = data.timeLimit;
+  if (data.memoryLimit !== undefined) update.memory_limit = data.memoryLimit;
+  if (data.starterCodes?.cpp !== undefined) update.starter_code_cpp = data.starterCodes.cpp;
+  if (data.starterCodes?.java !== undefined) update.starter_code_java = data.starterCodes.java;
+  if (data.starterCodes?.python !== undefined) update.starter_code_python = data.starterCodes.python;
+  if (data.editorialMarkdown !== undefined) update.editorial_markdown = data.editorialMarkdown;
+  if (data.editorialVideoUrl !== undefined) update.editorial_video_url = data.editorialVideoUrl;
+
+  return update;
+};
 
 export class ProblemRepository {
-  async createProblem(
-    data: Partial<IProblem> & { tags?: string[] }
-  ) {
-    // 1. Save to MongoDB
-    const problem = new Problem({
-      title: data.title,
-      slug: data.slug,
-      description: data.description,
-      difficulty: data.difficulty,
-      timeLimit: data.timeLimit,
-      memoryLimit: data.memoryLimit,
-      starterCodes: data.starterCodes,
-      editorialMarkdown: data.editorialMarkdown,
-      editorialVideoUrl: data.editorialVideoUrl,
-    });
-    await problem.save();
-
-    // 2. Save to MySQL Index
-    await prisma.problemIndex.create({
+  async createProblem(data: ProblemInput & Required<Pick<ProblemInput, 'title' | 'slug' | 'description' | 'difficulty'>>) {
+    const problem = await prisma.problem.create({
       data: {
-        mongo_problem_id: problem._id.toString(),
-        title: problem.title,
-        slug: problem.slug,
-        difficulty: problem.difficulty as Difficulty,
+        title: data.title,
+        slug: data.slug,
+        description: data.description,
+        difficulty: data.difficulty,
+        time_limit: data.timeLimit ?? 2000,
+        memory_limit: data.memoryLimit ?? 256,
+        starter_code_cpp: data.starterCodes?.cpp ?? '',
+        starter_code_java: data.starterCodes?.java ?? '',
+        starter_code_python: data.starterCodes?.python ?? '',
+        editorial_markdown: data.editorialMarkdown,
+        editorial_video_url: data.editorialVideoUrl,
         tags: {
           create: data.tags?.map((tagId) => ({
             tag: { connect: { id: tagId } },
-          })) || [],
+          })) ?? [],
         },
       },
+      include: problemInclude,
     });
 
-    return problem;
+    return formatProblem(problem);
   }
 
-  async updateProblem(
-    mongoId: string,
-    data: Partial<IProblem> & { tags?: string[] }
-  ) {
-    // 1. Update MongoDB
-    const problem = await Problem.findByIdAndUpdate(mongoId, data, { new: true });
-    if (!problem) return null;
+  async updateProblem(problemId: string, data: ProblemInput) {
+    try {
+      const problem = await prisma.$transaction(async (tx) => {
+        if (data.tags) {
+          await tx.problemTag.deleteMany({ where: { problem_id: problemId } });
 
-    // 2. Update MySQL Index
-    await prisma.$transaction(async (tx) => {
-      // Update basic fields
-      await tx.problemIndex.update({
-        where: { mongo_problem_id: mongoId },
-        data: {
-          title: problem.title,
-          slug: problem.slug,
-          difficulty: problem.difficulty as Difficulty,
-        },
+          if (data.tags.length > 0) {
+            await tx.problemTag.createMany({
+              data: data.tags.map((tagId) => ({
+                problem_id: problemId,
+                tag_id: tagId,
+              })),
+            });
+          }
+        }
+
+        return tx.problem.update({
+          where: { id: problemId },
+          data: toProblemData(data),
+          include: problemInclude,
+        });
       });
 
-      // Update tags if provided
-      if (data.tags) {
-        // Delete existing tag links
-        await tx.problemIndexTag.deleteMany({
-          where: { mongo_problem_id: mongoId },
-        });
-
-        // Insert new tag links
-        if (data.tags.length > 0) {
-          await tx.problemIndexTag.createMany({
-            data: data.tags.map((tagId) => ({
-              mongo_problem_id: mongoId,
-              tag_id: tagId,
-            })),
-          });
-        }
-      }
-    });
-
-    return problem;
-  }
-
-  async deleteProblem(mongoId: string) {
-    // 1. Delete MongoDB Problem & Testcases
-    await Problem.findByIdAndDelete(mongoId);
-    await Testcase.deleteMany({ problemId: mongoId });
-
-    // 2. Delete MySQL Index (cascade will handle problemIndexTags if configured, otherwise handle manually)
-    // In our Prisma schema, onDelete: Cascade is set for problemIndexTags relation to problem
-    await prisma.problemIndex.delete({
-      where: { mongo_problem_id: mongoId },
-    });
-
-    return true;
-  }
-
-  async getProblemBySlug(slug: string) {
-    let query: any = { slug };
-    // Mongoose ObjectId is 24 hex characters
-    if (/^[0-9a-fA-F]{24}$/.test(slug)) {
-      query = { $or: [{ slug }, { _id: slug }] };
+      return formatProblem(problem);
+    } catch (error: any) {
+      if (error?.code === 'P2025') return null;
+      throw error;
     }
-    const problem = await Problem.findOne(query);
-    if (!problem) return null;
+  }
 
-    // Fetch tags from SQL
-    const indexEntry = await prisma.problemIndex.findUnique({
-      where: { mongo_problem_id: problem._id.toString() },
-      include: {
-        tags: {
-          include: {
-            tag: true,
-          },
-        },
+  async deleteProblem(problemId: string) {
+    try {
+      await prisma.problem.delete({
+        where: { id: problemId },
+      });
+      return true;
+    } catch (error: any) {
+      if (error?.code === 'P2025') return false;
+      throw error;
+    }
+  }
+
+  async getProblemBySlug(slugOrId: string) {
+    const problem = await prisma.problem.findFirst({
+      where: {
+        OR: [{ slug: slugOrId }, { id: slugOrId }],
       },
+      include: problemInclude,
     });
 
-    const tags = indexEntry?.tags.map((t) => t.tag) || [];
-    return {
-      ...problem.toObject(),
-      tags,
-    };
+    return problem ? formatProblem(problem) : null;
   }
 
   async getProblemsList(filters: {
@@ -134,7 +170,7 @@ export class ProblemRepository {
     const { difficulty, tagSlug, page, limit, userId } = filters;
     const skip = (page - 1) * limit;
 
-    const whereClause: any = {};
+    const whereClause: Prisma.ProblemWhereInput = {};
     if (difficulty) {
       whereClause.difficulty = difficulty;
     }
@@ -149,71 +185,65 @@ export class ProblemRepository {
     }
 
     const [total, items] = await prisma.$transaction([
-      prisma.problemIndex.count({ where: whereClause }),
-      prisma.problemIndex.findMany({
+      prisma.problem.count({ where: whereClause }),
+      prisma.problem.findMany({
         where: whereClause,
         skip,
         take: limit,
         orderBy: { created_at: 'desc' },
-        include: {
-          tags: {
-            include: {
-              tag: true,
-            },
-          },
-        },
+        include: problemInclude,
       }),
     ]);
 
-    const problemIds = items.map(item => item.mongo_problem_id);
+    const problemIds = items.map((item) => item.id);
+    const submissionStats = problemIds.length
+      ? await prisma.submission.groupBy({
+          by: ['problem_id', 'status'],
+          where: { problem_id: { in: problemIds } },
+          _count: { _all: true },
+        })
+      : [];
 
-    // Aggregate submissions for acceptance rate
-    const submissionStats = await Submission.aggregate([
-      { $match: { problemId: { $in: problemIds.map(id => new (require('mongoose')).Types.ObjectId(id)) } } },
-      { $group: {
-          _id: "$problemId",
-          totalSubmissions: { $sum: 1 },
-          acceptedSubmissions: {
-            $sum: { $cond: [{ $eq: ["$status", "ACCEPTED"] }, 1, 0] }
-          }
-      }}
-    ]);
+    const statsMap = new Map<string, { totalSubmissions: number; acceptedSubmissions: number }>();
+    for (const stat of submissionStats) {
+      const current = statsMap.get(stat.problem_id) ?? { totalSubmissions: 0, acceptedSubmissions: 0 };
+      current.totalSubmissions += stat._count._all;
+      if (stat.status === 'ACCEPTED') {
+        current.acceptedSubmissions += stat._count._all;
+      }
+      statsMap.set(stat.problem_id, current);
+    }
 
-    const statsMap = new Map();
-    submissionStats.forEach(stat => {
-      const accRate = stat.totalSubmissions > 0 
-        ? Math.round((stat.acceptedSubmissions / stat.totalSubmissions) * 100) 
-        : 0;
-      statsMap.set(stat._id.toString(), {
-        acceptanceRate: accRate,
-        totalSubmissions: stat.totalSubmissions
-      });
-    });
-
-    // Check if current user has solved these problems
     let userSolvedSet = new Set<string>();
-    if (userId) {
-      const userSolved = await Submission.find({
-        userId,
-        problemId: { $in: problemIds },
-        status: "ACCEPTED"
-      }).select('problemId');
-      
-      userSolved.forEach(sub => userSolvedSet.add(sub.problemId.toString()));
+    if (userId && problemIds.length > 0) {
+      const userSolved = await prisma.submission.findMany({
+        where: {
+          user_id: userId,
+          problem_id: { in: problemIds },
+          status: 'ACCEPTED',
+        },
+        select: { problem_id: true },
+      });
+
+      userSolvedSet = new Set(userSolved.map((submission) => submission.problem_id));
     }
 
     const formattedItems = items.map((item) => {
-      const stats = statsMap.get(item.mongo_problem_id) || { acceptanceRate: 0, totalSubmissions: 0 };
+      const stats = statsMap.get(item.id) ?? { acceptedSubmissions: 0, totalSubmissions: 0 };
+      const acceptanceRate = stats.totalSubmissions > 0
+        ? Math.round((stats.acceptedSubmissions / stats.totalSubmissions) * 100)
+        : 0;
+
       return {
-        id: item.mongo_problem_id,
+        id: item.id,
         title: item.title,
         slug: item.slug,
         difficulty: item.difficulty,
         created_at: item.created_at,
-        tags: item.tags.map((t) => t.tag),
-        acceptanceRate: stats.acceptanceRate,
+        tags: item.tags.map((tag) => tag.tag),
+        acceptanceRate,
         totalSubmissions: stats.totalSubmissions,
-        isSolved: userSolvedSet.has(item.mongo_problem_id)
+        isSolved: userSolvedSet.has(item.id),
       };
     });
 
@@ -225,27 +255,42 @@ export class ProblemRepository {
     };
   }
 
-  // Testcase Management
   async addTestcase(problemId: string, data: { isExample: boolean; input: string; output: string }) {
-    const testcase = new Testcase({
-      problemId,
-      isExample: data.isExample,
-      input: data.input,
-      output: data.output,
+    const testcase = await prisma.testcase.create({
+      data: {
+        problem_id: problemId,
+        is_example: data.isExample,
+        input: data.input,
+        output: data.output,
+      },
     });
-    return await testcase.save();
+
+    return formatTestcase(testcase);
   }
 
-  async getTestcases(problemId: string, excludeHidden = false) {
-    const query: any = { problemId };
-    if (excludeHidden) {
-      query.isExample = true;
-    }
-    return await Testcase.find(query);
+  async getTestcases(problemId: string, isExampleOnly = false) {
+    const testcases = await prisma.testcase.findMany({
+      where: {
+        problem_id: problemId,
+        ...(isExampleOnly ? { is_example: true } : {}),
+      },
+      orderBy: { id: 'asc' },
+    });
+
+    return testcases.map(formatTestcase);
   }
 
   async deleteTestcase(testcaseId: string) {
-    return await Testcase.findByIdAndDelete(testcaseId);
+    try {
+      const testcase = await prisma.testcase.delete({
+        where: { id: testcaseId },
+      });
+      return formatTestcase(testcase);
+    } catch (error: any) {
+      if (error?.code === 'P2025') return null;
+      throw error;
+    }
   }
 }
+
 export const problemRepository = new ProblemRepository();

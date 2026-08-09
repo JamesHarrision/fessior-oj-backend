@@ -31,10 +31,10 @@ export class ProblemService {
     let slug = this.slugify(data.title);
     
     // Check slug collision
-    const existingIndex = await prisma.problemIndex.findUnique({
+    const existingProblem = await prisma.problem.findUnique({
       where: { slug },
     });
-    if (existingIndex) {
+    if (existingProblem) {
       slug = `${slug}-${Date.now().toString().slice(-4)}`;
     }
 
@@ -45,7 +45,7 @@ export class ProblemService {
   }
 
   async updateProblem(
-    mongoId: string,
+    problemId: string,
     data: {
       title?: string;
       description?: string;
@@ -62,27 +62,27 @@ export class ProblemService {
     
     if (data.title) {
       let slug = this.slugify(data.title);
-      const existingIndex = await prisma.problemIndex.findFirst({
+      const existingProblem = await prisma.problem.findFirst({
         where: {
           slug,
-          NOT: { mongo_problem_id: mongoId },
+          NOT: { id: problemId },
         },
       });
-      if (existingIndex) {
+      if (existingProblem) {
         slug = `${slug}-${Date.now().toString().slice(-4)}`;
       }
       updateData.slug = slug;
     }
 
-    const problem = await problemRepository.updateProblem(mongoId, updateData);
+    const problem = await problemRepository.updateProblem(problemId, updateData);
     if (!problem) {
       throw new AppError('Problem not found', 404);
     }
     return problem;
   }
 
-  async deleteProblem(mongoId: string) {
-    const deleted = await problemRepository.deleteProblem(mongoId);
+  async deleteProblem(problemId: string) {
+    const deleted = await problemRepository.deleteProblem(problemId);
     if (!deleted) {
       throw new AppError('Problem not found', 404);
     }
@@ -136,21 +136,20 @@ export class ProblemService {
   // Testcase Management
   async addTestcase(problemId: string, isExample: boolean, input: string, output: string) {
     const problem = await problemRepository.getProblemBySlug(problemId); // checks if exists
-    const mongoId = problem ? problem._id.toString() : problemId; // slug or ID
-    
-    // Check if mongoId is valid objectId representation
-    let realMongoId = mongoId;
-    if (problem) {
-      realMongoId = problem._id.toString();
+    if (!problem) {
+      throw new AppError('Problem not found', 404);
     }
-    
-    return await problemRepository.addTestcase(realMongoId, { isExample, input, output });
+
+    return await problemRepository.addTestcase(problem.id, { isExample, input, output });
   }
 
   async getTestcases(problemId: string, isExampleOnly = false) {
     const problem = await problemRepository.getProblemBySlug(problemId);
-    const realMongoId = problem ? problem._id.toString() : problemId;
-    return await problemRepository.getTestcases(realMongoId, isExampleOnly);
+    if (!problem) {
+      throw new AppError('Problem not found', 404);
+    }
+
+    return await problemRepository.getTestcases(problem.id, isExampleOnly);
   }
 
   async deleteTestcase(testcaseId: string) {

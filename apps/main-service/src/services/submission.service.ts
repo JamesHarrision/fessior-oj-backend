@@ -1,13 +1,55 @@
-import { Problem } from '../models/problem.model';
-import { Submission } from '../models/submission.model';
-import { Testcase } from '../models/testcase.model';
-import { submissionQueue } from '../config/queue';
-import { AppError } from '@ocj/errors';
-import mongoose from 'mongoose';
-import { executeTestCase, LANGUAGE_IDS, LanguageKey } from '@ocj/executor';
+import { ProgrammingLanguage } from '@prisma/client';
 import { DEFAULT_LIMITS } from '@ocj/constants';
+import { executeTestCase, LANGUAGE_IDS, LanguageKey } from '@ocj/executor';
+import { AppError } from '@ocj/errors';
+import { prisma } from '../config/prisma';
+import { submissionQueue } from '../config/queue';
+
+const problemSelect = {
+  id: true,
+  title: true,
+  slug: true,
+  difficulty: true,
+  time_limit: true,
+};
+
+const formatSubmission = (submission: any) => ({
+  id: submission.id,
+  _id: submission.id,
+  userId: submission.user_id,
+  problemId: submission.problem_id,
+  code: submission.code,
+  language: submission.language,
+  status: submission.status,
+  executionTime: submission.execution_time,
+  memoryUsed: submission.memory_used,
+  errorMessage: submission.error_message,
+  testCasesPassed: submission.test_cases_passed,
+  testCasesTotal: submission.test_cases_total,
+  aiFeedback: submission.ai_feedback,
+  matchId: submission.match_id,
+  createdAt: submission.created_at,
+  updatedAt: submission.updated_at,
+  problem: submission.problem
+    ? {
+        id: submission.problem.id,
+        title: submission.problem.title,
+        slug: submission.problem.slug,
+        difficulty: submission.problem.difficulty,
+      }
+    : undefined,
+});
 
 export class SubmissionService {
+  private async findProblem(slugOrId: string) {
+    return prisma.problem.findFirst({
+      where: {
+        OR: [{ id: slugOrId }, { slug: slugOrId }],
+      },
+      select: problemSelect,
+    });
+  }
+
   async submit(
     userId: string,
     data: {
@@ -15,63 +57,55 @@ export class SubmissionService {
       code: string;
       language: 'cpp' | 'java' | 'python';
       matchId?: string;
-      contestId?: string;
     }
   ) {
-    // 1. Find problem by Mongo ObjectId or slug
-    let problem = null;
-    if (mongoose.Types.ObjectId.isValid(data.problemId)) {
-      problem = await Problem.findById(data.problemId);
-    }
-    if (!problem) {
-      problem = await Problem.findOne({ slug: data.problemId });
-    }
-
+    const problem = await this.findProblem(data.problemId);
     if (!problem) {
       throw new AppError('Problem not found', 404);
     }
 
-    // 2. Create submission in MongoDB
-    const submission = new Submission({
-      userId,
-      problemId: problem._id,
-      code: data.code,
-      language: data.language,
-      status: 'PENDING',
-      testCasesPassed: 0,
-      testCasesTotal: 0,
-      matchId: data.matchId ?? null,
-      contestId: data.contestId ?? null,
+    const submission = await prisma.submission.create({
+      data: {
+        user_id: userId,
+        problem_id: problem.id,
+        code: data.code,
+        language: data.language as ProgrammingLanguage,
+        status: 'PENDING',
+        test_cases_passed: 0,
+        test_cases_total: 0,
+        match_id: data.matchId ?? null,
+      },
     });
-    await submission.save();
 
-    // 3. Add to BullMQ Queue
     await submissionQueue.add('submission-job', {
-      submissionId: submission._id.toString(),
+      submissionId: submission.id,
       code: submission.code,
       language: submission.language,
-      problemId: problem._id.toString(),
+      problemId: problem.id,
     });
 
-    return submission;
+    return formatSubmission(submission);
   }
 
   async getSubmissionDetails(submissionId: string, userId: string, isAdmin = false) {
-    if (!mongoose.Types.ObjectId.isValid(submissionId)) {
-      throw new AppError('Invalid submission ID format', 400);
-    }
+    const submission = await prisma.submission.findUnique({
+      where: { id: submissionId },
+      include: {
+        problem: {
+          select: problemSelect,
+        },
+      },
+    });
 
-    const submission = await Submission.findById(submissionId).populate('problemId', 'title slug difficulty');
     if (!submission) {
       throw new AppError('Submission not found', 404);
     }
 
-    // Security check: Only the author or an Admin can view details of a submission
-    if (submission.userId !== userId && !isAdmin) {
+    if (submission.user_id !== userId && !isAdmin) {
       throw new AppError('Forbidden: Access denied to this submission', 403);
     }
 
-    return submission;
+    return formatSubmission(submission);
   }
 
   async getUserSubmissions(
@@ -86,25 +120,37 @@ export class SubmissionService {
     const limit = filters.limit || 10;
     const skip = (page - 1) * limit;
 
-    const query: any = { userId };
-    if (filters.problemId && mongoose.Types.ObjectId.isValid(filters.problemId)) {
-      query.problemId = new mongoose.Types.ObjectId(filters.problemId);
+    let problemId = filters.problemId;
+    if (problemId) {
+      const problem = await this.findProblem(problemId);
+      problemId = problem?.id ?? problemId;
     }
 
-    const [total, items] = await Promise.all([
-      Submission.countDocuments(query),
-      Submission.find(query)
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit)
-        .populate('problemId', 'title slug difficulty'),
+    const where = {
+      user_id: userId,
+      ...(problemId ? { problem_id: problemId } : {}),
+    };
+
+    const [total, items] = await prisma.$transaction([
+      prisma.submission.count({ where }),
+      prisma.submission.findMany({
+        where,
+        orderBy: { created_at: 'desc' },
+        skip,
+        take: limit,
+        include: {
+          problem: {
+            select: problemSelect,
+          },
+        },
+      }),
     ]);
 
     return {
       total,
       page,
       limit,
-      items,
+      items: items.map(formatSubmission),
     };
   }
 
@@ -119,39 +165,35 @@ export class SubmissionService {
     const judge0Url = process.env.JUDGE0_URL || `https://${rapidApiHost}`;
     const languageId = LANGUAGE_IDS[data.language as LanguageKey] || 71;
 
-    let testcasesToRun: Array<{ input: string; output: string; isExample: boolean }> = [];
-    let problem: any = null;
+    let testcasesToRun: Array<{ input: string; output: string; is_example: boolean }> = [];
+    let problem: Awaited<ReturnType<SubmissionService['findProblem']>> = null;
 
     if (data.problemId) {
-      // ── Has problem context: fetch problem + testcases ──
-      if (mongoose.Types.ObjectId.isValid(data.problemId)) {
-        problem = await Problem.findById(data.problemId);
-      }
-      if (!problem) {
-        problem = await Problem.findOne({ slug: data.problemId });
-      }
+      problem = await this.findProblem(data.problemId);
       if (!problem) {
         throw new AppError('Problem not found', 404);
       }
 
       if (data.customInput !== undefined && data.customInput !== null) {
-        testcasesToRun = [{ input: data.customInput, output: '', isExample: false }];
+        testcasesToRun = [{ input: data.customInput, output: '', is_example: false }];
       } else {
-        testcasesToRun = await Testcase.find({ problemId: problem._id, isExample: true });
+        testcasesToRun = await prisma.testcase.findMany({
+          where: { problem_id: problem.id, is_example: true },
+          orderBy: { id: 'asc' },
+        });
         if (testcasesToRun.length === 0) {
-          testcasesToRun = [{ input: '', output: '', isExample: true }];
+          testcasesToRun = [{ input: '', output: '', is_example: true }];
         }
       }
     } else {
-      // ── No problem context (playground/sandbox): run with custom input or empty ──
       testcasesToRun = [
-        { input: data.customInput ?? '', output: '', isExample: false },
+        { input: data.customInput ?? '', output: '', is_example: false },
       ];
     }
 
     const results = [];
     for (const tc of testcasesToRun) {
-      const timeLimit = problem?.timeLimit ?? DEFAULT_LIMITS.TIME_LIMIT_MS;
+      const timeLimit = problem?.time_limit ?? DEFAULT_LIMITS.TIME_LIMIT_MS;
       const result = await executeTestCase(
         data.code,
         languageId,
@@ -165,7 +207,6 @@ export class SubmissionService {
         }
       );
       let finalStatus = result.status;
-      // For custom input, we don't have expected output to compare, so any successful run without crashes is "ACCEPTED".
       if (data.customInput !== undefined && !['CE', 'RE', 'TLE'].includes(finalStatus)) {
         finalStatus = 'ACCEPTED';
       }

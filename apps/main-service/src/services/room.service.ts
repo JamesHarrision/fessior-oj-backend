@@ -1,6 +1,5 @@
 import { roomRepository } from '../repositories/room.repository';
 import { CustomRoomStatus, Difficulty, MatchStatus, PlayerMatchStatus } from '@prisma/client';
-import { Problem } from '../models/problem.model';
 import { prisma } from '../config/prisma';
 import { io } from '../sockets/socket';
 import { SOCKET_EVENTS } from '@ocj/constants';
@@ -42,7 +41,9 @@ export class RoomService {
     }
 
     if (data.problemId) {
-      const problem = await Problem.findById(data.problemId);
+      const problem = await prisma.problem.findUnique({
+        where: { id: data.problemId },
+      });
       if (!problem) {
         throw new Error('Problem not found');
       }
@@ -161,19 +162,28 @@ export class RoomService {
       if (room.difficulty) {
         query.difficulty = room.difficulty;
       }
-      const count = await Problem.countDocuments(query);
+      const count = await prisma.problem.count({ where: query });
       if (count === 0) {
-        const fallbackCount = await Problem.countDocuments();
+        const fallbackCount = await prisma.problem.count();
         if (fallbackCount === 0) {
           throw new Error('No problems available for match');
         }
         const randomIndex = Math.floor(Math.random() * fallbackCount);
-        const randomProblemList = await Problem.find().skip(randomIndex).limit(1);
-        problemId = randomProblemList[0]?._id.toString() as string;
+        const randomProblemList = await prisma.problem.findMany({
+          skip: randomIndex,
+          take: 1,
+          select: { id: true },
+        });
+        problemId = randomProblemList[0]?.id as string;
       } else {
         const randomIndex = Math.floor(Math.random() * count);
-        const problemList = await Problem.find(query).skip(randomIndex).limit(1);
-        problemId = problemList[0]?._id.toString() as string;
+        const problemList = await prisma.problem.findMany({
+          where: query,
+          skip: randomIndex,
+          take: 1,
+          select: { id: true },
+        });
+        problemId = problemList[0]?.id as string;
       }
     }
 

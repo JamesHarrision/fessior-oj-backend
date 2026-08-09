@@ -5,5 +5,4 @@ export const submitCodeSchema = z.object({
   code: z.string().min(10, 'Code must be at least 10 characters long'),
   language: z.enum(['cpp', 'java', 'python']),
   matchId: z.string().optional(),
-  contestId: z.string().optional(),
 });

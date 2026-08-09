@@ -1,11 +1,9 @@
 import './config/env';
 
-import { connectMongoDB } from './config/mongoose';
 import { startSubmissionWorker } from './workers/submission.worker';
 
 const bootstrap = async () => {
   console.log('Starting Worker Service...');
-  await connectMongoDB();
   startSubmissionWorker();
 };
 

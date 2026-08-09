@@ -39,8 +39,7 @@ model User {
   custom_rooms_created       CustomRoom[]            @relation("Creator")
   custom_room_participations CustomRoomParticipant[]
   match_participations       MatchParticipant[]
-  AiHistory                  AiHistory[]
-  news_authored              News[]
+  submissions                Submission[]
 
   @@map("users")
 }
@@ -147,7 +146,7 @@ model Match {
   id             String            @id @default(uuid()) @db.VarChar(36)
   player1_id     String?           @db.VarChar(36) // Keep optional for backward compatibility
   player2_id     String?           @db.VarChar(36) // Keep optional for backward compatibility
-  problem_id     String            @db.VarChar(24)
+  problem_id     String            @db.VarChar(36)
   winner_id      String?           @db.VarChar(36)
   status         MatchStatus       @default(PENDING)
   player1_status PlayerMatchStatus @default(CODING)
@@ -197,7 +196,7 @@ model Tag {
   slug       String            @unique @db.VarChar(100)
   color      String?           @db.VarChar(7)
   user_stats UserTagStat[]
-  problems   ProblemIndexTag[]
+  problem_tags ProblemTag[]
 
   @@map("tags")
 }
@@ -214,32 +213,101 @@ model UserTagStat {
   @@map("user_tag_stats")
 }
 
-model ProblemIndex {
-  mongo_problem_id String            @id @db.VarChar(24)
-  title            String            @db.VarChar(255)
-  slug             String            @unique @db.VarChar(255)
-  difficulty       Difficulty
-  created_at       DateTime          @default(now())
-  tags             ProblemIndexTag[]
-
-  @@map("problem_index")
-}
-
-model ProblemIndexTag {
-  mongo_problem_id String @db.VarChar(24)
-  tag_id           String @db.VarChar(36)
-
-  problem ProblemIndex @relation(fields: [mongo_problem_id], references: [mongo_problem_id], onDelete: Cascade)
-  tag     Tag          @relation(fields: [tag_id], references: [id], onDelete: Cascade)
-
-  @@id([mongo_problem_id, tag_id])
-  @@map("problem_index_tags")
-}
-
 enum Difficulty {
   EASY
   MEDIUM
   HARD
+}
+
+enum ProgrammingLanguage {
+  cpp
+  java
+  python
+}
+
+enum SubmissionStatus {
+  PENDING
+  PROCESSING
+  ACCEPTED
+  WA
+  TLE
+  MLE
+  RE
+  CE
+}
+
+model Problem {
+  id                  String       @id @default(uuid()) @db.VarChar(36)
+  title               String       @db.VarChar(255)
+  slug                String       @unique @db.VarChar(255)
+  description         String       @db.Text
+  difficulty          Difficulty
+  time_limit          Int          @default(2000)
+  memory_limit        Int          @default(256)
+  starter_code_cpp    String       @db.Text
+  starter_code_java   String       @db.Text
+  starter_code_python String       @db.Text
+  editorial_markdown  String?      @db.Text
+  editorial_video_url String?      @db.VarChar(500)
+  created_at          DateTime     @default(now())
+  updated_at          DateTime     @updatedAt
+
+  tags        ProblemTag[]
+  testcases   Testcase[]
+  submissions Submission[]
+
+  @@map("problems")
+}
+
+model ProblemTag {
+  problem_id String @db.VarChar(36)
+  tag_id     String @db.VarChar(36)
+
+  problem Problem @relation(fields: [problem_id], references: [id], onDelete: Cascade)
+  tag     Tag     @relation(fields: [tag_id], references: [id], onDelete: Cascade)
+
+  @@id([problem_id, tag_id])
+  @@map("problem_tags")
+}
+
+model Testcase {
+  id         String  @id @default(uuid()) @db.VarChar(36)
+  problem_id String @db.VarChar(36)
+  is_example Boolean @default(false)
+  input      String  @db.Text
+  output     String  @db.Text
+
+  problem Problem @relation(fields: [problem_id], references: [id], onDelete: Cascade)
+
+  @@index([problem_id])
+  @@map("testcases")
+}
+
+model Submission {
+  id                String              @id @default(uuid()) @db.VarChar(36)
+  user_id           String              @db.VarChar(36)
+  problem_id        String              @db.VarChar(36)
+  code              String              @db.LongText
+  language          ProgrammingLanguage
+  status            SubmissionStatus    @default(PENDING)
+  execution_time    Float?
+  memory_used       Int?
+  error_message     String?             @db.Text
+  test_cases_passed Int                 @default(0)
+  test_cases_total  Int                 @default(0)
+  ai_feedback       String?             @db.Text
+  match_id          String?             @db.VarChar(36)
+  created_at        DateTime            @default(now())
+  updated_at        DateTime            @updatedAt
+
+  user    User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  problem Problem @relation(fields: [problem_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([problem_id])
+  @@index([status])
+  @@index([match_id])
+  @@map("submissions")
 }
 
 // 1. Custom Rooms
@@ -253,7 +321,7 @@ model CustomRoom {
   id               String           @id @default(uuid()) @db.VarChar(36)
   room_code        String           @unique @db.VarChar(20)
   creator_id       String           @db.VarChar(36)
-  problem_id       String?          @db.VarChar(24)
+  problem_id       String?          @db.VarChar(36)
   difficulty       Difficulty?
   time_limit       Int?             @default(2000)
   memory_limit     Int?             @default(256)
@@ -281,54 +349,6 @@ model CustomRoomParticipant {
 
   @@unique([room_id, user_id])
   @@map("custom_room_participants")
-}
-
-// 2. Contests
-enum ContestStatus {
-  UPCOMING
-  REGISTRATION
-  ONGOING
-  ENDED
-  RESULTS
-}
-
-model Contest {
-  id          String        @id @default(uuid()) @db.VarChar(36)
-  title       String        @db.VarChar(255)
-  description String?       @db.Text
-  start_time  DateTime
-  end_time    DateTime
-  status      ContestStatus @default(UPCOMING)
-  created_at  DateTime      @default(now())
-  updated_at  DateTime      @updatedAt
-
-  problems      ContestProblem[]
-  registrations ContestRegistration[]
-
-  @@map("contests")
-}
-
-model ContestProblem {
-  contest_id       String @db.VarChar(36)
-  mongo_problem_id String @db.VarChar(24)
-  points           Int    @default(100)
-  order            Int    @default(0)
-
-  contest Contest @relation(fields: [contest_id], references: [id], onDelete: Cascade)
-
-  @@id([contest_id, mongo_problem_id])
-  @@map("contest_problems")
-}
-
-model ContestRegistration {
-  contest_id    String   @db.VarChar(36)
-  user_id       String   @db.VarChar(36)
-  registered_at DateTime @default(now())
-
-  contest Contest @relation(fields: [contest_id], references: [id], onDelete: Cascade)
-
-  @@id([contest_id, user_id])
-  @@map("contest_registrations")
 }
 
 // 3. Comments & Discussions
@@ -360,124 +380,3 @@ model CommentLike {
   @@map("comment_likes")
 }
 
-// 4. Social & Friends
-enum FriendshipStatus {
-  PENDING
-  ACCEPTED
-}
-
-model Friendship {
-  id          String           @id @default(uuid()) @db.VarChar(36)
-  sender_id   String           @db.VarChar(36)
-  receiver_id String           @db.VarChar(36)
-  status      FriendshipStatus @default(PENDING)
-  created_at  DateTime         @default(now())
-  updated_at  DateTime         @updatedAt
-
-  @@unique([sender_id, receiver_id])
-  @@map("friendships")
-}
-
-model Block {
-  blocker_id String   @db.VarChar(36)
-  blocked_id String   @db.VarChar(36)
-  created_at DateTime @default(now())
-
-  @@id([blocker_id, blocked_id])
-  @@map("blocks")
-}
-
-// 5. Shop & Inventory
-model ShopItem {
-  id          String   @id @default(uuid()) @db.VarChar(36)
-  name        String   @db.VarChar(100)
-  description String?  @db.VarChar(500)
-  price       Int
-  item_type   String   @db.VarChar(50) // e.g. AVATAR_FRAME, THEME
-  asset_url   String   @db.VarChar(500)
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-
-  inventories InventoryItem[]
-
-  @@map("shop_items")
-}
-
-model InventoryItem {
-  id          String   @id @default(uuid()) @db.VarChar(36)
-  user_id     String   @db.VarChar(36)
-  item_id     String   @db.VarChar(36)
-  is_equipped Boolean  @default(false)
-  acquired_at DateTime @default(now())
-
-  item ShopItem @relation(fields: [item_id], references: [id], onDelete: Cascade)
-
-  @@unique([user_id, item_id])
-  @@map("inventory_items")
-}
-
-// 6. Notifications
-model Notification {
-  id         String   @id @default(uuid()) @db.VarChar(36)
-  user_id    String   @db.VarChar(36)
-  title      String   @db.VarChar(255)
-  content    String   @db.VarChar(500)
-  type       String   @db.VarChar(50)
-  is_read    Boolean  @default(false)
-  data       String?  @db.Text
-  created_at DateTime @default(now())
-
-  @@map("notifications")
-}
-
-// 7. Reports
-enum ReportStatus {
-  PENDING
-  RESOLVED
-  REJECTED
-}
-
-model Report {
-  id               String       @id @default(uuid()) @db.VarChar(36)
-  user_id          String       @db.VarChar(36)
-  reported_user_id String?      @db.VarChar(36)
-  problem_id       String?      @db.VarChar(24)
-  type             String       @db.VarChar(50) // BUG, TYPO, CHEATING, OTHERS
-  content          String       @db.Text
-  status           ReportStatus @default(PENDING)
-  created_at       DateTime     @default(now())
-  updated_at       DateTime     @updatedAt
-
-  @@map("reports")
-}
-
-// 8. AI History
-model AiHistory {
-  id         String   @id @default(uuid()) @db.VarChar(36)
-  user_id    String   @db.VarChar(36)
-  type       String   @db.VarChar(50) // ROADMAP, INTERVIEW
-  input      String   @db.Text
-  output     String   @db.Text
-  created_at DateTime @default(now())
-
-  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@index([user_id])
-  @@index([created_at])
-  @@map("ai_histories")
-}
-
-// 9. News / Announcements
-model News {
-  id         String   @id @default(uuid()) @db.VarChar(36)
-  title      String   @db.VarChar(255)
-  content    String   @db.Text
-  author_id  String   @db.VarChar(36)
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  author User @relation(fields: [author_id], references: [id], onDelete: Cascade)
-
-  @@index([created_at])
-  @@map("news")
-}
