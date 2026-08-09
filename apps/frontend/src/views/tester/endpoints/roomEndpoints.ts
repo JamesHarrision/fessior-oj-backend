@@ -10,7 +10,7 @@ export const roomEndpoints: ApiEndpoint[] = [
     description: 'Tạo phòng thi đấu tùy chỉnh (Yêu cầu Token)',
     requiresAuth: true,
     defaultBody: JSON.stringify({
-      problemId: 'mongodb-problem-object-id', // Tùy chọn (Nếu chọn sẵn bài)
+      problemId: 'problem-uuid', // Tùy chọn (Nếu chọn sẵn bài)
       difficulty: 'MEDIUM' // EASY | MEDIUM | HARD (Bắt buộc nếu không chọn problemId)
     }, null, 2)
   },
@@ -65,7 +65,7 @@ export const roomEndpoints: ApiEndpoint[] = [
     pathParams: ['roomId'],
     defaultBody: JSON.stringify({
       difficulty: 'HARD',
-      problemId: 'mongodb-problem-object-id'
+      problemId: 'problem-uuid'
     }, null, 2)
   },
   {

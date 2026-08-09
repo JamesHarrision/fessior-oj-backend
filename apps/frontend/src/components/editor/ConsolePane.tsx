@@ -126,7 +126,7 @@ export const ConsolePane: React.FC<ConsolePaneProps> = ({
             <Play size={12} />
             <span>{isRunning ? 'Đang chạy...' : 'Chạy thử'}</span>
           </button>
-        {/* Submit — hidden when no problem context (playground/contest) */}
+        {/* Submit is hidden when no problem context is available. */}
         {showSubmit && (
           <button
             className="bg-vermilion text-linen font-display text-[11px] font-bold uppercase tracking-wider px-3.5 py-1.5 hover:bg-vermilion-hover transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"

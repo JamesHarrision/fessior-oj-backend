@@ -4,15 +4,11 @@ import { api } from '../services/api';
 import {
   Settings,
   FileText,
-  ShieldAlert,
   Shield,
   FileCode,
   Trophy,
   Users,
-  Sparkles,
   MessageSquare,
-  ShoppingBag,
-  Bell,
   Activity,
   X,
   Beaker
@@ -23,17 +19,11 @@ import { AdminProblemsTab } from '../components/admin/AdminProblemsTab';
 import { AdminSubmissionsTab } from '../components/admin/AdminSubmissionsTab';
 import { AdminMatchesTab } from '../components/admin/AdminMatchesTab';
 import { AdminRoomsTab } from '../components/admin/AdminRoomsTab';
-import { AdminAiTab } from '../components/admin/AdminAiTab';
 import { AdminCommentsTab } from '../components/admin/AdminCommentsTab';
-import { AdminFriendsTab } from '../components/admin/AdminFriendsTab';
-import { AdminShopTab } from '../components/admin/AdminShopTab';
 import { AdminLeaderboardTab } from '../components/admin/AdminLeaderboardTab';
-import { AdminNotificationsTab } from '../components/admin/AdminNotificationsTab';
-import { AdminReportsTab } from '../components/admin/AdminReportsTab';
-import { AdminNewsTab } from '../components/admin/AdminNewsTab';
 import { ApiTesterView } from './tester/ApiTesterView';
 
-import type { IProblem, IReport, ProblemDifficulty } from '@ocj/types';
+import type { IProblem, ProblemDifficulty } from '@ocj/types';
 
 interface AdminDashboardProps {
   currentSubView: string;
@@ -48,7 +38,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentSubView, 
 
   // Lists
   const [problems, setProblems] = useState<IProblem[]>([]);
-  const [reports, setReports] = useState<IReport[]>([]);
 
   // Create form states
   const [probTitle, setProbTitle] = useState('');
@@ -60,9 +49,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentSubView, 
       if (activeTab === 'problems') {
         const res = await api.getProblems();
         setProblems(Array.isArray(res.data) ? res.data : (res.data.items || []));
-      } else if (activeTab === 'reports') {
-        const res = await api.getReports();
-        setReports(res.data?.items || []);
       }
     } catch (err) {
       console.error(err);
@@ -113,29 +99,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentSubView, 
     }
   };
 
-  const handleUpdateReport = async (reportId: string, status: 'RESOLVED' | 'REJECTED') => {
-    try {
-      await api.updateReportStatus(reportId, status);
-      loadData();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   const tabsList = [
     { id: 'auth', label: 'Xác thực & Tài khoản', icon: Shield },
     { id: 'problems', label: 'Bài tập & Testcase', icon: FileText },
     { id: 'submissions', label: 'Nộp bài & Chấm bài', icon: FileCode },
     { id: 'matches', label: 'Đấu Solo & Lịch sử', icon: Trophy },
     { id: 'rooms', label: 'Phòng đấu PVP Custom', icon: Users },
-    { id: 'ai', label: 'Trí tuệ Nhân tạo AI', icon: Sparkles },
     { id: 'comments', label: 'Thảo luận & Bình luận', icon: MessageSquare },
-    { id: 'friends', label: 'Bạn bè & Mạng xã hội', icon: Users },
-    { id: 'shop', label: 'Cửa hàng vật phẩm', icon: ShoppingBag },
     { id: 'leaderboard', label: 'Bảng xếp hạng chung', icon: Activity },
-    { id: 'notifications', label: 'Thông báo', icon: Bell },
-    { id: 'reports', label: 'Báo cáo & Tố cáo', icon: ShieldAlert },
-    { id: 'news', label: 'Tin tức & Thông báo', icon: Bell },
     { id: 'tester', label: 'API Tester', icon: Beaker },
   ];
 
@@ -211,23 +182,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ currentSubView, 
 
           {activeTab === 'rooms' && <AdminRoomsTab />}
 
-          {activeTab === 'ai' && <AdminAiTab />}
-
           {activeTab === 'comments' && <AdminCommentsTab />}
 
-          {activeTab === 'friends' && <AdminFriendsTab />}
-
-          {activeTab === 'shop' && <AdminShopTab />}
-
           {activeTab === 'leaderboard' && <AdminLeaderboardTab />}
-
-          {activeTab === 'notifications' && <AdminNotificationsTab />}
-
-          {activeTab === 'reports' && (
-            <AdminReportsTab reports={reports} onUpdateStatus={handleUpdateReport} />
-          )}
-
-          {activeTab === 'news' && <AdminNewsTab />}
 
           {activeTab === 'tester' && <ApiTesterView />}
         </div>

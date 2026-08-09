@@ -1,5 +1,4 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import type {  ChatSession  } from "../types/chat.types";
 
 interface Props {
@@ -15,8 +14,6 @@ const ChatSidebar: React.FC<Props> = ({
   onSelectSession,
   onNewChat,
 }) => {
-  const navigate = useNavigate();
-
   return (
     <aside className="chat-sidebar">
       {/* Header */}
@@ -45,12 +42,6 @@ const ChatSidebar: React.FC<Props> = ({
         ))}
       </div>
 
-      {/* Footer */}
-      <div className="chat-sidebar-footer">
-        <button className="chat-upgrade-btn" onClick={() => navigate("/chat/upgrade")}>
-          <span>✦</span> Upgrade to Plus
-        </button>
-      </div>
     </aside>
   );
 };

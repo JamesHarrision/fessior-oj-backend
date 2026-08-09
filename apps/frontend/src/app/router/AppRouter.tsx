@@ -5,25 +5,20 @@ import { AppShellLayout } from '../layouts/AppShellLayout';
 import { AuthPage } from '../../features/auth/AuthPage';
 import { HomeView } from '../../views/HomeView';
 import ChatPage from '../../features/chat/pages/ChatPage';
-import InterviewPage from '../../features/interview/pages/InterviewPage';
 import { ProblemsPage } from '../../features/problems/ProblemsPage';
 import { MatchFindingView } from '../../views/MatchFindingView';
 import { SoloSolveView } from '../../views/SoloSolveView';
 import { PvPWorkspaceView } from '../../views/PvPWorkspaceView';
 import { PlaygroundView } from '../../views/PlaygroundView';
 import { RankingView } from '../../views/RankingView';
-import { ShopView } from '../../views/ShopView';
 import { SettingsView } from '../../views/SettingsView';
-import { AIView } from '../../views/AIView';
 import { SubmissionsView } from '../../views/SubmissionsView';
 import { CustomRoomsView } from '../../views/CustomRoomsView';
 import { AdminDashboard } from '../../views/AdminDashboard';
-import { FriendsView } from '../../views/FriendsView';
 import { TokenProofView } from '../../views/TokenProofView';
 import { ProfileView } from '../../views/ProfileView';
 import { useMatchStore } from '../../stores/match.store';
 import AboutPage from '../../features/about/pages/AboutPage';
-import ReportPage from '../../features/report/pages/ReportPage';
 
 /* =====================================================
    Route Wrappers
@@ -95,7 +90,6 @@ export function AppRouter() {
           <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/home" element={<HomeView />} />
           <Route path="/chat" element={<ChatPage />} />
-          <Route path="/interview" element={<InterviewPage />} />
 
           {/* ── Match & Solving ── */}
           <Route path="/match" element={<MatchRouteWrapper />} />
@@ -106,22 +100,15 @@ export function AppRouter() {
           {/* ── Problems ── */}
           <Route path="/problems" element={<ProblemsPage />} />
 
-          {/* ── Competitions ── */}
-          {/* <Route path="/contest" element={<ContestView />} /> */}
-          {/* <Route path="/contest/:contestId/problem/:problemId" element={<ContestSolveView />} /> */}
           <Route path="/ranking" element={<RankingView />} />
           <Route path="/custom-rooms" element={<CustomRoomsRouteWrapper />} />
 
           {/* ── Community ── */}
           <Route path="/submissions" element={<SubmissionsView />} />
-          <Route path="/friends" element={<FriendsView />} />
           <Route path="/profile/:username" element={<ProfileView />} />
           <Route path="/about" element={<AboutPage />} />
-          <Route path="/report" element={<ReportPage />} />
 
           {/* ── Tools ── */}
-          <Route path="/shop" element={<ShopView />} />
-          <Route path="/ai" element={<AIView />} />
           <Route path="/settings" element={<SettingsView />} />
         </Route>
 

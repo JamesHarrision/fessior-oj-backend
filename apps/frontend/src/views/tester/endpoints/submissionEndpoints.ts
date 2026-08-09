@@ -10,7 +10,7 @@ export const submissionEndpoints: ApiEndpoint[] = [
     description: 'Nộp code giải bài tập để hệ thống chấm điểm thông qua hàng đợi BullMQ (Yêu cầu Token)',
     requiresAuth: true,
     defaultBody: JSON.stringify({
-      problemId: 'mongodb-problem-object-id',
+      problemId: 'problem-uuid',
       language: 'python', // cpp | java | python
       code: 'import sys\nprint("Hello World")'
     }, null, 2)
@@ -24,7 +24,7 @@ export const submissionEndpoints: ApiEndpoint[] = [
     description: 'Biên dịch và chạy thử code với dữ liệu tùy chọn, không lưu vào lịch sử chấm bài (Yêu cầu Token)',
     requiresAuth: true,
     defaultBody: JSON.stringify({
-      problemId: 'mongodb-problem-object-id',
+      problemId: 'problem-uuid',
       language: 'cpp', // cpp | java | python
       code: '#include <iostream>\nusing namespace std;\nint main() { cout << "Test"; return 0; }',
       customInput: 'some-custom-input-data'

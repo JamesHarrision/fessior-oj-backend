@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { api } from '../services/api';
-import { Sparkles, Search, Filter, ArrowUpDown, X } from 'lucide-react';
+import { Search, Filter, ArrowUpDown, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 function formatRelativeTime(timestamp?: string | number): string {
@@ -96,8 +96,6 @@ export const SubmissionsView: React.FC = () => {
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSub, setSelectedSub] = useState<any>(null);
-  const [aiFeedback, setAiFeedback] = useState<string | null>(null);
-  const [loadingAi, setLoadingAi] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 15;
@@ -122,7 +120,6 @@ export const SubmissionsView: React.FC = () => {
 
   const handleViewDetail = async (sub: any) => {
     setSelectedSub(sub);
-    setAiFeedback(null);
     try {
       const res = await api.getSubmissionDetail(sub.id || sub._id);
       if (res.success && res.data) {
@@ -130,24 +127,6 @@ export const SubmissionsView: React.FC = () => {
       }
     } catch (err) {
       console.error(err);
-    }
-  };
-
-  const handleRequestAiFeedback = async () => {
-    if (!selectedSub) return;
-    setLoadingAi(true);
-    setAiFeedback(null);
-    try {
-      const res = await api.getAIFeedback(selectedSub.id || selectedSub._id);
-      if (res.success && (res.data?.feedback || res.data)) {
-        setAiFeedback(res.data.feedback || res.data);
-      } else {
-        setAiFeedback('AI could not generate feedback at this time. Please try again.');
-      }
-    } catch (err: any) {
-      setAiFeedback(`Error generating feedback: ${err.message || 'Server error'}`);
-    } finally {
-      setLoadingAi(false);
     }
   };
 
@@ -295,25 +274,6 @@ export const SubmissionsView: React.FC = () => {
                 </pre>
               </div>
 
-              <div className="pt-2">
-                <button
-                  disabled={loadingAi}
-                  onClick={handleRequestAiFeedback}
-                  className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-vermilion hover:bg-vermilion-hover text-linen font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
-                >
-                  <Sparkles size={16} className={loadingAi ? "animate-pulse" : ""} />
-                  {loadingAi ? 'AI is analyzing...' : 'Get AI Feedback (Mock Interview)'}
-                </button>
-
-                {aiFeedback && (
-                  <div className="mt-4 p-5 bg-vermilion/5 rounded-xl border border-vermilion/20 animate-fade-in-up shadow-sm">
-                    <h5 className="flex items-center gap-2 text-vermilion font-bold mb-3 text-lg">
-                      <Sparkles size={18} /> AI Feedback
-                    </h5>
-                    <p className="text-[0.95rem] text-linen leading-relaxed whitespace-pre-wrap">{aiFeedback}</p>
-                  </div>
-                )}
-              </div>
             </div>
           </div>
         </div>

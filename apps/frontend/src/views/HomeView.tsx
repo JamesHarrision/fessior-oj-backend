@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trophy, BookOpen, Flame, ArrowRight, AlertTriangle, Compass, Activity, Star, Calendar } from 'lucide-react';
+import { Trophy, BookOpen, Flame, ArrowRight, AlertTriangle, Activity, Star, Calendar } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import { getSubmissions } from '../features/submission/api/submissionApi';
@@ -211,7 +211,7 @@ export const HomeView: React.FC = () => {
           </div>
         </div>
 
-        {/* ── Middle Column: Daily Challenge, Problems, Roadmap ── */}
+        {/* ── Middle Column: Daily Challenge, Problems ── */}
         <div className="flex flex-col gap-6">
 
           {/* Thử thách hàng ngày */}
@@ -247,17 +247,6 @@ export const HomeView: React.FC = () => {
             <p className="font-body text-xs text-stone">Khám phá hơn 100+ bài tập thuật toán từ dễ đến khó.</p>
           </div>
 
-          {/* Roadmap AI */}
-          <div
-            onClick={() => navigate('/ai')}
-            className="bg-washi border border-charcoal p-6 cursor-pointer hover:border-stone group transition-colors flex flex-col gap-3 rounded-xl overflow-hidden"
-          >
-            <div className="bg-ink p-3 w-fit border border-charcoal group-hover:border-vermilion transition-colors rounded-xl">
-              <Compass size={24} className="text-blue-500" />
-            </div>
-            <h4 className="font-display font-bold text-linen uppercase tracking-wider">Roadmap AI</h4>
-            <p className="font-body text-xs text-stone">Truy cập lộ trình học tập cá nhân hóa do AI tạo ra.</p>
-          </div>
           </div>
           </div>
         </div>

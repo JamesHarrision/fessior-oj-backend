@@ -3,7 +3,6 @@ import { AlertCircle, Clock, Cpu } from 'lucide-react';
 import { formatExecutionTime, formatMemoryKb } from '@ocj/utils';
 import { StatusBadge } from '@ocj/ui';
 import { Spin } from 'antd';
-import { api } from '../../services/api';
 
 /* =====================================================
    ExecutionResultPanel — Ink & Vermillion
@@ -29,27 +28,6 @@ export const ExecutionResultPanel: React.FC<ExecutionResultPanelProps> = ({
   verdict,
   verdictDetails,
 }) => {
-  const [aiDebugLoading, setAiDebugLoading] = React.useState(false);
-  const [aiDebugResult, setAiDebugResult] = React.useState('');
-
-  const handleAIDebug = async () => {
-    if (!verdictDetails?.submissionId) return;
-    setAiDebugLoading(true);
-    setAiDebugResult('');
-    try {
-      const res = await api.getAIDebug(verdictDetails.submissionId);
-      if (res.success && res.data) {
-        setAiDebugResult(res.data.explanation);
-      } else {
-        setAiDebugResult('Không thể kết nối đến AI Mentor. Vui lòng thử lại sau.');
-      }
-    } catch (err) {
-      setAiDebugResult('Đã xảy ra lỗi khi gọi AI Mentor.');
-    } finally {
-      setAiDebugLoading(false);
-    }
-  };
-
   return (
     <div className="flex flex-col gap-4">
       {/* ── Running state ── */}
@@ -187,26 +165,6 @@ export const ExecutionResultPanel: React.FC<ExecutionResultPanelProps> = ({
         </div>
       )}
 
-      {/* ── AI Debug Feature ── */}
-      {!isRunning && !isSubmitting && verdict && verdict !== 'ACCEPTED' && verdict !== 'PENDING' && verdict !== 'PROCESSING' && verdictDetails?.submissionId && (
-        <div className="mt-2 border-t border-charcoal pt-4 flex flex-col gap-3">
-          <button
-            onClick={handleAIDebug}
-            disabled={aiDebugLoading}
-            className="self-start flex items-center gap-2 bg-charcoal text-linen font-display text-[11px] font-bold uppercase tracking-wider px-4 py-2 hover:bg-stone transition-colors disabled:opacity-50"
-          >
-            {aiDebugLoading ? <Spin size="small" /> : '🤖 AI giải thích lỗi'}
-          </button>
-          
-          {aiDebugResult && (
-            <div className="bg-ink border border-vermilion p-4">
-              <div className="font-body text-sm text-linen whitespace-pre-wrap leading-relaxed">
-                {aiDebugResult}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 };

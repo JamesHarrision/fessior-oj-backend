@@ -1,6 +1,5 @@
 import React from "react";
-import { FaCode, FaTrophy, FaRobot, FaUsers, FaBolt, FaGithub, FaEnvelope } from "react-icons/fa";
-import { MdSchool } from "react-icons/md";
+import { FaCode, FaComments, FaDatabase, FaUsers, FaBolt, FaGithub, FaEnvelope } from "react-icons/fa";
 
 // ─── Static data ──────────────────────────────────────────────────────────────
 
@@ -11,19 +10,14 @@ const FEATURES = [
     desc: "Monaco-powered editor with syntax highlighting, auto-complete, and multi-language support.",
   },
   {
-    icon: <FaTrophy />,
-    title: "Contests",
-    desc: "Weekly and monthly contests with real-time scoreboard and prize pools.",
+    icon: <FaDatabase />,
+    title: "Problem Bank",
+    desc: "MySQL-backed problems, testcases, submissions, and user progress in one focused data model.",
   },
   {
-    icon: <FaRobot />,
-    title: "Arya AI",
-    desc: "AI-powered mentor that gives DSA roadmaps and personalized feedback on your submissions.",
-  },
-  {
-    icon: <MdSchool />,
-    title: "Mock Interview",
-    desc: "Simulate real-world technical interviews with curated problem sets and time pressure.",
+    icon: <FaComments />,
+    title: "Arya Chatbox",
+    desc: "A lightweight coding assistant space for explanations, practice prompts, and solution discussions.",
   },
   {
     icon: <FaUsers />,
@@ -131,12 +125,12 @@ const AboutPage: React.FC = () => {
           <h1 className="text-5xl font-bold text-linen mb-6">About Us,</h1>
           <p className="text-lg text-stone max-w-2xl mx-auto mb-4 leading-relaxed">
             QUEU is a modern, fast, and minimalist platform for competitive programming and
-            technical interview preparation. Our mission is to provide the best possible
-            experience for developers to write, test, and improve their code.
+            practical coding practice. Our mission is to provide a focused experience for
+            developers to write, test, and improve their code.
           </p>
           <p className="text-lg text-stone max-w-2xl mx-auto leading-relaxed">
-            Built by developers, for developers — QUEU combines cutting-edge tooling with
-            AI-driven mentorship to help you reach your full potential in competitive programming.
+            Built by developers, for developers — QUEU combines a real-time judge, PvP rooms,
+            rankings, and a friendly chatbox into a clean portfolio-ready system.
           </p>
         </div>
       </section>
@@ -147,7 +141,7 @@ const AboutPage: React.FC = () => {
       <section>
         <h2 className="text-3xl font-bold text-linen mb-2 text-center">What we offer</h2>
         <p className="text-stone text-center mb-10">
-          Everything you need to become a better programmer — in one place.
+          The core workflows for a compact online judge — in one place.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {FEATURES.map((f) => (
@@ -168,8 +162,8 @@ const AboutPage: React.FC = () => {
             access to high-quality competitive programming resources.
           </p>
           <p>
-            From beginners solving their first "Two Sum" to grandmasters competing in
-            world-class contests — QUEU supports every step of your journey.
+            From beginners solving their first "Two Sum" to users climbing the ranking table,
+            QUEU supports a practical coding workflow from problem reading to judged submission.
           </p>
         </div>
         <div className="space-y-6">
@@ -186,12 +180,12 @@ const AboutPage: React.FC = () => {
           </div>
           <div className="flex items-start gap-4 bg-washi p-6 border border-charcoal rounded-xl">
             <div className="bg-ink p-3 rounded-xl text-blue-500 text-xl">
-              <FaRobot />
+              <FaComments />
             </div>
             <div>
-              <div className="text-lg font-bold text-linen mb-1">AI-Powered</div>
+              <div className="text-lg font-bold text-linen mb-1">Guided Practice</div>
               <div className="text-stone text-sm">
-                Arya, our AI mentor, gives personalized guidance and instant feedback.
+                Arya chat keeps explanations and problem-solving help close to the coding flow.
               </div>
             </div>
           </div>

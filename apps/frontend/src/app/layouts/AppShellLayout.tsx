@@ -1,13 +1,12 @@
-import { type ReactNode, useCallback, useEffect, useState } from 'react';
-import { Avatar, Dropdown, Badge } from 'antd';
-import { BellOutlined, UserOutlined, SettingOutlined, LogoutOutlined, SunOutlined, MoonOutlined } from '@ant-design/icons';
+import { type ReactNode, useCallback } from 'react';
+import { Avatar, Dropdown } from 'antd';
+import { UserOutlined, SettingOutlined, LogoutOutlined, SunOutlined, MoonOutlined } from '@ant-design/icons';
 import { Outlet, useLocation, useNavigate, NavLink } from 'react-router-dom';
 import LogoImage from '../../assets/Logo.png';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import { api } from '../../services/api';
 import { Role } from '@ocj/types';
-import { Home, Share2, Map, Handshake, BookOpen, Sparkles, Crown, LayoutDashboard } from 'lucide-react';
+import { Home, Share2, Handshake, BookOpen, Crown, LayoutDashboard } from 'lucide-react';
 
 /* =====================================================
    Navigation Items
@@ -21,17 +20,14 @@ interface NavItem {
   label: string;
   path: string;
   section: NavSection;
-  badge?: number;
   adminOnly?: boolean;
 }
 
 const navItems: NavItem[] = [
   { key: '/home', icon: <Home size={22} />, label: 'Home', path: '/home', section: 'main' },
   { key: '/chat', icon: <Share2 size={22} />, label: "Arya's Space", path: '/chat', section: 'main' },
-  { key: '/ai', icon: <Map size={22} />, label: 'Roadmap', path: '/ai', section: 'main' },
   { key: '/match', icon: <Handshake size={22} />, label: 'Solo Code 1vs1', path: '/match', section: 'main' },
   { key: '/editor', icon: <BookOpen size={22} />, label: 'Code Editor', path: '/editor', section: 'main' },
-  { key: '/interview', icon: <Sparkles size={22} />, label: 'Mock Interview', path: '/interview', section: 'main' },
 ];
 
 /* =====================================================
@@ -72,9 +68,6 @@ function Sidebar(props: {
                   <span className="whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     {item.label}
                   </span>
-                  {item.badge != null && item.badge > 0 && (
-                    <Badge count={item.badge} size="small" className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  )}
                 </button>
               </li>
             );
@@ -119,9 +112,8 @@ function TopBar(props: {
   onLogout: () => void;
   onNavigateProfile: () => void;
   onNavigateSettings: () => void;
-  notificationCount?: number;
 }) {
-  const { user, onLogout, onNavigateProfile, onNavigateSettings, notificationCount = 0 } = props;
+  const { user, onLogout, onNavigateProfile, onNavigateSettings } = props;
   const { theme, toggleTheme } = useTheme();
 
   const userDropdownItems = [
@@ -151,7 +143,6 @@ function TopBar(props: {
           { id: 3, label: 'Submissions', url: '/submissions' },
           { id: 4, label: 'Ranking', url: '/ranking' },
           { id: 5, label: 'About', url: '/about' },
-          { id: 6, label: 'Report', url: '/report' },
         ].map(item => (
           <NavLink
             key={item.id}
@@ -174,40 +165,6 @@ function TopBar(props: {
             {user?.eloRating ?? user?.elo_rating ?? 1000}
           </span>
         </div>
-
-        {/* Notifications */}
-        <Dropdown
-          menu={{
-            items: [
-              {
-                key: 'header',
-                label: <div className="font-display font-bold text-linen px-2 py-1 border-b border-charcoal">Thông báo</div>,
-                disabled: true,
-              },
-              {
-                key: 'empty',
-                label: <div className="text-stone text-xs text-center py-4">Chưa có thông báo mới</div>,
-                disabled: true,
-              }
-            ]
-          }}
-          trigger={['click']}
-          placement="bottomRight"
-        >
-          <button
-            type="button"
-            className="relative p-2 text-stone hover:text-linen transition-colors cursor-pointer"
-            title="Notifications"
-          >
-            {notificationCount > 0 ? (
-              <Badge count={notificationCount} size="small" offset={[-2, 2]}>
-                <BellOutlined className="text-lg" />
-              </Badge>
-            ) : (
-              <BellOutlined className="text-lg" />
-            )}
-          </button>
-        </Dropdown>
 
         {/* User Dropdown */}
         <Dropdown menu={{ items: userDropdownItems }} trigger={['click']} placement="bottomRight">
@@ -243,29 +200,6 @@ export function AppShellLayout() {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const [unreadCount, setUnreadCount] = useState(0);
-
-  // Poll notifications every 30s
-  useEffect(() => {
-    if (!user) return;
-
-    const fetchNotifications = async () => {
-      try {
-        const res = await api.getNotifications();
-        if (res.success && res.data) {
-          const unread = res.data.filter((n: any) => !n.is_read).length;
-          setUnreadCount(unread);
-        }
-      } catch (err) {
-        console.error('Failed to fetch notifications', err);
-      }
-    };
-
-    fetchNotifications();
-    const interval = setInterval(fetchNotifications, 30000);
-
-    return () => clearInterval(interval);
-  }, [user]);
 
   const selectedKey = ((): string => {
     const pathname = location.pathname;
@@ -295,7 +229,6 @@ export function AppShellLayout() {
         onLogout={handleLogout}
         onNavigateProfile={() => handleNavigate(`/profile/${user?.username}`)}
         onNavigateSettings={() => handleNavigate('/settings')}
-        notificationCount={unreadCount}
       />
 
       <div className="flex flex-1 overflow-hidden">
@@ -312,7 +245,7 @@ export function AppShellLayout() {
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-ink">
           <main className="flex-1 flex flex-col overflow-y-auto">
             <div className={
-              location.pathname.startsWith('/chat') || location.pathname.startsWith('/ai')
+              location.pathname.startsWith('/chat')
                 ? "flex-1 w-full h-full"
                 : "p-6 mx-auto w-full max-w-7xl"
             }>

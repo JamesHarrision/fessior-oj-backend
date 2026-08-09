@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { ProblemDescription } from './ProblemDescription';
 import { ProblemComments } from './ProblemComments';
-import { ReportForm } from './ReportForm';
 import type { IProblem } from '@ocj/types';
 
 interface LeftTabPanelProps {
@@ -9,8 +8,7 @@ interface LeftTabPanelProps {
 }
 
 export const LeftTabPanel: React.FC<LeftTabPanelProps> = ({ problem }) => {
-  const [leftTab, setLeftTab] = useState<'desc' | 'comments' | 'report'>('desc');
-  // 
+  const [leftTab, setLeftTab] = useState<'desc' | 'comments'>('desc');
 
   return (
     <div className="left-column">
@@ -27,20 +25,12 @@ export const LeftTabPanel: React.FC<LeftTabPanelProps> = ({ problem }) => {
         >
           Thảo luận
         </button>
-        <button
-          className={`left-tab-btn ${leftTab === 'report' ? 'active' : ''}`}
-          onClick={() => setLeftTab('report')}
-        >
-          Báo cáo
-        </button>
       </div>
       <div className="left-tab-content">
         {leftTab === 'desc' ? (
           <ProblemDescription problem={problem} />
-        ) : leftTab === 'comments' ? (
-          <ProblemComments targetId={problem?.id || ""} targetType="PROBLEM" />
         ) : (
-          <ReportForm targetId={problem?.id || ""} targetType="PROBLEM" onClose={() => setLeftTab("desc")} />
+          <ProblemComments targetId={problem?.id || ""} targetType="PROBLEM" />
         )}
       </div>
     </div>

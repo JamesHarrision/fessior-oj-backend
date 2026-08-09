@@ -8,11 +8,10 @@ export const CHAT_MODELS: ChatModel[] = [
 
 export const SUGGESTION_CARDS: SuggestionCard[] = [
   { id: 1, title: "Thử trình độ hiện tại", subtitle: "Kiểm tra xem bạn hiểu code tới đâu" },
-  { id: 2, title: "Tạo roadmap cho tôi", subtitle: "Tạo roadmap với những gì bạn muốn" },
-  { id: 3, title: "Lên kế hoạch cho phỏng vấn", subtitle: "Cần ôn lại gì cho buổi phỏng vấn" },
-  { id: 4, title: "Giải thích đoạn code sau", subtitle: "Giải thích cho tôi tại sao code này..." },
-  { id: 5, title: "Solo code 1vs1 là gì?", subtitle: "Tìm hiểu về hệ thống solo code" },
-  { id: 6, title: "AI mock interview", subtitle: "Tìm hiểu về hệ thống AI mock inter" },
+  { id: 2, title: "Gợi ý bài luyện tiếp theo", subtitle: "Chọn bài theo trình độ hiện tại" },
+  { id: 3, title: "Giải thích đoạn code sau", subtitle: "Giải thích cho tôi tại sao code này..." },
+  { id: 4, title: "Solo code 1vs1 là gì?", subtitle: "Tìm hiểu về hệ thống solo code" },
+  { id: 5, title: "Tối ưu lời giải", subtitle: "Phân tích độ phức tạp và cách cải thiện" },
 ];
 
 export const MOCK_SESSIONS: ChatSession[] = [
@@ -28,12 +27,12 @@ export const MOCK_SESSIONS: ChatSession[] = [
   },
   {
     id: "s2",
-    title: "Roadmap học Frontend",
+    title: "Tối ưu lời giải Two Sum",
     model: "model-1",
     createdAt: Date.now() - 172800000,
     messages: [
-      { id: "m3", role: "user", content: "Tạo roadmap học Frontend cho tôi", timestamp: Date.now() - 172800000 },
-      { id: "m4", role: "assistant", content: "Đây là roadmap học Frontend từ cơ bản đến nâng cao...", timestamp: Date.now() - 172790000 },
+      { id: "m3", role: "user", content: "Giúp tôi tối ưu lời giải Two Sum", timestamp: Date.now() - 172800000 },
+      { id: "m4", role: "assistant", content: "Với Two Sum, cách tối ưu phổ biến là dùng hash map để giảm từ O(n^2) xuống O(n).", timestamp: Date.now() - 172790000 },
     ],
   },
 ];

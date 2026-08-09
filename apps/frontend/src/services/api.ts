@@ -14,14 +14,8 @@ import {
   problemRepository,
   submissionRepository,
   leaderboardRepository,
-  shopRepository,
-  friendRepository,
-  contestRepository,
   roomRepository,
   commentRepository,
-  reportRepository,
-  aiRepository,
-  notificationRepository,
   matchRepository,
   userRepository,
 } from '../app/api/client';
@@ -127,56 +121,6 @@ export const api = {
   getLeaderboard: () => wrap<any>(leaderboardRepository.getLeaderboard()),
 
   // =========================================================
-  // Shop
-  // =========================================================
-   
-  getShopItems: () => wrap<any>(shopRepository.getItems()),
-   
-  getInventory: () => wrap<any>(shopRepository.getInventory()),
-  buyItem: (itemId: string) => wrap(shopRepository.purchaseItem(itemId)),
-  equipItem: (inventoryItemId: string) => wrap(shopRepository.equipItem(inventoryItemId)),
-   
-  createShopItem: (data: Record<string, unknown>) => rawPost<any>('/shop/items', data),
-
-  // =========================================================
-  // Friends & Social
-  // =========================================================
-  inviteFriend: (friendId: string) => rawPost<any>('/api/v1/friends/invite', { friendId }),
-   
-  getFriends: () => wrap<any>(friendRepository.getFriends()),
-   
-  getPendingRequests: () => wrap<any>(friendRepository.getFriendRequests()),
-  sendFriendRequest: (username: string) => wrap(friendRepository.sendFriendRequest(username)),
-  acceptFriendRequest: (userId: string) => wrap(friendRepository.respondFriendRequest(userId, 'accept')),
-  declineFriendRequest: (userId: string) => wrap(friendRepository.respondFriendRequest(userId, 'reject')),
-  removeFriend: (friendId: string) => rawDelete(`/friends/${friendId}`),
-
-  // =========================================================
-  // Contests
-  // =========================================================
-   
-  getContests: () => wrap<any>(contestRepository.getContests()),
-   
-  getContestDetail: (id: string) => wrap<any>(contestRepository.getContest(id)),
-  createContest: (data: Record<string, unknown>) =>
-     
-    wrap<any>(contestRepository.createContest(data as never)),
-  updateContest: (id: string, data: Record<string, unknown>) =>
-     
-    wrap<any>(contestRepository.updateContest(id, data as never)),
-  deleteContest: (id: string) => wrap(contestRepository.deleteContest(id)),
-  registerContest: (id: string) => wrap(contestRepository.register(id)),
-  unregisterContest: (id: string) => wrap(contestRepository.unregister(id)),
-   
-  getContestLeaderboard: (id: string) => wrap<any>(contestRepository.getScoreboard(id)),
-   
-  endContest: (id: string) => wrap<any>(contestRepository.endContest(id)),
-   
-  getContestProblems: (id: string) => wrap<any>(contestRepository.getContestProblems(id)),
-   
-  getContestSubmissions: (id: string) => wrap<any>(contestRepository.getContestSubmissions(id)),
-
-  // =========================================================
   // Rooms
   // =========================================================
    
@@ -209,41 +153,6 @@ export const api = {
   deleteComment: (id: string) => wrap(commentRepository.deleteComment(id)),
 
   // =========================================================
-  // Reports
-  // =========================================================
-  submitReport: (data: Record<string, unknown>) =>
-     
-    wrap<any>(reportRepository.createReport(data as never)),
-   
-  getReports: () => wrap<any>(reportRepository.getReports()),
-  updateReportStatus: (id: string, status: 'PENDING' | 'RESOLVED' | 'REJECTED') =>
-    wrap(reportRepository.updateReportStatus(id, status)),
-
-  // =========================================================
-  // AI
-  // =========================================================
-   
-  getAIRoadmap: (data: any) => wrap<any>(aiRepository.getRoadmap(data)),
-   
-  getAIFeedback: (submissionId: string) => wrap<any>(aiRepository.getFeedback(submissionId)),
-   
-  getAIDebug: (submissionId: string) => wrap<any>(aiRepository.getDebug(submissionId)),
-   
-  sendAIChatMessage: (historyId: string, message: string) => wrap<any>(aiRepository.sendChatMessage(historyId, message)),
-   
-  getAIHistory: () => wrap<any[]>(aiRepository.getHistory()),
-
-  // =========================================================
-  // Notifications
-  // =========================================================
-   
-  getNotifications: () => wrap<any>(notificationRepository.getNotifications()),
-   
-  createNotification: (data: Record<string, unknown>) => rawPost<any>('/notifications', data),
-  deleteNotification: (id: string) => wrap(notificationRepository.deleteNotification(id)),
-  markNotificationsAsRead: () => wrap(notificationRepository.markAllRead()),
-
-  // =========================================================
   // Match
   // =========================================================
    
@@ -253,12 +162,6 @@ export const api = {
    
   getMatchDetails: (id: string) => wrap<any>(matchRepository.getMatch(id)),
   deleteMatch: (id: string) => rawDelete(`/matches/${id}`),
-  // =========================================================
-  // News
-  // =========================================================
-  getNews: (page = 1, limit = 10) => rawGet<any>(`/news?page=${page}&limit=${limit}`),
-  createNews: (data: Record<string, unknown>) => rawPost<any>('/news', data),
-  deleteNews: (id: string) => rawDelete(`/news/${id}`),
 };
 
 export default api;

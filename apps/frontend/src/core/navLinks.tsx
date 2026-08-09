@@ -22,26 +22,14 @@ export const links: NavLink[] = [
   },
   {
     id: 3,
-    url: "/roadmap",
-    text: "Roadmap",
-    icon: <img src="/RoadMapButton.png" alt="Roadmap" />,
-  },
-  {
-    id: 4,
     url: "/solo",
     text: "Solo Code 1vs1",
     icon: <img src="/SoloButton.png" alt="Solo Code" />,
   },
   {
-    id: 5,
+    id: 4,
     url: "/editor",
     text: "Code Editor",
     icon: <img src="/EditorButton.png" alt="Code Editor" />,
-  },
-  {
-    id: 6,
-    url: "/interview",
-    text: "Mock Interview",
-    icon: <img src="/InterViewButton.png" alt="Mock Interview" />,
   },
 ];
