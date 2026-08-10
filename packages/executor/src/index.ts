@@ -29,8 +29,13 @@ const decodeBase64 = (value?: string | null) => {
   return value ? Buffer.from(value, 'base64').toString('utf-8') : '';
 };
 
-const isSandboxFailure = (statusId: number | undefined, compileOutput: string, stderrOutput: string) => {
-  const details = `${compileOutput}\n${stderrOutput}`.toLowerCase();
+const isSandboxFailure = (
+  statusId: number | undefined,
+  compileOutput: string,
+  stderrOutput: string,
+  judge0Message: string
+) => {
+  const details = `${compileOutput}\n${stderrOutput}\n${judge0Message}`.toLowerCase();
 
   return (
     statusId === 13 ||
@@ -80,6 +85,8 @@ export const executeTestCase = async (
         stdin: Buffer.from(stdin).toString('base64'),
         expected_output: Buffer.from(expectedOutput).toString('base64'),
         cpu_time_limit: timeLimitMs / 1000,
+        enable_per_process_and_thread_time_limit: true,
+        enable_per_process_and_thread_memory_limit: true,
       },
       {
         headers: { 'Content-Type': 'application/json' },
@@ -91,10 +98,11 @@ export const executeTestCase = async (
     const statusId = result.status?.id;
     const compileOutput = decodeBase64(result.compile_output);
     const stderrOutput = decodeBase64(result.stderr);
+    const judge0Message = result.message || '';
 
-    if (isSandboxFailure(statusId, compileOutput, stderrOutput)) {
+    if (isSandboxFailure(statusId, compileOutput, stderrOutput, judge0Message)) {
       throw new Error(
-        `Judge0 sandbox failure: ${compileOutput || stderrOutput || result.status?.description || 'Unknown error'}`
+        `Judge0 sandbox failure: ${compileOutput || stderrOutput || judge0Message || result.status?.description || 'Unknown error'}`
       );
     }
 

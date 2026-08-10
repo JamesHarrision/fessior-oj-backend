@@ -192,16 +192,24 @@ export class SubmissionService {
     const results = [];
     for (const tc of testcasesToRun) {
       const timeLimit = problem?.time_limit ?? DEFAULT_LIMITS.TIME_LIMIT_MS;
-      const result = await executeTestCase(
-        data.code,
-        languageId,
-        tc.input,
-        tc.output,
-        timeLimit,
-        {
-          judge0Url,
-        }
-      );
+      let result;
+      try {
+        result = await executeTestCase(
+          data.code,
+          languageId,
+          tc.input,
+          tc.output,
+          timeLimit,
+          {
+            judge0Url,
+          }
+        );
+      } catch (error: any) {
+        throw new AppError(
+          `Judge0 sandbox unavailable: ${error?.message || 'Unknown execution error'}`,
+          503
+        );
+      }
       let finalStatus = result.status;
       if (data.customInput !== undefined && !['CE', 'RE', 'TLE'].includes(finalStatus)) {
         finalStatus = 'ACCEPTED';
