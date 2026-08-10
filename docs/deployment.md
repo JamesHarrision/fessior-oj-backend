@@ -99,7 +99,7 @@ Truoc khi deploy production/staging, kiem tra:
 - `DATABASE_URL` tro dung MySQL trong network Docker.
 - `REDIS_HOST` la service name `redis` neu chay trong Docker network.
 - JWT secrets khong dung default.
-- Judge0/RapidAPI config san sang.
+- Judge0 Docker sandbox config san sang.
 - Gemini API key neu bat AI.
 - Cloudinary config neu bat upload avatar/assets.
 - CORS origin neu can siet production.

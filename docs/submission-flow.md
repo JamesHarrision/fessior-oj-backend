@@ -191,11 +191,11 @@ Muc dich: chay code nhanh, khong tao persistent submission theo route descriptio
 - **Chạy Testcase mẫu**: Backend (hàm `runCode`) tự động lọc `prisma.testcase.findMany({ is_example: true })` và chạy toàn bộ các testcase mẫu. Trả về `ACCEPTED` hoặc `WA` dựa trên so sánh output.
 - **Chạy Tùy biến Input (Custom Input)**: Nếu request gửi kèm `customInput`, Backend sẽ không so sánh `expectedOutput`. Miễn là tiến trình không gặp lỗi (CE, RE, TLE), kết quả sẽ được đánh dấu là `ACCEPTED` (để Frontend có thể hiển thị `actualOutput` thay vì báo `WA`).
 
-## Cơ chế Executor (Judge0 / Local Fallback)
+## Cơ chế Executor (Judge0 Docker Sandbox)
 
 Giao tiếp với hệ thống sandbox thông qua `packages/executor`.
-1. Gọi API `Judge0` để thực thi mã nguồn.
-2. Nếu Judge0 báo lỗi Cgroup Sandbox (Error 13 hoặc lỗi `/bin/sh`), hệ thống sẽ chuyển sang cơ chế **Local Execution Fallback** (Thực thi ngầm cục bộ).
-   - Tự động chạy lệnh `docker exec -i` vào container `judge0-*server`.
-   - Lưu ý: Node.js phải luôn đóng luồng `child.stdin.end()` sau khi gửi Input để tránh việc tiến trình `docker exec` bị treo vĩnh viễn chờ luồng đầu vào.
-   - Nếu `docker exec` thất bại, hệ thống sẽ thực thi mã trực tiếp trên Host (yêu cầu máy Host phải cài đặt sẵn `g++`, `python`).
+
+1. Gọi API Judge0 self-hosted để thực thi mã nguồn trong sandbox Docker.
+2. `JUDGE0_URL` là bắt buộc về mặt runtime. Local hybrid dùng `http://localhost:2358`, Docker services dùng `http://judge0-server:2358`.
+3. Nếu Judge0 không reachable hoặc trả lỗi sandbox/internal, executor sẽ throw để worker/BullMQ xử lý như infrastructure failure.
+4. Hệ thống chỉ nhận verdict từ Judge0 Docker sandbox.

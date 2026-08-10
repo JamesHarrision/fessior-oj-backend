@@ -6,7 +6,7 @@ This guide explains how to run OCJ locally.
 
 - Node.js compatible with the root `packageManager` npm version.
 - npm `10.9.2`.
-- Docker and Docker Compose for MySQL/Redis or the full Docker stack.
+- Docker and Docker Compose for MySQL, Redis, and the Judge0 sandbox.
 
 ## Install
 
@@ -44,6 +44,7 @@ Default local values are set in `apps/main-service/src/config/env.ts` and `apps/
 DATABASE_URL=mysql://root:ocj_root_secret@localhost:3307/ocj_main_db
 REDIS_HOST=localhost
 REDIS_PORT=6379
+JUDGE0_URL=http://localhost:2358
 ```
 
 Important env vars:
@@ -55,9 +56,7 @@ Important env vars:
 | `REDIS_PORT` | Redis port. |
 | `JWT_ACCESS_SECRET` | Access token signing secret. |
 | `JWT_REFRESH_SECRET` | Refresh token signing secret. |
-| `RAPIDAPI_KEY` | Optional Judge0 RapidAPI key. |
-| `RAPIDAPI_HOST` | Optional Judge0 RapidAPI host. |
-| `JUDGE0_URL` | Optional Judge0 endpoint override. |
+| `JUDGE0_URL` | Required Judge0-compatible sandbox URL. Local hybrid defaults to `http://localhost:2358`; Docker services use `http://judge0-server:2358`. |
 | `GEMINI_API_KEY` | Optional chatbox API key. |
 | `CLOUDINARY_*` | Optional avatar upload config. |
 
@@ -66,7 +65,7 @@ Important env vars:
 | Script | Purpose |
 | --- | --- |
 | `npm run dev` | Default hybrid dev flow. |
-| `npm run dev:hybrid` | Starts MySQL + Redis in Docker, prepares DB/packages, then runs frontend/main-service/worker-service locally. |
+| `npm run dev:hybrid` | Starts MySQL + Redis + Judge0 in Docker, prepares DB/packages, then runs frontend/main-service/worker-service locally. |
 | `npm run dev:local` | Prepares DB/packages and runs local app dev servers. Use when MySQL/Redis are already running. |
 | `npm run dev:prepare` | Runs Prisma generate, Prisma db push, and shared package builds. |
 | `npm run dev:apps` | Runs frontend/main-service/worker-service local dev servers only. |
@@ -76,7 +75,7 @@ Important env vars:
 ## Infrastructure Only
 
 ```bash
-docker compose up -d --remove-orphans --wait --wait-timeout 120 mysql redis
+docker compose up -d --remove-orphans --wait --wait-timeout 120 mysql redis judge0-server judge0-workers
 ```
 
 Default ports:
@@ -84,6 +83,7 @@ Default ports:
 ```text
 MySQL: localhost:3307 -> container 3306
 Redis: localhost:6379
+Judge0: http://localhost:2358
 ```
 
 ## Prisma
@@ -126,6 +126,7 @@ API:      http://localhost:6868
 Swagger:  http://localhost:6868/api-docs
 MySQL:    localhost:3307
 Redis:    localhost:6379
+Judge0:   http://localhost:2358
 ```
 
 ## Build

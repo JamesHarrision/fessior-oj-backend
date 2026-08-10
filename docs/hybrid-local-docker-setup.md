@@ -6,7 +6,7 @@ Hybrid mode is the default development flow:
 - `apps/main-service` runs locally with `tsx watch`.
 - `apps/worker-service` runs locally with `tsx watch`.
 - `mysql` and `redis` run through the root Docker Compose file.
-- Judge0 can run separately if you want a self-hosted executor; otherwise the executor can use the configured remote endpoint/simulation behavior.
+- Judge0 runs in Docker and is required for executing untrusted code. The executor only talks to the configured Judge0 Docker sandbox.
 
 ## One Command
 
@@ -35,7 +35,7 @@ The hybrid script:
 ## Infrastructure Only
 
 ```powershell
-docker compose up -d --remove-orphans --wait --wait-timeout 120 mysql redis
+docker compose up -d --remove-orphans --wait --wait-timeout 120 mysql redis judge0-server judge0-workers
 ```
 
 Default ports:
@@ -89,7 +89,7 @@ Sample accounts:
 - Swagger: `http://localhost:6868/api-docs`
 - MySQL: `localhost:3307`
 - Redis: `localhost:6379`
-- Optional Judge0: `http://localhost:2358`
+- Judge0 sandbox: `http://localhost:2358`
 
 ## Stop
 

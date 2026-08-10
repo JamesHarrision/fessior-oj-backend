@@ -99,7 +99,7 @@ src/
 | --- | --- |
 | `@ocj/constants` | Route prefixes, socket events, Redis channels, supported languages, default limits. |
 | `@ocj/errors` | Error helpers/classes dung chung. |
-| `@ocj/executor` | Logic goi Judge0/local executor va map language id. |
+| `@ocj/executor` | Logic goi Judge0 self-hosted sandbox va map language id. |
 | `@ocj/tsconfig` | TypeScript config chung. |
 | `@ocj/types` | Type definitions dung chung FE/BE. |
 | `@ocj/utils` | Utility functions, vi du tinh ELO PvP. |
