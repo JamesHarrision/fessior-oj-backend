@@ -120,17 +120,7 @@ export const startSubmissionWorker = () => {
         );
       } catch (err: any) {
         console.error(`Error processing job ${job.id}:`, err);
-        try {
-          await prisma.submission.update({
-            where: { id: submissionId },
-            data: {
-              status: 'RE',
-              error_message: err.message || 'Unknown runner error',
-            },
-          });
-        } catch (dbErr) {
-          console.error('Failed to update submission on failure state:', dbErr);
-        }
+        throw err;
       }
     },
     {
@@ -147,5 +137,10 @@ export const startSubmissionWorker = () => {
     console.error(`Job ${job?.id} failed:`, err);
   });
 
+  worker.on('error', (err) => {
+    console.error('Submission worker error:', err);
+  });
+
   console.log('Submission Queue Worker started successfully');
+  return worker;
 };
