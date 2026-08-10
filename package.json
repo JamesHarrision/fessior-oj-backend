@@ -11,7 +11,7 @@
     "dev": "npm run dev:hybrid",
     "dev:apps": "turbo run dev --filter=frontend --filter=main-service --filter=worker-service --concurrency 15",
     "dev:local": "npm run dev:prepare && npm run dev:apps",
-    "dev:hybrid": "docker compose up -d --remove-orphans --wait --wait-timeout 120 mysql redis && npm run dev:local",
+    "dev:hybrid": "docker compose up -d --remove-orphans --wait --wait-timeout 120 mysql redis judge0-server judge0-workers && npm run dev:local",
     "dev:prepare": "npm run db:generate && npm run db:push && npm run build:packages",
     "dev:docker": "docker compose up -d --build --remove-orphans --wait --wait-timeout 120",
     "build:packages": "turbo run build --filter=@ocj/api --filter=@ocj/constants --filter=@ocj/errors --filter=@ocj/executor --filter=@ocj/types --filter=@ocj/ui --filter=@ocj/utils --filter=@ocj/validators --output-logs=errors-only",

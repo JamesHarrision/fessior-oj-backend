@@ -33,6 +33,69 @@ services:
     volumes:
       - redis_data:/data
 
+  judge0-db:
+    image: postgres:13.0
+    container_name: ocj_judge0_db
+    restart: always
+    env_file:
+      - path: judge0-server/judge0-v1.13.0/judge0.conf
+    environment:
+      POSTGRES_HOST: judge0-db
+    volumes:
+      - judge0_postgres_data:/var/lib/postgresql/data/
+
+  judge0-redis:
+    image: redis:6.0
+    container_name: ocj_judge0_redis
+    restart: always
+    env_file:
+      - path: judge0-server/judge0-v1.13.0/judge0.conf
+    command: [
+      "bash", "-c",
+      'docker-entrypoint.sh --appendonly yes --requirepass "$$REDIS_PASSWORD"'
+    ]
+    volumes:
+      - judge0_redis_data:/data
+
+  judge0-server:
+    image: judge0/judge0:1.13.0
+    container_name: ocj_judge0_server
+    restart: always
+    privileged: true
+    ports:
+      - "2358:2358"
+    env_file:
+      - path: judge0-server/judge0-v1.13.0/judge0.conf
+    environment:
+      POSTGRES_HOST: judge0-db
+      REDIS_HOST: judge0-redis
+    volumes:
+      - ./judge0-server/judge0-v1.13.0/judge0.conf:/judge0.conf:ro
+    depends_on:
+      judge0-db:
+        condition: service_started
+      judge0-redis:
+        condition: service_started
+
+  judge0-workers:
+    image: judge0/judge0:1.13.0
+    container_name: ocj_judge0_workers
+    restart: always
+    privileged: true
+    command: ["./scripts/workers"]
+    env_file:
+      - path: judge0-server/judge0-v1.13.0/judge0.conf
+    environment:
+      POSTGRES_HOST: judge0-db
+      REDIS_HOST: judge0-redis
+    volumes:
+      - ./judge0-server/judge0-v1.13.0/judge0.conf:/judge0.conf:ro
+    depends_on:
+      judge0-db:
+        condition: service_started
+      judge0-redis:
+        condition: service_started
+
   frontend:
     build:
       context: .
@@ -63,10 +126,14 @@ services:
       - path: .env.docker.example
       - path: .env.docker
         required: false
+    environment:
+      JUDGE0_URL: http://judge0-server:2358
     depends_on:
       mysql:
         condition: service_healthy
       redis:
+        condition: service_started
+      judge0-server:
         condition: service_started
 
   worker-service:
@@ -79,11 +146,17 @@ services:
       - path: .env.docker.example
       - path: .env.docker
         required: false
+    environment:
+      JUDGE0_URL: http://judge0-server:2358
     depends_on:
       redis:
+        condition: service_started
+      judge0-server:
         condition: service_started
 
 volumes:
   mysql_data:
   redis_data:
+  judge0_postgres_data:
+  judge0_redis_data:
   frontend_node_modules:
