@@ -4,9 +4,7 @@ import { executeTestCase, getLanguageId, LanguageKey } from '@ocj/executor';
 import { prisma } from '../config/prisma';
 import { redisOptions, redis } from '../config/redis';
 
-const getRapidApiKey = () => process.env.RAPIDAPI_KEY || '';
-const getRapidApiHost = () => process.env.RAPIDAPI_HOST || 'judge0-ce.p.rapidapi.com';
-const getJudge0Url = () => process.env.JUDGE0_URL || `https://${getRapidApiHost()}`;
+const getJudge0Url = () => process.env.JUDGE0_URL || 'http://localhost:2358';
 
 export const startSubmissionWorker = () => {
   const worker = new Worker(
@@ -76,8 +74,6 @@ export const startSubmissionWorker = () => {
             problem.time_limit || DEFAULT_LIMITS.TIME_LIMIT_MS,
             {
               judge0Url: getJudge0Url(),
-              rapidApiKey: getRapidApiKey(),
-              rapidApiHost: getRapidApiHost(),
             }
           );
 

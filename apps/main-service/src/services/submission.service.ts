@@ -160,9 +160,7 @@ export class SubmissionService {
     language: 'cpp' | 'java' | 'python';
     customInput?: string;
   }) {
-    const rapidApiKey = process.env.RAPIDAPI_KEY || '';
-    const rapidApiHost = process.env.RAPIDAPI_HOST || 'judge0-ce.p.rapidapi.com';
-    const judge0Url = process.env.JUDGE0_URL || `https://${rapidApiHost}`;
+    const judge0Url = process.env.JUDGE0_URL || 'http://localhost:2358';
     const languageId = LANGUAGE_IDS[data.language as LanguageKey] || 71;
 
     let testcasesToRun: Array<{ input: string; output: string; is_example: boolean }> = [];
@@ -202,8 +200,6 @@ export class SubmissionService {
         timeLimit,
         {
           judge0Url,
-          rapidApiKey,
-          rapidApiHost,
         }
       );
       let finalStatus = result.status;
