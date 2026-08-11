@@ -16,7 +16,8 @@ export const SubmissionStatus = {
   TLE: 'TLE',
   MLE: 'MLE',
   RE: 'RE',
-  CE: 'CE'
+  CE: 'CE',
+  SYSTEM_ERROR: 'SYSTEM_ERROR'
 } as const;
 export type SubmissionStatus = typeof SubmissionStatus[keyof typeof SubmissionStatus];
 
@@ -183,7 +184,7 @@ export interface ISubmission {
   userId: string;
   code: string;
   language: LanguageSlug | 'python' | 'cpp' | 'java';
-  status: SubmissionStatus | 'PENDING' | 'PROCESSING' | 'ACCEPTED' | 'WA' | 'TLE' | 'MLE' | 'RE' | 'CE' | 'ERROR';
+  status: SubmissionStatus | 'PENDING' | 'PROCESSING' | 'ACCEPTED' | 'WA' | 'TLE' | 'MLE' | 'RE' | 'CE' | 'SYSTEM_ERROR' | 'ERROR';
   errorMessage?: string;
   testCasesPassed?: number;
   testCasesTotal?: number;

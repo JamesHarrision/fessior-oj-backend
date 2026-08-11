@@ -85,10 +85,10 @@ export const ConsolePane: React.FC<ConsolePaneProps> = ({
         setRunResults(res.data);
         setRunActiveCaseIdx(0);
       } else {
-        setRunResults([{ status: 'CE', error: 'Không thể kết nối đến hệ thống biên dịch.', actualOutput: '', input: testMode === 'custom' ? customInput : '' }]);
+        setRunResults([{ status: 'SYSTEM_ERROR', error: 'Không thể kết nối đến hệ thống biên dịch.', actualOutput: '', input: testMode === 'custom' ? customInput : '' }]);
       }
     } catch (err: any) {
-      setRunResults([{ status: 'CE', error: err.message || 'Lỗi không xác định khi thực thi mã nguồn.', actualOutput: '', input: testMode === 'custom' ? customInput : '' }]);
+      setRunResults([{ status: 'SYSTEM_ERROR', error: err.message || 'Lỗi không xác định khi thực thi mã nguồn.', actualOutput: '', input: testMode === 'custom' ? customInput : '' }]);
     } finally {
       setIsRunning(false);
     }

@@ -28,8 +28,21 @@ export const startSubmissionWorker = () => {
     console.log(`Job ${job.id} completed successfully`);
   });
 
-  worker.on('failed', (job, err) => {
+  worker.on('failed', async (job, err) => {
     console.error(`Job ${job?.id} failed:`, err);
+
+    if (!job) return;
+
+    const maxAttempts = job.opts.attempts ?? 1;
+    if (job.attemptsMade < maxAttempts) {
+      return;
+    }
+
+    try {
+      await processor.handleFinalFailure(job.data, err);
+    } catch (failureErr) {
+      console.error(`Failed to mark submission job ${job.id} as SYSTEM_ERROR:`, failureErr);
+    }
   });
 
   worker.on('error', (err) => {

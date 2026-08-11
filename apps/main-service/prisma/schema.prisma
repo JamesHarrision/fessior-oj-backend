@@ -234,6 +234,7 @@ enum SubmissionStatus {
   MLE
   RE
   CE
+  SYSTEM_ERROR
 }
 
 model Problem {

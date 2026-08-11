@@ -56,7 +56,17 @@ export const ExecutionResultPanel: React.FC<ExecutionResultPanelProps> = ({
       {/* ── Run Results ── */}
       {!isRunning && !isSubmitting && runResults && (
         <div className="flex flex-col gap-3">
-          {runResults.some((r) => r.status === 'CE') ? (
+          {runResults.some((r) => r.status === 'SYSTEM_ERROR') ? (
+            <div className="border border-charcoal bg-washi p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertCircle size={16} className="text-stone" />
+                <span className="font-display text-xs font-bold text-linen">Lỗi Hệ Thống Chấm Bài</span>
+              </div>
+              <pre className="font-mono text-xs text-linen/80 whitespace-pre-wrap">
+                {runResults[0].error || runResults[0].actualOutput || 'Sandbox chưa sẵn sàng.'}
+              </pre>
+            </div>
+          ) : runResults.some((r) => r.status === 'CE') ? (
             <div className="border border-vermilion bg-washi p-3">
               <div className="flex items-center gap-2 mb-2">
                 <AlertCircle size={16} className="text-vermilion" />

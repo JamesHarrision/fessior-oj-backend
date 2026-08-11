@@ -20,6 +20,7 @@ const LABELS: Record<string, string> = {
   MLE: 'Memory Limit',
   RE: 'Runtime Error',
   CE: 'Compile Error',
+  SYSTEM_ERROR: 'System Error',
   PENDING: 'Pending',
   PROCESSING: 'Processing',
   ERROR: 'Error',

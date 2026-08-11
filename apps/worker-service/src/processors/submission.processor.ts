@@ -62,13 +62,13 @@ export class SubmissionProcessor {
 
     const problem = await this.dependencies.problemRepository.findById(problemId);
     if (!problem) {
-      await this.dependencies.submissionRepository.markFailed(submissionId, 'Problem context not found');
+      await this.dependencies.submissionRepository.markSystemError(submissionId, 'Problem context not found');
       return;
     }
 
     const testCases = await this.dependencies.testcaseRepository.findByProblemId(problemId);
     if (testCases.length === 0) {
-      await this.dependencies.submissionRepository.markFailed(submissionId, 'No testcases found for this problem');
+      await this.dependencies.submissionRepository.markSystemError(submissionId, 'No testcases found for this problem');
       return;
     }
 
@@ -99,6 +99,30 @@ export class SubmissionProcessor {
       status: judgeResult.status,
       testCasesPassed: judgeResult.passedCount,
       testCasesTotal: judgeResult.totalCount,
+      matchId: submission.match_id ?? undefined,
+    });
+  }
+
+  async handleFinalFailure(rawData: unknown, error: Error) {
+    if (!isSubmissionJobData(rawData)) {
+      return;
+    }
+
+    const submission = await this.dependencies.submissionRepository.findById(rawData.submissionId);
+    if (!submission) {
+      return;
+    }
+
+    const message = error.message || 'Submission worker failed after all retry attempts';
+    await this.dependencies.submissionRepository.markSystemError(rawData.submissionId, message);
+
+    await this.dependencies.publisher.publishFinalResult({
+      submissionId: rawData.submissionId,
+      userId: submission.user_id,
+      problemId: rawData.problemId,
+      status: 'SYSTEM_ERROR',
+      testCasesPassed: submission.test_cases_passed,
+      testCasesTotal: submission.test_cases_total,
       matchId: submission.match_id ?? undefined,
     });
   }

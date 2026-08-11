@@ -38,11 +38,11 @@ export class SubmissionRepository {
     });
   }
 
-  markFailed(id: string, errorMessage: string) {
+  markSystemError(id: string, errorMessage: string) {
     return prisma.submission.update({
       where: { id },
       data: {
-        status: 'CE',
+        status: 'SYSTEM_ERROR',
         error_message: errorMessage,
       },
     });

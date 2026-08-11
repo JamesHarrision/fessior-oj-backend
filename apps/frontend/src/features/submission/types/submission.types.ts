@@ -4,7 +4,8 @@ export type SubmissionStatus =
   | "time_limit_exceeded"
   | "compile_error"
   | "runtime_error"
-  | "memory_limit_exceeded";
+  | "memory_limit_exceeded"
+  | "system_error";
 
 export interface SubmissionRequest {
   page?: number;

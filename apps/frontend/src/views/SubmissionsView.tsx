@@ -39,6 +39,7 @@ function getStatusDisplay(status: string) {
   if (s === 'MLE' || s === 'MEMORY_LIMIT_EXCEEDED') return { label: 'Memory Limit Exceeded', color: '#f59e0b' };
   if (s === 'CE' || s === 'COMPILE_ERROR') return { label: 'Compile Error', color: '#f59e0b' };
   if (s === 'RE' || s === 'RUNTIME_ERROR') return { label: 'Runtime Error', color: '#f59e0b' };
+  if (s === 'SYSTEM_ERROR' || s === 'ERROR') return { label: 'System Error', color: '#6b7280' };
   if (s === 'PROCESSING') return { label: 'Processing...', color: '#60a5fa' };
   if (s === 'PENDING') return { label: 'Pending...', color: '#9ca3af' };
   return { label: status || 'Unknown', color: '#6b7280' };

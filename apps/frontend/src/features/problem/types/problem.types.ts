@@ -1,5 +1,5 @@
 export type Difficulty = "EASY" | "MEDIUM" | "HARD";
-export type SubmissionStatus = "AC" | "WA" | "TLE" | "MLE" | "RE" | "CE" | "PENDING" | null;
+export type SubmissionStatus = "AC" | "WA" | "TLE" | "MLE" | "RE" | "CE" | "SYSTEM_ERROR" | "PENDING" | null;
 
 export interface ProblemTag {
   id: number;

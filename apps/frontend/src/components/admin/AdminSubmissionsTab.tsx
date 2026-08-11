@@ -84,6 +84,7 @@ export const AdminSubmissionsTab: React.FC = () => {
       case 'ACCEPTED': return 'green';
       case 'WRONG_ANSWER': return 'red';
       case 'COMPILE_ERROR': return 'yellow';
+      case 'SYSTEM_ERROR': return 'gray';
       case 'PENDING': return 'blue';
       default: return 'gray';
     }
