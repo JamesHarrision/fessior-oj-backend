@@ -1,11 +1,11 @@
 import { Worker, Job } from 'bullmq';
-import { DEFAULT_LIMITS } from '@ocj/constants';
-import { executeTestCase, getLanguageId, LanguageKey } from '@ocj/executor';
+import { LanguageKey } from '@ocj/executor';
 import { redisOptions } from '../config/redis';
 import { submissionPublisher } from '../publishers/submission.publisher';
 import { problemRepository } from '../repositories/problem.repository';
 import { submissionRepository } from '../repositories/submission.repository';
 import { testcaseRepository } from '../repositories/testcase.repository';
+import { submissionJudgeService } from '../services/submission-judge.service';
 
 const getJudge0Url = () => process.env.JUDGE0_URL || 'http://localhost:2358';
 
@@ -37,56 +37,33 @@ export const startSubmissionWorker = () => {
           return;
         }
 
-        let passedCount = 0;
-        let totalTime = 0;
-        let maxMemory = 0;
-        let finalStatus: 'ACCEPTED' | 'WA' | 'TLE' | 'MLE' | 'RE' | 'CE' = 'ACCEPTED';
-        let errorMsg = '';
-
-        const languageId = getLanguageId(language as LanguageKey);
-
-        for (let i = 0; i < testCases.length; i++) {
-          const tc = testCases[i];
-          const result = await executeTestCase(
-            code,
-            languageId,
-            tc.input,
-            tc.output,
-            problem.time_limit || DEFAULT_LIMITS.TIME_LIMIT_MS,
-            {
-              judge0Url: getJudge0Url(),
-            }
-          );
-
-          if (result.status === 'ACCEPTED') {
-            passedCount++;
-          } else {
-            finalStatus = result.status as typeof finalStatus;
-            errorMsg = result.error || `Failed on testcase ${i + 1}`;
-            break;
-          }
-
-          totalTime += result.time;
-          maxMemory = Math.max(maxMemory, result.memory);
-        }
+        const judgeResult = await submissionJudgeService.judge({
+          code,
+          language: language as LanguageKey,
+          problem,
+          testCases,
+          judge0Url: getJudge0Url(),
+        });
 
         await submissionRepository.finalize(submissionId, {
-          status: finalStatus,
-          testCasesPassed: passedCount,
-          testCasesTotal: testCases.length,
-          executionTime: totalTime,
-          memoryUsed: maxMemory,
-          errorMessage: errorMsg || null,
+          status: judgeResult.status,
+          testCasesPassed: judgeResult.passedCount,
+          testCasesTotal: judgeResult.totalCount,
+          executionTime: judgeResult.executionTime,
+          memoryUsed: judgeResult.memoryUsed,
+          errorMessage: judgeResult.errorMessage,
         });
-        console.log(`Submission ${submissionId} evaluated: ${finalStatus} (${passedCount}/${testCases.length})`);
+        console.log(
+          `Submission ${submissionId} evaluated: ${judgeResult.status} (${judgeResult.passedCount}/${judgeResult.totalCount})`
+        );
 
         await submissionPublisher.publishFinalResult({
           submissionId,
           userId: submission.user_id,
           problemId,
-          status: finalStatus,
-          testCasesPassed: passedCount,
-          testCasesTotal: testCases.length,
+          status: judgeResult.status,
+          testCasesPassed: judgeResult.passedCount,
+          testCasesTotal: judgeResult.totalCount,
           matchId: submission.match_id ?? undefined,
         });
       } catch (err: any) {
