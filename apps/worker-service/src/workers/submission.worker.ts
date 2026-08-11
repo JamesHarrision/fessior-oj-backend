@@ -1,7 +1,8 @@
 import { Worker, Job } from 'bullmq';
-import { DEFAULT_LIMITS, REDIS_CHANNELS } from '@ocj/constants';
+import { DEFAULT_LIMITS } from '@ocj/constants';
 import { executeTestCase, getLanguageId, LanguageKey } from '@ocj/executor';
-import { redisOptions, redis } from '../config/redis';
+import { redisOptions } from '../config/redis';
+import { submissionPublisher } from '../publishers/submission.publisher';
 import { problemRepository } from '../repositories/problem.repository';
 import { submissionRepository } from '../repositories/submission.repository';
 import { testcaseRepository } from '../repositories/testcase.repository';
@@ -79,18 +80,15 @@ export const startSubmissionWorker = () => {
         });
         console.log(`Submission ${submissionId} evaluated: ${finalStatus} (${passedCount}/${testCases.length})`);
 
-        await redis.publish(
-          REDIS_CHANNELS.SUBMISSION_UPDATES,
-          JSON.stringify({
-            submissionId,
-            userId: submission.user_id,
-            problemId,
-            status: finalStatus,
-            testCasesPassed: passedCount,
-            testCasesTotal: testCases.length,
-            matchId: submission.match_id ?? undefined,
-          })
-        );
+        await submissionPublisher.publishFinalResult({
+          submissionId,
+          userId: submission.user_id,
+          problemId,
+          status: finalStatus,
+          testCasesPassed: passedCount,
+          testCasesTotal: testCases.length,
+          matchId: submission.match_id ?? undefined,
+        });
       } catch (err: any) {
         console.error(`Error processing job ${job.id}:`, err);
         throw err;
