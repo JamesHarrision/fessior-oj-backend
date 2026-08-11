@@ -1,8 +1,10 @@
 import { Worker, Job } from 'bullmq';
 import { DEFAULT_LIMITS, REDIS_CHANNELS } from '@ocj/constants';
 import { executeTestCase, getLanguageId, LanguageKey } from '@ocj/executor';
-import { prisma } from '../config/prisma';
 import { redisOptions, redis } from '../config/redis';
+import { problemRepository } from '../repositories/problem.repository';
+import { submissionRepository } from '../repositories/submission.repository';
+import { testcaseRepository } from '../repositories/testcase.repository';
 
 const getJudge0Url = () => process.env.JUDGE0_URL || 'http://localhost:2358';
 
@@ -14,45 +16,23 @@ export const startSubmissionWorker = () => {
       console.log(`Processing Job ${job.id} for Submission ${submissionId}`);
 
       try {
-        const submission = await prisma.submission.findUnique({
-          where: { id: submissionId },
-        });
+        const submission = await submissionRepository.findById(submissionId);
         if (!submission) {
           console.error(`Submission ${submissionId} not found in database`);
           return;
         }
 
-        await prisma.submission.update({
-          where: { id: submissionId },
-          data: { status: 'PROCESSING' },
-        });
+        await submissionRepository.markProcessing(submissionId);
 
-        const problem = await prisma.problem.findUnique({
-          where: { id: problemId },
-        });
+        const problem = await problemRepository.findById(problemId);
         if (!problem) {
-          await prisma.submission.update({
-            where: { id: submissionId },
-            data: {
-              status: 'CE',
-              error_message: 'Problem context not found',
-            },
-          });
+          await submissionRepository.markFailed(submissionId, 'Problem context not found');
           return;
         }
 
-        const testCases = await prisma.testcase.findMany({
-          where: { problem_id: problemId },
-          orderBy: { id: 'asc' },
-        });
+        const testCases = await testcaseRepository.findByProblemId(problemId);
         if (testCases.length === 0) {
-          await prisma.submission.update({
-            where: { id: submissionId },
-            data: {
-              status: 'CE',
-              error_message: 'No testcases found for this problem',
-            },
-          });
+          await submissionRepository.markFailed(submissionId, 'No testcases found for this problem');
           return;
         }
 
@@ -89,16 +69,13 @@ export const startSubmissionWorker = () => {
           maxMemory = Math.max(maxMemory, result.memory);
         }
 
-        await prisma.submission.update({
-          where: { id: submissionId },
-          data: {
-            status: finalStatus,
-            test_cases_passed: passedCount,
-            test_cases_total: testCases.length,
-            execution_time: totalTime,
-            memory_used: maxMemory,
-            error_message: errorMsg || null,
-          },
+        await submissionRepository.finalize(submissionId, {
+          status: finalStatus,
+          testCasesPassed: passedCount,
+          testCasesTotal: testCases.length,
+          executionTime: totalTime,
+          memoryUsed: maxMemory,
+          errorMessage: errorMsg || null,
         });
         console.log(`Submission ${submissionId} evaluated: ${finalStatus} (${passedCount}/${testCases.length})`);
 
